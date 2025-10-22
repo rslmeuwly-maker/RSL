@@ -1,0 +1,2 @@
+# RSL
+Romandie scooter league
