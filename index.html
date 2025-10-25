@@ -7,6 +7,8 @@
 
   <!-- === STYLES === -->
   <style>
+    html,body{height:100%}
+
     /* HERO */
     .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
     .hero.hero-photo::before{
@@ -28,13 +30,25 @@
     @media(max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
     @media(max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
 
-    /* GATE / ACCÈS */
-    .rsl-gate{position:fixed;inset:0;z-index:9999;display:none;color:#fff;
-      background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.85)),url("images/lanoubc_noir.jpg") center/cover no-repeat}
-    .rsl-gate .gate-inner{max-width:960px;margin:5vh auto;padding:24px}
-    .rsl-gate .banner{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px 18px;margin-bottom:16px;text-align:center}
+    /* ====== GATE / ACCÈS ====== */
+    .rsl-gate{
+      position:fixed;inset:0;z-index:9999;display:none;color:#fff;
+      background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.85)),url("images/lanoubc_noir.jpg") center/cover no-repeat;
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+    .rsl-gate .gate-inner{
+      max-width:960px; margin:0 auto;
+      min-height:100vh;
+    }
+    @supports (height: 100dvh){ .rsl-gate .gate-inner{ min-height:100dvh; } }
+    .rsl-gate .banner{
+      background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.15);
+      border-radius:14px;padding:14px 18px;margin-bottom:16px;text-align:center
+    }
     .rsl-gate .grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
-    @media(max-width:720px){.rsl-gate .grid{grid-template-columns:1fr}}
+    @media(max-width:820px){.rsl-gate .grid{grid-template-columns:1fr}}
+
     .rsl-card{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px}
     .rsl-card h3{margin:0 0 8px}
     .rsl-card label{display:block;font-size:14px;margin:8px 0 6px}
@@ -91,9 +105,7 @@
         <li><a href="contact.html">Contact</a></li>
         <li><a href="cours.html">Cours</a></li>
       </ul>
-      <div class="cta">
-        <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
-      </div>
+      <div class="cta"><a class="btn" id="btnMembre" href="membres.html">Devenir membre</a></div>
     </div>
   </nav>
 
@@ -158,7 +170,7 @@
     </div>
   </section>
 
-  <!-- POP-UP (ouvre uniquement après accès) -->
+  <!-- POP-UP (après accès) -->
   <dialog id="dlg">
     <div class="modal-card" style="text-align:center">
       <h3>Rejoindre la RSL</h3>
@@ -240,7 +252,7 @@
     })();
   </script>
 
-  <!-- Gate + anti-spam + envoi + reset accès -->
+  <!-- Gate + signature + anti-spam + reset accès + chat différé -->
   <script>
     (function(){
       const ACCESS_KEY='rsl_access', ACCESS_OK='ok', PASSCODE='RSL2026';
@@ -259,9 +271,37 @@
       const chkHuman=document.getElementById('chkHuman');
       const chkConsent=document.getElementById('chkConsent');
 
-      /* --- Gate --- */
-      function showGate(){gate.style.display='block';}
-      function hideGate(){gate.style.display='none';}
+      const hbRoot=document.getElementById('hb-root'); // conteneur tchat (masqué au départ)
+      let helpbotLoaded=false;
+
+      /* Charger le chat SEULEMENT après l’accès */
+      function loadHelpbot(){
+        if(helpbotLoaded) return;
+        const s=document.createElement('script');
+        s.src='js/helpbot.js';
+        s.defer=true;
+        s.onload=()=>{ if(hbRoot) hbRoot.style.display=''; };
+        document.body.appendChild(s);
+        helpbotLoaded=true;
+      }
+
+      /* Scroll lock pendant gate */
+      function lockScroll(){ document.body.style.overflow='hidden'; document.documentElement.style.overflow='hidden'; }
+      function unlockScroll(){ document.body.style.overflow=''; document.documentElement.style.overflow=''; }
+
+      /* Gate show/hide */
+      function showGate(){
+        gate.style.display='block';
+        hbRoot && (hbRoot.style.display='none'); // chat invisible
+        lockScroll();
+        resizeSignature(); // s'assure que le canvas a une taille valide
+      }
+      function hideGate(){
+        gate.style.display='none';
+        unlockScroll();
+        window.scrollTo({top:0,behavior:'instant'});
+        loadHelpbot(); // charge le tchat maintenant
+      }
       function openWelcomeDelayed(ms){ if(typeof window.rslOpenWelcome==='function') setTimeout(()=>window.rslOpenWelcome(),ms); }
 
       function initGate(){
@@ -281,129 +321,117 @@
         });
       }
 
-      /* --- Signature (Pointer Events, mobile friendly) --- */
-      (function(){
+      /* Signature (Pointer Events + mobile) */
+      let ctx=null, drawing=false;
+      function ensureSigCss(){ if(sigCanvas && !sigCanvas.style.height) sigCanvas.style.height='160px'; }
+      function resizeSignature(){
         if(!sigCanvas) return;
-
-        // Empêche le scroll durant le dessin
+        requestAnimationFrame(()=>{
+          const ratio=Math.max(1,window.devicePixelRatio||1);
+          const w=sigCanvas.clientWidth||300;
+          const h=sigCanvas.clientHeight||160;
+          if(!ctx) ctx=sigCanvas.getContext('2d',{willReadFrequently:true});
+          sigCanvas.width=Math.floor(w*ratio);
+          sigCanvas.height=Math.floor(h*ratio);
+          ctx.setTransform(ratio,0,0,ratio,0,0);
+          ctx.fillStyle='#0b0b0b'; ctx.fillRect(0,0,w,h);
+          ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#fff';
+        });
+      }
+      function getPos(e){
+        const r=sigCanvas.getBoundingClientRect();
+        const t=e.touches?e.touches[0]:e;
+        return {x:(t.clientX??t.pageX)-r.left,y:(t.clientY??t.pageY)-r.top};
+      }
+      function sigStart(e){
+        drawing=true;
+        if(e.pointerId!=null) try{ sigCanvas.setPointerCapture(e.pointerId); }catch(_){}
+        const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+        e.preventDefault?.();
+      }
+      function sigMove(e){
+        if(!drawing) return;
+        const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
+        e.preventDefault?.();
+      }
+      function sigEnd(e){
+        drawing=false;
+        if(e && e.pointerId!=null) try{ sigCanvas.releasePointerCapture(e.pointerId); }catch(_){}
+      }
+      function initSignature(){
+        if(!sigCanvas) return;
+        ensureSigCss(); resizeSignature(); setTimeout(resizeSignature,0);
+        window.addEventListener('resize', resizeSignature);
         ['touchstart','touchmove','touchend','touchcancel'].forEach(evt=>{
           sigCanvas.addEventListener(evt, e=>e.preventDefault(), {passive:false});
         });
-
-        const ctx = sigCanvas.getContext('2d', { willReadFrequently: true });
-        let drawing = false;
-
-        function resizeCanvas(){
-          const ratio = Math.max(1, window.devicePixelRatio || 1);
-          const w = sigCanvas.clientWidth;
-          const h = sigCanvas.clientHeight || 160;
-          sigCanvas.width  = Math.floor(w * ratio);
-          sigCanvas.height = Math.floor(h * ratio);
-          ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-          ctx.fillStyle = '#0b0b0b';
-          ctx.fillRect(0,0,w,h);
-          ctx.lineWidth = 2;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-          ctx.strokeStyle = '#ffffff';
-        }
-        const ensureCssHeight = ()=>{ if(!sigCanvas.style.height) sigCanvas.style.height = '160px'; };
-        ensureCssHeight(); resizeCanvas(); setTimeout(resizeCanvas,0);
-        window.addEventListener('resize', resizeCanvas);
-
-        function getPos(e){
-          const r = sigCanvas.getBoundingClientRect();
-          const t = e.touches ? e.touches[0] : e;
-          return { x: (t.clientX ?? t.pageX) - r.left, y: (t.clientY ?? t.pageY) - r.top };
-        }
-        function start(e){
-          drawing = true;
-          if(e.pointerId!=null) try{ sigCanvas.setPointerCapture(e.pointerId); }catch(_){}
-          const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
-        }
-        function move(e){
-          if(!drawing) return;
-          const p = getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
-        }
-        function end(e){
-          drawing = false;
-          if(e && e.pointerId!=null) try{ sigCanvas.releasePointerCapture(e.pointerId); }catch(_){}
-        }
-
         if('onpointerdown' in window){
-          sigCanvas.addEventListener('pointerdown', start, {passive:false});
-          sigCanvas.addEventListener('pointermove',  move,  {passive:false});
-          window.addEventListener('pointerup',       end,   {passive:false});
-          window.addEventListener('pointercancel',   end,   {passive:false});
+          sigCanvas.addEventListener('pointerdown', sigStart, {passive:false});
+          sigCanvas.addEventListener('pointermove',  sigMove,  {passive:false});
+          window.addEventListener('pointerup',       sigEnd,   {passive:false});
+          window.addEventListener('pointercancel',   sigEnd,   {passive:false});
         }else{
-          sigCanvas.addEventListener('mousedown', start);
-          sigCanvas.addEventListener('mousemove', move);
-          window.addEventListener('mouseup', end);
-          sigCanvas.addEventListener('touchstart', start, {passive:false});
-          sigCanvas.addEventListener('touchmove',  move,  {passive:false});
-          sigCanvas.addEventListener('touchend',   end,   {passive:false});
+          sigCanvas.addEventListener('mousedown', sigStart);
+          sigCanvas.addEventListener('mousemove', sigMove);
+          window.addEventListener('mouseup', sigEnd);
+          sigCanvas.addEventListener('touchstart', sigStart, {passive:false});
+          sigCanvas.addEventListener('touchmove',  sigMove,  {passive:false});
+          sigCanvas.addEventListener('touchend',   sigEnd,   {passive:false});
         }
-
         sigClear?.addEventListener('click', ()=>{
-          const w = sigCanvas.clientWidth, h = sigCanvas.clientHeight || 160;
-          ctx.fillStyle = '#0b0b0b'; ctx.fillRect(0,0,w,h);
-          ctx.beginPath(); ctx.strokeStyle = '#ffffff';
+          const w=sigCanvas.clientWidth||300, h=sigCanvas.clientHeight||160;
+          ctx.fillStyle='#0b0b0b'; ctx.fillRect(0,0,w,h);
+          ctx.beginPath(); ctx.strokeStyle='#ffffff';
         });
+      }
 
-        // Injecte l’image PNG dans le champ caché juste avant envoi
-        preForm?.addEventListener('submit', ()=>{
-          try { sigHidden.value = sigCanvas.toDataURL('image/png'); } catch(_){}
-        });
-      })();
+      /* Pré-inscription : Anti-spam + Envoi Formspree */
+      let formShownAt = Date.now();
+      function initPreForm(){
+        preForm?.addEventListener('submit', async e=>{
+          e.preventDefault();
+          preErr.style.display='none';
 
-      /* --- Pré-inscription : Anti-spam + Envoi Formspree --- */
-      let formShownAt = Date.now(); // anti-bot: délai
-      preForm?.addEventListener('submit', async e=>{
-        e.preventDefault();
-        preErr.style.display='none';
-
-        // Soumission trop rapide ?
-        const elapsed = Date.now() - formShownAt;
-        if(elapsed < 3000){
-          preErr.textContent = "Soumission trop rapide — merci de réessayer.";
-          preErr.style.display = 'block';
-          return;
-        }
-        // Honeypot rempli ?
-        const hp = preForm.querySelector('input[name="website"]');
-        if(hp && hp.value.trim()!==""){
-          preErr.textContent = "Détection anti-spam — merci de réessayer.";
-          preErr.style.display = 'block';
-          return;
-        }
-        // Cases obligatoires
-        if(!chkHuman.checked || !chkConsent.checked){
-          preErr.textContent = "Merci de cocher « je ne suis pas un robot » et « j’accepte d’être contacté ».";
-          preErr.style.display = 'block';
-          return;
-        }
-
-        const formData = new FormData(preForm);
-        try{
-          const resp = await fetch(preForm.action, { method:'POST', headers:{'Accept':'application/json'}, body: formData });
-          if(resp.ok){
-            preMsg.textContent = 'Merci ! Pré-inscription envoyée ✅';
-            preMsg.style.display = 'block';
-            preForm.reset();
-            chkHuman.checked = false; chkConsent.checked = false;
-            formShownAt = Date.now();
-          }else{
-            preErr.textContent = "Oups, envoi impossible pour le moment. Réessaie plus tard.";
-            preErr.style.display = 'block';
+          // délai anti-bot
+          if(Date.now() - formShownAt < 3000){
+            preErr.textContent="Soumission trop rapide — merci de réessayer.";
+            preErr.style.display='block'; return;
           }
-        }catch{
-          preErr.textContent = "Erreur réseau — réessaie.";
-          preErr.style.display = 'block';
-        }
-      });
+          // honeypot
+          const hp=preForm.querySelector('input[name="website"]');
+          if(hp && hp.value.trim()!==""){
+            preErr.textContent="Détection anti-spam — merci de réessayer.";
+            preErr.style.display='block'; return;
+          }
+          // cases
+          if(!chkHuman.checked || !chkConsent.checked){
+            preErr.textContent="Merci de cocher « je ne suis pas un robot » et « j’accepte d’être contacté ».";
+            preErr.style.display='block'; return;
+          }
+          // signature → PNG
+          try{ if(sigCanvas && sigHidden){ sigHidden.value = sigCanvas.toDataURL('image/png'); } }catch(_){}
 
-      /* Init + reset accès à la fermeture */
-      function init(){ initGate(); }
+          const formData=new FormData(preForm);
+          try{
+            const resp=await fetch(preForm.action,{method:'POST',headers:{'Accept':'application/json'},body:formData});
+            if(resp.ok){
+              preMsg.textContent='Merci ! Pré-inscription envoyée ✅';
+              preMsg.style.display='block';
+              preForm.reset(); chkHuman.checked=false; chkConsent.checked=false;
+              formShownAt=Date.now();
+            }else{
+              preErr.textContent="Oups, envoi impossible pour le moment. Réessaie plus tard.";
+              preErr.style.display='block';
+            }
+          }catch{
+            preErr.textContent="Erreur réseau — réessaie.";
+            preErr.style.display='block';
+          }
+        });
+      }
+
+      /* Init + reset accès */
+      function init(){ initGate(); initSignature(); initPreForm(); }
       if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
       window.addEventListener('pagehide',()=>{ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} });
       window.addEventListener('beforeunload',()=>{ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} });
@@ -411,8 +439,8 @@
     })();
   </script>
 
-  <!-- HelpBot (RSL) -->
-  <div id="hb-root">
+  <!-- HelpBot (RSL) — masqué et SANS script chargé avant accès -->
+  <div id="hb-root" style="display:none">
     <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
     <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
       <div class="hb-head">
@@ -429,7 +457,7 @@
       </div>
     </div>
   </div>
-  <script defer src="js/helpbot.js"></script>
+  <!-- IMPORTANT : ne pas inclure <script src="js/helpbot.js"> ici ; il est injecté après l’accès -->
 
 </body>
 </html>
