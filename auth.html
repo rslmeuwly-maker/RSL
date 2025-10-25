@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Test Supabase — RSL</title>
+</head>
+<body>
+  <h1>Test de connexion à Supabase</h1>
+  <p id="result">Connexion en cours...</p>
+
+  <!-- Lib Supabase -->
+  <script src="https://esm.sh/@supabase/supabase-js@2.45.4"></script>
+  <script>
+    const SUPABASE_URL = "https://jynxifufaouxwjzapzq.supabase.co";  // ton URL
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";  // ta clé anon
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function testConnection() {
+      const { data, error } = await sb.from('profiles').select('*').limit(1);
+      const result = document.getElementById('result');
+      if (error) {
+        result.textContent = "❌ Erreur : " + error.message;
+      } else {
+        result.textContent = "✅ Connexion OK à Supabase !";
+      }
+    }
+
+    testConnection();
+  </script>
+</body>
+</html>
