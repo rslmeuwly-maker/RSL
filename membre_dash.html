@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RSL — Romandie Scooter League (Trottinette Freestyle)</title>
+
+  <!-- Fonts + Style -->
+<style>
+    /* === Image de fond hero === */
+    .hero.hero-photo {
+      position: relative;
+      color: #fff;
+      overflow: hidden;
+    }
+    .hero.hero-photo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
+        url("images/lanoubc_noir.jpg") center/cover no-repeat;
+      z-index: 0;
+    }
+    .hero.hero-photo .hero-inner { position: relative; z-index: 1; }
+
+    /* === FOOTER (3 colonnes + bas à droite) === */
+    .foot .links-3cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 36px 6vw;
+      align-items: start;
+    }
+    .foot .links-3cols h4 { margin: 0 0 8px; color:#fff; font-weight:700; }
+    .foot .links-3cols ul { list-style: none; margin: 0; padding: 0; }
+    .foot .links-3cols li { margin: 6px 0; }
+    .foot .links-3cols a { color:#cdd6ff; text-decoration: none; }
+    .foot .links-3cols a:hover { text-decoration: underline; }
+
+    .foot .bottom.bottom-right {
+      border-top:1px solid rgba(255,255,255,0.08);
+      margin-top:14px; padding:10px 0;
+      display:flex; justify-content:flex-end; align-items:center; gap:14px;
+    }
+    .foot .bottom.bottom-right p { margin:0; }
+    .foot .bottom.bottom-right a { color:#cdd6ff; text-decoration:none; }
+    .foot .bottom.bottom-right a:hover{ text-decoration:underline; }
+
+    @media (max-width: 900px){
+      .foot .links-3cols { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px){
+      .foot .links-3cols { grid-template-columns: 1fr; }
+      .foot .bottom.bottom-right { justify-content: space-between; }
+    }
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <!-- HERO -->
+  <header class="hero hero-photo">
+    <div class="container hero-inner">
+      <div class="grid">
+        <div>
+          <h1>Romandie Scooter League</h1>
+          <p>Association romande dédiée à la <b>trottinette freestyle</b> — Park & Street. Organisation de contests et cours encadrés par des profs formés RSL.</p>
+          <div class="panel"><div class="chip">Montreux — berceau historique • Saison officielle 2026</div></div>
+        </div>
+        <div class="panel">
+          <strong>Prochain rendez-vous</strong>
+          <p class="muted">Montreux Scooter Contest — 6 décembre 2025</p>
+          <a class="btn red" href="evenements.html">Inscriptions</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- DISCIPLINES -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <h2>Disciplines</h2>
+        <span class="muted">Trottinette Freestyle — Park • Street</span>
+      </div>
+      <div class="cards">
+        <article class="card"><h3>Trottinette Freestyle (Park)</h3><p class="muted">Figures aériennes, quarters, spines, bowls. Base des contests RSL.</p></article>
+        <article class="card"><h3>Trottinette Freestyle (Street)</h3><p class="muted">Rails, ledges, gaps : lignes techniques & créativité.</p></article>
+        <article class="card"><h3>Prof Formé RSL</h3><p class="muted">Encadrants certifiés RSL : sécurité, pédagogie et progression. <a href="formation.html">En savoir plus</a>.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTUALITÉS -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <h2>Actualités & événements</h2>
+        <a class="muted" href="evenements.html">Voir tout</a>
+      </div>
+      <div class="grid-3">
+        <article class="card"><div class="chip">04.10.2025</div><h3>Ouverture cours trottinette RSL</h3><p class="muted">Cours hebdos avec profs formés RSL. Inscriptions en ligne.</p></article>
+        <article class="card"><div class="chip">06.12.2025</div><h3>Montreux Scooter Contest — 20e édition</h3><p class="muted">Jam + contest, juges, speaker et bénévoles.</p></article>
+        <article class="card"><div class="chip">Jan 2026</div><h3>Formation Moniteurs RSL</h3><p class="muted">Session unique, 1 jour avec éducatrice & Samaritains.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMITÉ -->
+  <section id="comite">
+    <div class="container">
+      <div class="section-head"><h2>Comité RSL</h2></div>
+      <div class="committee">
+        <div class="member"><img src="images/comite_joel.png" alt="Joël Meuwly"><h3>Joël Meuwly</h3><p class="muted">Président · Coordination · Résultats · Sponsors</p></div>
+        <div class="member"><img src="images/comite_william.png" alt="William Maurer"><h3>William Maurer</h3><p class="muted">Comptable · Trésorier</p></div>
+        <div class="member"><img src="images/comite_florian.png" alt="Florian Barbezat"><h3>Florian Barbezat</h3><p class="muted">Responsable médias · Prof RSL</p></div>
+        <div class="member"><img src="images/comite_louis.png" alt="Louis Zanolli"><h3>Louis Zanolli</h3><p class="muted">Co-responsable médias · Prof RSL</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- HelpBot (RSL) -->
+<link rel="stylesheet" href="css/helpbot.css">
+<div id="hb-root">
+  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+    <div class="hb-head">
+      <div class="title" id="hbTitle">Aide — RSL</div>
+      <div class="actions">
+        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
+        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="hb-body" id="hbBody"></div>
+    <div class="hb-foot">
+      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
+      <button id="hbSend" class="hb-send">Envoyer</button>
+    </div>
+  </div>
+</div>
+<script defer src="js/helpbot.js"></script>
+
+</body></html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Paiement Starter — Romandie Scooter League</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/common.css"/>
+  <link rel="stylesheet" href="css/fonts.css"/>
+
+  <style>
+    .container{max-width:1100px;margin:0 auto;padding:0 18px}
+    .title{margin:20px 0 8px;font-weight:800;font-size:26px;text-align:center}
+    .muted{text-align:center;color:#6b7785;margin-bottom:32px}
+
+    /* Wrapper centré */
+    .payment-wrapper{
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap:40px;
+      flex-wrap:wrap;
+      max-width:900px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:#fff;
+      border:1px solid #d0d7e2;
+      border-radius:16px;
+      padding:24px;
+      width:380px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      text-align:center;
+      transition:transform 0.2s ease;
+    }
+    .card:hover{transform:translateY(-4px);}
+    .card h2{margin:0 0 6px;font-size:22px}
+    .bigprice{font-size:30px;font-weight:800;margin:8px 0}
+    .muted-list{color:#6b7785;font-size:15px;list-style:none;padding:0;margin:12px 0}
+    .muted-list li{margin:6px 0}
+    .actions{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #cfd6e4;background:#eef2f7;text-decoration:none;color:#111;font-weight:600;text-align:center}
+    .btn.dark{background:#111827;color:#fff;border-color:#111827}
+    .btn.green{background:#17b26a;color:#fff;border-color:#17b26a}
+
+    /* Modales TWINT */
+    dialog::backdrop{background:rgba(0,0,0,.45)}
+    dialog.modal{border:0;border-radius:16px;max-width:680px;width:92vw;padding:0}
+    .modal-card{padding:18px;background:#fff;border:1px solid #d0d7e2;border-radius:16px}
+    .qr{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center}
+    @media(max-width:640px){.qr{grid-template-columns:1fr}}
+    .qr img{width:180px;max-width:100%;border-radius:12px;border:1px solid #e5e7eb}
+    .muted-small{color:#6b7785;font-size:13px}
+  </style>
+</head>
+<body>
+
+  <!-- NAV identique -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <img src="images/logo_rsl.png" alt="Logo RSL">
+        <span><b>RSL — Romandie Scooter League</b></span>
+      </a>
+      <ul>
+        <li><a href="formation.html">Formation RSL</a></li>
+        <li><a href="disciplines.html">Disciplines</a></li>
+        <li><a href="ou_rider.html">Où rider ?</a></li>
+        <li><a href="game.html">Games</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="comite.html">Comité</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="cours.html">Cours</a></li>
+      </ul>
+      <div class="cta">
+        <button class="btn" id="btnIdentity">Se connecter</button>
+        <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+        <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+      </div>
+      <div class="cta">
+        <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- En-tête -->
+  <header class="page-head">
+    <div class="container">
+      <h1 class="title">Paiement — Offre Starter</h1>
+      <p class="muted">Paiement unique : <b>50.– / an</b>.</p>
+    </div>
+  </header>
+
+  <!-- Bloc centré -->
+  <main class="container">
+    <div class="payment-wrapper">
+
+      <!-- Carte annuelle unique -->
+      <section class="card">
+        <h2>Starter — annuel</h2>
+        <div class="bigprice">50.– <span class="muted">/ an</span></div>
+        <ul class="muted-list">
+          <li>Carte membre RSL officielle</li>
+          <li>Tarif cours membre : 20.– (au lieu de 30.–)</li>
+          <li>Priorités inscriptions events</li>
+        </ul>
+        <div class="actions">
+          <!-- Remplace # par TON lien Stripe -->
+          <a class="btn green" href="#" target="_blank" rel="noopener">Payer 50.– (carte)</a>
+          <button class="btn dark" id="btnTwint50">TWINT 50.–</button>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="card" style="margin:40px auto;max-width:700px;text-align:center">
+      <strong>Infos paiement</strong>
+      <p class="muted" style="margin:6px 0 0">
+        L’adhésion est valable jusqu’au 31 décembre (renouvellement automatique).
+        Résiliation possible jusqu’au <b>31 décembre</b> pour l’année suivante.
+      </p>
+    </div>
+  </main>
+
+  <!-- Modale TWINT -->
+  <dialog class="modal" id="twintDlg50">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px">TWINT — 50.– (Starter annuel)</h3>
+      <div class="qr">
+        <img src="images/twint_50.png" alt="QR TWINT 50.–">
+        <div>
+          <p class="muted">Scanne le QR pour régler <strong>50.–</strong>. Ou paie au <b>078 300 80 43</b> (WhatsApp OK).</p>
+          <div class="actions">
+            <a class="btn" target="_blank" href="https://wa.me/41783008043?text=TWINT%2050.-%20Starter%20annuel">Confirmer WhatsApp</a>
+            <a class="btn" target="_blank" href="mailto:rsl.meuwly@gmail.com?subject=TWINT%2050&body=Nom:____">Confirmer Email</a>
+          </div>
+          <p class="muted-small">Activation après confirmation.</p>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="btn dark" id="closeTwint50">Fermer</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // TWINT modale
+    const open = document.getElementById('btnTwint50');
+    const dlg  = document.getElementById('twintDlg50');
+    const close= document.getElementById('closeTwint50');
+    if(open && dlg) open.addEventListener('click', ()=> dlg.showModal());
+    if(close && dlg) close.addEventListener('click', ()=> dlg.close());
+  </script>
+</body>
+</html>

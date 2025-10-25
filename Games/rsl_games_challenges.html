@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RSL — Challenges Timer (LITE, propre)</title>
+
+  <!-- Police + Reset -->
+<style>
+    :root{
+      --bg:#0b0e14;         /* fond site */
+      --panel:#0f1422;      /* panneaux */
+      --ink:#e9eef6;        /* texte principal */
+      --muted:#9fb1cb;      /* texte secondaire */
+      --line:#243652;       /* contours */
+      --violet:#9b5cff;     /* action primaire */
+      --green:#3be28f;      /* validation */
+      --red:#ff557a;        /* erreur / stop */
+      --yellow:#ffd166;     /* accent */
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Outfit',system-ui,Segoe UI,Roboto,Arial}
+    a{color:inherit}
+    .container{max-width:1000px;margin:0 auto;padding:16px}
+    .nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.8);backdrop-filter:blur(6px);z-index:5}
+    .nav-inner{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:8px;text-decoration:none}
+    .brand img{height:28px;width:auto;display:block}
+    .brand span{font-weight:800;letter-spacing:.2px}
+
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+    .card h2{margin:0 0 8px 0;font-size:22px}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .stack{display:flex;flex-direction:column;gap:8px}
+    .space{height:10px}
+    .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+    .btn.primary{background:var(--violet);color:#10062a}
+    .btn.secondary{background:#121a2a;color:#dfeaff;border:1px solid var(--line)}
+    .btn.green{background:var(--green);color:#02210f}
+    .btn.red{background:var(--red);color:#2a0010}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    input,select{background:#101728;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+    input[type="number"]{width:110px}
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border-radius:999px;background:#121a2a;border:1px solid var(--line);font-size:12px;color:var(--muted)}
+
+    /* Timer */
+    .timer{display:flex;align-items:end;gap:10px;font-variant-numeric:tabular-nums}
+    .time{font-size:42px;font-weight:800;letter-spacing:1px}
+    .time small{font-size:13px;color:var(--muted);display:block;margin-top:-4px;font-weight:600}
+    .big{font-size:18px;font-weight:700}
+    .ok{color:var(--green)}
+    .warn{color:var(--yellow)}
+    .err{color:var(--red)}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    thead th{background:#0c1322;color:#cfe;padding:10px;font-size:12px;text-align:left;border-bottom:1px solid var(--line)}
+    tbody td{padding:10px;border-bottom:1px solid #18243a}
+    tbody tr:last-child td{border-bottom:0}
+    tbody tr:hover{background:#0e1627}
+    .right{text-align:right}
+
+    /* List */
+    .challenge{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px;border:1px solid var(--line);border-radius:12px;background:#0f1728}
+    .challenge h4{margin:0;font-size:16px}
+    .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#131d31;border:1px solid var(--line);color:#cfe}
+
+    .footer{padding:14px;color:#99b1d1;text-align:center;font-size:12px}
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+  <nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <main class="container">
+    <div class="grid">
+      <!-- COL GAUCHE : Timer + Contrôles -->
+      <section class="card">
+        <h2>Chrono</h2>
+        <div class="timer">
+          <div class="time" id="time">00:00.0 <small>compte ↗ depuis 0</small></div>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="row">
+          <button class="btn primary" id="startBtn">▶️ Démarrer</button>
+          <button class="btn secondary" id="pauseBtn" disabled>⏸️ Pause</button>
+          <button class="btn red" id="resetBtn" disabled>↻ Réinitialiser</button>
+          <span class="chip">vitesse: temps réel</span>
+        </div>
+
+        <div class="space"></div>
+
+        <div class="stack">
+          <div class="row">
+            <label class="chip">Objectif · Durée (mm:ss)
+              <input id="goalMin" type="number" min="0" value="1" /> :
+              <input id="goalSec" type="number" min="0" max="59" value="00" />
+            </label>
+            <label class="chip">Objectif · Nb de tricks
+              <input id="goalReps" type="number" min="1" value="20" />
+            </label>
+          </div>
+
+          <div class="row">
+            <input id="playerName" placeholder="Nom & prénom" style="min-width:220px" />
+            <select id="challengeSelect" style="min-width:220px"></select>
+            <button class="btn green" id="saveAttemptBtn" disabled>💾 Enregistrer</button>
+          </div>
+
+          <div class="chips" id="statusChips">
+            <span class="chip">Statut : <b id="statusText">prêt</b></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- COL DROITE : Gestion des challenges -->
+      <aside class="card">
+        <h2>Challenges</h2>
+        <div class="stack">
+          <div class="row">
+            <input id="cTitle" placeholder="Nom du challenge (ex. 20 Whips / 1:00)" style="flex:1" />
+          </div>
+          <div class="row">
+            <label class="chip">Durée (mm:ss)
+              <input id="cMin" type="number" min="0" value="1" /> :
+              <input id="cSec" type="number" min="0" max="59" value="00" />
+            </label>
+            <label class="chip">Nb tricks
+              <input id="cReps" type="number" min="1" value="20" />
+            </label>
+            <button class="btn primary" id="addChallengeBtn">+ Ajouter</button>
+          </div>
+          <div id="challengeList" class="stack"></div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:16px">
+      <h2>Résultats (session)</h2>
+      <div class="row muted" style="margin-bottom:8px">
+        <span class="chip">Stockés en local (navigateur)</span>
+        <button class="btn secondary" id="exportBtn">📤 Exporter (JSON)</button>
+        <button class="btn red" id="clearBtn">🗑️ Effacer</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Nom</th>
+              <th>Challenge</th>
+              <th class="right">Tricks</th>
+              <th class="right">Temps</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footer">© 2025 — Romandie Scooter League · LITE</p>
+  </main>
+
+  <script>
+    // ===== State =====
+    const $ = (s)=> document.querySelector(s);
+    const fmt2 = (n)=> String(n).padStart(2,'0');
+
+    const startBtn   = $('#startBtn');
+    const pauseBtn   = $('#pauseBtn');
+    const resetBtn   = $('#resetBtn');
+    const saveBtn    = $('#saveAttemptBtn');
+    const timeEl     = $('#time');
+    const statusText = $('#statusText');
+
+    const goalMin = $('#goalMin');
+    const goalSec = $('#goalSec');
+    const goalReps = $('#goalReps');
+    const playerName = $('#playerName');
+    const challengeSelect = $('#challengeSelect');
+
+    const cTitle = $('#cTitle');
+    const cMin = $('#cMin');
+    const cSec = $('#cSec');
+    const cReps = $('#cReps');
+    const addChallengeBtn = $('#addChallengeBtn');
+    const challengeList = $('#challengeList');
+
+    const tbody = document.querySelector('#resultsTable tbody');
+    const exportBtn = $('#exportBtn');
+    const clearBtn = $('#clearBtn');
+
+    let running=false, paused=false, raf=0;
+    let t0=0, acc=0; // t0 start, acc accumulated
+    let session = {
+      challenges: [],
+      results: []
+    };
+
+    // ===== Load / Save session (localStorage) =====
+    const KEY='rsl_timer_lite_session';
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(raw){ session = JSON.parse(raw) || session; }
+    }catch(e){ /* ignore */ }
+    function saveSession(){
+      try{ localStorage.setItem(KEY, JSON.stringify(session)); }catch(e){}
+    }
+
+    // ===== Default challenges (if empty) =====
+    if(!session.challenges || !session.challenges.length){
+      session.challenges = [
+        {id: uid(), title:'20 Whips — 1:00', min:1, sec:0, reps:20},
+        {id: uid(), title:'50 Whips — 2:00', min:2, sec:0, reps:50},
+        {id: uid(), title:'Endurance — 100 tricks — 3:00', min:3, sec:0, reps:100}
+      ];
+      saveSession();
+    }
+
+    // ===== UI Builders =====
+    function uid(){ return Math.random().toString(36).slice(2,9); }
+
+    function renderChallenges(){
+      // select
+      challengeSelect.innerHTML = session.challenges.map(c=>`<option value="${c.id}">${c.title}</option>`).join('');
+      // list
+      challengeList.innerHTML = '';
+      session.challenges.forEach(c=>{
+        const div = document.createElement('div');
+        div.className='challenge';
+        div.innerHTML = `
+          <div>
+            <h4>${c.title}</h4>
+            <div class="chips">
+              <span class="badge">Durée ${fmt2(c.min)}:${fmt2(c.sec)}</span>
+              <span class="badge">${c.reps} tricks</span>
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn secondary" data-set="${c.id}">Utiliser</button>
+            <button class="btn red" data-del="${c.id}">Supprimer</button>
+          </div>
+        `;
+        // actions
+        div.querySelector('[data-set]').onclick = ()=> {
+          goalMin.value = c.min; goalSec.value = c.sec; goalReps.value = c.reps;
+          challengeSelect.value = c.id;
+          flashStatus('Challenge chargé', 'ok');
+        };
+        div.querySelector('[data-del]').onclick = ()=> {
+          session.challenges = session.challenges.filter(x=> x.id!==c.id);
+          saveSession(); renderChallenges();
+        };
+        challengeList.appendChild(div);
+      });
+    }
+
+    function renderResults(){
+      tbody.innerHTML = session.results.map(r=>`
+        <tr>
+          <td>${new Date(r.ts).toLocaleString()}</td>
+          <td>${escapeHtml(r.name||'')}</td>
+          <td>${escapeHtml(r.challenge||'')}</td>
+          <td class="right">${r.reps}</td>
+          <td class="right">${r.time}</td>
+        </tr>
+      `).join('');
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    renderChallenges();
+    renderResults();
+
+    // ===== Timer logic (up-counter) =====
+    function now(){ return performance.now(); }
+    function start(){
+      if(running) return;
+      running=true; paused=false;
+      t0 = now();
+      startBtn.disabled=true; pauseBtn.disabled=false; resetBtn.disabled=false;
+      flashStatus('Chrono en cours…');
+      frame();
+    }
+    function pause(){
+      if(!running) return;
+      if(!paused){
+        paused=true; acc += now()-t0; cancelAnimationFrame(raf);
+        pauseBtn.textContent='▶️ Reprendre';
+        flashStatus('Pause');
+      }else{
+        paused=false; t0 = now();
+        pauseBtn.textContent='⏸️ Pause';
+        flashStatus('Chrono en cours…');
+        frame();
+      }
+    }
+    function reset(){
+      running=false; paused=false;
+      cancelAnimationFrame(raf);
+      acc=0; t0=0;
+      display(0);
+      startBtn.disabled=false; pauseBtn.disabled=true; resetBtn.disabled=true;
+      pauseBtn.textContent='⏸️ Pause';
+      flashStatus('Réinitialisé', 'warn');
+    }
+    function frame(){
+      const t = (paused? acc : acc + (now()-t0));
+      display(t);
+      // auto stop when reach goal time (optional)
+      const goalMs = (parseInt(goalMin.value||0)*60 + parseInt(goalSec.value||0))*1000;
+      if(goalMs>0 && t>=goalMs){
+        // freeze at goal
+        acc = goalMs; t0 = now();
+        display(goalMs);
+        running=false; paused=false; startBtn.disabled=false; pauseBtn.disabled=true;
+        flashStatus('Objectif temps atteint ✔', 'ok');
+        return;
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    function display(ms){
+      const ds = Math.floor(ms/100);
+      const s  = Math.floor(ds/10);
+      const m  = Math.floor(s/60);
+      const remS = s%60;
+      const remD = ds%10;
+      timeEl.innerHTML = `${fmt2(m)}:${fmt2(remS)}.<span class="big">${remD}</span> <small>compte ↗ depuis 0</small>`;
+    }
+
+    // ===== Save attempt =====
+    function saveAttempt(){
+      const name = playerName.value.trim();
+      const c = session.challenges.find(x=> x.id===challengeSelect.value);
+      if(!c){ flashStatus('Choisis un challenge', 'err'); return; }
+      const reps = parseInt(goalReps.value||0);
+      const goalMs = (parseInt(goalMin.value||0)*60 + parseInt(goalSec.value||0))*1000;
+      const t = acc + (running && !paused ? (now()-t0) : 0);
+      const timeStr = msToStr(Math.min(t, goalMs||t));
+      session.results.unshift({
+        id: uid(), ts: Date.now(), name, challenge: c.title, reps, time: timeStr
+      });
+      saveSession(); renderResults();
+      flashStatus('Enregistré ✅', 'ok');
+    }
+    function msToStr(ms){
+      const s  = Math.floor(ms/1000);
+      const m  = Math.floor(s/60);
+      const remS = s%60;
+      const d10 = Math.floor((ms%1000)/100);
+      return `${fmt2(m)}:${fmt2(remS)}.${d10}`;
+    }
+
+    // ===== Events =====
+    startBtn.onclick = start;
+    pauseBtn.onclick = pause;
+    resetBtn.onclick = reset;
+    saveBtn.onclick = saveAttempt;
+
+    addChallengeBtn.onclick = ()=>{
+      const title = cTitle.value.trim() || `${cReps.value} tricks — ${fmt2(cMin.value)}:${fmt2(cSec.value)}`;
+      const min = parseInt(cMin.value||0);
+      const sec = parseInt(cSec.value||0);
+      const reps = parseInt(cReps.value||0);
+      session.challenges.unshift({id:uid(), title, min, sec, reps});
+      saveSession(); renderChallenges();
+      cTitle.value='';
+      flashStatus('Challenge ajouté ✔', 'ok');
+    };
+
+    // Save enabled when name + challenge selected
+    function updateSaveEnabled(){
+      saveBtn.disabled = !playerName.value.trim() || !challengeSelect.value;
+    }
+    playerName.addEventListener('input', updateSaveEnabled);
+    challengeSelect.addEventListener('change', updateSaveEnabled);
+    updateSaveEnabled();
+
+    // Export / clear
+    exportBtn.onclick = ()=>{
+      const data = JSON.stringify(session,null,2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'rsl_challenges_session.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+    clearBtn.onclick = ()=>{
+      if(confirm('Effacer tous les résultats et challenges ?')){
+        session = {challenges:[], results:[]};
+        saveSession(); renderChallenges(); renderResults();
+        flashStatus('Session vidée', 'warn');
+      }
+    };
+
+    // Helpers
+    function flashStatus(text, kind){
+      statusText.textContent = text;
+      statusText.classList.remove('ok','warn','err');
+      if(kind) statusText.classList.add(kind);
+      setTimeout(()=>{
+        statusText.textContent = running ? (paused ? 'Pause' : 'Chrono en cours…') : 'prêt';
+        statusText.classList.remove('ok','warn','err');
+      }, 1800);
+    }
+  </script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>

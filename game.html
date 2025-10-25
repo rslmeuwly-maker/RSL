@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Games — Romandie Scooter League</title>
+<style>
+    /* HERO avec image foncée */
+    .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
+    .hero.hero-photo::before{
+      content:"";position:absolute;inset:0;z-index:0;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),
+        url("images/lanoubc6.jpg") center/cover no-repeat;
+    }
+    .hero.hero-photo .container{position:relative;z-index:1}
+
+    /* Grille des jeux */
+    .games-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:18px;
+    }
+    @media (max-width:1024px){ .games-grid{grid-template-columns:repeat(2,1fr);} }
+    @media (max-width:680px){ .games-grid{grid-template-columns:1fr;} }
+
+    .card.game{display:flex;flex-direction:column;gap:10px}
+    .game-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .game-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+    .tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2f7;font-size:12px}
+
+    /* ===== FOOTER corrigé : 3 colonnes + copyright à droite ===== */
+    .foot .links-3cols{
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+    }
+    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+    .foot .links-3cols li{margin:6px 0}
+    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+    .foot .links-3cols a:hover{text-decoration:underline}
+    .foot .bottom.bottom-right{
+      border-top:1px solid rgba(255,255,255,0.08);
+      margin-top:14px;padding:10px 0;
+      display:flex;justify-content:flex-end;align-items:center;gap:14px
+    }
+    .foot .bottom.bottom-right p{margin:0}
+    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+    .foot .bottom.bottom-right a:hover{text-decoration:underline}
+    @media (max-width:900px){ .foot .links-3cols{grid-template-columns:1fr 1fr} }
+    @media (max-width:600px){ .foot .links-3cols{grid-template-columns:1fr} .foot .bottom.bottom-right{justify-content:space-between} }
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+
+  <!-- NAV (identique au site) -->
+  <nav class="nav">
+  <div class="container nav-inner">
+    <!-- ✅ corrigé ici -->
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <!-- HERO -->
+  <header class="hero hero-photo">
+    <div class="container hero-inner">
+      <div class="grid">
+        <div>
+          <h1>Games</h1>
+          <p class="muted">Mini-jeux, défis techniques et formats fun pour progresser en trottinette freestyle.</p>
+          <div class="panel"><div class="chip">Park & Street • Solo / 1v1 / Équipe</div></div>
+        </div>
+        <div class="panel">
+          <strong>Comment ça marche ?</strong>
+          <p class="muted">Clique un jeu pour ouvrir sa fiche. Tu peux ajouter/enlever des jeux librement.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LISTE DES JEUX -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Catalogue des jeux</h2>
+        <span class="muted">Les règles détaillées s’ouvrent dans les pages du dossier <code>Games/</code>.</span>
+      </div>
+
+      <div class="games-grid">
+
+        <!-- SCOOT (1v1) -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>SCOOT (1v1)</h3>
+            <span class="tag">Technique</span>
+          </div>
+          <p class="muted">Chaque rider propose une figure. L’adversaire doit la replaquer. En cas d’échec, on gagne une lettre. Le premier à écrire S-C-O-O-T perd.</p>
+          <ul class="list">
+            <li>Durée : 10–20 min</li>
+            <li>Matériel : —</li>
+            <li>Niveau : tous</li>
+          </ul>
+          <div class="game-actions">
+            <a class="btn" href="Games/dsl_game_scoot.html">Règles détaillées</a>
+          </div>
+        </article>
+
+        <!-- Random Tricks -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>Random Tricks RSL</h3>
+            <span class="tag">Fun</span>
+          </div>
+          <p class="muted">Tire des tricks aléatoires (ou combos) et tente de les replaquer en un nombre d’essais limité.</p>
+          <ul class="list">
+            <li>Durée : 10–15 min</li>
+            <li>Matériel : liste/app</li>
+          </ul>
+          <div class="game-actions">
+            <a class="btn" href="Games/random_tricks_RSL.html">Règles détaillées</a>
+          </div>
+        </article>
+
+        <!-- Finger Hero / Groove -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>Finger Hero — Groove</h3>
+            <span class="tag">Rythme</span>
+          </div>
+          <p class="muted">Un jeu de coordination et de rythme pour travailler la précision des placements et le timing.</p>
+          <ul class="list">
+            <li>Durée : 5–10 min</li>
+            <li>Matériel : —</li>
+          </ul>
+          <div class="game-actions">
+            <a class="btn" href="Games/rsl_finger_Hero_Groove.html">Règles détaillées</a>
+          </div>
+        </article>
+
+        <!-- Simon -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>RSL Simon</h3>
+            <span class="tag">Mémoire</span>
+          </div>
+          <p class="muted">Chaque tour ajoute un trick à la suite. Rejoue toute la séquence sans te tromper… sinon élimination !</p>
+          <ul class="list">
+            <li>Durée : 10–20 min</li>
+            <li>Matériel : —</li>
+          </ul>
+          <div class="game-actions">
+            <a class="btn" href="Games/rsl_game_simon.html">Règles détaillées</a>
+          </div>
+        </article>
+
+        <!-- Challenges -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>RSL Games — Challenges</h3>
+            <span class="tag">Défis</span>
+          </div>
+          <p class="muted">Séries de challenges à points : amplitude, style, tech, créativité. Parfait pour animer une séance de club.</p>
+          <ul class="list">
+            <li>Durée : 20–30 min</li>
+            <li>Matériel : feuille score (optionnel)</li>
+          </ul>
+          <div class="game-actions">
+            <a class="btn" href="Games/rsl_games_challenges.html">Règles détaillées</a>
+          </div>
+        </article>
+
+        <!-- Scoot Runner -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>RSL Scoot Runner</h3>
+            <span class="tag">Speed</span>
+          </div>
+          <p class="muted">Parcours chronométré avec modules. Bonus si le trick imposé est replaqué sur chaque obstacle.</p>
+          <ul class="list">
+            <li>Durée : 10–20 min</li>
+            <li>Matériel : chrono, cônes</li>
+          </ul>
+          <div class="game-actions">
+            <a class="btn" href="Games/rsl_scoot_runner.html">Règles détaillées</a>
+          </div>
+        </article>
+
+        <!-- À venir -->
+        <article class="card game">
+          <div class="game-head">
+            <h3>…à venir</h3>
+            <span class="tag">Nouveau</span>
+          </div>
+          <p class="muted">D’autres formats arrivent bientôt (team relay, tech ladder, best line, etc.).</p>
+          <div class="game-actions">
+            <a class="btn" href="contact.html">Proposer un jeu</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER corrigé -->
+  <footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- HelpBot (RSL) -->
+<link rel="stylesheet" href="css/helpbot.css">
+<div id="hb-root">
+  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+    <div class="hb-head">
+      <div class="title" id="hbTitle">Aide — RSL</div>
+      <div class="actions">
+        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
+        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="hb-body" id="hbBody"></div>
+    <div class="hb-foot">
+      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
+      <button id="hbSend" class="hb-send">Envoyer</button>
+    </div>
+  </div>
+</div>
+<script defer src="js/helpbot.js"></script>
+
+</body></html>

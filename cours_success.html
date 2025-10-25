@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Cours — Romandie Scooter League</title>
+
+<!-- jsPDF pour PDF facture + décharge -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+  /* Hero */
+  .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
+  .hero.hero-photo::before{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:
+      linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),
+      url("images/lanoubc5.jpg") center/cover no-repeat;
+  }
+  .hero.hero-photo .hero-inner{position:relative;z-index:1}
+
+  /* Spots cards */
+  .spots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  @media(max-width:900px){.spots{grid-template-columns:1fr}}
+  .spot{border:1px solid #e2e8f0;border-radius:14px;padding:14px;background:#fff}
+  .spot.disabled{opacity:.55}
+  .spot-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2f7}
+  .badge.grey{background:#e5e7eb}
+  .spot-actions{margin-top:10px}
+
+  /* Modal */
+  dialog::backdrop{background:rgba(0,0,0,.45)}
+  dialog.formodal{border:0;border-radius:16px;max-width:980px;width:92vw;padding:0}
+  .modal-card{padding:18px;background:#fff;border:1px solid #d0d7e2;border-radius:16px}
+  .modal-card h3{margin:0 0 6px}
+  label{font-weight:700;color:#0f172a}
+  input,select,textarea{
+    width:100%;padding:10px 12px;border:1px solid #c7cfdb;border-radius:12px;background:#fff;color:#0f172a
+  }
+  .muted{color:#334155}.tiny{font-size:12px;color:#64748b}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#eef2f7;font-weight:700}
+  .chip.light{background:#f8fafc}
+  .price-ok{color:#16a34a;font-weight:800}
+  .price-strike{color:#64748b;text-decoration:line-through}
+
+  /* Lieux tabs dans le formulaire */
+  .lieux-bar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+  .lieu-pill{border:1.5px solid #c7cfdb;border-radius:999px;padding:8px 12px;background:#fff;font-weight:700;cursor:pointer}
+  .lieu-pill.on{background:#111827;color:#fff;border-color:#111827}
+  .lieu-pill.small{font-weight:600;padding:6px 10px}
+
+  /* Grilles de dates */
+  .pill-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  @media(max-width:780px){.pill-grid{grid-template-columns:repeat(2,1fr)}}
+  .pill{
+    border:1.5px solid #c7cfdb;border-radius:999px;padding:10px 12px;text-align:center;
+    cursor:pointer;user-select:none;background:#fff;font-weight:600;color:#0f172a;
+    transition:box-shadow .15s,border-color .15s,background .15s
+  }
+  .pill:hover{box-shadow:0 1px 0 rgba(0,0,0,.05)}
+  .pill.disabled{opacity:.35;pointer-events:none}
+  .pill.on{background:#16a34a;color:#fff;border-color:#128a3e}
+
+  /* Conditions */
+  .condx{font-size:14px;line-height:1.65;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:12px;padding:12px;color:#0f172a}
+
+  /* Footer identique */
+  .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{border-top:1px solid rgba(255,255,255,0.08);margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero hero-photo">
+  <div class="container hero-inner">
+    <div class="grid">
+      <div>
+        <h1>Cours RSL — Skateparks partenaires</h1>
+        <p>Sessions de 1h encadrées par un <a href="formation.html"><b>moniteur formé RSL</b></a>.</p>
+        <div class="panel"><div class="chip">Tarifs : Public 30.– • Membres RSL 20.–</div></div>
+        <div class="panel"><div class="chip">Livret « Tricks RSL » : 20.– • Membres Basic : 10.– • Rider/Premium : Offert</div></div>
+      </div>
+      <div class="panel">
+        <strong>Inscriptions</strong>
+        <p class="muted">Clique un lieu pour ouvrir le formulaire (pré-sélectionné sur ce skatepark).</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- LIEUX -->
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2>Lieux</h2><span class="muted">Montreux & La Fièvre (intérieur) • autres = extérieur</span></div>
+    <div class="spots">
+      <article class="spot">
+        <div class="spot-head"><h3>Skatepark Montreux (intérieur)</h3><span class="badge">Ouvert</span></div>
+        <p class="muted">Sessions toute l’année (hors fériés/vacances).</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="montreux">S’inscrire (Montreux)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Lausanne — La Fièvre (intérieur)</h3><span class="badge">Ouvert</span></div>
+        <p class="muted">Skatepark indoor — cours toute l’année (hors fériés/vacances).</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="lafievre">S’inscrire (La Fièvre)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Lausanne — Vidy (extérieur)</h3><span class="badge grey">Saisonnier</span></div>
+        <p class="muted">Pas de cours en janv • fév • nov • déc.</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="vidy">S’inscrire (Vidy)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Yverdon (extérieur)</h3><span class="badge grey">Saisonnier</span></div>
+        <p class="muted">Pas de cours en janv • fév • nov • déc.</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="yverdon">S’inscrire (Yverdon)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Bulle (extérieur)</h3><span class="badge grey">Saisonnier</span></div>
+        <p class="muted">Pas de cours en janv • fév • nov • déc.</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="bulle">S’inscrire (Bulle)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Martigny (extérieur)</h3><span class="badge grey">Saisonnier</span></div>
+        <p class="muted">Pas de cours en janv • fév • nov • déc.</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="martigny">S’inscrire (Martigny)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Fribourg (extérieur)</h3><span class="badge grey">Saisonnier</span></div>
+        <p class="muted">Pas de cours en janv • fév • nov • déc.</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="fribourg">S’inscrire (Fribourg)</button></div>
+      </article>
+
+      <article class="spot">
+        <div class="spot-head"><h3>Genève — Plainpalais (extérieur)</h3><span class="badge grey">Saisonnier</span></div>
+        <p class="muted">Pas de cours en janv • fév • nov • déc.</p>
+        <div class="spot-actions"><button class="btn open-form" data-lieu="plainpalais">S’inscrire (Plainpalais)</button></div>
+      </article>
+
+      <!-- Autre région -->
+      <article class="spot">
+        <div class="spot-head"><h3>Autre région ?</h3><span class="badge">Nouveau</span></div>
+        <p class="muted">Tu viens d’une autre région et tu veux des cours RSL ? Écris-nous !</p>
+        <div class="spot-actions">
+          <a class="btn" href="contact.html">Nous contacter</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULAIRE (UNIQUE) -->
+<dialog class="formodal" id="dlg">
+  <div class="modal-card">
+    <h3 id="dlgTitle">Inscription cours — <span id="titleLieu">Montreux</span></h3>
+    <p class="muted tiny" style="margin:4px 0 10px">Tu peux ajouter plusieurs lieux et dates dans une seule inscription.</p>
+
+    <!-- Sélecteur de lieu principal + barre de lieux actifs -->
+    <div class="grid-2" style="gap:12px">
+      <div>
+        <label for="selectLieu">Lieu principal</label>
+        <select id="selectLieu">
+          <option value="montreux">Montreux (intérieur)</option>
+          <option value="lafievre">Lausanne — La Fièvre (intérieur)</option>
+          <option value="vidy">Lausanne — Vidy (extérieur)</option>
+          <option value="yverdon">Yverdon (extérieur)</option>
+          <option value="bulle">Bulle (extérieur)</option>
+          <option value="martigny">Martigny (extérieur)</option>
+          <option value="fribourg">Fribourg (extérieur)</option>
+          <option value="plainpalais">Genève — Plainpalais (extérieur)</option>
+        </select>
+      </div>
+      <div>
+        <label>Ajouter/Switcher de lieu</label>
+        <div class="lieux-bar" id="lieuxBar"></div>
+      </div>
+    </div>
+
+    <!-- Grille de dates du lieu actif -->
+    <div style="margin-top:10px">
+      <div class="chips"><span class="chip light" id="ruleText">Règles calendrier…</span></div>
+      <div id="daysGrid" class="pill-grid" aria-live="polite" style="margin-top:8px"></div>
+    </div>
+
+    <!-- Infos élève -->
+    <form id="formRSL" action="https://formspree.io/f/mzzjjgqe" method="POST">
+      <div class="grid-2" style="gap:12px;margin-top:14px">
+        <div><label>Prénom</label><input name="prenom" required placeholder="Prénom"></div>
+        <div><label>Nom</label><input name="nom" required placeholder="Nom"></div>
+      </div>
+      <div class="grid-2" style="gap:12px;margin-top:8px">
+        <div><label>Âge</label><input name="age" type="number" min="4" max="18" required placeholder="ex: 11"></div>
+        <div>
+          <label>N° membre RSL (facultatif)</label>
+          <input name="num_membre" id="numMembre" placeholder="XXXXXXXXXXXX" inputmode="numeric" maxlength="12">
+          <span class="tiny muted" id="membreHint">Saisi si tu es membre RSL.</span>
+        </div>
+      </div>
+
+      <p style="margin:10px 0 6px"><b>Tarifs</b> — <span id="pPublic">Public 30.–/séance</span> • <span id="pMembre">Membre 20.–/séance</span></p>
+      <p id="totaux" style="font-weight:800">Total (non-membre) : 0.– · Total (membre RSL) : 0.–</p>
+
+      <div class="condx" style="margin:12px 0">
+        <h4>Autorisation parentale & décharge</h4>
+        <ul style="margin:0 0 8px 18px">
+          <li>Participation sous la responsabilité du représentant légal.</li>
+          <li>Organisation déchargée sauf faute grave.</li>
+          <li>Autorisation d’agir en cas d’urgence médicale.</li>
+        </ul>
+        <label class="chip" style="background:#fff">
+          <input type="checkbox" id="acceptCG" required> J’accepte les conditions
+        </label>
+        <a class="chip" style="background:#fff;text-decoration:underline" href="./docs/autorisation_decharge_RSL.pdf" target="_blank" rel="noopener">conditions générales (PDF)</a>
+        <div class="tiny muted" style="margin-top:8px">Photos/vidéos (optionnel) : vues larges pour communication RSL (site / réseaux).</div>
+        <label class="chip" style="background:#fff;margin-top:6px">
+          <input type="checkbox" id="acceptPhoto" name="photo_ok" value="oui"> J’autorise l’utilisation de photos/vidéos (optionnel)
+        </label>
+      </div>
+
+      <!-- Champs techniques pour email -->
+      <input type="hidden" name="_subject" value="Inscription cours RSL">
+      <input type="hidden" name="site_source" value="rsl.ch / cours">
+      <input type="hidden" name="selections_json" id="selectionsField">
+      <input type="hidden" name="total_public" id="totalPublicField">
+      <input type="hidden" name="total_membre" id="totalMembreField">
+      <input type="hidden" name="tarif_applique" id="tarifAppliqueField">
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+        <button type="button" class="btn dark" onclick="dlg.close()">Fermer</button>
+        <button type="submit" class="btn" id="btnSubmit">Envoyer & payer</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+/* =========================
+   PARAMÈTRES CALENDRIER 2026
+   ========================= */
+
+/** Lieux déclarés */
+const LIEUX = {
+  montreux:   { label: 'Montreux (intérieur)', type: 'interieur' },
+  lafievre:   { label: 'Lausanne — La Fièvre (intérieur)', type: 'interieur' },
+  vidy:       { label: 'Lausanne — Vidy (extérieur)', type: 'exterieur' },
+  yverdon:    { label: 'Yverdon (extérieur)', type: 'exterieur' },
+  bulle:      { label: 'Bulle (extérieur)', type: 'exterieur' },
+  martigny:   { label: 'Martigny (extérieur)', type: 'exterieur' },
+  fribourg:   { label: 'Fribourg (extérieur)', type: 'exterieur' },
+  plainpalais:{ label: 'Genève — Plainpalais (extérieur)', type: 'exterieur' },
+};
+
+/** Fériés 2026 — VD + FR + fédéraux (à compléter si besoin) */
+const HOLIDAYS_2026 = new Set([
+  // Fédéral + récurrents
+  '2026-01-01','2026-05-14','2026-05-25','2026-08-01','2026-12-25',
+  // Exemples VD/FR (ajuste si nécessaire)
+  '2026-03-19','2026-03-29','2026-09-21'
+]);
+
+/** Vacances scolaires (VD/FR) 2026 — intervalles [start, end] inclus (à ajuster si besoin) */
+const VACANCES_2026 = [
+  ['2026-02-14','2026-02-21'], // Hiver
+  ['2026-04-04','2026-04-11'], // Pâques
+  ['2026-07-04','2026-08-08'], // Été (exemple)
+  ['2026-10-17','2026-10-24'], // Automne
+  ['2026-12-19','2026-12-26'], // Noël
+];
+
+/** Mois interdits pour EXTÉRIEUR: jan(0), fév(1), nov(10), déc(11) */
+const EXTERIEUR_MOIS_OFF = new Set([0,1,10,11]);
+
+/* =========================
+   UTILITAIRES DATES
+   ========================= */
+const fmtISO = (d) => d.toISOString().slice(0,10);
+const inRange = (iso, a, b) => iso >= a && iso <= b;
+function isVacation(iso){
+  return VACANCES_2026.some(([a,b]) => inRange(iso,a,b));
+}
+function isHoliday(iso){ return HOLIDAYS_2026.has(iso); }
+function isSaturday(d){ return d.getDay()===6; }
+
+/* =========================
+   MODAL & SÉLECTIONS
+   ========================= */
+const dlg = document.getElementById('dlg');
+const selectLieu = document.getElementById('selectLieu');
+const titleLieu  = document.getElementById('titleLieu');
+const lieuxBar   = document.getElementById('lieuxBar');
+const daysGrid   = document.getElementById('daysGrid');
+const ruleText   = document.getElementById('ruleText');
+
+/** selections = { lieuKey: Set<isoDate> } */
+const selections = {};
+Object.keys(LIEUX).forEach(k => selections[k] = new Set());
+
+/** lieu actif dans l’UI */
+let activeLieu = 'montreux';
+
+/* Ouverture depuis les boutons de la page */
+document.querySelectorAll('.open-form').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const key = btn.dataset.lieu;
+    openFormWithLieu(key);
+  });
+});
+
+/* Changement depuis le select en haut du modal */
+selectLieu.addEventListener('change', ()=>{
+  setActiveLieu(selectLieu.value, false);
+});
+
+/* Ouvre le modal en activant/pré-sélectionnant un lieu */
+function openFormWithLieu(key){
+  setActiveLieu(key, true);
+  dlg.showModal();
+}
+
+/* Active un lieu (et l’ajoute dans la barre si nécessaire) */
+function setActiveLieu(key, alsoEnsureBar){
+  activeLieu = key;
+  selectLieu.value = key;
+  titleLieu.textContent = LIEUX[key].label.replace(/\s*\(.*?\)\s*$/,''); // titre plus court
+  if(alsoEnsureBar) ensureLieuInBar(key);
+  renderLieuxBar();
+  renderGridForLieu(key);
+  updateTotals();
+}
+
+/* Ajoute une pastille pour le lieu si absente */
+function ensureLieuInBar(key){
+  // rien de spécial: la barre rend tous les lieux; on met juste .on sur l’actif
+}
+
+/* Barre de lieux (permet de switcher rapidement) */
+function renderLieuxBar(){
+  lieuxBar.innerHTML = '';
+  Object.keys(LIEUX).forEach(key=>{
+    const b = document.createElement('button');
+    b.type='button';
+    b.className = 'lieu-pill small' + (key===activeLieu?' on':'');
+    b.textContent = LIEUX[key].label.split(' — ')[0]; // label court
+    b.title = LIEUX[key].label;
+    b.addEventListener('click', ()=> setActiveLieu(key, false));
+    lieuxBar.appendChild(b);
+  });
+}
+
+/* Règles affichées pour le lieu actif */
+function computeRulesText(key){
+  const isExt = LIEUX[key].type==='exterieur';
+  const base = isExt ? 'Extérieur : pas de cours en janvier, février, novembre, décembre.' : 'Intérieur : cours toute l’année.';
+  return base + ' Fériés et vacances scolaires (VD/FR) exclus.';
+}
+
+/* Génère la grille des samedis 2026 selon les règles du lieu */
+function renderGridForLieu(key){
+  ruleText.textContent = computeRulesText(key);
+  daysGrid.innerHTML = '';
+  const isExt = LIEUX[key].type==='exterieur';
+  const start = new Date('2026-01-01T00:00:00');
+  const end   = new Date('2026-12-31T23:59:59');
+  // aller au 1er samedi
+  while(!isSaturday(start)) start.setDate(start.getDate()+1);
+
+  while(start <= end){
+    const iso = fmtISO(start);
+    const month = start.getMonth();
+
+    let disabled = false;
+    if(isExt && EXTERIEUR_MOIS_OFF.has(month)) disabled = true; // hiver/nov/déc
+    if(isHoliday(iso) || isVacation(iso)) disabled = true;
+
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.className = 'pill' + (disabled?' disabled':'');
+    btn.textContent = `sam., ${String(start.getDate()).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.`;
+    btn.dataset.iso = iso;
+    if(!disabled){
+      if(selections[key].has(iso)) btn.classList.add('on');
+      btn.addEventListener('click', ()=>{
+        if(selections[key].has(iso)){ selections[key].delete(iso); btn.classList.remove('on'); }
+        else { selections[key].add(iso); btn.classList.add('on'); }
+        updateTotals();
+      });
+    }
+    daysGrid.appendChild(btn);
+    start.setDate(start.getDate()+7);
+  }
+}
+
+/* ====== Tarifs & membre ====== */
+const MEMBER_RE = /^2\d{10}7$/;
+let isMember=false;
+const numMembre = document.getElementById('numMembre');
+const membreHint= document.getElementById('membreHint');
+const pPublic   = document.getElementById('pPublic');
+const pMembre   = document.getElementById('pMembre');
+numMembre.addEventListener('input', ()=>{
+  isMember = MEMBER_RE.test(numMembre.value.trim());
+  membreHint.textContent = isMember ? 'Tarif membre détecté.' : 'Saisi si tu es membre RSL.';
+  pPublic.className = isMember ? 'price-strike' : '';
+  pMembre.className = isMember ? 'price-ok' : '';
+  updateTotals();
+});
+
+/* ====== Totaux & récap ====== */
+const totauxEl = document.getElementById('totaux');
+function updateTotals(){
+  let n = 0;
+  Object.values(selections).forEach(set => n += set.size);
+  const totalPublic = n * 30, totalMembre = n * 20;
+  if(isMember){
+    totauxEl.innerHTML = `Total (non-membre) : <span class="price-strike">${totalPublic}.–</span> · Total (membre RSL) : <span class="price-ok">${totalMembre}.–</span>`;
+  }else{
+    totauxEl.textContent = `Total (non-membre) : ${totalPublic}.– · Total (membre RSL) : ${totalMembre}.–`;
+  }
+}
+
+/* ====== Submit + PDF + envoi ====== */
+const form = document.getElementById('formRSL');
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!document.getElementById('acceptCG').checked){ alert('Tu dois accepter les conditions.'); return; }
+
+  // au moins une séance choisie ?
+  const n = Object.values(selections).reduce((acc,set)=>acc+set.size,0);
+  if(n===0){ alert('Choisis au moins une séance.'); return; }
+
+  // construire payload
+  const selectionsObj = {};
+  Object.keys(LIEUX).forEach(k=>{
+    if(selections[k].size>0) selectionsObj[k] = Array.from(selections[k]).sort();
+  });
+
+  const totalPublic = n*30, totalMembre = n*20;
+  document.getElementById('selectionsField').value = JSON.stringify(selectionsObj);
+  document.getElementById('totalPublicField').value = totalPublic + '.–';
+  document.getElementById('totalMembreField').value = totalMembre + '.–';
+  document.getElementById('tarifAppliqueField').value = isMember ? 'membre (20.–/séance)' : 'public (30.–/séance)';
+
+  // PDFs
+  await generateInvoicePDF({
+    prenom: form.prenom.value.trim(),
+    nom: form.nom.value.trim(),
+    age: form.age.value.trim(),
+    membre: isMember,
+    num: numMembre.value.trim(),
+    selections: selectionsObj,
+    total: isMember? totalMembre : totalPublic
+  });
+  await generateWaiverPDF({
+    prenom: form.prenom.value.trim(),
+    nom: form.nom.value.trim(),
+    age: form.age.value.trim(),
+    photo: document.getElementById('acceptPhoto').checked,
+    selections: selectionsObj
+  });
+
+  // Envoi Formspree (non bloquant)
+  try{
+    await fetch(form.action, { method:'POST', headers:{'Accept':'application/json'}, body:new FormData(form) });
+  }catch(_){}
+
+  // Redirection paiement/boutique (à adapter si besoin)
+  window.location.href='https://www.jfrideshop.ch/shop/category/cours-56';
+});
+
+/* ====== Génération PDF ====== */
+async function generateInvoicePDF(info){
+  const { jsPDF } = window.jspdf; const doc=new jsPDF();
+  const today=new Date().toISOString().slice(0,10);
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Romandie Scooter League — Facture cours',14,16);
+  doc.setFont('helvetica',''); doc.setFontSize(11);
+  doc.text(`Date: ${today}`,14,24);
+  doc.text(`Participant: ${info.nom} ${info.prenom} (Âge: ${info.age})`,14,32);
+  if(info.num){ doc.text(`N° membre RSL: ${info.num} ${info.membre?'(valide)':''}`,14,40); }
+
+  doc.setFont('helvetica','bold'); doc.text('Séances',14,52);
+  doc.setFont('helvetica','');
+  let y=60;
+  Object.keys(info.selections).forEach(k=>{
+    doc.text(`• ${LIEUX[k].label} :`,14,y); y+=6;
+    info.selections[k].forEach(d=>{ doc.text(`   - ${d}`,14,y); y+=6; });
+    y+=2;
+  });
+
+  doc.setFont('helvetica','bold'); doc.text('Total',14,y+6);
+  doc.setFont('helvetica','');
+  doc.text(`Tarif appliqué: ${info.membre?'Membre (20.–/séance)':'Public (30.–/séance)'}`,14,y+14);
+  doc.text(`Montant dû: ${info.total}.–`,14,y+22);
+  doc.save('facture_cours_RSL.pdf');
+}
+
+async function generateWaiverPDF(info){
+  const { jsPDF } = window.jspdf; const doc=new jsPDF();
+  const today=new Date().toISOString().slice(0,10);
+  doc.setFont('helvetica','bold'); doc.setFontSize(16);
+  doc.text('Autorisation parentale & décharge — RSL',14,16);
+  doc.setFont('helvetica',''); doc.setFontSize(11);
+  doc.text(`Date: ${today}`,14,24);
+  doc.text(`Participant: ${info.nom} ${info.prenom} (Âge: ${info.age})`,14,32);
+
+  doc.setFont('helvetica','bold'); doc.text('Séances sélectionnées :',14,44);
+  doc.setFont('helvetica','');
+  let y=52;
+  Object.keys(info.selections).forEach(k=>{
+    doc.text(`• ${LIEUX[k].label} :`,14,y); y+=6;
+    info.selections[k].forEach(d=>{ doc.text(`   - ${d}`,14,y); y+=6; });
+    y+=2;
+  });
+
+  doc.setFont('helvetica','bold'); doc.text('Conditions acceptées :',14,y+8);
+  doc.setFont('helvetica','');
+  doc.text('- Participation sous la responsabilité du représentant légal.',14,y+16);
+  doc.text('- Organisation déchargée sauf faute grave.',14,y+24);
+  doc.text('- Autorisation d\'agir en cas d\'urgence médicale.',14,y+32);
+  doc.text(`- Photos/vidéos : ${info.photo?'AUTORISÉ':'NON AUTORISÉ'}.`,14,y+40);
+  doc.text('Signature (parent/tuteur): ____________________________',14,y+56);
+  doc.save('autorisation_decharge_RSL.pdf');
+}
+
+/* ====== Init par défaut (page chargée) ====== */
+function initUI(){
+  renderLieuxBar();
+  setActiveLieu('montreux', true);
+  updateTotals();
+}
+initUI();
+</script>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts globaux éventuels -->
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- HelpBot (RSL) -->
+<link rel="stylesheet" href="css/helpbot.css">
+<div id="hb-root">
+  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+    <div class="hb-head">
+      <div class="title" id="hbTitle">Aide — RSL</div>
+      <div class="actions">
+        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
+        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="hb-body" id="hbBody"></div>
+    <div class="hb-foot">
+      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
+      <button id="hbSend" class="hb-send">Envoyer</button>
+    </div>
+  </div>
+</div>
+<script defer src="js/helpbot.js"></script>
+
+</body>
+</html>

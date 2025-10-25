@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conditions Générales — RSL (Ride4Style)</title>
+<style>
+  html{scroll-behavior:smooth}
+  body{font-family:'Outfit',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;margin:0;color:#0f172a;background:#fff;line-height:1.65}
+
+  /* HERO */
+  .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
+  .hero.hero-photo::before{
+    content:"";position:absolute;inset:0;z-index:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),url("images/lanoubc18.jpg") center/cover no-repeat;
+  }
+  .hero.hero-photo .container{position:relative;z-index:1}
+  .hero.hero-photo .hero-inner{padding:72px 0}
+
+  main{max-width:1000px;margin:0 auto;padding:28px 20px}
+  h1,h2{line-height:1.2;margin:0 0 12px}
+  h1{font-size:clamp(26px,4vw,38px)}
+  h2{font-size:clamp(20px,2.4vw,26px);margin-top:30px}
+  p,li{font-size:16px}
+  .muted{color:#64748b}
+
+  .card{background:#f1f5f9;border:1px solid #cbd5e1;border-radius:12px;padding:14px;margin:14px 0}
+  .inline-code{font-family:ui-monospace,Consolas,Menlo,monospace;background:#e2e8f0;border-radius:6px;padding:1px 6px}
+
+  /* SOMMAIRE en cartes */
+  #sommaire{margin:22px 0 30px}
+  #sommaire h2{margin-bottom:10px}
+  .toc-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  @media (max-width:1000px){.toc-cards{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:700px){.toc-cards{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:480px){.toc-cards{grid-template-columns:1fr}}
+  .toc-card{
+    display:flex;align-items:center;gap:10px;padding:14px 12px;border:1px solid #cbd5e1;border-radius:12px;
+    background:#f8fafc;color:#0f172a;text-decoration:none;font-weight:700;
+    box-shadow:0 0 0 rgba(0,0,0,0);transition:transform .12s,box-shadow .12s,border-color .12s,background .12s
+  }
+  .toc-ico{font-size:20px;line-height:1}
+  .toc-card:hover{transform:translateY(-2px);border-color:#94a3b8;box-shadow:0 6px 18px rgba(15,23,42,.08);background:#fff}
+  .toc-card:active{transform:translateY(0)}
+
+  /* FOOTER identique à Événements */
+  .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;align-items:center;gap:14px
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
+/* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero hero-photo">
+  <div class="container hero-inner">
+    <h1>Conditions Générales d’Utilisation et de Vente (CGU/CGV)</h1>
+    <p class="muted">RSL — Romandie Scooter League (Ride4Style) • Version : 14 octobre 2025</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- Identité & contact -->
+  <section class="card" id="identite">
+    <strong>Identité & contact</strong><br>
+    Association : Ride4Style (Montreux Scooter Contest)<br>
+    Adresse : Rue du Marché 16, 1820 Montreux, Suisse<br>
+    E-mail : <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a><br>
+    Coordonnées bancaires (CHF) : IBAN <span class="inline-code">CH94 8080 8009 3546 9723 0</span> — IID (n° BC) <span class="inline-code">80808</span> — SWIFT/BIC <span class="inline-code">RAIFCH22</span>
+  </section>
+
+  <!-- Sommaire cartes -->
+  <section id="sommaire" aria-label="Sommaire">
+    <h2>Sommaire</h2>
+    <div class="toc-cards">
+      <a class="toc-card" href="#objet"><span class="toc-ico">📖</span><span>Objet & définitions</span></a>
+      <a class="toc-card" href="#inscription"><span class="toc-ico">📝</span><span>Inscription & éligibilité</span></a>
+      <a class="toc-card" href="#abonnements"><span class="toc-ico">🪪</span><span>Abonnements annuels</span></a>
+      <a class="toc-card" href="#paiement"><span class="toc-ico">💳</span><span>Paiement</span></a>
+      <a class="toc-card" href="#events"><span class="toc-ico">📅</span><span>Événements & cours</span></a>
+      <a class="toc-card" href="#resiliation"><span class="toc-ico">⛔</span><span>Résiliation</span></a>
+      <a class="toc-card" href="#retractation"><span class="toc-ico">↩️</span><span>Rétractation</span></a>
+      <a class="toc-card" href="#utilisation"><span class="toc-ico">⚙️</span><span>Utilisation</span></a>
+      <a class="toc-card" href="#responsabilite"><span class="toc-ico">⚖️</span><span>Responsabilité</span></a>
+      <a class="toc-card" href="#donnees"><span class="toc-ico">🔒</span><span>Protection des données</span></a>
+      <a class="toc-card" href="#pi"><span class="toc-ico">©️</span><span>Propriété intellectuelle</span></a>
+      <a class="toc-card" href="#modifs"><span class="toc-ico">🛠️</span><span>Modifications</span></a>
+      <a class="toc-card" href="#droit"><span class="toc-ico">📍</span><span>Droit applicable & for</span></a>
+      <a class="toc-card" href="#tiers"><span class="toc-ico">🤝</span><span>Inscriptions partenaires (tiers)</span></a>
+      <a class="toc-card" href="#transfert"><span class="toc-ico">🔁</span><span>Transfert de données (fédé/partenaires)</span></a>
+      <a class="toc-card" href="#conditions-partenaires"><span class="toc-ico">📑</span><span>Conditions propres aux événements partenaires</span></a>
+      <a class="toc-card" href="#contact"><span class="toc-ico">✉️</span><span>Contact</span></a>
+    </div>
+  </section>
+
+  <!-- Intro -->
+  <section id="intro">
+    <p>Les présentes Conditions Générales d’Utilisation et de Vente (« CGU/CGV ») régissent l’accès et l’utilisation du site et des services proposés par l’association Ride4Style, opérant sous l’enseigne « RSL — Romandie Scooter League » (ci-après « RSL »), ainsi que la vente d’abonnements, d’inscriptions à des événements/compétitions et de cours (collectivement les « Services »). En achetant un Service ou en utilisant le site, vous acceptez sans réserve les présentes CGU/CGV.</p>
+  </section>
+
+  <!-- Articles -->
+  <section id="objet">
+    <h2>Article 1 — Objet & définitions</h2>
+    <p>« Abonnement » : accès annuel aux fonctionnalités et contenus réservés de la plateforme RSL, selon l’offre choisie.</p>
+    <p>« Événements » : compétitions, contests et manifestations physiques organisés ou co-organisés par RSL.</p>
+    <p>« Cours » : prestations d’enseignement, entraînements ou sessions encadrées proposées par RSL ou ses partenaires.</p>
+  </section>
+
+  <section id="inscription">
+    <h2>Article 2 — Inscription & éligibilité</h2>
+    <p>2.1. L’inscription au site et l’achat des Services sont ouverts aux personnes majeures ou aux mineurs avec l’accord préalable et écrit du représentant légal.</p>
+    <p>2.2. L’utilisateur s’engage à fournir des informations exactes et à les maintenir à jour. RSL peut refuser ou suspendre l’accès en cas de non-respect des présentes CGU/CGV.</p>
+  </section>
+
+  <section id="abonnements">
+    <h2>Article 3 — Abonnements annuels</h2>
+    <p>3.1. Durée : l’Abonnement a une durée d’un (1) an à compter de la date d’activation.</p>
+    <p>3.2. Renouvellement :</p>
+    <ul>
+      <li>Paiement par carte (Stripe) : renouvellement automatique à l’échéance, sauf résiliation dans les délais (art. 6).</li>
+      <li>Paiement via TWINT : pas de renouvellement automatique ; un nouvel achat devra être effectué chaque année.</li>
+    </ul>
+    <p>3.3. Tarifs : les prix sont en CHF. RSL peut ajuster les tarifs à l’échéance suivante ; les modifications sont communiquées sur le site ou par e-mail.</p>
+  </section>
+
+  <section id="paiement">
+    <h2>Article 4 — Paiement</h2>
+    <p>4.1. Moyens acceptés : cartes bancaires (via Stripe) et TWINT. Le débit intervient au moment de la commande.</p>
+    <p>4.2. Sécurité : les paiements par carte sont traités par Stripe. RSL ne stocke pas les données complètes de carte.</p>
+    <p>4.3. Facturation : une confirmation de commande est envoyée par e-mail. Les prix s’entendent TVA incluse si applicable ; si l’association n’est pas assujettie à la TVA, les prix sont indiqués TVA non applicable.</p>
+  </section>
+
+  <section id="events">
+    <h2>Article 5 — Événements & cours</h2>
+    <p>5.1. Inscriptions : les places peuvent être limitées et attribuées selon l’ordre des paiements reçus. L’inscription est ferme après réception du paiement et confirmation par RSL.</p>
+    <p>5.2. Non-échange & non-remboursement : les Cours et inscriptions aux Événements ne sont ni échangeables ni remboursables une fois validés.</p>
+    <p>5.3. Exception : en cas de demande introduite au moins 14 jours avant la date de l’Événement ou du Cours, RSL peut, à sa seule discrétion et à titre exceptionnel, accorder un remboursement partiel ou un avoir.</p>
+    <p>5.4. Annulation/modification par l’organisateur : en cas d’annulation par RSL, l’utilisateur se verra proposer un report, un avoir ou un remboursement. En cas de modification substantielle (date/lieu), l’utilisateur peut demander un remboursement si le report ne lui convient pas.</p>
+  </section>
+
+  <section id="resiliation">
+    <h2>Article 6 — Résiliation & non-reconduction</h2>
+    <p>6.1. Abonnements payés par carte (Stripe) : l’utilisateur peut résilier la reconduction automatique à tout moment depuis son compte ou en écrivant à <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a>. La demande doit parvenir au plus tard le 1er décembre précédant l’échéance annuelle afin d’éviter la reconduction pour l’année suivante.</p>
+    <p>6.2. Abonnements payés via TWINT : pas de reconduction automatique ; l’Abonnement cesse à l’échéance si aucun nouvel achat n’est effectué.</p>
+    <p>6.3. Effets : toute période d’Abonnement entamée reste due et n’est pas remboursée.</p>
+  </section>
+
+  <section id="retractation">
+    <h2>Article 7 — Droit de rétractation</h2>
+    <p>7.1. Le droit suisse ne prévoit pas de droit de rétractation général pour les achats en ligne. Aucun droit de rétractation n’est donc accordé, sauf disposition contraire des présentes CGU/CGV.</p>
+    <p>7.2. La possibilité de non-reconduction avant le 1er décembre (art. 6.1) tient lieu de mécanisme de sortie pour la période suivante.</p>
+    <p>7.3. Lorsque l’exécution débute immédiatement (accès au contenu/plateforme, inscription confirmée), l’utilisateur reconnaît perdre tout droit hypothétique de rétractation.</p>
+  </section>
+
+  <section id="utilisation">
+    <h2>Article 8 — Règles d’utilisation & conduite</h2>
+    <p>L’utilisateur s’engage à un comportement respectueux lors des Événements et sur le site. RSL peut exclure tout participant en cas de non-respect des règles de sécurité, d’éthique sportive ou des lois en vigueur, sans remboursement.</p>
+  </section>
+
+  <section id="responsabilite">
+    <h2>Article 9 — Responsabilité</h2>
+    <p>9.1. Site & Services numériques : RSL met en œuvre des efforts raisonnables pour assurer la disponibilité du site, sans garantie d’absence d’interruptions.</p>
+    <p>9.2. Événements : la pratique des sports de glisse comporte des risques. Chaque participant déclare disposer d’une assurance adéquate (accidents/responsabilité civile) et respecter les consignes de sécurité. RSL décline toute responsabilité pour les dommages non imputables à une faute grave ou intentionnelle de sa part.</p>
+    <p>9.3. Partenaires : certains Services peuvent être fournis par des partenaires ; RSL n’est pas responsable des prestations qu’ils exécutent sous leur contrôle.</p>
+  </section>
+
+  <section id="donnees">
+    <h2>Article 10 — Protection des données</h2>
+    <p>10.1. Cadre légal : traitement conforme à la loi fédérale sur la protection des données (LPD) en vigueur en Suisse.</p>
+    <p>10.2. Finalités : gestion des comptes, paiements, inscriptions, communication et sécurité du site.</p>
+    <p>10.3. Sous-traitants : prestataires de paiement (Stripe, TWINT) et services d’hébergement/outils nécessaires à l’exécution des Services.</p>
+    <p>10.4. Droits : droit d’accès et de rectification ; demandes à adresser à <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a>.</p>
+    <p>10.5. Cookies : le site peut utiliser des cookies techniques et analytiques ; les préférences peuvent être gérées via le navigateur.</p>
+  </section>
+
+  <section id="pi">
+    <h2>Article 11 — Propriété intellectuelle</h2>
+    <p>Les contenus, logos, visuels et marques de RSL sont protégés. Toute reproduction ou utilisation non autorisée est interdite.</p>
+  </section>
+
+  <section id="modifs">
+    <h2>Article 12 — Modifications des CGU/CGV</h2>
+    <p>RSL peut modifier les présentes CGU/CGV à tout moment. La version applicable est celle publiée sur le site à la date de l’achat ou de l’utilisation du Service. Les changements affectant la reconduction de l’Abonnement seront annoncés de manière appropriée.</p>
+  </section>
+
+  <section id="droit">
+    <h2>Article 13 — Droit applicable & for</h2>
+    <p>Les présentes CGU/CGV sont soumises au droit suisse. Le for exclusif est à Montreux (canton de Vaud), sous réserve des fors impératifs.</p>
+  </section>
+
+  <section id="contact">
+    <h2>Article 14 — Contact</h2>
+    <p>Pour toute question, résiliation ou demande relative aux Services : <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a>.</p>
+    <p class="muted">© RSL — Romandie Scooter League / Ride4Style, 2025</p>
+  </section>
+
+  <section id="tiers">
+    <h2>Article 15 — Rôle d’intermédiaire & organisateurs tiers</h2>
+    <p>Dans certains cas, RSL agit en qualité d’intermédiaire technique pour la gestion des inscriptions à des compétitions, événements ou contests organisés par des tiers, notamment des clubs, associations partenaires ou fédérations. RSL n’est dans ce cas pas l’organisateur de l’événement et ne saurait être tenue responsable de son contenu, de son déroulement, de ses conditions d’accès ou de toute modification, report ou annulation décidée par l’organisateur. Les conditions spécifiques propres à chaque événement (règlement sportif, catégories, assurance, etc.) relèvent de la seule responsabilité de l’organisateur. L’utilisateur s’engage à les consulter et à les accepter préalablement à son inscription.</p>
+  </section>
+
+  <section id="transfert">
+    <h2>Article 16 — Transmission de données à la fédération & partenaires</h2>
+    <p>Dans le cadre de certaines inscriptions (p. ex. contests officiels, événements fédéraux, championnats), RSL peut être amenée à transmettre certaines données personnelles (nom, prénom, date de naissance, club, niveau, coordonnées, etc.) à l’organisateur ou à la fédération concernée, uniquement dans le but d’assurer l’inscription, la planification sportive, la gestion des licences et la sécurité de l’événement. Ces partenaires s’engagent à respecter la législation suisse sur la protection des données. Aucune donnée n’est transmise à des tiers à des fins commerciales.</p>
+  </section>
+
+  <section id="conditions-partenaires">
+    <h2>Article 17 — Conditions propres aux événements partenaires</h2>
+    <p>Certaines inscriptions disponibles sur la plateforme RSL peuvent être soumises à des conditions spécifiques propres à l’événement concerné (assurance obligatoire, certificat médical, autorisation parentale, règlement sportif, politique de remboursement, etc.). Ces conditions sont réputées connues et acceptées au moment de l’inscription. En cas d’annulation, de report ou de modification décidée par un tiers, les politiques applicables (remboursement, avoir, report) sont exclusivement celles de l’organisateur concerné.</p>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>
+```0

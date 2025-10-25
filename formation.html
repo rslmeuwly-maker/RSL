@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Formation — Romandie Scooter League</title>
+
+  <!-- Fonts + Style -->
+<style>
+    /* === Image de fond hero === */
+    .hero.hero-photo {
+      position: relative;
+      color: #fff;
+      overflow: hidden;
+    }
+    .hero.hero-photo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.75)),
+        url("images/lanoubc1.jpg") center/cover no-repeat;
+      z-index: 0;
+    }
+    .hero.hero-photo .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* === FOOTER 3 colonnes + bas à droite === */
+    .foot .links-3cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 36px 6vw;
+      align-items: start;
+    }
+    .foot .links-3cols h4 { margin: 0 0 8px; color: #fff; font-weight: 700; }
+    .foot .links-3cols ul { list-style: none; margin: 0; padding: 0; }
+    .foot .links-3cols li { margin: 6px 0; }
+    .foot .links-3cols a { color: #cdd6ff; text-decoration: none; }
+    .foot .links-3cols a:hover { text-decoration: underline; }
+
+    .foot .bottom.bottom-right {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 14px;
+      padding: 10px 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 14px;
+    }
+    .foot .bottom.bottom-right p { margin: 0; }
+    .foot .bottom.bottom-right a { color: #cdd6ff; text-decoration: none; }
+    .foot .bottom.bottom-right a:hover { text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      .foot .links-3cols { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .foot .links-3cols { grid-template-columns: 1fr; }
+      .foot .bottom.bottom-right { justify-content: space-between; }
+    }
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+
+<body>
+
+  <!-- NAV identique à l'index -->
+  <nav class="nav">
+  <div class="container nav-inner">
+    <!-- ✅ corrigé: retour index -->
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <!-- HERO avec image -->
+  <header class="hero hero-photo">
+    <div class="container hero-inner">
+      <div class="grid">
+        <!-- Colonne gauche : texte -->
+        <div>
+          <h1>Formation <b>Moniteur RSL</b></h1>
+          <p>
+            Journée complète (6–7h) encadrée par une <b>éducatrice spécialisée</b> + <b>module Samaritains (≈2h)</b> :
+            sécurité & pédagogie, progression technique, pratique au skatepark, <b>examen</b> et <b>certificat RSL</b>.
+          </p>
+
+          <div class="price">
+            <span class="now">30.–</span>
+            <span class="was">99.–</span>
+            <span class="note">prix de lancement</span>
+          </div>
+
+          <div class="panel">
+            <div class="chip">Certificat RSL</div>
+            <div class="chip">1ʳᵉ session 2026</div>
+            <a class="chip" href="docs/formation-horaire.pdf" download>Télécharger l’horaire (.pdf)</a>
+          </div>
+        </div>
+
+        <!-- Colonne droite : formulaire -->
+        <div class="panel enroll">
+          <strong>Choisis ta date (1er samedi du mois — 2026)</strong>
+
+          <form class="rsl-form" id="formationForm"
+                action="https://formspree.io/f/xrbylkqk" method="POST"
+                onsubmit="alert('Merci ! Inscription envoyée. Tu recevras un email de confirmation si l’auto-reply Formspree est activé.');">
+
+            <p class="muted small">Capacité : 20 inscrits par date (bloqué localement quand c’est plein).</p>
+
+            <div class="form-row">
+              <label for="formationDate">Date</label>
+              <select id="formationDate" name="date_choisie" required>
+                <option value="">— Sélectionne une date —</option>
+                <option value="2026-03-07">Samedi 07 mars 2026</option>
+                <option value="2026-04-04">Samedi 04 avril 2026</option>
+                <option value="2026-05-02">Samedi 02 mai 2026</option>
+                <option value="2026-06-06">Samedi 06 juin 2026</option>
+                <option value="2026-07-04">Samedi 04 juillet 2026</option>
+                <option value="2026-10-03">Samedi 03 octobre 2026</option>
+                <option value="2026-11-07">Samedi 07 novembre 2026</option>
+                <option value="2026-12-05">Samedi 05 décembre 2026</option>
+              </select>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-row">
+                <label for="nom">Nom et prénom</label>
+                <input id="nom" name="nom" required placeholder="Nom et prénom" />
+              </div>
+
+              <div class="form-row">
+                <label for="email">Email</label>
+                <input id="email" type="email" name="email" required placeholder="ton@email.ch" />
+              </div>
+
+              <div class="form-row">
+                <label for="naissance">Date de naissance</label>
+                <input id="naissance" type="date" name="date_naissance" required />
+              </div>
+            </div>
+
+            <input type="hidden" name="subject" value="Inscription Formation RSL 2026" />
+
+            <div class="form-actions">
+              <button class="btn" type="submit">Je m’inscris</button>
+            </div>
+
+            <p class="tiny">Astuce : ajoute l’événement dans ton agenda Google après confirmation.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU : Programme & Après la formation -->
+  <section class="section">
+    <div class="container grid-2">
+      <div class="card">
+        <h3>Programme (exemple de journée 6–7h)</h3>
+        <ul class="list">
+          <li><b>09:00 – 09:15</b> · Accueil & présentation RSL</li>
+          <li><b>09:15 – 10:00</b> · Rôle du moniteur : attitude, responsabilité, motivation</li>
+          <li><b>10:00 – 10:45</b> · Pédagogie & progression : structurer un cours</li>
+          <li><b>11:00 – 12:30</b> · <b>Module Samaritains (≈2h) :</b> sécuriser la zone, évaluer, 144, plaies/entorses/trauma</li>
+          <li><b>12:30 – 13:15</b> · Pause</li>
+          <li><b>13:15 – 14:15</b> · Sécurité & gestion des risques au skatepark</li>
+          <li><b>14:15 – 15:15</b> · Communication positive avec les jeunes</li>
+          <li><b>15:30 – 16:30</b> · Mise en pratique : chaque participant anime un mini-cours</li>
+          <li><b>16:30 – 17:00</b> · Examen & remise des certificats</li>
+        </ul>
+        <p class="tiny muted" style="margin-top:8px">Télécharge la version PDF : <a href="docs/formation-horaire.pdf" download>formation-horaire.pdf</a></p>
+      </div>
+
+      <div class="card">
+        <h3>Après la formation</h3>
+        <ul class="list">
+          <li><b>Certificat « Moniteur RSL »</b> (si réussite de l’examen)</li>
+          <li><b>Référencement</b> : ton profil apparaît sur le site RSL (annuaire des moniteurs)</li>
+          <li><b>Contact direct</b> : les clubs/parents peuvent te contacter via la RSL pour des cours</li>
+          <li><b>Accès</b> : ressources pédagogiques & mises à jour RSL</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER corrigé ===== -->
+  <footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- HelpBot (RSL) -->
+<link rel="stylesheet" href="css/helpbot.css">
+<div id="hb-root">
+  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+    <div class="hb-head">
+      <div class="title" id="hbTitle">Aide — RSL</div>
+      <div class="actions">
+        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
+        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="hb-body" id="hbBody"></div>
+    <div class="hb-foot">
+      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
+      <button id="hbSend" class="hb-send">Envoyer</button>
+    </div>
+  </div>
+</div>
+<script defer src="js/helpbot.js"></script>
+
+</body></html>

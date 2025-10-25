@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Où rider ? — Romandie Scooter League</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Styles locaux (hero + carte + footer) -->
+  <style>
+    .hero.hero-photo{position:relative;color:#fff;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08)}
+    .hero.hero-photo::before{content:"";position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.75)),url("images/lanoubc4.jpg") center/cover no-repeat;z-index:0}
+    .hero.hero-photo .container{position:relative;z-index:1}
+
+    /* Carte + panneau filtres */
+    #map{height:68vh;min-height:420px;border-radius:14px;border:1px solid #e6e9ee}
+    .map-wrap{display:grid;grid-template-columns:260px 1fr;gap:16px}
+    @media (max-width:900px){.map-wrap{grid-template-columns:1fr}}
+    .filters{border:1px solid #e6e9ee;border-radius:14px;padding:14px;height:68vh;min-height:420px;overflow:auto}
+    .filters h3{margin:0 0 8px}
+    .legend{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:center;margin:10px 0}
+    .dot{width:14px;height:14px;border-radius:50%}
+    .dot.green{background:#16a34a}.dot.blue{background:#0ea5e9}.dot.red{background:#ef4444}.dot.violet{background:#7c3aed}
+    .filters label{display:flex;gap:8px;align-items:center;margin:8px 0;font-weight:600}
+    .filters small{color:#4b5563}
+
+    /* Footer (identique) */
+    .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}
+    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+    .foot .links-3cols li{margin:6px 0}
+    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+    .foot .links-3cols a:hover{text-decoration:underline}
+    .foot .bottom.bottom-right{border-top:1px solid rgba(255,255,255,0.08);margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center}
+    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+    .foot .bottom.bottom-right a:hover{text-decoration:underline}
+    @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+    @media (max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
+  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/common.css"/>
+  <link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/"><img src="images/logo_rsl.png" alt="Logo RSL"><span><b>RSL — Romandie Scooter League</b></span></a>
+      <ul>
+        <li><a href="formation.html">Formation RSL</a></li>
+        <li><a href="disciplines.html">Disciplines</a></li>
+        <li><a href="ou_rider.html">Où rider ?</a></li>
+        <li><a href="game.html">Games</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="comite.html">Comité</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="cours.html">Cours</a></li>
+      </ul>
+      <div class="cta">
+        <button class="btn" id="btnIdentity">Se connecter</button>
+        <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+        <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+      </div>
+      <div class="cta"><a class="btn" id="btnMembre" href="membres.html">Devenir membre</a></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero hero-photo">
+    <div class="container hero-inner">
+      <div class="grid">
+        <div>
+          <h1>Où rider ?</h1>
+          <p class="muted">Carte des <b>skateparks</b>, <b>shops partenaires</b> et <b>lieux de cours RSL</b>.</p>
+        </div>
+        <div class="panel">
+          <strong>Filtres rapides</strong>
+          <p class="muted">Affiche ce qui t’intéresse (cours int./ext., shops, skateparks).</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CARTE + FILTRES -->
+  <main class="container" style="padding:28px 0 40px">
+    <div class="map-wrap">
+      <aside class="filters" aria-label="Filtres carte">
+        <h3>Filtres</h3>
+        <div class="legend"><span class="dot green"></span><span>Cours RSL — <b>intérieur</b></span></div>
+        <div class="legend"><span class="dot blue"></span><span>Cours RSL — <b>extérieur</b></span></div>
+        <div class="legend"><span class="dot red"></span><span><b>Shops</b> partenaires</span></div>
+        <div class="legend"><span class="dot violet"></span><span><b>Skateparks</b></span></div>
+
+        <label><input type="checkbox" id="f-int" checked> Cours RSL (intérieur)</label>
+        <label><input type="checkbox" id="f-ext" checked> Cours RSL (extérieur)</label>
+        <label><input type="checkbox" id="f-shop" checked> Shops partenaires</label>
+        <label><input type="checkbox" id="f-park" checked> Skateparks</label>
+        <hr style="margin:12px 0">
+        <small>Astuce : clique un pin pour l’adresse et les infos.</small>
+      </aside>
+
+      <div id="map" role="region" aria-label="Carte des spots"></div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <div class="container">
+      <div class="links links-3cols">
+        <div class="col"><h4>RSL</h4><ul><li><a href="formation.html">Formation</a></li><li><a href="evenements.html">Événements</a></li><li><a href="reglement.html">Règlement</a></li></ul></div>
+        <div class="col"><h4>Ressources</h4><ul><li><a href="membres.html">Adhésion</a></li><li><a href="comite.html">Comité</a></li><li><a href="ou_rider.html">Où rider</a></li></ul></div>
+        <div class="col"><h4>Contest</h4><ul><li><a href="evenements.html">Événements</a></li><li><a href="inscriptions.html">Inscriptions</a></li><li><a href="resultats.html">Résultats</a></li></ul></div>
+      </div>
+      <div class="bottom bottom-right">
+        <p class="tiny">© 2025 — Romandie Scooter League</p>
+        <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS Carte -->
+  <script>
+  (function(){
+    /* ===== 1) Carte de base ===== */
+    const map = L.map('map').setView([46.8, 8.2], 8);
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
+    osm.on('tileerror', () => {
+      L.tileLayer('https://tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap (FR)'}).addTo(map);
+    });
+
+    /* ===== 2) Icônes par catégorie ===== */
+    function pin(color, emoji){
+      return L.divIcon({
+        className:'rsl-marker',
+        html: '<div style="width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+color+';border:2px solid #fff;font-size:16px">'+emoji+'</div>',
+        iconSize:[30,30], iconAnchor:[15,15]
+      });
+    }
+    const ICONS = {
+      int : pin('#16a34a','🏫'),     // indoor cours
+      ext : pin('#0ea5e9','🛼'),     // outdoor cours
+      shop: pin('#ef4444','🏪'),     // shops
+      park: pin('#7c3aed','🛹')      // skateparks
+    };
+
+    /* ===== 3) Données ===== 
+       - coords approximatives OK pour placer le pin.
+       - shops partenaires : Sportmania (St-Sulpice/VD), Adrelyx (Sion/VS), Surf Machine (Bulle/FR), JF Rideshop (Montreux/VD)
+    */
+    const spots = [
+      // — Cours RSL (indoor)
+      {type:'int', name:'Cours RSL — Montreux (indoor)',   lat:46.433, lng:6.910, city:'Montreux', note:'Ouvert hors fériés/vacances', link:'cours.html'},
+      {type:'int', name:'Cours RSL — Lausanne (La Fièvre, indoor)', lat:46.536, lng:6.626, city:'Lausanne', note:'Halle La Fièvre', link:'cours.html'},
+
+      // — Cours RSL (outdoor)
+      {type:'ext', name:'Cours RSL — Lausanne (Vidy, outdoor)', lat:46.523, lng:6.610, city:'Lausanne', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Bulle (outdoor)',     lat:46.616, lng:7.057, city:'Bulle', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Yverdon (outdoor)',   lat:46.778, lng:6.640, city:'Yverdon', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Martigny (outdoor)',  lat:46.103, lng:7.074, city:'Martigny', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Fribourg (outdoor)',  lat:46.802, lng:7.151, city:'Fribourg', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Genève (Plainpalais, outdoor)', lat:46.198, lng:6.142, city:'Genève', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
+
+      // — Shops partenaires
+      {type:'shop', name:'Sportmania (shop partenaire)', lat:46.512, lng:6.561, city:'St-Sulpice (VD)', note:'Chemin des Pâquis 7, 1025', url:'https://www.sportmania.ch'},
+      {type:'shop', name:'Adrelyx (shop partenaire)',    lat:46.226, lng:7.353, city:'Sion (VS)', note:'Rue de la Drague 14, 1950', url:'https://www.adrelyx.ch'},
+      {type:'shop', name:'Surf Machine (shop partenaire)', lat:46.617, lng:7.056, city:'Bulle (FR)', note:'Rue de Vevey 18, 1630', url:'https://www.surf-machine.ch'},
+      {type:'shop', name:'JF Rideshop (shop partenaire)', lat:46.433, lng:6.910, city:'Montreux (VD)', note:'Rue de la Paix 3, 1820', url:'https://jfrideshop.ch'},
+
+      // — Skateparks (exemples)
+      {type:'park', name:'Skatepark de Sion',     lat:46.233, lng:7.360, city:'Sion',  note:'Park street/park'},
+      {type:'park', name:'Skatepark de Vevey',    lat:46.461, lng:6.844, city:'Vevey', note:'Bowl + street'},
+      {type:'park', name:'Skatepark de Nyon',     lat:46.383, lng:6.231, city:'Nyon',  note:'Street plaza'}
+    ];
+
+    /* ===== 4) Création des marqueurs et index par type ===== */
+    const layers = { int: L.layerGroup().addTo(map), ext: L.layerGroup().addTo(map), shop: L.layerGroup().addTo(map), park: L.layerGroup().addTo(map) };
+
+    function popupHtml(s){
+      const link = s.url ? `<a href="${s.url}" target="_blank" rel="noopener">Site</a>` : (s.link ? `<a href="${s.link}">Infos & cours</a>` : '');
+      return `<b>${s.name}</b><br>${s.city||''}${s.city?'<br>':''}${s.note||''}${link?'<br>'+link:''}`;
+    }
+
+    spots.forEach(s=>{
+      const m = L.marker([s.lat, s.lng], {icon: ICONS[s.type]}).bindPopup(popupHtml(s));
+      layers[s.type].addLayer(m);
+    });
+
+    /* ===== 5) Filtres ===== */
+    const fInt  = document.getElementById('f-int');
+    const fExt  = document.getElementById('f-ext');
+    const fShop = document.getElementById('f-shop');
+    const fPark = document.getElementById('f-park');
+
+    function applyFilters(){
+      (fInt.checked  ? map.addLayer(layers.int)  : map.removeLayer(layers.int));
+      (fExt.checked  ? map.addLayer(layers.ext)  : map.removeLayer(layers.ext));
+      (fShop.checked ? map.addLayer(layers.shop) : map.removeLayer(layers.shop));
+      (fPark.checked ? map.addLayer(layers.park) : map.removeLayer(layers.park));
+    }
+    [fInt,fExt,fShop,fPark].forEach(el=>el.addEventListener('change', applyFilters));
+    applyFilters();
+  })();
+  </script>
+
+  <!-- Identité (inchangé) -->
+  <script>
+  (function(){
+    function init(){
+      var idBtn=document.getElementById('btnIdentity');
+      var btnLogout=document.getElementById('btnLogout');
+      var btnAccount=document.getElementById('btnAccount');
+      function refresh(user){var logged=!!user;
+        if(idBtn) idBtn.style.display=logged?'none':'';
+        if(btnLogout) btnLogout.style.display=logged?'':'none';
+        if(btnAccount) btnAccount.style.display=logged?'':'none';
+      }
+      if(window.netlifyIdentity){
+        window.netlifyIdentity.on('init',function(user){refresh(user);});
+        window.netlifyIdentity.on('login',function(user){refresh(user);window.netlifyIdentity.close();});
+        window.netlifyIdentity.on('logout',function(){refresh(null);});
+        window.netlifyIdentity.init();
+      }
+      if(idBtn) idBtn.addEventListener('click',function(){if(window.netlifyIdentity) window.netlifyIdentity.open();});
+      if(btnLogout) btnLogout.addEventListener('click',function(){if(window.netlifyIdentity) window.netlifyIdentity.logout();});
+      if(btnAccount) btnAccount.addEventListener('click',function(e){e.preventDefault();if(window.netlifyIdentity) window.netlifyIdentity.open('settings');});
+    }
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);} else {init();}
+  })();
+  </script>
+  <script defer src="js/site.js"></script>
+  <script defer src="/.netlify/identity-widget.js"></script>
+  <script defer src="js/auth.js"></script>
+
+  <!-- HelpBot -->
+  <link rel="stylesheet" href="css/helpbot.css">
+  <div id="hb-root">
+    <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+    <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+      <div class="hb-head"><div class="title" id="hbTitle">Aide — RSL</div><div class="actions"><button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button><button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button></div></div>
+      <div class="hb-body" id="hbBody"></div>
+      <div class="hb-foot"><input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question…"><button id="hbSend" class="hb-send">Envoyer</button></div>
+    </div>
+  </div>
+  <script defer src="js/helpbot.js"></script>
+
+</body>
+</html>

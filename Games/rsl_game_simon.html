@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>RSL — Simon des Tricks (mémoire) v2 — Touches clavier</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#0f1422; --ink:#e9eef6; --muted:#9fb1cb; --line:#243652;
+    --violet:#9b5cff; --green:#3be28f; --red:#ff557a; --yellow:#ffd166; --blue:#6ec1ff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Outfit',system-ui,Segoe UI,Roboto,Arial}
+  .container{max-width:1000px;margin:0 auto;padding:16px}
+  .nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.8);backdrop-filter:blur(6px);z-index:5}
+  .nav-inner{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit}
+  .brand img{height:28px;width:auto;display:block}
+  .brand span{font-weight:800;letter-spacing:.2px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .card h2{margin:0 0 8px 0;font-size:22px}
+
+  /* Board */
+  .board{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px}
+  .pad{position:relative;border-radius:16px;padding:18px;text-align:center;font-weight:800;border:1px solid var(--line);
+       background:#10192b; min-height:110px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+       box-shadow:0 6px 28px rgba(0,0,0,.25) inset; user-select:none}
+  .pad[data-i="0"]{background:linear-gradient(180deg,#cdd8ff,#8ba8ff);}   /* blue */
+  .pad[data-i="1"]{background:linear-gradient(180deg,#d7c6ff,#9b7bff);}   /* violet */
+  .pad[data-i="2"]{background:linear-gradient(180deg,#bdf6d9,#5fe7a9);}   /* green */
+  .pad[data-i="3"]{background:linear-gradient(180deg,#ffdba3,#ffc04d);}   /* yellow */
+  .pad .hint{position:absolute;bottom:8px;right:10px;font-size:12px;color:#000;opacity:.6;font-weight:900}
+  .pad.active{filter:saturate(1.25) brightness(1.12); transform:translateY(-2px);}
+  .pad.wrong{animation:shake .35s linear}
+  @keyframes shake{ 20%{transform:translateX(-4px)} 40%{transform:translateX(4px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} 100%{transform:none}}
+
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{padding:6px 10px;border-radius:999px;background:#121a2a;border:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+  .btn.primary{background:var(--violet);color:#10062a}
+  .btn.secondary{background:#121a2a;color:#dfeaff;border:1px solid var(--line)}
+  .btn.green{background:var(--green);color:#02210f}
+  .btn.red{background:var(--red);color:#2a0010}
+  input,textarea{background:#101728;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+  textarea{min-height:120px; resize:vertical;}
+
+  .status{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .big{font-size:18px;font-weight:800}
+  .muted{color:var(--muted)}
+  .pill{padding:6px 10px;border-radius:999px;background:#0d1526;border:1px solid var(--line)}
+  .ok{color:var(--green)} .warn{color:var(--yellow)} .err{color:var(--red)}
+
+  .footer{padding:14px;color:#99b1d1;text-align:center;font-size:12px}
+/* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+  <nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <main class="container">
+    <div class="grid">
+      <!-- JEU -->
+      <section class="card">
+        <h2>Repère la séquence… puis <b>rejoue-la</b> !</h2>
+        <div class="status">
+          <span class="pill">Niveau: <b id="level">0</b></span>
+          <span class="pill">Meilleur: <b id="best">0</b></span>
+          <span class="pill">Tricks possibles: <b id="trickCount">4</b></span>
+          <span id="msg" class="big muted">Prêt</span>
+        </div>
+
+        <div class="board" id="board">
+          <div class="pad" data-i="0"><span id="t0">Whip</span><span class="hint">F / 1</span></div>
+          <div class="pad" data-i="1"><span id="t1">Barspin</span><span class="hint">G / 2</span></div>
+          <div class="pad" data-i="2"><span id="t2">Tailwhip</span><span class="hint">H / 3</span></div>
+          <div class="pad" data-i="3"><span id="t3">360</span><span class="hint">J / 4</span></div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="playBtn">▶️ Jouer</button>
+          <button class="btn green" id="strictBtn">Strict OFF</button>
+          <button class="btn red" id="resetBestBtn">↻ Reset meilleur</button>
+          <span class="chip">Touches : F G H J (ou 1 2 3 4)</span>
+        </div>
+      </section>
+
+      <!-- LISTE ÉDITABLE -->
+      <aside class="card">
+        <h2>Liste des tricks (éditable)</h2>
+        <p class="muted" style="margin:0 0 6px">Un trick par ligne (les 4 premiers alimentent les 4 pads, les suivants peuvent apparaître dans la séquence).</p>
+        <textarea id="tricksBox">Whip
+Barspin
+Tailwhip
+360
+Scooter flip
+Inward
+Bryflip
+Fingerwhip
+Backflip
+Frontflip</textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="btn secondary" id="saveTricksBtn">💾 Sauvegarder</button>
+          <button class="btn secondary" id="shuffleBtn">🔀 Mélanger</button>
+          <span class="chip">Sauvé en local</span>
+        </div>
+      </aside>
+    </div>
+
+    <p class="footer">© 2025 — Romandie Scooter League · “Simon des Tricks”</p>
+  </main>
+
+  <!-- Modale règles -->
+  <dialog id="howDlg">
+    <div class="card" style="max-width:560px">
+      <h2>Règles</h2>
+      <p>Observe la séquence de tricks (les pads s’allument). Ensuite, <b>rejoue la même séquence</b> en appuyant sur les pads — au <b>clavier</b> (F/G/H/J ou 1/2/3/4) ou au <b>tactile</b>.</p>
+      <ul>
+        <li>Chaque manche ajoute <b>1 trick</b> en plus.</li>
+        <li>Mode <b>Strict</b> : une seule erreur = manche perdue.</li>
+        <li>Tu peux éditer la <b>liste des tricks</b> (colonne de droite) ; elle est sauvegardée dans le navigateur.</li>
+      </ul>
+      <div class="row"><button class="btn primary" id="closeHow">OK</button></div>
+    </div>
+  </dialog>
+
+<script>
+  const $ = s => document.querySelector(s);
+  const pads = [...document.querySelectorAll('.pad')];
+  const levelEl = $('#level'), bestEl = $('#best'), msgEl = $('#msg'), trickCountEl = $('#trickCount');
+  const playBtn = $('#playBtn'), strictBtn = $('#strictBtn'), resetBestBtn = $('#resetBestBtn');
+  const tricksBox = $('#tricksBox'), saveTricksBtn = $('#saveTricksBtn'), shuffleBtn = $('#shuffleBtn');
+  const howBtn = $('#howBtn'), howDlg = $('#howDlg'), closeHow = $('#closeHow');
+
+  // Audio simple (WebAudio)
+  let AC=null; function audio(){ if(!AC){ AC = new (window.AudioContext||window.webkitAudioContext)(); } return AC; }
+  function ensureAudio(){ try{ audio().resume(); }catch(e){} }
+  function beep(freq=440, dur=0.14, vol=0.08){
+    const ctx=audio(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=freq; g.gain.value=vol;
+    o.connect(g).connect(ctx.destination);
+    const t=ctx.currentTime; o.start(t); g.gain.exponentialRampToValueAtTime(0.0001, t+dur); o.stop(t+dur+0.02);
+  }
+  const tones=[392,494,523,659,740,880,988,1175]; // G4..D6 approx
+
+  // Local storage
+  const KEY_TRICKS='rsl_simon_tricks';
+  const KEY_BEST='rsl_simon_best';
+  const KEY_STRICT='rsl_simon_strict';
+
+  function loadTricks(){
+    try{
+      const raw=localStorage.getItem(KEY_TRICKS);
+      if(raw){ tricksBox.value = raw; }
+    }catch(e){}
+    applyTricksToUI();
+  }
+  function saveTricks(){
+    localStorage.setItem(KEY_TRICKS, tricksBox.value.trim());
+    applyTricksToUI();
+    flash('Tricks sauvegardés', 'ok');
+  }
+  function getTrickList(){
+    return tricksBox.value.split('\n').map(s=>s.trim()).filter(Boolean);
+  }
+  function applyTricksToUI(){
+    const list=getTrickList();
+    trickCountEl.textContent = list.length;
+    for(let i=0;i<4;i++){
+      const txt = list[i] || `Pad ${i+1}`;
+      const span = document.getElementById('t'+i);
+      if(span) span.textContent = txt;
+    }
+  }
+
+  // State
+  let sequence=[];   // ex: [0,2,1,...]
+  let inputIdx=0;
+  let playingBack=false;
+  let strict = false;
+  let best = parseInt(localStorage.getItem(KEY_BEST)||'0',10) || 0;
+  bestEl.textContent = best;
+
+  try{
+    strict = localStorage.getItem(KEY_STRICT)==='1';
+    strictBtn.textContent = strict ? 'Strict ON' : 'Strict OFF';
+    strictBtn.classList.toggle('green', strict);
+  }catch(e){}
+
+  function setStrict(v){
+    strict=v; localStorage.setItem(KEY_STRICT, v?'1':'0');
+    strictBtn.textContent = v ? 'Strict ON' : 'Strict OFF';
+    strictBtn.classList.toggle('green', v);
+  }
+
+  // Start / next round
+  function startGame(){
+    if(playingBack) return;
+    ensureAudio();
+    sequence.length=0; inputIdx=0;
+    nextRound();
+  }
+  function nextRound(){
+    const list = getTrickList();
+    if(list.length<4){ flash('Ajoute au moins 4 tricks', 'err'); return; }
+    const next = Math.floor(Math.random()*4);
+    sequence.push(next);
+    levelEl.textContent = sequence.length;
+    msgEl.textContent = 'Observe…';
+    playback();
+  }
+
+  function playback(){
+    playingBack=true; inputIdx=0;
+    const stepMs = Math.max(420 - sequence.length*6, 250);
+    let i=0;
+    const tick=()=>{
+      if(i>=sequence.length){ playingBack=false; msgEl.textContent='À toi !'; return; }
+      const idx = sequence[i];
+      flashPad(idx);
+      const freq = tones[idx%tones.length];
+      beep(freq, 0.13, 0.09);
+      i++;
+      setTimeout(tick, stepMs);
+    };
+    tick();
+  }
+
+  function flashPad(i){
+    const p = document.querySelector(`.pad[data-i="${i}"]`);
+    if(!p) return;
+    p.classList.add('active');
+    setTimeout(()=> p.classList.remove('active'), 160);
+  }
+
+  function press(i){
+    if(playingBack) return;
+    ensureAudio();
+    const list=getTrickList();
+    const name=(list[i]||('Pad '+(i+1)));
+    flashPad(i);
+    beep(tones[i%tones.length], 0.12, 0.08);
+    if(sequence[inputIdx]===i){
+      inputIdx++;
+      if(inputIdx===sequence.length){
+        if(sequence.length>best){ best=sequence.length; bestEl.textContent=best; localStorage.setItem(KEY_BEST,String(best)); }
+        msgEl.textContent='Bien joué !';
+        setTimeout(()=> nextRound(), 550);
+      }
+    }else{
+      const p = document.querySelector(`.pad[data-i="${i}"]`);
+      p?.classList.add('wrong'); setTimeout(()=> p?.classList.remove('wrong'), 350);
+      beep(110, 0.25, 0.1);
+      msgEl.textContent = 'Oups…';
+      if(strict){
+        flash('Perdu (mode strict). Rejoue !', 'warn');
+        levelEl.textContent='0';
+        sequence.length=0; inputIdx=0;
+      }else{
+        flash('Raté. Rejoue la même manche.', 'warn');
+        inputIdx=0;
+        setTimeout(()=> playback(), 500);
+      }
+    }
+  }
+
+  // UI bindings
+  pads.forEach(p=> p.addEventListener('pointerdown', ()=> press(parseInt(p.dataset.i,10)) ));
+  playBtn.addEventListener('click', ()=> { ensureAudio(); startGame(); });
+  strictBtn.addEventListener('click', ()=> setStrict(!strict));
+  resetBestBtn.addEventListener('click', ()=> { best=0; localStorage.setItem(KEY_BEST,'0'); bestEl.textContent='0'; flash('Meilleur remis à 0', 'ok'); });
+  saveTricksBtn.addEventListener('click', saveTricks);
+  shuffleBtn.addEventListener('click', ()=> {
+    const list = getTrickList();
+    for(let i=list.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [list[i],list[j]]=[list[j],list[i]]; }
+    tricksBox.value = list.join('\n');
+    saveTricks();
+  });
+  howBtn.addEventListener('click', ()=> howDlg.showModal());
+  closeHow.addEventListener('click', ()=> howDlg.close());
+
+  // Clavier (F/G/H/J ou 1/2/3/4)
+  const keyMap={ 'f':0,'g':1,'h':2,'j':3,'1':0,'2':1,'3':2,'4':3 };
+  document.addEventListener('keydown', (e)=>{
+    const k=e.key.toLowerCase();
+    if(keyMap[k]!=null){
+      e.preventDefault();
+      press(keyMap[k]);
+    }
+    if(k===' '){ e.preventDefault(); startGame(); }
+  }, {passive:false});
+
+  function flash(text, kind){
+    msgEl.textContent=text;
+    msgEl.classList.remove('ok','warn','err');
+    if(kind) msgEl.classList.add(kind);
+    setTimeout(()=> { msgEl.textContent='Prêt'; msgEl.classList.remove('ok','warn','err'); }, 1800);
+  }
+
+  // init
+  loadTricks();
+</script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>

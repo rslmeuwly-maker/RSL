@@ -1,0 +1,460 @@
+/* ============ Variables & base ============ */
+:root{
+  --bg:#0f1a24;        /* header/hero */
+  --ink:#101418;       /* main text */
+  --muted:#6b7785;     /* secondary text */
+  --brand:#17b26a;     /* RSL green */
+  --accent:#E10600;    /* Swiss red */
+  --card:#ffffff;
+  --soft:#f3f5f7;
+  --border:#e6e9ee;
+  --radius:16px;
+  --shadow:0 10px 30px rgba(10,12,16,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font:16px/1.6 'Outfit',system-ui,Segoe UI,Roboto,Arial;color:var(--ink);background:#fff}
+a{color:inherit;text-decoration:none}
+.container{max-width:1180px;margin:auto;padding:0 22px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.05;margin:0 0 8px;font-weight:800}
+h2{font-size:clamp(22px,3.2vw,30px);margin:0 0 12px;font-weight:800}
+h3{margin:0 0 8px;font-weight:700}
+.muted{color:var(--muted)}
+.tiny{font-size:12px;color:var(--muted)}
+
+/* ============ NAVBAR centrée ============ */
+.nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:60; padding:14px 0;}
+.nav-inner{
+  display:flex;align-items:center;justify-content:center;gap:22px;
+  min-height:100px; height:100px;
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;white-space:nowrap}
+.brand img{
+  height:110px;width:auto;object-fit:contain;border-radius:10px;
+  border:1px solid var(--border); margin: 8px 0;
+}
+.brand span{font-weight:900}
+.nav ul{display:flex;gap:18px;margin:0;padding:0;list-style:none}
+.nav a{position:relative;font-weight:600;opacity:.95;padding:6px 10px;border-radius:6px}
+.nav a:hover{background:var(--brand);color:#fff}
+.nav a.active::after{content:"";position:absolute;left:10px;right:10px;bottom:-6px;height:2px;background:var(--brand);border-radius:2px}
+.nav .cta{margin-left:0}
+.nav .btn{margin-left:6px}
+.nav-toggle{display:none;background:transparent;border:0}
+.nav-toggle span{width:22px;height:2px;background:#111;border-radius:2px;display:block;margin:5px 0}
+
+/* ============ Boutons ============ */
+.btn{
+  background:var(--brand);color:#fff;padding:11px 16px;border-radius:999px;
+  font-weight:800;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:10px;
+  transition:transform .18s,filter .18s
+}
+.btn:hover{filter:brightness(.96);transform:translateY(-1px)}
+.btn.dark{background:#1f2937}
+.btn.red{background:var(--accent)}
+
+/* Shimmer (doucement 1x) */
+@keyframes shimmerOnce{
+  0%,100%{box-shadow:0 0 0 0 rgba(23,178,106,0);transform:translateY(0)}
+  12%{box-shadow:0 0 0 12px rgba(23,178,106,.22)}
+  24%{box-shadow:0 0 0 0 rgba(23,178,106,0);transform:translateY(-1px)}
+  36%{box-shadow:0 0 0 12px rgba(23,178,106,.22)}
+  48%{box-shadow:0 0 0 0 rgba(23,178,106,0);transform:translateY(0)}
+}
+.btn.shimmer{animation:shimmerOnce 3.2s ease-out 1.2s 1 forwards}
+
+/* ============ HERO ============ */
+.hero{background:var(--bg);color:#fff;padding:64px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.hero-inner .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
+.hero p{color:#c7d1dc;margin:0 0 18px}
+.panel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:18px}
+.chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 10px;font-size:13px}
+
+/* ============ Sections & cartes ============ */
+section{padding:56px 0}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+
+/* ============ Comité ============ */
+.committee{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.member{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.member img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:1px solid var(--border);margin-bottom:8px}
+@media(max-width:980px){.committee{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ Footer ============ */
+.foot{background:#0b1218;color:#c7d1dc;padding:32px 0;margin-top:40px}
+.list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+
+/* ============ Modal (dialog) ============ */
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog{border:none;border-radius:16px;padding:0;max-width:540px;width:92vw}
+.modal-card{padding:20px;border:1px solid var(--border);border-radius:16px;background:#fff}
+.modal-actions{display:flex;gap:10px;margin-top:10px}
+
+/* ============ Responsive nav ============ */
+@media(max-width:1000px){
+  .brand img{height:90px}
+}
+@media(max-width:900px){
+  .nav-toggle{display:block}
+  .nav-inner{justify-content:space-between;height:72px}
+  .nav ul{display:none}
+  .nav.open ul{
+    display:flex;position:fixed;inset:72px 0 auto 0;background:#fff;border-bottom:1px solid var(--border);
+    flex-direction:column;padding:16px 22px;gap:12px
+  }
+}
+/* --- Correction alignement "Événements 2026" --- */
+.nav ul li a {
+  white-space: nowrap;       /* empêche le retour à la ligne */
+  line-height: 1;            /* garde le lien bien centré verticalement */
+  display: flex;
+  align-items: center;       /* aligne le texte sur la même ligne que les autres */
+  padding: 6px 10px;
+}
+/* ==== Bloc prix propre (30 en vert, 99 barré) ==== */
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+.price .now {
+  font-weight: 800;
+  font-size: clamp(26px, 4.2vw, 36px);
+  color: var(--brand);           /* vert RSL */
+  line-height: 1;
+}
+.price .was {
+  font-size: clamp(16px, 2.6vw, 20px);
+  color: #ef4444;                /* rouge doux */
+  text-decoration: line-through;
+  opacity: .9;
+}
+.price .note {
+  font-size: 13px;
+  color: #cfe8da;
+}
+
+/* ==== Formulaire formation (beau & lisible) ==== */
+.panel.enroll { border-radius: var(--radius); }
+
+.rsl-form { display: grid; gap: 12px; }
+.rsl-form .small { font-size: 13px; }
+
+.rsl-form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 700px){
+  .rsl-form .form-grid { grid-template-columns: 1fr; }
+}
+
+.rsl-form .form-row { display: grid; gap: 6px; }
+.rsl-form label {
+  font-weight: 700;
+  color: #eaf2f7;            /* lisible sur hero sombre */
+}
+
+.rsl-form input,
+.rsl-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  outline: none;
+}
+.rsl-form input:focus,
+.rsl-form select:focus {
+  border-color: rgba(23,178,106,.7);
+  box-shadow: 0 0 0 3px rgba(23,178,106,.18);
+}
+
+.rsl-form .form-actions { margin-top: 6px; }
+@media (max-width: 700px){
+  .rsl-form .form-actions .btn { width: 100%; }
+}
+/* ===== Lieux (cours) ===== */
+.spots{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:16px;
+}
+@media (max-width: 1000px){ .spots{ grid-template-columns: repeat(2,1fr);} }
+@media (max-width: 640px){ .spots{ grid-template-columns: 1fr; } }
+
+.spot{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.spot-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.spot h3{ margin:0; }
+.spot .badge{ background: var(--soft); border: 1px solid var(--border); border-radius: 999px; padding: 6px 10px; font-size: 13px; }
+.spot .badge.grey{ background:#f1f3f6; color:#7a8795; border-color:#e3e7ee; }
+.spot-actions{ margin-top:auto; }
+
+/* état désactivé */
+.spot.disabled{
+  opacity:.6;
+  pointer-events:none;   /* non cliquable */
+  filter: grayscale(10%);
+}
+/* ===== Lieux (cours) ===== */
+.spots{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:16px;
+}
+@media (max-width: 1000px){ .spots{ grid-template-columns: repeat(2,1fr);} }
+@media (max-width: 640px){ .spots{ grid-template-columns: 1fr; } }
+
+.spot{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.spot-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.spot h3{ margin:0; }
+.spot .badge{ background: var(--soft); border: 1px solid var(--border); border-radius: 999px; padding: 6px 10px; font-size: 13px; }
+.spot .badge.grey{ background:#f1f3f6; color:#7a8795; border-color:#e3e7ee; }
+.spot-actions{ margin-top:auto; }
+
+/* état désactivé */
+.spot.disabled{
+  opacity:.6;
+  pointer-events:none;   /* non cliquable */
+  filter: grayscale(10%);
+}
+/* =========================
+   Habillage carte RSL (drop-in)
+   ========================= */
+
+/* Conteneur carte (déjà présent dans ton HTML) */
+#mapWrap{
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(10,12,16,.04);
+}
+
+/* Hauteur carte + arrondis */
+#map{
+  height: 68vh;             /* garde ta hauteur dynamique */
+  min-height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Barre outils au-dessus de la carte */
+.map-toolbar{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Filtres (chips) */
+.filters{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filters .chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.filters .chip:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0,0,0,.06);
+}
+.filters .chip.off{
+  opacity: .45;
+}
+
+/* Pastilles de légende */
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.g{background:#17b26a}.b{background:#3b82f6}.o{background:#f59e0b}.p{background:#8b5cf6}.r{background:#ef4444}
+
+/* Recherche + bouton géoloc */
+.searchbox{display:flex;gap:8px}
+.searchbox input{
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-width: 240px;
+  background: #fff;
+}
+#loc.btn, #btnLocate.btn{ /* au cas où l’id varie */
+  background: var(--brand);
+  color: #fff;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s, filter .18s;
+}
+#loc.btn:hover, #btnLocate.btn:hover{
+  filter: brightness(.96);
+  transform: translateY(-1px);
+}
+
+/* Bas de carte : légende + liste résultats */
+.map-bottom{
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+.legend{
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+.count{font-weight: 800; color: var(--ink)}
+
+.result-list{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  max-height: 280px;
+  overflow: auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,.04);
+}
+.result-list .row{
+  padding: 10px 8px;
+  border-bottom: 1px dashed var(--border);
+  cursor: pointer;
+  border-radius: 8px;
+}
+.result-list .row:last-child{border-bottom:none}
+.result-list .row:hover{background: #fafafa}
+
+/* Style popups Leaflet */
+.leaflet-popup-content{
+  margin: 10px 12px;
+  font: 15px/1.5 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--ink);
+}
+.leaflet-popup-content strong{font-weight:800}
+.leaflet-popup-content .btn{
+  display:inline-block;
+  margin-top:6px;
+  padding:7px 10px;
+  border-radius:10px;
+  background: var(--brand);
+  color:#fff;
+  font-weight:800;
+  text-decoration:none;
+}
+.leaflet-container a.leaflet-popup-close-button{
+  color:#111; font-size:18px; right:10px; top:8px;
+}
+
+/* Cluster (si tu ajoutes markercluster plus tard) */
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large{
+  background: rgba(23,178,106,.12);
+  border: 1px solid rgba(23,178,106,.25);
+  color: #0b3b26;
+}
+
+/* HERO harmonisé si besoin (déjà présent dans ton thème) */
+.hero .container h1{
+  margin-bottom: 6px;
+}
+.hero .container p{
+  color: #c7d1dc;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 980px){
+  .map-bottom{grid-template-columns: 1fr}
+  .searchbox input{min-width: 0; width: 100%}
+}
+/* ==== Carte RSL : légende collée à la carte ==== */
+#mapWrap { 
+  padding-bottom: 10px !important;   /* un peu moins d'air sous la carte */
+}
+
+#mapWrap #map {
+  margin-bottom: 4px !important;     /* colle la légende à la carte */
+}
+
+#mapWrap .map-bottom {
+  margin-top: 4px !important;        /* au lieu de 14px */
+  gap: 8px !important;                /* un poil plus serré */
+  align-items: start;
+}
+
+#mapWrap .legend {
+  gap: 8px !important;
+  margin-top: 0 !important;
+  font-size: 13.5px;
+}
+/* ==== Ajustement carte RSL : légende collée ==== */
+#mapWrap {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#map {
+  margin-bottom: 3px !important; /* colle la légende */
+}
+
+.map-bottom {
+  margin-top: 3px !important;
+  gap: 6px !important;
+  align-items: start;
+}
+
+.legend {
+  gap: 6px !important;
+  margin-top: 0 !important;
+  font-size: 13px !important;
+}

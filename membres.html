@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="fr" data-page-requires-auth="true">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deviens membre — Romandie Scooter League</title>
+<style>
+    /* Héro sombre */
+    .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
+    .hero.hero-photo::before{
+      content:"";position:absolute;inset:0;z-index:0;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),
+        url("images/lanoubc8.jpg") center/cover no-repeat;
+    }
+    .hero.hero-photo .container{position:relative;z-index:1}
+
+    /* Cartes prix */
+    .plans{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+    @media(max-width:1400px){.plans{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:900px){.plans{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.plans{grid-template-columns:1fr}}
+    .plan{display:flex;flex-direction:column;gap:8px}
+    .plan .price{font-size:28px;font-weight:800}
+    .badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge.small{font-size:11px;padding:4px 8px;border-radius:999px;background:#eef2f7}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+
+    /* Modals */
+    dialog::backdrop{background:rgba(0,0,0,.45)}
+    dialog.modal{border:0;border-radius:16px;max-width:680px;width:92vw;padding:0}
+    .modal-card{padding:18px;background:#fff;border:1px solid #d0d7e2;border-radius:16px}
+    .qr{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center}
+    @media(max-width:640px){.qr{grid-template-columns:1fr}}
+    .qr img{width:180px;max-width:100%;border-radius:12px;border:1px solid #e5e7eb}
+    .muted-small{color:#6b7785;font-size:13px}
+
+    /* ===== FOOTER corrigé : 3 colonnes + copyright à droite ===== */
+    .foot .links-3cols{
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+    }
+    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+    .foot .links-3cols li{margin:6px 0}
+    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+    .foot .links-3cols a:hover{text-decoration:underline}
+    .foot .bottom.bottom-right{
+      border-top:1px solid rgba(255,255,255,0.08);
+      margin-top:14px;padding:10px 0;
+      display:flex;justify-content:flex-end;align-items:center;gap:14px
+    }
+    .foot .bottom.bottom-right p{margin:0}
+    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+    .foot .bottom.bottom-right a:hover{text-decoration:underline}
+    @media (max-width:900px){ .foot .links-3cols{grid-template-columns:1fr 1fr} }
+    @media (max-width:600px){ .foot .links-3cols{grid-template-columns:1fr} .foot .bottom.bottom-right{justify-content:space-between} }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+  <div class="container nav-inner">
+    <!-- corrigé ici -->
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <!-- HERO -->
+  <header class="hero hero-photo">
+    <div class="container hero-inner">
+      <div class="grid">
+        <div>
+          <h1>Deviens membre RSL</h1>
+          <p class="muted">Soutiens la scène et profite d’avantages (cours à prix membre, priorités events, etc.).</p>
+
+          <div class="panel" style="margin-top:10px">
+            <strong>Renouvellement & résiliation</strong>
+            <p class="muted" style="margin:6px 0 0">
+              L’adhésion annuelle se renouvelle automatiquement chaque 1er janvier.
+              Résiliation possible jusqu’au <b>31 décembre</b> pour l’année suivante.
+              Les abonnements mensuels (selon la formule) sont reconduits le 1er de chaque mois ;
+              résiliation jusqu’au <b>20 du mois</b> en cours pour stopper le mois suivant.
+            </p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <strong>Modes de paiement</strong>
+          <p class="muted" style="margin:6px 0 10px">Carte via Stripe ou <b>TWINT</b> (QR + téléphone).</p>
+          <div class="actions">
+            <a class="btn" href="#plans">Choisir ma formule</a>
+          </div>
+          <div style="margin-top:10px">
+            <a class="btn" href="membre_portail.html">Déjà membre</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PLANS -->
+  <section class="section" id="plans">
+    <div class="container">
+      <div class="section-head">
+        <h2>Choisis ta formule</h2>
+        <span class="muted">Paiement par carte ou TWINT disponible.</span>
+      </div>
+
+      <div class="plans">
+
+        <!-- Starter -->
+        <article class="card plan" style="border-top:5px solid #17b26a">
+          <h3>Starter</h3>
+          <div class="price">50.– <span class="muted">/ an</span></div>
+          <ul class="muted">
+            <li>Carte membre RSL officielle</li>
+            <li>Tarif cours membre : 20.– (au lieu de 30.–)</li>
+            <li>Priorités inscriptions events</li>
+          </ul>
+          <div class="actions">
+            <a class="btn" href="lien50.html" target="_blank" rel="noopener">Payer 50.–</a>
+          </div>
+        </article>
+
+        <!-- Rider -->
+        <article class="card plan" style="border-top:5px solid #ff8c00">
+          <h3>Rider</h3>
+          <div class="price">80.– <span class="muted">/ an</span></div>
+          <ul class="muted">
+            <li>Tous les avantages Starter</li>
+            <li>Livret « Tricks RSL » offert</li>
+            <li>Réductions partenaires</li>
+          </ul>
+          <div class="actions">
+            <a class="btn" href="lien80.html" target="_blank" rel="noopener">Payer 80.–</a>
+          </div>
+        </article>
+
+        <!-- Pro / Soutien -->
+        <article class="card plan" style="border-top:5px solid #e10600">
+          <h3>Pro / Soutien</h3>
+          <div class="price">149.– <span class="muted">/ an</span></div>
+          <ul class="muted">
+            <li>Tous les avantages Rider</li>
+            <li>Nom cité (soutien officiel)</li>
+          </ul>
+          <div class="actions">
+            <a class="btn" href="lien149.html" target="_blank" rel="noopener">Paiement 149.– ou 15.– / mois</a>
+          </div>
+        </article>
+
+        <!-- Intermédiaire -->
+        <article class="card plan" style="border-top:5px solid #0ea5e9">
+          <h3>Intermédiaire</h3>
+          <div class="price">289.– <span class="muted">/ an</span></div>
+          <ul class="muted">
+            <li>20 cours dans l’année</li>
+            <li>Livret « Tricks RSL » offert</li>
+            <li>T-shirt membre offert</li>
+          </ul>
+          <div class="actions">
+            <a class="btn" href="lien289.html" target="_blank" rel="noopener">Paiement 289.– ou 25.– / mois</a>
+          </div>
+        </article>
+
+        <!-- Premium -->
+        <article class="card plan" style="border-top:5px solid #6d28d9">
+          <h3>Premium</h3>
+          <div class="price">490.– <span class="muted">/ an</span></div>
+          <ul class="muted">
+            <li>Cours gratuits toute l’année</li>
+            <li>Livret « Tricks RSL » offert</li>
+            <li>T-shirt membre offert</li>
+          </ul>
+          <div class="actions">
+            <a class="btn" href="lien490.html" target="_blank" rel="noopener">Paiement 490.– ou 43.– / mois</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+</body>
+</html>

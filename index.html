@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RSL — Romandie Scooter League (Trottinette Freestyle)</title>
+
+  <!-- Styles -->
+  <style>
+    .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
+    .hero.hero-photo::before{
+      content:"";position:absolute;inset:0;z-index:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),url("images/lanoubc_noir.jpg") center/cover no-repeat
+    }
+    .hero.hero-photo .hero-inner{position:relative;z-index:1}
+
+    .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}
+    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+    .foot .links-3cols li{margin:6px 0}
+    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+    .foot .links-3cols a:hover{text-decoration:underline}
+    .foot .bottom.bottom-right{border-top:1px solid rgba(255,255,255,.08);margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;align-items:center;gap:14px}
+    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+    .foot .bottom.bottom-right a:hover{text-decoration:underline}
+    @media(max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
+
+    .rsl-gate{position:fixed;inset:0;z-index:9999;display:none;color:#fff;
+      background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.85)),url("images/lanoubc_noir.jpg") center/cover no-repeat}
+    .rsl-gate .gate-inner{max-width:960px;margin:5vh auto;padding:24px}
+    .rsl-gate .banner{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px 18px;margin-bottom:16px;text-align:center}
+    .rsl-gate .grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+    @media(max-width:860px){.rsl-gate .grid{grid-template-columns:1fr}}
+    .rsl-card{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px}
+    .rsl-card h3{margin:0 0 8px}
+    .rsl-card label{display:block;font-size:14px;margin:8px 0 4px}
+    .rsl-input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff}
+    .rsl-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{cursor:pointer;border:none;padding:10px 14px;border-radius:10px;background:#2563eb;color:#fff;font-weight:600}
+    .btn.dark{background:#0f172a}.btn.red{background:#dc2626}
+    .muted{opacity:.85}.tiny{font-size:12px;opacity:.8}
+    .sig-wrap{border:1px dashed rgba(255,255,255,.35);border-radius:12px;overflow:hidden;background:#0b0b0b}
+    canvas#rslSignature{display:block;width:100%;height:160px;touch-action:none;cursor:crosshair}
+
+    /* === Logo blanc sous le mot de passe === */
+    .rsl-logo-box{
+      margin-top:18px;
+      text-align:right;
+    }
+    .rsl-logo-box img{
+      max-width:120px;
+      background:#fff;
+      border-radius:10px;
+      padding:8px;
+      filter:drop-shadow(0 0 4px rgba(0,0,0,.35));
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .rsl-logo-box img:hover{
+      transform:scale(1.05);
+      box-shadow:0 0 10px rgba(255,255,255,.4);
+    }
+  </style>
+
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/common.css"/>
+  <link rel="stylesheet" href="css/fonts.css"/>
+  <link rel="stylesheet" href="css/helpbot.css"/>
+</head>
+
+<body>
+
+  <!-- HERO -->
+  <header class="hero hero-photo">
+    <div class="container hero-inner">
+      <h1>Romandie Scooter League</h1>
+      <p>Association romande dédiée à la <b>trottinette freestyle</b> — Park & Street.</p>
+    </div>
+  </header>
+
+  <!-- ======= GATE ======= -->
+  <div class="rsl-gate" id="rslGate">
+    <div class="gate-inner">
+      <div class="banner">
+        <b>Bienvenue sur le site d'RSL</b> — ouverture officielle <b>janvier 2026</b>
+      </div>
+
+      <div class="grid">
+        <!-- Pré-inscription -->
+        <div class="rsl-card">
+          <h3>Pré-inscription</h3>
+          <form id="rslPreForm" method="POST" action="https://formspree.io/f/xovparwe">
+            <label>Nom<input class="rsl-input" name="Nom" required></label>
+            <label>Prénom<input class="rsl-input" name="Prénom" required></label>
+            <label>Email<input class="rsl-input" type="email" name="Email" required></label>
+            <input type="hidden" name="SignaturePNG" id="rslSigData">
+            <label>Signature</label>
+            <div class="sig-wrap"><canvas id="rslSignature"></canvas></div>
+            <div class="rsl-actions">
+              <button type="button" class="btn dark" id="sigClear">Effacer</button>
+              <button type="submit" class="btn">Envoyer</button>
+            </div>
+            <p id="preMsg" class="tiny" style="display:none"></p>
+          </form>
+        </div>
+
+        <!-- Membre comité -->
+        <div class="rsl-card">
+          <h3>Membre RSL / Comité</h3>
+          <form id="rslPassForm">
+            <label>Mot de passe
+              <input class="rsl-input" type="password" id="rslPass" placeholder="••••••••" required>
+            </label>
+            <div class="rsl-actions"><button type="submit" class="btn">Entrer</button></div>
+            <p id="passMsg" class="tiny" style="display:none"></p>
+
+            <!-- Logo fond blanc -->
+            <div class="rsl-logo-box">
+              <img src="images/logo_rsl.png" alt="Logo RSL">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP (bloqué sans accès) -->
+  <dialog id="dlg">
+    <div class="modal-card" style="text-align:center">
+      <h3>Rejoindre la RSL</h3>
+      <p>Choisis ton activité : formation ou cours freestyle.</p>
+      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+        <a href="formation.html" class="btn">Formation</a>
+        <a href="cours.html" class="btn">Cours</a>
+        <button class="btn dark" id="btnClose">Fermer</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- SCRIPT -->
+  <script>
+    (function(){
+      const dlg=document.getElementById('dlg');
+      const closeBtn=document.getElementById('btnClose');
+      function openWelcome(){if(dlg?.showModal&&!dlg.open)dlg.showModal();}
+      window.rslOpenWelcome=openWelcome;
+      closeBtn?.addEventListener('click',()=>dlg.close());
+    })();
+  </script>
+
+  <script>
+    (function(){
+      const ACCESS_KEY='rsl_access',ACCESS_OK='ok',PASSCODE='RSL2026';
+      const gate=document.getElementById('rslGate'),
+            preForm=document.getElementById('rslPreForm'),preMsg=document.getElementById('preMsg'),
+            sigCanvas=document.getElementById('rslSignature'),sigClear=document.getElementById('sigClear'),
+            sigHidden=document.getElementById('rslSigData'),
+            passForm=document.getElementById('rslPassForm'),passInput=document.getElementById('rslPass'),
+            passMsg=document.getElementById('passMsg');
+      function showGate(){gate.style.display='block';}function hideGate(){gate.style.display='none';}
+      function openWelcomeDelayed(ms){if(typeof window.rslOpenWelcome==='function')setTimeout(()=>window.rslOpenWelcome(),ms);}
+
+      if(sigCanvas){
+        const ctx=sigCanvas.getContext('2d');let drawing=false;
+        function resizeCanvas(){const r=window.devicePixelRatio||1;
+          sigCanvas.width=sigCanvas.clientWidth*r;sigCanvas.height=sigCanvas.clientHeight*r;
+          ctx.setTransform(r,0,0,r,0,0);ctx.lineWidth=2;ctx.lineCap='round';ctx.strokeStyle='#fff';
+          ctx.fillStyle='#0b0b0b';ctx.fillRect(0,0,sigCanvas.clientWidth,sigCanvas.clientHeight);}
+        resizeCanvas();window.addEventListener('resize',resizeCanvas);
+        function pos(e){const r=sigCanvas.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+        function start(e){drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
+        function move(e){if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();}
+        function end(){drawing=false;}
+        sigCanvas.addEventListener('mousedown',start);
+        sigCanvas.addEventListener('mousemove',move);
+        window.addEventListener('mouseup',end);
+        sigCanvas.addEventListener('touchstart',start,{passive:false});
+        sigCanvas.addEventListener('touchmove',move,{passive:false});
+        sigCanvas.addEventListener('touchend',end);
+        sigClear?.addEventListener('click',()=>{ctx.fillStyle='#0b0b0b';ctx.fillRect(0,0,sigCanvas.clientWidth,sigCanvas.clientHeight);ctx.beginPath();});
+      }
+
+      function initGate(){
+        let hasAccess=false;try{hasAccess=localStorage.getItem(ACCESS_KEY)===ACCESS_OK;}catch(e){}
+        if(!hasAccess){showGate();}else{hideGate();openWelcomeDelayed(10000);}
+        passForm?.addEventListener('submit',e=>{
+          e.preventDefault();
+          const val=(passInput?.value||'').trim();
+          if(val===PASSCODE){localStorage.setItem(ACCESS_KEY,ACCESS_OK);hideGate();openWelcomeDelayed(400);}
+          else{passMsg.textContent='Mot de passe incorrect.';passMsg.style.display='block';}
+        });
+      }
+
+      preForm?.addEventListener('submit',async e=>{
+        e.preventDefault();
+        if(sigCanvas&&sigHidden)sigHidden.value=sigCanvas.toDataURL('image/png');
+        const data=new FormData(preForm);
+        try{
+          const resp=await fetch(preForm.action,{method:'POST',headers:{'Accept':'application/json'},body:data});
+          preMsg.textContent=resp.ok?'Merci ! Pré-inscription envoyée ✅':'Erreur : réessaye plus tard';
+          preMsg.style.display='block';if(resp.ok)preForm.reset();
+        }catch{preMsg.textContent='Erreur réseau — réessaie.';preMsg.style.display='block';}
+      });
+
+      function init(){initGate();}
+      if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+      window.addEventListener('pagehide',()=>{localStorage.removeItem(ACCESS_KEY);});
+      window.addEventListener('beforeunload',()=>{localStorage.removeItem(ACCESS_KEY);});
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')localStorage.removeItem(ACCESS_KEY);});
+    })();
+  </script>
+
+</body>
+</html>

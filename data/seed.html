@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Où rider ? — RSL</title>
+
+  <!-- Ta stack existante -->
+<!-- Leaflet + MarkerCluster (CDNs) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <style>
+    :root{
+      --ink:#0f1223; --muted:#70788a; --panel:#f6f7fb;
+      --blue:#2563eb; --violet:#7c3aed; --orange:#f59e0b; --green:#10b981; --red:#ef4444;
+      --radius:14px;
+    }
+    .map-shell{ display:grid; grid-template-columns: 360px 1fr; gap:18px; min-height: calc(100vh - 220px); }
+    @media (max-width: 960px){ .map-shell{ grid-template-columns: 1fr; } }
+    .panel { background: var(--panel); border:1px solid #e7e9f1; border-radius: var(--radius); padding:14px; }
+    .filter label{ font-size:14px; color:var(--muted); display:block; margin-bottom:4px; }
+    .filter input[type="text"], .filter select { width:100%; border:1px solid #e1e4ee; border-radius:12px; padding:10px 12px; font-size:14px; }
+    .filter .row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .chips{ display:flex; flex-wrap: wrap; gap:8px; }
+    .chip{ font-size:12px; border-radius:999px; padding:6px 10px; background:#f1f3fa; border:1px solid #e1e4ee; }
+    #map{ width:100%; height: 100%; min-height: 520px; border-radius: var(--radius); border:1px solid #e7e9f1; }
+    .result-list{ margin-top:10px; display:flex; flex-direction:column; gap:8px; max-height:380px; overflow:auto; }
+    .result-item{ border:1px solid #e7e9f1; border-radius:12px; padding:10px; cursor:pointer; background:#fff; }
+    .legend{ display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:6px; font-size:12px; color:var(--muted); }
+    .meta{ font-size:12px; color:var(--muted); }
+    .custom-marker{ filter: drop-shadow(0 6px 16px rgba(0,0,0,.15)); }
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <!-- NAV (ta nav existante peut être incluse via un include ou copiée) -->
+
+  <header class="hero">
+    <div class="container hero-inner">
+      <div class="grid">
+        <div>
+          <h1>Où rider ?</h1>
+          <p class="muted">Carte des <b>skateparks</b>, <b>shops</b> partenaires et <b>lieux de cours</b> RSL — Suisse entière.<br>
+            Filtres : canton, type, <b>catégorie Officiel/DIY</b> et <b>statut</b>. Ajoute/enlève des spots manuellement.</p>
+          <div class="chips">
+            <a id="btnExport" class="chip" href="#">Exporter JSON</a>
+            <a id="btnImport" class="chip" href="#">Importer JSON</a>
+            <a id="btnAdd" class="chip" href="#">Ajouter un lieu</a>
+          </div>
+        </div>
+        <div class="panel">
+          <strong>Astuce</strong>
+          <p class="muted">Clique un résultat pour centrer la carte, puis “Éditer” dans la popup pour modifier.</p>
+          <div class="legend" style="margin-top:8px">
+            <div>🛹 Bleu = Officiel</div>
+            <div>🛹 Violet = DIY</div>
+            <div>🏪 Orange = Shop</div>
+            <div>📚 Vert = Lieu de cours</div>
+            <div>👤 Rouge = Coach</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="map-shell">
+      <!-- Filtres -->
+      <aside class="panel filter">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <h3 style="margin:0">Filtres</h3>
+          <span class="meta">Visibles: <span id="visibleCount">0</span></span>
+        </div>
+
+        <label>Recherche</label>
+        <input id="searchInput" type="text" placeholder="Nom, ville, adresse…">
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>Type</label>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" class="typeToggle" value="skatepark" checked> Skateparks</label>
+              <label class="chip"><input type="checkbox" class="typeToggle" value="shop" checked> Shops</label>
+              <label class="chip"><input type="checkbox" class="typeToggle" value="cours" checked> Cours</label>
+              <label class="chip"><input type="checkbox" class="typeToggle" value="coach" checked> Profs</label>
+            </div>
+          </div>
+          <div>
+            <label>Catégorie (skateparks)</label>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" class="catToggle" value="officiel" checked> Officiel</label>
+              <label class="chip"><input type="checkbox" class="catToggle" value="DIY" checked> DIY</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>Canton</label>
+            <select id="cantonSelect">
+              <option value="">Tous</option>
+              <option>GE</option><option>VD</option><option>VS</option><option>FR</option><option>NE</option><option>JU</option>
+              <option>BE</option><option>ZH</option><option>BS</option><option>BL</option><option>SO</option><option>AG</option>
+              <option>SG</option><option>TI</option><option>LU</option><option>ZG</option><option>SZ</option><option>OW</option><option>NW</option><option>GL</option><option>UR</option>
+              <option>AR</option><option>AI</option><option>SH</option><option>Tg</option><option>GR</option>
+            </select>
+          </div>
+          <div>
+            <label>Statut</label>
+            <select id="statusSelect">
+              <option value="">Tous</option>
+              <option value="actif">Actif</option>
+              <option value="incertain">Incertains</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:10px">
+          <label>Résultats</label>
+          <div id="resultList" class="result-list"></div>
+        </div>
+      </aside>
+
+      <!-- Carte -->
+      <section><div id="map"></div></section>
+    </div>
+  </main>
+
+  <!-- Dialog: Add/Edit -->
+  <dialog id="modalAdd" class="panel" style="max-width:760px;width:90%">
+    <form id="addForm" method="dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3 style="margin:0">Ajouter / éditer un lieu</h3>
+        <button type="button" class="btn secondary" onclick="modalAdd.close()">Fermer</button>
+      </div>
+
+      <div class="filter row">
+        <div><label>Type</label>
+          <select name="type" required>
+            <option value="skatepark">Skatepark</option>
+            <option value="shop">Shop</option>
+            <option value="cours">Lieu de cours</option>
+            <option value="coach">Coach RSL</option>
+          </select>
+        </div>
+        <div><label>Catégorie (skateparks)</label>
+          <select name="category">
+            <option value="">—</option>
+            <option value="officiel">Officiel</option>
+            <option value="DIY">DIY</option>
+          </select>
+        </div>
+        <div><label>Nom</label><input name="name" required></div>
+        <div><label>Adresse</label><input name="address"></div>
+        <div><label>NPA</label><input name="postalCode"></div>
+        <div><label>Ville</label><input name="city"></div>
+        <div><label>Canton</label><input name="canton" placeholder="VD/GE/VS/..."></div>
+        <div><label>Latitude</label><input name="lat" type="number" step="any" required></div>
+        <div><label>Longitude</label><input name="lng" type="number" step="any" required></div>
+        <div><label>Site web</label><input name="website"></div>
+        <div><label>Dernière preuve (date)</label><input name="lastVerified" type="date"></div>
+        <div><label>Source / lien</label><input name="source" placeholder="URL ou texte"></div>
+        <div style="grid-column:1/-1"><label>Notes / horaires</label><textarea name="notes" rows="3" style="width:100%"></textarea></div>
+        <div class="row" style="grid-column:1/-1">
+          <label class="chip"><input name="rslCourses" type="checkbox"> Propose des cours RSL</label>
+          <div><label>Statut</label>
+            <select name="status">
+              <option value="actif">Actif</option>
+              <option value="incertain">Incertain</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+        <button type="button" id="btnDelete" class="btn secondary" style="display:none">Supprimer</button>
+        <button type="submit" class="btn">Enregistrer</button>
+      </div>
+
+      <input type="hidden" name="id" />
+    </form>
+  </dialog>
+
+  <!-- Dialog: Import/Export -->
+  <dialog id="modalIO" class="panel" style="max-width:880px;width:90%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0">Importer / Exporter les données</h3>
+      <button type="button" class="btn secondary" onclick="modalIO.close()">Fermer</button>
+    </div>
+    <p class="muted">Copie/colle le JSON ci-dessous pour sauvegarder ou charger tes lieux. Les données sont aussi stockées dans ton navigateur.</p>
+    <textarea id="jsonArea" rows="16" style="width:100%;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12px"></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+      <button id="btnLoadJSON" class="btn secondary">Charger</button>
+      <button id="btnCopyJSON" class="btn">Copier</button>
+    </div>
+  </dialog>
+
+  <script>
+    const STORAGE_KEY = 'rsl_map_v2';
+    let data = [];
+
+    async function loadData(){
+      try{
+        const res = await fetch('data/seed.json', { cache: 'no-store' });
+        data = res.ok ? await res.json() : [];
+      }catch(e){ data = []; }
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw && !data.length) data = JSON.parse(raw);
+      if(!data) data = [];
+      save();
+    }
+    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+    let map, markers, allMarkers = new Map();
+    const colors = { officiel: '#2563eb', DIY: '#7c3aed' }; // Bleu / Violet
+    const typeColors = { shop:'#f59e0b', cours:'#10b981', coach:'#ef4444' };
+
+    function iconFor(item){
+      let color = '#161a2a';
+      if(item.type==='skatepark'){ color = colors[item.category] || '#2563eb'; }
+      else { color = typeColors[item.type] || '#161a2a'; }
+      const emoji = item.type==='skatepark' ? '🛹' : item.type==='shop' ? '🏪' : item.type==='cours' ? '📚' : '👤';
+      return L.divIcon({
+        className:'custom-marker',
+        html:'<div style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:'+color+';border:2px solid white">'+emoji+'</div>',
+        iconSize:[28,28], iconAnchor:[14,14]
+      });
+    }
+
+    function escapeHTML(s){ return (s||'').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m])); }
+    function escapeAttr(s){ return (s||'').replace(/[\\"']/g, m => ({'\\\"':'&quot;',"'":'&#39;'}[m]||m)); }
+
+    function popupHTML(item){
+      const cat = item.category ? '<span class="chip" style="margin-left:6px">'+escapeHTML(item.category)+'</span>' : '';
+      const top = '<h3 style="margin:0 0 4px 0">'+escapeHTML(item.name)+' '+cat+'</h3>';
+      const addr = '<div class="muted">'+[item.address,item.postalCode,item.city].filter(Boolean).map(escapeHTML).join(', ')+'</div>';
+      const meta = '<div class="meta" style="margin-top:6px">Type: <b>'+item.type+'</b> · Canton: '+escapeHTML(item.canton||'')+(item.status?(' · Statut: '+escapeHTML(item.status)):'')+'</div>';
+      const notes = item.notes? '<div style="margin-top:6px">'+escapeHTML(item.notes)+'</div>' : '';
+      const verif = (item.lastVerified||item.source) ? '<div class="meta" style="margin-top:6px">Dernière preuve: '+escapeHTML(item.lastVerified||'—')+(item.source?(' · Source: <a class="muted" target="_blank" rel="noreferrer" href="'+escapeAttr(item.source)+'">lien</a>'):'')+'</div>' : '';
+      const links = [];
+      if (item.website) links.push('<a class="muted" href="'+escapeAttr(item.website)+'" target="_blank" rel="noreferrer">Site</a>');
+      const linkRow = links.length? '<div style="margin-top:6px">'+links.join(' · ')+'</div>' : '';
+      const editBtn = '<div style="margin-top:10px"><button data-edit="'+item.id+'" class="btn secondary">Éditer</button></div>';
+      return '<div>'+top+addr+meta+notes+verif+linkRow+editBtn+'</div>';
+    }
+
+    function initMap(){
+      map = L.map('map', { scrollWheelZoom: true }).setView([46.8, 8.2], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+      markers = L.markerClusterGroup(); map.addLayer(markers);
+      map.on('popupopen', (e)=>{ const btn = e.popup._contentNode.querySelector('button[data-edit]'); if(btn) btn.addEventListener('click', ()=> openEdit(btn.getAttribute('data-edit')) ); });
+    }
+
+    function renderMarkers(){
+      markers.clearLayers(); allMarkers.clear();
+      const filtered = getFiltered();
+      for(const item of filtered){
+        const m = L.marker([item.lat, item.lng], { icon: iconFor(item) }).bindPopup(popupHTML(item));
+        markers.addLayer(m); allMarkers.set(item.id, m);
+      }
+      document.getElementById('visibleCount').textContent = String(filtered.length);
+      renderList(filtered);
+    }
+
+    function renderList(items){
+      const list = document.getElementById('resultList'); list.innerHTML = '';
+      for(const item of items){
+        const el = document.createElement('div'); el.className = 'result-item';
+        el.innerHTML = '<div style="font-weight:700">'+escapeHTML(item.name)+'</div>'
+          + '<div class="meta">'+escapeHTML(item.city||'')+' · '+escapeHTML(item.canton||'')+' · '+item.type+(item.category?(' · '+escapeHTML(item.category)):'')+'</div>';
+        el.addEventListener('click', ()=>{ const m = allMarkers.get(item.id); if(m){ map.setView(m.getLatLng(), 14); m.openPopup(); } });
+        list.appendChild(el);
+      }
+    }
+
+    function getFiltered(){
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const canton = document.getElementById('cantonSelect').value;
+      const status = document.getElementById('statusSelect').value;
+      const types = Array.from(document.querySelectorAll('.typeToggle:checked')).map(i=>i.value);
+      const cats = Array.from(document.querySelectorAll('.catToggle:checked')).map(i=>i.value);
+      return data.filter(item => {
+        if(!types.includes(item.type)) return false;
+        if(item.type==='skatepark' && cats.length && !cats.includes(item.category||'')) return false;
+        if(canton && item.canton !== canton) return false;
+        if(status && item.status !== status) return false;
+        if(q){
+          const hay = (item.name+' '+(item.address||'')+' '+(item.city||'')+' '+(item.postalCode||'')).toLowerCase();
+          if(!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function openAdd(){ const f = document.getElementById('addForm'); f.reset(); f.id.value=''; document.getElementById('btnDelete').style.display='none'; modalAdd.showModal(); }
+    function openEdit(id){ const it = data.find(x=>x.id===id); if(!it) return; const f = document.getElementById('addForm'); ['id','type','category','name','address','postalCode','city','canton','lat','lng','website','lastVerified','source','notes','status'].forEach(k=>{ f[k].value = it[k] ?? '' }); f.rslCourses.checked = !!it.rslCourses; document.getElementById('btnDelete').style.display='inline-block'; modalAdd.showModal(); }
+    function upsertFromForm(ev){ ev.preventDefault(); const f=ev.target; const obj = Object.fromEntries(new FormData(f).entries()); obj.lat=parseFloat(obj.lat); obj.lng=parseFloat(obj.lng); obj.rslCourses=!!f.rslCourses.checked; if(obj.id){ const i=data.findIndex(x=>x.id===obj.id); data[i]=Object.assign({}, data[i], obj); } else { obj.id=crypto.randomUUID(); data.push(obj); } save(); modalAdd.close(); renderMarkers(); }
+    function removeCurrent(){ const id=document.getElementById('addForm').id.value; if(!id) return; const i=data.findIndex(x=>x.id===id); if(i>=0){ data.splice(i,1); save(); renderMarkers(); modalAdd.close(); } }
+
+    function exportJSON(){ document.getElementById('jsonArea').value = JSON.stringify(data, null, 2); modalIO.showModal(); }
+    function importJSON(){ document.getElementById('jsonArea').value = ''; modalIO.showModal(); }
+
+    const modalAdd = document.getElementById('modalAdd');
+    const modalIO = document.getElementById('modalIO');
+
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      await loadData(); initMap(); renderMarkers();
+      document.getElementById('btnAdd').addEventListener('click', openAdd);
+      document.getElementById('btnExport').addEventListener('click', exportJSON);
+      document.getElementById('btnImport').addEventListener('click', importJSON);
+      document.getElementById('btnCopyJSON')?.addEventListener('click', ()=>navigator.clipboard.writeText(document.getElementById('jsonArea').value||''));
+      document.getElementById('btnLoadJSON')?.addEventListener('click', ()=>{ try{ data = JSON.parse(document.getElementById('jsonArea').value||'[]'); save(); renderMarkers(); modalIO.close(); }catch(e){ alert('JSON invalide'); } });
+      document.getElementById('btnDelete')?.addEventListener('click', removeCurrent);
+      ['searchInput','cantonSelect','statusSelect',...document.querySelectorAll('.typeToggle, .catToggle')].forEach(el=>{ el.addEventListener('input', renderMarkers); el.addEventListener('change', renderMarkers); });
+    });
+  </script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>

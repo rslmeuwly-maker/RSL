@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Random Tricks — RSL Theme</title>
+
+  <!-- Outfit font to match site -->
+<style>
+    :root{
+      /* === Palette RSL (modifiable facilement) === */
+      --rsl-ink:#0f1a24;          /* texte principal (nav sombre du site) */
+      --rsl-muted:#6b7a8c;        /* texte secondaire */
+      --rsl-bg:#ffffff;           /* fond */
+      --rsl-soft:#f4f7fb;         /* panneaux doux */
+      --rsl-border:#e5edf5;       /* bordures légères */
+      --rsl-primary:#3EE08F;      /* accent RSL (vert néon logo) */
+      --rsl-primary-ink:#05351e;  /* texte sur bouton vert */
+      --rsl-primary-hover:#2ec47b;
+      --rsl-chip:#0f1a24;         /* pour contours plus marqués si besoin */
+
+      --shadow:0 12px 30px rgba(2,6,23,.08);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font:16px/1.55 "Outfit", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--rsl-ink);
+      background:var(--rsl-bg);
+    }
+
+    .wrap{max-width:780px;margin:0 auto;padding:20px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+    h1{font-size:clamp(22px,5vw,34px);line-height:1.12;margin:0;font-weight:800;letter-spacing:.2px}
+    .muted{color:var(--rsl-muted);font-size:14px}
+
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .card{
+      background:#fff;
+      border:1px solid var(--rsl-border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+      margin-bottom:12px;
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--rsl-soft);
+      border:1px solid var(--rsl-border);
+      border-radius:999px;padding:6px 10px;font-size:13px
+    }
+
+    input, textarea, select{
+      width:100%;padding:12px;border:1px solid var(--rsl-border);
+      background:#fff;border-radius:12px;font:14px/1.4 "Outfit", system-ui
+    }
+
+    /* === Boutons RSL === */
+    .btn{
+      border:0;border-radius:14px;padding:12px 18px;
+      font-weight:800;cursor:pointer;box-shadow:var(--shadow);
+      transition:transform .06s ease, filter .15s ease, background-color .15s ease;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:var(--rsl-primary);color:var(--rsl-primary-ink)}
+    .btn.primary:hover{background:var(--rsl-primary-hover)}
+    .btn.ghost{background:#fff;border:1px solid var(--rsl-border);color:var(--rsl-ink)}
+    .btn[disabled]{opacity:.55;filter:saturate(.6);cursor:not-allowed}
+
+    /* Slot animé */
+    .slot{
+      display:grid;place-items:center;position:relative;
+      height:3.6em;overflow:hidden;border-radius:14px;
+      border:2px dashed var(--rsl-primary);
+      background:linear-gradient(180deg,#fff,#fafbfc);
+      font-size:clamp(28px,6vw,46px);font-weight:800;margin:12px 0
+    }
+    .slot span{display:block;will-change:transform}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    .pulse{animation:pulse .22s ease-out}
+
+    /* Presets */
+    .presets button{border-radius:10px;padding:8px 10px}
+
+    /* Bandeau style site (logo + options à droite) */
+    .topline{display:flex;gap:12px;align-items:center;margin-left:auto}
+    .brand{
+      display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--rsl-ink)
+    }
+    .brand img{width:40px;height:40px;object-fit:contain;border-radius:8px}
+    .brand b{font-weight:800}
+    .editor{display:none}
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+  <div class="wrap">
+    <header class="hero">
+      <!-- Logo à gauche (tu peux remplacer src par images/logo_rsl.png) -->
+      <a class="brand" href="#" title="RSL">
+        <img src="images/logo_rsl.png" alt="RSL" onerror="this.src=''; this.outerHTML='<div style=\'width:40px;height:40px;border-radius:10px;background:#0f1a24;color:#3EE08F;display:grid;place-items:center;font-weight:900\'>RSL</div>'">
+        <span><b>RSL</b> · Random Tricks</span>
+      </a>
+
+      <div class="topline">
+        <label class="pill"><input type="checkbox" id="autoLang" checked> <span id="lbl_auto">Auto‑langue</span></label>
+        <select id="langSelect" class="pill">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="it">Italiano</option>
+          <option value="es">Español</option>
+        </select>
+        <label class="pill"><input type="checkbox" id="sound"> <span id="lbl_sound">Son 8‑bit</span></label>
+      </div>
+
+      <div class="muted" id="subtitle">Clique “Tirer” pour un trick aléatoire. Tu peux éditer la liste.</div>
+    </header>
+
+    <section class="card">
+      <div class="row">
+        <button class="btn primary" id="draw"><span id="btn_draw">🎲 Tirer</span></button>
+        <label class="pill"><input type="checkbox" id="noRepeat" checked> <span id="lbl_norepeat">Sans répétitions</span></label>
+        <button class="btn ghost" id="toggleEditor"><span id="btn_edit">Afficher l’éditeur</span></button>
+        <button class="btn ghost" id="resetList"><span id="btn_reset">Réinit</span></button>
+      </div>
+
+      <div class="slot"><span id="result">—</span></div>
+
+      <div class="editor" id="editor">
+        <div class="row presets" style="margin:8px 0">
+          <span class="pill" id="lbl_presets">Presets :</span>
+          <button class="btn ghost" id="p_easy">Easy</button>
+          <button class="btn ghost" id="p_street">Street</button>
+          <button class="btn ghost" id="p_park">Park</button>
+        </div>
+        <textarea id="tricks" rows="8"></textarea>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== i18n =====
+    var I18N = {
+      fr:{title:"Random Tricks", subtitle:"Clique “Tirer” pour un trick aléatoire. Tu peux éditer la liste.",
+          draw:"🎲 Tirer", norepeat:"Sans répétitions", edit_show:"Afficher l’éditeur", edit_hide:"Masquer l’éditeur",
+          reset:"Réinit", presets:"Presets :", sound:"Son 8‑bit", autolang:"Auto‑langue"},
+      en:{title:"Random Tricks", subtitle:"Tap “Draw” for a random trick. You can edit the list.",
+          draw:"🎲 Draw", norepeat:"No repetitions", edit_show:"Show editor", edit_hide:"Hide editor",
+          reset:"Reset", presets:"Presets:", sound:"8‑bit sound", autolang:"Auto language"},
+      de:{title:"Random Tricks", subtitle:"„Ziehen“ für einen zufälligen Trick. Liste ist bearbeitbar.",
+          draw:"🎲 Ziehen", norepeat:"Ohne Wiederholungen", edit_show:"Editor anzeigen", edit_hide:"Editor ausblenden",
+          reset:"Zurücksetzen", presets:"Presets:", sound:"8‑bit Sound", autolang:"Auto‑Sprache"},
+      it:{title:"Random Tricks", subtitle:"Tocca “Estrai” per un trick casuale. Puoi modificare la lista.",
+          draw:"🎲 Estrai", norepeat:"Senza ripetizioni", edit_show:"Mostra editor", edit_hide:"Nascondi editor",
+          reset:"Reimposta", presets:"Preset:", sound:"Suono 8‑bit", autolang:"Lingua automatica"},
+      es:{title:"Random Tricks", subtitle:"Pulsa “Sacar” para un truco aleatorio. Puedes editar la lista.",
+          draw:"🎲 Sacar", norepeat:"Sin repeticiones", edit_show:"Mostrar editor", edit_hide:"Ocultar editor",
+          reset:"Reiniciar", presets:"Presets:", sound:"Sonido 8‑bit", autolang:"Idioma automático"},
+    };
+    function detectLang(){var l=(navigator.language||'en').slice(0,2).toLowerCase(); return I18N[l]?l:'en';}
+    function applyI18n(l){
+      var t=I18N[l]||I18N.en;
+      document.getElementById('subtitle').textContent=t.subtitle;
+      document.getElementById('btn_draw').textContent=t.draw;
+      document.getElementById('lbl_norepeat').textContent=t.norepeat;
+      document.getElementById('btn_reset').textContent=t.reset;
+      document.getElementById('lbl_presets').textContent=t.presets;
+      document.getElementById('lbl_sound').textContent=t.sound;
+      document.getElementById('lbl_auto').textContent=t.autolang;
+    }
+
+    // ===== WebAudio (option) =====
+    var audioCtx=null, soundOn=false;
+    function initAudio(){ if(!audioCtx){ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); } }
+    function beep(freq,dur,type,vol){
+      if(!soundOn||!audioCtx) return;
+      var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type=type||'square'; g.gain.value=vol!=null?vol:0.07;
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime+dur);
+    }
+    function s_draw(){ beep(740,0.08,'square',0.07); setTimeout(function(){beep(880,0.06)},85); }
+    function s_end(){ beep(523,0.12); setTimeout(function(){beep(659,0.12)},150); }
+
+    // ===== Données =====
+    var PRESETS = {
+      easy:['Bunny Hop','Manual','Nose Manual','180','Barspin','Tailwhip','No Footer','Can-Can','One Foot','One Hand','Feeble','50-50','Boardslide'],
+      street:['Feeble Grind','Smith Grind','50-50 Grind','Boardslide','Lipslide','Crook','Overcrook','Hurricane','Bar to Manual','Whip to Manual'],
+      park:['Bryflip','Buttercup','Kickless','Fingerwhip','Double Whip','T-Bog','Flair','Backflip','Front Flip']
+    };
+    var DEFAULT_TRICKS = [
+      'Bunny Hop','Manual','Nose Manual','180','360','540',
+      'Barspin','Double Barspin','Tailwhip','Double Tailwhip',
+      'Triple Whip','Heelwhip','Inward','Bryflip','Buttercup',
+      'Kickless','Fingerwhip','Double Fingerwhip','T-Bog','No Hander',
+      'No Footer','Can-Can','One Foot','One Hand',
+      'Feeble Grind','Smith Grind','50-50 Grind','Boardslide','Lipslide','Hurricane',
+      'Icepick','Crook','Overcrook',
+      'Whip to Bars','Bars to Whip','Bar to Fingerwhip','Whip Rewind','Whip Front',
+      'Full Cab','Half Cab','Truckdriver (360 Barspin)',
+      'Full Whip','Front Scooter Flip (FSF)','Back Scooter Flip (BSF)',
+      'Front Flip','Backflip','Flair','Tuck No Hand','Bar Manual','Whip Manual'
+    ];
+    var TRICKS = DEFAULT_TRICKS.slice();
+    var pool = TRICKS.slice();
+
+    function setTricksFromText(){
+      var area=document.getElementById('tricks');
+      var arr = area.value.split('\n').map(function(t){return t.trim();}).filter(Boolean);
+      TRICKS = arr.length? arr : DEFAULT_TRICKS.slice();
+      pool = TRICKS.slice();
+    }
+    function pickTrick(noRepeat){
+      if(noRepeat){
+        if(pool.length===0){ pool = TRICKS.slice(); } // reset silencieux
+        var idx=Math.floor(Math.random()*pool.length);
+        return pool.splice(idx,1)[0];
+      }
+      return TRICKS[Math.floor(Math.random()*TRICKS.length)];
+    }
+    function spinTo(text){
+      var res=document.getElementById('result');
+      var flashes=Math.floor(8+Math.random()*8), base=55, i=0;
+      function spin(){
+        res.textContent = TRICKS[Math.floor(Math.random()*TRICKS.length)];
+        if(i<flashes){ i++; setTimeout(spin, base+i*20); }
+        else { res.textContent=text; res.classList.remove('pulse'); void res.offsetWidth; res.classList.add('pulse'); }
+      }
+      spin();
+    }
+
+    // ===== DOM =====
+    document.addEventListener('DOMContentLoaded', function(){
+      // Lang
+      var auto=document.getElementById('autoLang'), sel=document.getElementById('langSelect');
+      sel.value = detectLang(); applyI18n(sel.value);
+      sel.disabled = auto.checked;
+      auto.addEventListener('change', function(){ sel.disabled=this.checked; if(this.checked){ sel.value=detectLang(); applyI18n(sel.value);} });
+      sel.addEventListener('change', function(){ applyI18n(this.value); });
+
+      // Editor
+      var editor=document.getElementById('editor'), btnEdit=document.getElementById('toggleEditor');
+      function editLabel(){ var t=I18N[sel.value]; return editor.style.display==='none'?t.edit_show:t.edit_hide; }
+      document.getElementById('tricks').value = DEFAULT_TRICKS.join('\n');
+      editor.style.display='none'; btnEdit.textContent = editLabel();
+      btnEdit.addEventListener('click', function(){ editor.style.display = (editor.style.display==='none')?'block':'none'; btnEdit.textContent=editLabel(); });
+
+      // Sound
+      document.getElementById('sound').addEventListener('change', function(){ soundOn=this.checked; if(soundOn){ initAudio(); s_end(); } });
+
+      // Presets
+      document.getElementById('p_easy').addEventListener('click', function(){ document.getElementById('tricks').value = PRESETS.easy.join('\n'); setTricksFromText(); });
+      document.getElementById('p_street').addEventListener('click', function(){ document.getElementById('tricks').value = PRESETS.street.join('\n'); setTricksFromText(); });
+      document.getElementById('p_park').addEventListener('click', function(){ document.getElementById('tricks').value = PRESETS.park.join('\n'); setTricksFromText(); });
+      document.getElementById('resetList').addEventListener('click', function(){ document.getElementById('tricks').value = DEFAULT_TRICKS.join('\n'); setTricksFromText(); });
+
+      // Draw
+      document.getElementById('draw').addEventListener('click', function(){
+        setTricksFromText();
+        var trick = pickTrick(document.getElementById('noRepeat').checked);
+        spinTo(trick);
+        if(soundOn) s_draw();
+      });
+    });
+  </script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>

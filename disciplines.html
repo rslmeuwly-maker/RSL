@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Disciplines & Règlement — RSL</title>
+
+  <!-- Fonts + style global -->
+<!-- Mini CSS local pour le hero + footer -->
+  <style>
+    .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
+    .hero.hero-photo::before{
+      content:"";position:absolute;inset:0;z-index:0;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.75)),
+        url("images/lanoubc3.jpg") center/cover no-repeat;
+    }
+    .hero.hero-photo .container{position:relative;z-index:1}
+
+    /* === FOOTER demandé : 3 colonnes pleine largeur + bas à droite === */
+    .foot .links-3cols{
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+    }
+    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+    .foot .links-3cols li{margin:6px 0}
+    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+    .foot .links-3cols a:hover{text-decoration:underline}
+    .foot .bottom.bottom-right{
+      border-top:1px solid rgba(255,255,255,0.08);
+      margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px
+    }
+    .foot .bottom.bottom-right p{margin:0}
+    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+    .foot .bottom.bottom-right a:hover{text-decoration:underline}
+    @media (max-width: 900px){ .foot .links-3cols{grid-template-columns:1fr 1fr} }
+    @media (max-width: 600px){ .foot .links-3cols{grid-template-columns:1fr} .foot .bottom.bottom-right{justify-content:space-between} }
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+
+  <!-- NAV (identique à l’index) -->
+  <nav class="nav">
+  <div class="container nav-inner">
+    <!-- corrigé ici -->
+    <a class="brand" href="index.html">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+
+  <!-- HERO avec image lanoubc3 -->
+  <header class="hero hero-photo">
+    <div class="container">
+      <h1>Disciplines & Règlement</h1>
+      <p>Les deux styles majeurs de la trottinette freestyle : <strong>Park</strong> & <strong>Street</strong>.<br>
+      Et les règles officielles des contests RSL.</p>
+    </div>
+  </header>
+
+  <!-- DISCIPLINES -->
+  <section class="section">
+    <div class="container grid-2">
+      <!-- PARK -->
+      <article class="card">
+        <h2>Trottinette Freestyle — Park</h2>
+        <p class="muted">Skateparks avec bowls, spines et quarters. Amplitude, flow et gros airs.</p>
+
+        <div class="chips" style="margin:10px 0 14px">
+          <span class="badge">Bowls</span>
+          <span class="badge">Quarters</span>
+          <span class="badge">Funbox</span>
+          <span class="badge">Spines</span>
+        </div>
+
+        <ul class="list">
+          <li>Figures : backflips, tailwhips, bri flips, combos aériens</li>
+          <li>Critères de jugement : amplitude, style, propreté</li>
+          <li>Format : runs chronométrés (1–2 runs), meilleure note retenue</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Catégories</h3>
+        <div class="chips" style="margin-top:6px">
+          <span class="badge">U12</span>
+          <span class="badge">U16</span>
+          <span class="badge">Open</span>
+          <span class="badge">Filles</span>
+          <span class="badge">Am</span>
+          <span class="badge">Pro</span>
+        </div>
+      </article>
+
+      <!-- STREET -->
+      <article class="card">
+        <h2>Trottinette Freestyle — Street</h2>
+        <p class="muted">Rails, ledges, marches. Technique, précision et créativité urbaine.</p>
+
+        <div class="chips" style="margin:10px 0 14px">
+          <span class="badge">Rails</span>
+          <span class="badge">Ledges</span>
+          <span class="badge">Gaps</span>
+          <span class="badge">Curbs</span>
+        </div>
+
+        <ul class="list">
+          <li>Figures : grinds, slides, manuals, lignes techniques</li>
+          <li>Critères de jugement : difficulté, contrôle, originalité</li>
+          <li>Format : best line / best trick selon l’événement</li>
+        </ul>
+
+        <h3 style="margin-top:14px">Catégories</h3>
+        <div class="chips" style="margin-top:6px">
+          <span class="badge">U12</span>
+          <span class="badge">U16</span>
+          <span class="badge">Open</span>
+          <span class="badge">Filles</span>
+          <span class="badge">Am</span>
+          <span class="badge">Pro</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- RÈGLEMENT -->
+  <section class="section" style="background:#fafafa">
+    <div class="container">
+      <div class="section-head">
+        <h2>Règlement Officiel RSL</h2>
+        <span class="muted">Applicable sur toutes les manches officielles de la Romandie Scooter League</span>
+      </div>
+
+      <ul class="list" style="max-width:800px;margin:auto;line-height:1.8;font-size:17px">
+        <li>⚠️ <b>Casque obligatoire</b> pour tous les riders.</li>
+        <li>Qualifications : <b>2 runs (45–60s)</b> — le meilleur compte.</li>
+        <li>Finale : <b>2 runs</b> — le meilleur compte.</li>
+        <li>Grille de 100 points :
+          <ul style="margin-top:4px">
+            <li>Difficulté : 40</li>
+            <li>Exécution : 30</li>
+            <li>Style : 20</li>
+            <li>Créativité : 10</li>
+          </ul>
+        </li>
+        <li>Classement du tour : <b>2 meilleurs résultats sur 3 manches</b>.</li>
+        <li>Le port des protections supplémentaires est fortement recommandé.</li>
+        <li>Les juges sont choisis pour leur expérience et leur neutralité.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FOOTER corrigé uniquement -->
+  <footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- HelpBot (RSL) -->
+<link rel="stylesheet" href="css/helpbot.css">
+<div id="hb-root">
+  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+    <div class="hb-head">
+      <div class="title" id="hbTitle">Aide — RSL</div>
+      <div class="actions">
+        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
+        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="hb-body" id="hbBody"></div>
+    <div class="hb-foot">
+      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
+      <button id="hbSend" class="hb-send">Envoyer</button>
+    </div>
+  </div>
+</div>
+<script defer src="js/helpbot.js"></script>
+
+</body></html>

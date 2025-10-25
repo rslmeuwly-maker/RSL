@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Paiement Pro / Soutien — Romandie Scooter League</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/common.css"/>
+  <link rel="stylesheet" href="css/fonts.css"/>
+
+  <style>
+    .container{max-width:1100px;margin:0 auto;padding:0 18px}
+    .title{margin:20px 0 8px;font-weight:800;font-size:26px;text-align:center}
+    .muted{text-align:center;color:#6b7785;margin-bottom:32px}
+
+    .payment-wrapper{
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap:40px;
+      flex-wrap:wrap;
+      max-width:900px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:#fff;
+      border:1px solid #d0d7e2;
+      border-radius:16px;
+      padding:24px;
+      width:380px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      text-align:center;
+      transition:transform 0.2s ease;
+    }
+    .card:hover{transform:translateY(-4px);}
+    .card h2{margin:0 0 6px;font-size:22px}
+    .bigprice{font-size:30px;font-weight:800;margin:8px 0}
+    .muted-list{color:#6b7785;font-size:15px;list-style:none;padding:0;margin:12px 0}
+    .muted-list li{margin:6px 0}
+    .actions{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #cfd6e4;background:#eef2f7;text-decoration:none;color:#111;font-weight:600;text-align:center}
+    .btn.dark{background:#111827;color:#fff;border-color:#111827}
+    .btn.orange{background:#e67e22;color:#fff;border-color:#e67e22}
+    .btn.purple{background:#6d28d9;color:#fff;border-color:#6d28d9}
+
+    dialog::backdrop{background:rgba(0,0,0,.45)}
+    dialog.modal{border:0;border-radius:16px;max-width:680px;width:92vw;padding:0}
+    .modal-card{padding:18px;background:#fff;border:1px solid #d0d7e2;border-radius:16px}
+    .qr{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center}
+    @media(max-width:640px){.qr{grid-template-columns:1fr}}
+    .qr img{width:180px;max-width:100%;border-radius:12px;border:1px solid #e5e7eb}
+    .muted-small{color:#6b7785;font-size:13px}
+  </style>
+</head>
+<body>
+
+  <!-- NAV identique -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <img src="images/logo_rsl.png" alt="Logo RSL">
+        <span><b>RSL — Romandie Scooter League</b></span>
+      </a>
+      <ul>
+        <li><a href="formation.html">Formation RSL</a></li>
+        <li><a href="disciplines.html">Disciplines</a></li>
+        <li><a href="ou_rider.html">Où rider ?</a></li>
+        <li><a href="game.html">Games</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="comite.html">Comité</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="cours.html">Cours</a></li>
+      </ul>
+      <div class="cta">
+        <button class="btn" id="btnIdentity">Se connecter</button>
+        <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+        <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+      </div>
+      <div class="cta">
+        <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- En-tête -->
+  <header class="page-head">
+    <div class="container">
+      <h1 class="title">Paiement — Offre Pro / Soutien</h1>
+      <p class="muted">Choisis ton mode de paiement : <b>annuel 149.–</b> ou <b>mensuel 15.– / mois</b>.</p>
+    </div>
+  </header>
+
+  <!-- Bloc centré -->
+  <main class="container">
+    <div class="payment-wrapper">
+
+      <!-- Carte annuelle -->
+      <section class="card">
+        <h2>Pro / Soutien — annuel</h2>
+        <div class="bigprice">149.– <span class="muted">/ an</span></div>
+        <ul class="muted-list">
+          <li>Tous les avantages Rider</li>
+          <li>Nom cité (soutien officiel)</li>
+        </ul>
+        <div class="actions">
+          <a class="btn purple" href="#" target="_blank" rel="noopener">Payer 149.– (carte)</a>
+          <button class="btn dark" id="btnTwint149">TWINT 149.–</button>
+        </div>
+      </section>
+
+      <!-- Carte mensuelle -->
+      <section class="card">
+        <h2>Pro / Soutien — mensuel</h2>
+        <div class="bigprice">15.– <span class="muted">/ mois</span></div>
+        <ul class="muted-list">
+          <li>Tous les avantages Rider</li>
+          <li>Renouvellement automatique chaque mois</li>
+        </ul>
+        <div class="actions">
+          <a class="btn orange" href="#" target="_blank" rel="noopener">Payer 15.– / mois (carte)</a>
+          <button class="btn dark" id="btnTwint15">TWINT 15.– / mois</button>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="card" style="margin:40px auto;max-width:700px;text-align:center">
+      <strong>Infos paiement & renouvellement</strong>
+      <p class="muted" style="margin:6px 0 0">
+        L’adhésion annuelle est valable jusqu’au 31 décembre (renouvellement automatique).<br>
+        L’abonnement mensuel est reconduit le 1er de chaque mois ; résiliation possible jusqu’au <b>20 du mois</b>.
+      </p>
+    </div>
+  </main>
+
+  <!-- Modales TWINT -->
+  <dialog class="modal" id="twintDlg149">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px">TWINT — 149.– (Pro / Soutien annuel)</h3>
+      <div class="qr">
+        <img src="images/twint_149.png" alt="QR TWINT 149.–">
+        <div>
+          <p class="muted">Scanne le QR pour régler <strong>149.–</strong>. Ou paie au <b>078 300 80 43</b>.</p>
+          <div class="actions">
+            <a class="btn" target="_blank" href="https://wa.me/41783008043?text=TWINT%20149.-%20Pro%20Soutien%20annuel">Confirmer WhatsApp</a>
+            <a class="btn" target="_blank" href="mailto:rsl.meuwly@gmail.com?subject=TWINT%20149&body=Nom:____">Confirmer Email</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="btn dark" id="closeTwint149">Fermer</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="twintDlg15">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px">TWINT — 15.– / mois (Pro / Soutien mensuel)</h3>
+      <div class="qr">
+        <img src="images/twint_15.png" alt="QR TWINT 15.–">
+        <div>
+          <p class="muted">Scanne le QR pour régler <strong>15.– / mois</strong>. Ou paie au <b>078 300 80 43</b>.</p>
+          <div class="actions">
+            <a class="btn" target="_blank" href="https://wa.me/41783008043?text=TWINT%2015.-%20Pro%20Soutien%20mensuel">Confirmer WhatsApp</a>
+            <a class="btn" target="_blank" href="mailto:rsl.meuwly@gmail.com?subject=TWINT%2015&body=Nom:____">Confirmer Email</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="btn dark" id="closeTwint15">Fermer</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    const modals = [
+      ['btnTwint149','twintDlg149','closeTwint149'],
+      ['btnTwint15','twintDlg15','closeTwint15'],
+    ];
+    modals.forEach(([openId,dlgId,closeId])=>{
+      const open = document.getElementById(openId);
+      const dlg = document.getElementById(dlgId);
+      const close = document.getElementById(closeId);
+      if(open && dlg) open.addEventListener('click', ()=> dlg.showModal());
+      if(close && dlg) close.addEventListener('click', ()=> dlg.close());
+    });
+  </script>
+</body>
+</html>
