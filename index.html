@@ -37,11 +37,8 @@
       overflow-y:auto; -webkit-overflow-scrolling:touch;
       padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     }
-    .rsl-gate .gate-inner{
-      max-width:960px; margin:0 auto;
-      min-height:100vh;
-    }
-    @supports (height: 100dvh){ .rsl-gate .gate-inner{ min-height:100dvh; } }
+    .rsl-gate .gate-inner{max-width:960px;margin:0 auto;min-height:100vh}
+    @supports (height:100dvh){.rsl-gate .gate-inner{min-height:100dvh}}
     .rsl-gate .banner{
       background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.15);
       border-radius:14px;padding:14px 18px;margin-bottom:16px;text-align:center
@@ -54,17 +51,18 @@
     .rsl-card label{display:block;font-size:14px;margin:8px 0 6px}
     .rsl-input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff}
     .rsl-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{cursor:pointer;border:none;padding:10px 14px;border-radius:10px;background:#2563eb;color:#fff;font-weight:600}
-    .btn.dark{background:#0f172a}
+    .btn{cursor:pointer;border:none;padding:10px 14px;border-radius:10px;background:#22c55e;color:#fff;font-weight:600}
     .btn.red{background:#dc2626}
+    .btn.dark{background:#0f172a}
+    .btn-blue{background:#2563eb;color:#fff}
     .muted{opacity:.85}
     .tiny{font-size:12px;opacity:.8}
 
     /* Signature */
     .sig-wrap{border:1px dashed rgba(255,255,255,.35);border-radius:12px;overflow:hidden;background:#0b0b0b}
-    #rslSignature{display:block;width:100%;height:160px;touch-action:none;cursor:crosshair}
+    #rslSignature{display:block;width:100%;height:200px;touch-action:none;cursor:crosshair}
 
-    /* Logo sous mot de passe (fond blanc, responsive) */
+    /* Logo sous mot de passe */
     .rsl-logo-box{margin-top:14px;text-align:right}
     .rsl-logo-box img{max-width:140px;width:50%;background:#fff;border-radius:12px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
     @media(max-width:720px){.rsl-logo-box{text-align:center}.rsl-logo-box img{width:60%;max-width:180px}}
@@ -74,6 +72,30 @@
     .rsl-check input[type="checkbox"]{width:22px;height:22px;flex:0 0 22px;margin-top:2px}
     .rsl-check label{flex:1;line-height:1.3}
     .error{color:#ffb4b4;margin-top:6px;display:none}
+
+    /* ====== MOBILE ONLY ====== */
+    @media (max-width: 900px){
+      .hero.hero-photo{min-height:100vh}
+      @supports (height:100dvh){.hero.hero-photo{min-height:100dvh}}
+      .hero.hero-photo .container{max-width:none;padding-left:0;padding-right:0}
+      .hero.hero-photo .hero-inner{min-height:inherit;display:flex;align-items:center;padding:0 20px}
+      .hero.hero-photo::before{left:0;right:0;top:0;bottom:0;background-size:cover;background-position:center}
+      .hero .grid{display:grid;grid-template-columns:1fr;gap:14px;width:100%}
+      .cards{display:grid;grid-template-columns:1fr;gap:14px}
+      .grid-3{display:grid;grid-template-columns:1fr;gap:14px}
+      .committee{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+      @media (max-width:640px){.committee{grid-template-columns:1fr}}
+      .panel,.card,.committee .member{background:rgba(0,0,0,.55)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:16px!important}
+      .nav ul{display:none}
+      .nav .cta{display:none}
+      #rslMobileBurger{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:100;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.55);color:#fff;font-size:22px;backdrop-filter:blur(6px) saturate(120%)}
+      #rslMobileDim{position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .18s ease}
+      #rslMobileSheet{position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));z-index:99;width:min(86vw,340px);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:10px;transform:translateX(12px) translateY(-8px) scale(.98);opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+      #rslMobileSheet ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+      #rslMobileSheet a{display:block;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#cdd6ff;text-decoration:none}
+      .rsl-menu-open #rslMobileDim{opacity:1;pointer-events:auto}
+      .rsl-menu-open #rslMobileSheet{opacity:1;pointer-events:auto;transform:none}
+    }
   </style>
 
   <!-- Fonts + externes -->
@@ -105,7 +127,11 @@
         <li><a href="contact.html">Contact</a></li>
         <li><a href="cours.html">Cours</a></li>
       </ul>
-      <div class="cta"><a class="btn" id="btnMembre" href="membres.html">Devenir membre</a></div>
+      <!-- CTA: membre + login (bleu sous le vert) -->
+      <div class="cta">
+        <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+        <a class="btn-blue" id="btnLogin" href="login.html">Login</a>
+      </div>
     </div>
   </nav>
 
@@ -195,7 +221,7 @@
     </div>
   </footer>
 
-  <!-- ====== GATE ACCÈS + FORM ====== -->
+  <!-- ====== GATE ACCÈS ====== -->
   <div class="rsl-gate" id="rslGate" role="dialog" aria-modal="true" aria-labelledby="rslGateTitle">
     <div class="gate-inner">
       <div class="banner" id="rslGateTitle"><b>Bienvenue sur le site d'RSL</b> — ouverture officielle janvier 2026</div>
@@ -215,33 +241,23 @@
           <p class="tiny" style="margin-top:10px;opacity:.7">Le code doit être ressaisi à chaque visite (sécurité).</p>
         </div>
 
-        <!-- Pré-inscription (Formspree + anti-spam) -->
+        <!-- Signature + email -->
         <div class="rsl-card">
-          <h3>Pré-inscription</h3>
-          <p class="muted">Laisse tes coordonnées et signe ci-dessous pour être prévenu à l’ouverture.</p>
-          <form id="rslPreForm" method="POST" action="https://formspree.io/f/xovparwe" novalidate>
-            <!-- Honeypot -->
-            <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-5000px;opacity:.01" aria-hidden="true">
-            <label>Nom<input class="rsl-input" type="text" name="Nom" autocomplete="family-name" required></label>
-            <label>Prénom<input class="rsl-input" type="text" name="Prénom" autocomplete="given-name" required></label>
-            <label>Email<input class="rsl-input" type="email" name="Email" placeholder="ton@email.ch" required></label>
-            <div class="rsl-check"><input type="checkbox" id="chkHuman" required><label for="chkHuman">Je ne suis pas un robot</label></div>
-            <div class="rsl-check"><input type="checkbox" id="chkConsent" required><label for="chkConsent">J’accepte d’être contacté par la RSL concernant ma pré-inscription.</label></div>
-            <p id="preErr" class="error">Merci de cocher les cases et de compléter correctement le formulaire.</p>
-            <input type="hidden" name="_subject" value="Pré-inscription RSL">
-            <input type="hidden" name="SignaturePNG" id="rslSigData">
-            <label>Signature</label>
-            <div class="sig-wrap"><canvas id="rslSignature"></canvas></div>
-            <div class="rsl-actions"><button type="button" class="btn dark" id="sigClear">Effacer</button><button type="submit" class="btn">Envoyer</button></div>
-            <p id="preMsg" class="tiny" style="margin-top:8px;display:none"></p>
-          </form>
+          <h3>Signature</h3>
+          <p class="muted">Signe ci-dessous puis clique “Valider la signature”. Un e-mail prérempli à la RSL s’ouvrira.</p>
+          <div class="sig-wrap"><canvas id="rslSignature"></canvas></div>
+          <div class="rsl-actions">
+            <button type="button" class="btn dark" id="sigClear">Effacer</button>
+            <button type="button" class="btn" id="sigValidate">Valider la signature</button>
+          </div>
+          <p class="tiny" id="sigMsg" style="display:none;margin-top:8px"></p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- === JS === -->
-  <!-- Pop-up d’accueil (ne s’ouvre qu’après accès) -->
+  <!-- Pop-up d’accueil (après accès) -->
   <script>
     (function(){
       const dlg=document.getElementById('dlg');
@@ -252,7 +268,7 @@
     })();
   </script>
 
-  <!-- Gate + signature + anti-spam + reset accès + chat différé -->
+  <!-- Gate + signature + chat différé -->
   <script>
     (function(){
       const ACCESS_KEY='rsl_access', ACCESS_OK='ok', PASSCODE='RSL2026';
@@ -262,19 +278,9 @@
       const passInput=document.getElementById('rslPass');
       const passMsg=document.getElementById('passMsg');
 
-      const preForm=document.getElementById('rslPreForm');
-      const preErr=document.getElementById('preErr');
-      const preMsg=document.getElementById('preMsg');
-      const sigCanvas=document.getElementById('rslSignature');
-      const sigClear=document.getElementById('sigClear');
-      const sigHidden=document.getElementById('rslSigData');
-      const chkHuman=document.getElementById('chkHuman');
-      const chkConsent=document.getElementById('chkConsent');
-
-      const hbRoot=document.getElementById('hb-root'); // conteneur tchat (masqué au départ)
+      const hbRoot=document.getElementById('hb-root');
       let helpbotLoaded=false;
 
-      /* Charger le chat SEULEMENT après l’accès */
       function loadHelpbot(){
         if(helpbotLoaded) return;
         const s=document.createElement('script');
@@ -285,28 +291,16 @@
         helpbotLoaded=true;
       }
 
-      /* Scroll lock pendant gate */
       function lockScroll(){ document.body.style.overflow='hidden'; document.documentElement.style.overflow='hidden'; }
       function unlockScroll(){ document.body.style.overflow=''; document.documentElement.style.overflow=''; }
 
-      /* Gate show/hide */
-      function showGate(){
-        gate.style.display='block';
-        hbRoot && (hbRoot.style.display='none'); // chat invisible
-        lockScroll();
-        resizeSignature(); // s'assure que le canvas a une taille valide
-      }
-      function hideGate(){
-        gate.style.display='none';
-        unlockScroll();
-        window.scrollTo({top:0,behavior:'instant'});
-        loadHelpbot(); // charge le tchat maintenant
-      }
+      function showGate(){ gate.style.display='block'; hbRoot && (hbRoot.style.display='none'); lockScroll(); }
+      function hideGate(){ gate.style.display='none'; unlockScroll(); window.scrollTo({top:0,behavior:'instant'}); loadHelpbot(); }
       function openWelcomeDelayed(ms){ if(typeof window.rslOpenWelcome==='function') setTimeout(()=>window.rslOpenWelcome(),ms); }
 
       function initGate(){
         let hasAccess=false; try{ hasAccess = localStorage.getItem(ACCESS_KEY)===ACCESS_OK; }catch(e){}
-        if(!hasAccess){ showGate(); } else { hideGate(); openWelcomeDelayed(10000); }
+        if(!hasAccess){ showGate(); } else { hideGate(); openWelcomeDelayed(400); }
 
         passForm?.addEventListener('submit',e=>{
           e.preventDefault();
@@ -321,125 +315,74 @@
         });
       }
 
-      /* Signature (Pointer Events + mobile) */
-      let ctx=null, drawing=false;
-      function ensureSigCss(){ if(sigCanvas && !sigCanvas.style.height) sigCanvas.style.height='160px'; }
-      function resizeSignature(){
-        if(!sigCanvas) return;
-        requestAnimationFrame(()=>{
-          const ratio=Math.max(1,window.devicePixelRatio||1);
-          const w=sigCanvas.clientWidth||300;
-          const h=sigCanvas.clientHeight||160;
-          if(!ctx) ctx=sigCanvas.getContext('2d',{willReadFrequently:true});
-          sigCanvas.width=Math.floor(w*ratio);
-          sigCanvas.height=Math.floor(h*ratio);
-          ctx.setTransform(ratio,0,0,ratio,0,0);
-          ctx.fillStyle='#0b0b0b'; ctx.fillRect(0,0,w,h);
-          ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#fff';
-        });
+      // ===== Signature =====
+      const canvas = document.getElementById('rslSignature');
+      const btnClear = document.getElementById('sigClear');
+      const btnValidate = document.getElementById('sigValidate');
+      const msg = document.getElementById('sigMsg');
+      let ctx, drawing=false;
+
+      function ensureSize(){
+        if(!canvas) return;
+        const ratio = Math.max(1, window.devicePixelRatio || 1);
+        const w = canvas.clientWidth || 400;
+        const h = canvas.clientHeight || 200;
+        if(!ctx) ctx = canvas.getContext('2d', { willReadFrequently:true });
+        canvas.width = Math.floor(w * ratio);
+        canvas.height = Math.floor(h * ratio);
+        ctx.setTransform(ratio,0,0,ratio,0,0);
+        ctx.fillStyle = '#0b0b0b'; ctx.fillRect(0,0,w,h);
+        ctx.lineWidth = 2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#fff';
       }
-      function getPos(e){
-        const r=sigCanvas.getBoundingClientRect();
-        const t=e.touches?e.touches[0]:e;
-        return {x:(t.clientX??t.pageX)-r.left,y:(t.clientY??t.pageY)-r.top};
-      }
-      function sigStart(e){
-        drawing=true;
-        if(e.pointerId!=null) try{ sigCanvas.setPointerCapture(e.pointerId); }catch(_){}
-        const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
-        e.preventDefault?.();
-      }
-      function sigMove(e){
-        if(!drawing) return;
-        const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();
-        e.preventDefault?.();
-      }
-      function sigEnd(e){
-        drawing=false;
-        if(e && e.pointerId!=null) try{ sigCanvas.releasePointerCapture(e.pointerId); }catch(_){}
-      }
+      function pos(e){ const r=canvas.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return {x:(t.clientX??t.pageX)-r.left, y:(t.clientY??t.pageY)-r.top}; }
+      function start(e){ drawing=true; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); e.preventDefault?.(); }
+      function move(e){ if(!drawing) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault?.(); }
+      function end(){ drawing=false; }
+
       function initSignature(){
-        if(!sigCanvas) return;
-        ensureSigCss(); resizeSignature(); setTimeout(resizeSignature,0);
-        window.addEventListener('resize', resizeSignature);
-        ['touchstart','touchmove','touchend','touchcancel'].forEach(evt=>{
-          sigCanvas.addEventListener(evt, e=>e.preventDefault(), {passive:false});
-        });
+        if(!canvas) return;
+        ensureSize(); setTimeout(ensureSize,0); window.addEventListener('resize', ensureSize);
         if('onpointerdown' in window){
-          sigCanvas.addEventListener('pointerdown', sigStart, {passive:false});
-          sigCanvas.addEventListener('pointermove',  sigMove,  {passive:false});
-          window.addEventListener('pointerup',       sigEnd,   {passive:false});
-          window.addEventListener('pointercancel',   sigEnd,   {passive:false});
+          canvas.addEventListener('pointerdown', start, {passive:false});
+          canvas.addEventListener('pointermove',  move,  {passive:false});
+          window.addEventListener('pointerup',    end,   {passive:false});
+          window.addEventListener('pointercancel',end,   {passive:false});
         }else{
-          sigCanvas.addEventListener('mousedown', sigStart);
-          sigCanvas.addEventListener('mousemove', sigMove);
-          window.addEventListener('mouseup', sigEnd);
-          sigCanvas.addEventListener('touchstart', sigStart, {passive:false});
-          sigCanvas.addEventListener('touchmove',  sigMove,  {passive:false});
-          sigCanvas.addEventListener('touchend',   sigEnd,   {passive:false});
+          canvas.addEventListener('mousedown', start);
+          canvas.addEventListener('mousemove', move);
+          window.addEventListener('mouseup', end);
+          canvas.addEventListener('touchstart', start, {passive:false});
+          canvas.addEventListener('touchmove',  move,  {passive:false});
+          canvas.addEventListener('touchend',   end,   {passive:false});
         }
-        sigClear?.addEventListener('click', ()=>{
-          const w=sigCanvas.clientWidth||300, h=sigCanvas.clientHeight||160;
+        btnClear?.addEventListener('click', ()=>{
+          const w = canvas.clientWidth || 400, h = canvas.clientHeight || 200;
           ctx.fillStyle='#0b0b0b'; ctx.fillRect(0,0,w,h);
-          ctx.beginPath(); ctx.strokeStyle='#ffffff';
+          ctx.beginPath(); ctx.strokeStyle='#fff';
+          msg.style.display='none';
         });
-      }
-
-      /* Pré-inscription : Anti-spam + Envoi Formspree */
-      let formShownAt = Date.now();
-      function initPreForm(){
-        preForm?.addEventListener('submit', async e=>{
-          e.preventDefault();
-          preErr.style.display='none';
-
-          // délai anti-bot
-          if(Date.now() - formShownAt < 3000){
-            preErr.textContent="Soumission trop rapide — merci de réessayer.";
-            preErr.style.display='block'; return;
-          }
-          // honeypot
-          const hp=preForm.querySelector('input[name="website"]');
-          if(hp && hp.value.trim()!==""){
-            preErr.textContent="Détection anti-spam — merci de réessayer.";
-            preErr.style.display='block'; return;
-          }
-          // cases
-          if(!chkHuman.checked || !chkConsent.checked){
-            preErr.textContent="Merci de cocher « je ne suis pas un robot » et « j’accepte d’être contacté ».";
-            preErr.style.display='block'; return;
-          }
-          // signature → PNG
-          try{ if(sigCanvas && sigHidden){ sigHidden.value = sigCanvas.toDataURL('image/png'); } }catch(_){}
-
-          const formData=new FormData(preForm);
+        btnValidate?.addEventListener('click', ()=>{
           try{
-            const resp=await fetch(preForm.action,{method:'POST',headers:{'Accept':'application/json'},body:formData});
-            if(resp.ok){
-              preMsg.textContent='Merci ! Pré-inscription envoyée ✅';
-              preMsg.style.display='block';
-              preForm.reset(); chkHuman.checked=false; chkConsent.checked=false;
-              formShownAt=Date.now();
-            }else{
-              preErr.textContent="Oups, envoi impossible pour le moment. Réessaie plus tard.";
-              preErr.style.display='block';
-            }
+            const dataUrl = canvas.toDataURL('image/png');
+            const a=document.createElement('a'); a.href=dataUrl; a.download='signature-rsl.png'; document.body.appendChild(a); a.click(); a.remove();
+            const subject = encodeURIComponent('Pré-inscription / Signature RSL');
+            const body = encodeURIComponent("Bonjour RSL,\n\n- Nom & Prénom : \n- Date de naissance : \n- Téléphone : \n- Ville : \n\n→ J’ai joint ma signature (fichier téléchargé: signature-rsl.png).\n\nMerci et à bientôt !");
+            window.location.href = `mailto:rsl.meuwly@gmail.com?subject=${subject}&body=${body}`;
+            msg.textContent = "Signature enregistrée. Ajoute le fichier 'signature-rsl.png' à l’e-mail qui s’ouvre.";
+            msg.style.display='block';
           }catch{
-            preErr.textContent="Erreur réseau — réessaie.";
-            preErr.style.display='block';
+            msg.textContent = "Impossible de générer la signature. Réessaie.";
+            msg.style.display='block';
           }
         });
       }
 
-      /* Init + reset accès */
-      function init(){ initGate(); initSignature(); initPreForm(); }
+      function init(){ initGate(); initSignature(); }
       if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
-      window.addEventListener('pagehide',()=>{ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} });
-      window.addEventListener('beforeunload',()=>{ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} });
-      document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} }});
     })();
   </script>
 
-  <!-- HelpBot (RSL) — masqué et SANS script chargé avant accès -->
+  <!-- HelpBot (chargé après accès) -->
   <div id="hb-root" style="display:none">
     <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
     <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
@@ -458,6 +401,76 @@
     </div>
   </div>
   <!-- IMPORTANT : ne pas inclure <script src="js/helpbot.js"> ici ; il est injecté après l’accès -->
+
+  <!-- ====== JS MOBILE : burger + menu off-canvas ====== -->
+  <script>
+    (function(){
+      const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+
+      function buildMobileMenu(){
+        if(document.getElementById('rslMobileBurger')) return;
+        const nav = document.querySelector('.nav');
+        const list = nav?.querySelector('ul');
+        if(!nav || !list) return;
+
+        // Burger
+        const burger = document.createElement('button');
+        burger.id = 'rslMobileBurger';
+        burger.type = 'button';
+        burger.setAttribute('aria-label','Ouvrir le menu');
+        burger.setAttribute('aria-expanded','false');
+        burger.textContent = '☰';
+
+        // Overlay + sheet
+        const dim = document.createElement('div'); dim.id = 'rslMobileDim';
+        const sheet = document.createElement('aside'); sheet.id = 'rslMobileSheet';
+
+        // Clone de la nav + CTA en tête (Membre + Login)
+        const cloned = list.cloneNode(true);
+        const memberHref = document.getElementById('btnMembre')?.getAttribute('href') || 'membres.html';
+        const loginHref  = document.getElementById('btnLogin')?.getAttribute('href')  || 'login.html';
+
+        const li1 = document.createElement('li'); const a1 = document.createElement('a');
+        a1.href = memberHref; a1.innerHTML = '<b>Devenir membre</b>'; li1.appendChild(a1);
+
+        const li2 = document.createElement('li'); const a2 = document.createElement('a');
+        a2.href = loginHref; a2.innerHTML = '<b>Login</b>'; li2.appendChild(a2);
+
+        cloned.prepend(li2);
+        cloned.prepend(li1);
+        sheet.appendChild(cloned);
+
+        // Injection
+        document.body.appendChild(burger);
+        document.body.appendChild(dim);
+        document.body.appendChild(sheet);
+
+        // Open/Close
+        const open = () => { document.body.classList.add('rsl-menu-open'); burger.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; };
+        const close = () => { document.body.classList.remove('rsl-menu-open'); burger.setAttribute('aria-expanded','false'); document.body.style.overflow=''; };
+
+        burger.addEventListener('click', ()=> document.body.classList.contains('rsl-menu-open') ? close() : open());
+        dim.addEventListener('click', close);
+        sheet.querySelectorAll('a').forEach(x => x.addEventListener('click', close));
+
+        // Auto-clean si retour desktop
+        const mq = window.matchMedia('(max-width: 900px)');
+        mq.addEventListener?.('change', e=>{ if(!e.matches) destroyMobileMenu(); });
+      }
+
+      function destroyMobileMenu(){
+        document.getElementById('rslMobileBurger')?.remove();
+        document.getElementById('rslMobileDim')?.remove();
+        document.getElementById('rslMobileSheet')?.remove();
+        document.body.classList.remove('rsl-menu-open');
+        document.body.style.overflow='';
+      }
+
+      function init(){ if(isMobile()) buildMobileMenu(); else destroyMobileMenu(); }
+      if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+      window.addEventListener('resize', ()=>{ if(isMobile()) buildMobileMenu(); else destroyMobileMenu(); });
+    })();
+  </script>
 
 </body>
 </html>
