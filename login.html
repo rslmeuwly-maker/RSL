@@ -3,76 +3,98 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Login — RSL</title>
+  <title>Connexion — RSL</title>
   <style>
-    body{font-family:system-ui,Arial,sans-serif;max-width:520px;margin:40px auto;padding:0 16px;text-align:center}
-    input,button{padding:10px;font-size:16px;margin:6px 0;width:100%}
-    .muted{opacity:.7;font-size:.9em;margin-top:10px}
-    .box{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:14px 0}
-    .title{font-weight:700;margin-bottom:6px}
-    .ok{color:#059669}.err{color:#dc2626}
-    a{color:#2563eb;text-decoration:none}
+    body{font-family:system-ui,Arial,sans-serif;max-width:520px;margin:40px auto;padding:0 16px;text-align:center;background:#f7f7fb}
+    h1{margin-bottom:10px}
+    form{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    input,button{padding:12px;font-size:16px;margin:6px 0;width:100%;border-radius:10px;border:1px solid #d1d5db}
+    button{border:0;background:#2563eb;color:#fff;font-weight:600}
+    .muted{opacity:.75;font-size:.9em;margin-top:8px}
+    .ok{color:#059669;font-weight:700}
+    .err{color:#dc2626;font-weight:700}
+    a{color:#2563eb}
   </style>
 </head>
 <body>
-  <h1>Connexion RSL</h1>
+  <h1>Connexion à RSL</h1>
 
-  <div class="box">
-    <div class="title">Créer un compte</div>
-    <form id="signup">
-      <input id="name" placeholder="Nom complet" required>
-      <input id="email" type="email" placeholder="Email" required>
-      <input id="password" type="password" placeholder="Mot de passe" required>
-      <button>S'inscrire</button>
-    </form>
-    <p class="muted">Tu recevras un email de confirmation (si activé).</p>
-  </div>
+  <form id="signup">
+    <h3>Créer un compte</h3>
+    <input id="name" placeholder="Nom complet" autocomplete="name">
+    <input id="email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="password" type="password" placeholder="Mot de passe" autocomplete="new-password" required>
+    <button type="submit">S'inscrire</button>
+    <p class="muted">Tu recevras un e-mail de confirmation si activé.</p>
+  </form>
 
-  <div class="box">
-    <div class="title">Se connecter</div>
-    <form id="login">
-      <input id="lemail" type="email" placeholder="Email" required>
-      <input id="lpass" type="password" placeholder="Mot de passe" required>
-      <button>Connexion</button>
-    </form>
-  </div>
+  <form id="login">
+    <h3>Se connecter</h3>
+    <input id="lemail" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="lpass" type="password" placeholder="Mot de passe" autocomplete="current-password" required>
+    <button type="submit">Connexion</button>
+  </form>
+
+  <p class="muted">
+    Mot de passe oublié ? <a href="#" id="forgot">Envoyer un lien de réinitialisation</a>
+  </p>
 
   <p id="msg" class="muted"></p>
-  <p><a href="/">← Retour au site</a></p>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm'
+  <!-- Supabase SDK (global) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Variables publiques (à remplir) -->
+  <script src="/env.js"></script>
 
-    // === REMPLACE UNIQUEMENT SI TON URL/CLÉ CHANGENT ===
-    const supabaseUrl = 'https://jynxifufaouxwjzapzq.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+  <script>
+    // sécurité : clés chargées depuis env.js
+    const SUPABASE_URL  = window.env?.SUPABASE_URL;
+    const SUPABASE_ANON = window.env?.SUPABASE_ANON;
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    const msg = document.getElementById('msg');
-    const show = (t, ok=false)=>{ msg.textContent = (ok?'✅ ':'❌ ') + t; msg.className = ok ? 'ok' : 'err'; };
+    const msgEl = document.getElementById('msg');
+    const info = (t, ok=false)=>{ msgEl.className = ok?'ok':'err'; msgEl.textContent = t; };
 
     // Inscription
     document.getElementById('signup').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const { data, error } = await supabase.auth.signUp({
-        email: email.value,
-        password: password.value,
-        options: { data: { full_name: name.value } }
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const { error } = await supabase.auth.signUp({
+        email, password,
+        options: {
+          data: { full_name: name },
+          emailRedirectTo: `${location.origin}/login`
+        }
       });
-      if (error) return show(error.message);
-      show('Compte créé. Vérifie ton email si la confirmation est activée.', true);
+      if (error) return info('❌ ' + error.message);
+      info('✅ Compte créé ! Vérifie ton e-mail pour confirmer.', true);
     });
 
     // Connexion
     document.getElementById('login').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: lemail.value,
-        password: lpass.value
+      const email = document.getElementById('lemail').value.trim();
+      const password = document.getElementById('lpass').value;
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return info('❌ ' + error.message);
+      info('✅ Connecté ! Redirection…', true);
+      location.href = '/membre';
+    });
+
+    // Reset password
+    document.getElementById('forgot').addEventListener('click', async (e)=>{
+      e.preventDefault();
+      const email = prompt('Ton email pour recevoir le lien de réinitialisation :');
+      if(!email) return;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${location.origin}/reset.html`
       });
-      if (error) return show(error.message);
-      show('Connecté ! Redirection…', true);
-      setTimeout(()=>{ window.location.href='/' }, 800);
+      if (error) return info('❌ ' + error.message);
+      info('✅ Lien envoyé (si l’email existe).', true);
     });
   </script>
 </body>
