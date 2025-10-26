@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Espace membre — RSL</title>
+<style>
+  body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px}
+  .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px}
+  button{padding:10px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:600}
+</style>
+</head><body>
+  <div class="card">
+    <h1>Espace membre</h1>
+    <p id="userLine">Chargement…</p>
+    <p><button id="logout">Se déconnecter</button></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/env.js"></script>
+  <script>
+    const client = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+    (async ()=>{
+      const { data:{ session } } = await client.auth.getSession();
+      if(!session){ location.href = "/login"; return; }
+      document.getElementById('userLine').textContent = `Connecté : ${session.user.email}`;
+    })();
+    document.getElementById('logout').onclick = async()=>{ await client.auth.signOut(); location.href="/login"; };
+  </script>
+</body></html>

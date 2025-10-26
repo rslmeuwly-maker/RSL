@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Réinitialiser le mot de passe — RSL</title>
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      background: #f7f7fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    p { font-size: 14px; color: #374151; margin-top: 12px }
+    .ok { color: #059669; font-weight: 600 }
+    .err { color: #dc2626; font-weight: 600 }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Réinitialiser ton mot de passe</h2>
+    <p>Entre ton nouveau mot de passe ci-dessous :</p>
+
+    <input id="newpass" type="password" placeholder="Nouveau mot de passe" />
+    <button id="save">Mettre à jour le mot de passe</button>
+    <p id="msg"></p>
+    <p><a href="/login">← Retour à la connexion</a></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/env.js"></script>
+  <script>
+    const client = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+    const msg = document.getElementById('msg');
+    const ok = (t)=>{ msg.className='ok'; msg.textContent=t; };
+    const err = (t)=>{ msg.className='err'; msg.textContent=t; };
+
+    document.getElementById('save').onclick = async () => {
+      const pwd = document.getElementById('newpass').value;
+      if (!pwd) return err("Entre un mot de passe.");
+      const { data, error } = await client.auth.updateUser({ password: pwd });
+      if (error) return err(error.message);
+      ok("Mot de passe mis à jour ! Tu peux maintenant te reconnecter.");
+    };
+  </script>
+</body>
+</html>
