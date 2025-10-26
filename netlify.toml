@@ -1,16 +1,9 @@
 [[redirects]]
   from = "/login"
-  to = "/login.html"
+  to = "/auth/index.html"
   status = 200
 
 [[redirects]]
   from = "/membre"
-  to = "/membre.html"
+  to = "/auth/membre.html"
   status = 200
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "DENY"

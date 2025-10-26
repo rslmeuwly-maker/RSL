@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Connexion — Espace membre</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:420px;margin:60px auto;padding:0 16px;text-align:center;background:#f7f7fb}
+    form{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    input,button{width:100%;padding:12px;font-size:16px;margin:6px 0;border-radius:10px;border:1px solid #d1d5db}
+    button{border:0;background:#2563eb;color:#fff;font-weight:600}
+    .muted{opacity:.75;font-size:.9em;margin-top:6px}
+    .ok{color:#059669;font-weight:700}.err{color:#dc2626;font-weight:700}
+    a{color:#2563eb}
+  </style>
+</head>
+<body>
+  <h1>Connexion / Inscription</h1>
+
+  <form id="signup">
+    <h3>Créer un compte</h3>
+    <input id="su-email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="su-pass" type="password" placeholder="Mot de passe" autocomplete="new-password" required>
+    <button type="submit">S’inscrire</button>
+    <p class="muted">Tu recevras un e-mail de confirmation si activé.</p>
+  </form>
+
+  <form id="login">
+    <h3>Se connecter</h3>
+    <input id="si-email" type="email" placeholder="Email" autocomplete="email" required>
+    <input id="si-pass" type="password" placeholder="Mot de passe" autocomplete="current-password" required>
+    <button type="submit">Connexion</button>
+  </form>
+
+  <p class="muted">
+    Mot de passe oublié ? <a href="#" id="forgot">Envoyer le lien</a>
+  </p>
+
+  <p id="msg" class="muted"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/env.js"></script>
+  <script>
+    const sb = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+    const msgEl = document.getElementById('msg');
+    const set = (ok,t)=>{ msgEl.className = ok?'ok':'err'; msgEl.textContent = t };
+
+    document.getElementById('signup').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('su-email').value.trim();
+      const password = document.getElementById('su-pass').value;
+      const { error } = await sb.auth.signUp({ email, password, options:{ emailRedirectTo: location.origin + '/auth/index.html' } });
+      if(error) return set(false, '❌ '+error.message);
+      set(true, '✅ Compte créé ! Vérifie ton e-mail.');
+    });
+
+    document.getElementById('login').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('si-email').value.trim();
+      const password = document.getElementById('si-pass').value;
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) return set(false, '❌ '+error.message);
+      set(true, '✅ Connecté ! Redirection…');
+      location.href = '/auth/membre.html';
+    });
+
+    document.getElementById('forgot').addEventListener('click', async (e)=>{
+      e.preventDefault();
+      const email = prompt('Ton email pour recevoir le lien de réinitialisation :');
+      if(!email) return;
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/auth/reset.html' });
+      if(error) return set(false, '❌ '+error.message);
+      set(true, '✅ Lien envoyé (si l’email existe).');
+    });
+  </script>
+</body>
+</html>

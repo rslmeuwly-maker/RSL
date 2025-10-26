@@ -4,8 +4,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Games — Romandie Scooter League</title>
-<style>
-    /* HERO avec image foncée */
+
+  <style>
+    /* ====== TA VERSION DESKTOP ORIGINALE (inchangée) ====== */
     .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
     .hero.hero-photo::before{
       content:"";position:absolute;inset:0;z-index:0;
@@ -15,7 +16,6 @@
     }
     .hero.hero-photo .container{position:relative;z-index:1}
 
-    /* Grille des jeux */
     .games-grid{
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
@@ -29,7 +29,6 @@
     .game-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
     .tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2f7;font-size:12px}
 
-    /* ===== FOOTER corrigé : 3 colonnes + copyright à droite ===== */
     .foot .links-3cols{
       display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
     }
@@ -48,67 +47,118 @@
     .foot .bottom.bottom-right a:hover{text-decoration:underline}
     @media (max-width:900px){ .foot .links-3cols{grid-template-columns:1fr 1fr} }
     @media (max-width:600px){ .foot .links-3cols{grid-template-columns:1fr} .foot .bottom.bottom-right{justify-content:space-between} }
-  /* FOOTER : 3 colonnes + bloc bas à droite */
-  .foot .links-3cols{
-    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
-  }
-  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
-  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
-  .foot .links-3cols li{margin:6px 0}
-  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
-  .foot .links-3cols a:hover{text-decoration:underline}
-  .foot .bottom.bottom-right{
-    border-top:1px solid rgba(255,255,255,0.08);
-    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
-  }
-  .foot .bottom.bottom-right p{margin:0}
-  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
-  .foot .bottom.bottom-right a:hover{text-decoration:underline}
-  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
-  @media (max-width:600px){
-    .foot .links-3cols{grid-template-columns:1fr}
-    .foot .bottom.bottom-right{justify-content:space-between}
-  }
-</style>
+  </style>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css"/>
-<link rel="stylesheet" href="css/common.css"/>
-<link rel="stylesheet" href="css/fonts.css"/>
+  <!-- Fonts + CSS globaux -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/common.css"/>
+  <link rel="stylesheet" href="css/fonts.css"/>
+
+  <!-- ====== MOBILE-ONLY (comme les autres pages) ====== -->
+  <style>
+    @media (max-width:900px){
+      /* Hero plein écran + contenu remonté */
+      .hero.hero-photo{min-height:100vh;position:relative}
+      @supports (height:100dvh){ .hero.hero-photo{min-height:100dvh} }
+      .hero.hero-photo .hero-inner{
+        min-height:inherit;display:flex;align-items:flex-start;
+        padding:max(12px, calc(env(safe-area-inset-top) + 8px)) 18px 16px;
+      }
+      .hero.hero-photo::before{background-size:cover;background-position:center}
+      .hero h1{font-size:34px;line-height:1.1;margin:0 0 6px;text-shadow:0 2px 10px rgba(0,0,0,.55)}
+      .hero p{font-size:16.5px;line-height:1.5;margin:0 0 10px;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+      .hero .panel{
+        background:rgba(14,14,16,.58)!important;border:1px solid rgba(255,255,255,.12)!important;
+        border-radius:14px!important;padding:10px 12px!important;backdrop-filter:saturate(110%) blur(4px)
+      }
+
+      /* Cartes look "app" */
+      .games-grid{gap:14px}
+      .panel,.card{
+        background:rgba(14,14,16,.68)!important;border:1px solid rgba(255,255,255,.12)!important;
+        border-radius:16px!important;padding:14px!important;box-shadow:0 6px 22px rgba(0,0,0,.28);
+        backdrop-filter:saturate(110%) blur(4px)
+      }
+      .card.game h3{font-size:19px;line-height:1.2;margin:0 0 6px;text-transform:uppercase}
+      .card.game .muted{color:rgba(255,255,255,.92)}
+      .tag{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:600}
+      .list{margin:6px 0 0;padding:0;list-style:none}
+      .list li{padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
+      .list li:first-child{border-top:none}
+      .game-actions .btn{width:100%;padding:12px 14px;border-radius:12px}
+
+      /* Menu burger (off-canvas à droite) */
+      .nav ul,.nav .cta{display:none}
+      .nav .brand span{display:none}
+      #rslMobileBurger{
+        position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));
+        z-index:100;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.15);
+        background:rgba(0,0,0,.55);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;
+        box-shadow:0 6px 18px rgba(0,0,0,.35)
+      }
+      #rslMobileDim{
+        position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
+        opacity:0;pointer-events:none;transition:opacity .18s ease
+      }
+      #rslMobileSheet{
+        position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));
+        z-index:99;width:min(86vw,340px);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);
+        border-radius:16px;padding:10px;transform:translateX(12px) translateY(-8px) scale(.98);
+        opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+        box-shadow:0 20px 60px rgba(0,0,0,.5)
+      }
+      #rslMobileSheet ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+      #rslMobileSheet a{display:block;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#cdd6ff;text-decoration:none}
+      .rsl-menu-open #rslMobileDim{opacity:1;pointer-events:auto}
+      .rsl-menu-open #rslMobileSheet{opacity:1;pointer-events:auto;transform:none}
+
+      /* Flèche scroll-down en bas du hero */
+      .scroll-down{
+        position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+        font-size:42px;color:#fff;opacity:.9;animation:bounce 1.6s infinite;text-shadow:0 3px 8px rgba(0,0,0,.7);
+        z-index:50;pointer-events:none;
+      }
+      @keyframes bounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+      /* Footer en 1 colonne pour l’app feeling */
+      .foot .links-3cols{grid-template-columns:1fr;gap:10px}
+      .foot .bottom.bottom-right{justify-content:space-between}
+      body{padding-bottom:84px} /* marges si bouton flottant un jour */
+    }
+  </style>
 </head>
 <body>
 
   <!-- NAV (identique au site) -->
   <nav class="nav">
-  <div class="container nav-inner">
-    <!-- ✅ corrigé ici -->
-    <a class="brand" href="index.html">
-      <img src="images/logo_rsl.png" alt="Logo RSL">
-      <span><b>RSL — Romandie Scooter League</b></span>
-    </a>
-    <ul>
-      <li><a href="formation.html">Formation RSL</a></li>
-      <li><a href="disciplines.html">Disciplines</a></li>
-      <li><a href="ou_rider.html">Où rider ?</a></li>
-      <li><a href="game.html">Games</a></li>
-      <li><a href="evenements.html">Événements</a></li>
-      <li><a href="comite.html">Comité</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    
-      <li><a href="cours.html">Cours</a></li>
-    </ul>
-    <div class="cta">
-      <button class="btn" id="btnIdentity">Se connecter</button>
-      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
-      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="images/logo_rsl.png" alt="Logo RSL">
+        <span><b>RSL — Romandie Scooter League</b></span>
+      </a>
+      <ul>
+        <li><a href="formation.html">Formation RSL</a></li>
+        <li><a href="disciplines.html">Disciplines</a></li>
+        <li><a href="ou_rider.html">Où rider ?</a></li>
+        <li><a href="game.html">Games</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="comite.html">Comité</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="cours.html">Cours</a></li>
+      </ul>
+      <div class="cta">
+        <button class="btn" id="btnIdentity">Se connecter</button>
+        <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+        <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+      </div>
+      <div class="cta">
+        <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+      </div>
     </div>
-    <div class="cta">
-      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
-    </div>
-  </div>
-</nav>
+  </nav>
 
   <!-- HERO -->
   <header class="hero hero-photo">
@@ -126,6 +176,9 @@
       </div>
     </div>
   </header>
+
+  <!-- FLECHE (affichée uniquement en mobile via CSS) -->
+  <div class="scroll-down">⬇️</div>
 
   <!-- LISTE DES JEUX -->
   <section class="section">
@@ -250,89 +303,109 @@
     </div>
   </section>
 
-  <!-- FOOTER corrigé -->
+  <!-- FOOTER (identique) -->
   <footer class="foot">
-  <div class="container">
-    <div class="links links-3cols">
-      <div class="col">
-        <h4>RSL</h4>
-        <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
-        </ul>
+    <div class="container">
+      <div class="links links-3cols">
+        <div class="col">
+          <h4>RSL</h4>
+          <ul>
+            <li><a href="formation.html">Formation</a></li>
+            <li><a href="evenements.html">Événements</a></li>
+            <li><a href="reglement.html">Règlement</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Ressources</h4>
+          <ul>
+            <li><a href="membres.html">Adhésion</a></li>
+            <li><a href="comite.html">Comité</a></li>
+            <li><a href="ou_rider.html">Où rider</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h4>Contest</h4>
+          <ul>
+            <li><a href="evenements.html">Événements</a></li>
+            <li><a href="inscriptions.html">Inscriptions</a></li>
+            <li><a href="resultats.html">Résultats</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="col">
-        <h4>Ressources</h4>
-        <ul>
-          <li><a href="membres.html">Adhésion</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
-        </ul>
-      </div>
-      <div class="col">
-        <h4>Contest</h4>
-        <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
-        </ul>
+      <div class="bottom bottom-right">
+        <p class="tiny">© 2025 — Romandie Scooter League</p>
+        <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
       </div>
     </div>
-    <div class="bottom bottom-right">
-      <p class="tiny">© 2025 — Romandie Scooter League</p>
-      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
-    </div>
-  </div>
-</footer>
-<script>
-(function(){
-  function init(){
-    var idBtn = document.getElementById('btnIdentity');
-    var btnLogout = document.getElementById('btnLogout');
-    var btnAccount = document.getElementById('btnAccount');
-    function refresh(user){
-      var logged = !!user;
-      if(idBtn) idBtn.style.display = logged ? 'none' : '';
-      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
-      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
-    }
-    if(window.netlifyIdentity){
-      window.netlifyIdentity.on('init', function(user){ refresh(user); });
-      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
-      window.netlifyIdentity.on('logout', function(){ refresh(null); });
-      window.netlifyIdentity.init();
-    }
-    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
-    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
-    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
-  }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
-})();
-</script>
-<script defer src="js/site.js"></script>
-<script defer src="/.netlify/identity-widget.js"></script>
-<script defer src="js/auth.js"></script>
+  </footer>
 
-<!-- HelpBot (RSL) -->
-<link rel="stylesheet" href="css/helpbot.css">
-<div id="hb-root">
-  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
-  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
-    <div class="hb-head">
-      <div class="title" id="hbTitle">Aide — RSL</div>
-      <div class="actions">
-        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
-        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
-      </div>
-    </div>
-    <div class="hb-body" id="hbBody"></div>
-    <div class="hb-foot">
-      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
-      <button id="hbSend" class="hb-send">Envoyer</button>
-    </div>
-  </div>
-</div>
-<script defer src="js/helpbot.js"></script>
+  <!-- ===== JS : flèche + burger (mobile only) ===== -->
+  <script>
+  (function(){
+    // flèche -> disparait quand on scrolle un peu
+    const arrow=document.querySelector('.scroll-down');
+    if(arrow){
+      const onScroll=()=>{ arrow.style.opacity=(window.scrollY>80)?'0':'0.9'; };
+      window.addEventListener('scroll',onScroll,{passive:true});
+      onScroll();
+    }
 
-</body></html>
+    // menu burger off-canvas (mobile ≤900px)
+    const isMobile=()=>window.matchMedia('(max-width: 900px)').matches;
+
+    function buildMobileMenu(){
+      if(document.getElementById('rslMobileBurger')) return;
+      const nav=document.querySelector('.nav');
+      const list=nav?.querySelector('ul');
+      if(!nav||!list) return;
+
+      const burger=document.createElement('button');
+      burger.id='rslMobileBurger'; burger.type='button'; burger.textContent='☰';
+      burger.setAttribute('aria-label','Ouvrir le menu');
+      burger.setAttribute('aria-expanded','false');
+
+      const dim=document.createElement('div'); dim.id='rslMobileDim';
+      const sheet=document.createElement('aside'); sheet.id='rslMobileSheet';
+
+      const cloned=list.cloneNode(true);
+      const li=document.createElement('li');
+      const a=document.createElement('a');
+      a.href=document.getElementById('btnMembre')?.getAttribute('href')||'membres.html';
+      a.innerHTML='<b>Devenir membre</b>';
+      li.appendChild(a); cloned.prepend(li);
+      sheet.appendChild(cloned);
+
+      document.body.append(burger,dim,sheet);
+
+      const open=()=>{document.body.classList.add('rsl-menu-open'); burger.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden';};
+      const close=()=>{document.body.classList.remove('rsl-menu-open'); burger.setAttribute('aria-expanded','false'); document.body.style.overflow='';};
+
+      burger.addEventListener('click',()=>document.body.classList.contains('rsl-menu-open')?close():open());
+      dim.addEventListener('click',close);
+      sheet.querySelectorAll('a').forEach(x=>x.addEventListener('click',close));
+
+      // si on repasse desktop, ferme tout
+      const mq=window.matchMedia('(max-width: 900px)');
+      mq.addEventListener?.('change',e=>{ if(!e.matches) close(); });
+    }
+
+    function destroyMobileMenu(){
+      document.getElementById('rslMobileBurger')?.remove();
+      document.getElementById('rslMobileDim')?.remove();
+      document.getElementById('rslMobileSheet')?.remove();
+      document.body.classList.remove('rsl-menu-open');
+      document.body.style.overflow='';
+    }
+
+    function init(){ isMobile()?buildMobileMenu():destroyMobileMenu(); }
+    if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',init); } else { init(); }
+    window.addEventListener('resize',()=>{ isMobile()?buildMobileMenu():destroyMobileMenu(); });
+  })();
+  </script>
+
+  <!-- tes scripts existants -->
+  <script defer src="js/site.js"></script>
+  <script defer src="/.netlify/identity-widget.js"></script>
+  <script defer src="js/auth.js"></script>
+</body>
+</html>

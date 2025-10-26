@@ -4,98 +4,138 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Connexion — RSL</title>
-  <style>
-    body{font-family:system-ui,Arial,sans-serif;max-width:520px;margin:40px auto;padding:0 16px;text-align:center;background:#f7f7fb}
-    h1{margin-bottom:10px}
-    form{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-    input,button{padding:12px;font-size:16px;margin:6px 0;width:100%;border-radius:10px;border:1px solid #d1d5db}
-    button{border:0;background:#2563eb;color:#fff;font-weight:600}
-    .muted{opacity:.75;font-size:.9em;margin-top:8px}
-    .ok{color:#059669;font-weight:700}
-    .err{color:#dc2626;font-weight:700}
-    a{color:#2563eb}
-  </style>
+<style>
+/* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
 </head>
 <body>
-  <h1>Connexion à RSL</h1>
+  <nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <img src="images/logo_rsl.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
 
-  <form id="signup">
-    <h3>Créer un compte</h3>
-    <input id="name" placeholder="Nom complet" autocomplete="name">
-    <input id="email" type="email" placeholder="Email" autocomplete="email" required>
-    <input id="password" type="password" placeholder="Mot de passe" autocomplete="new-password" required>
-    <button type="submit">S'inscrire</button>
-    <p class="muted">Tu recevras un e-mail de confirmation si activé.</p>
-  </form>
-
-  <form id="login">
-    <h3>Se connecter</h3>
-    <input id="lemail" type="email" placeholder="Email" autocomplete="email" required>
-    <input id="lpass" type="password" placeholder="Mot de passe" autocomplete="current-password" required>
-    <button type="submit">Connexion</button>
-  </form>
-
-  <p class="muted">
-    Mot de passe oublié ? <a href="#" id="forgot">Envoyer un lien de réinitialisation</a>
-  </p>
-
-  <p id="msg" class="muted"></p>
-
-  <!-- Supabase SDK (global) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Variables publiques (à remplir) -->
-  <script src="/env.js"></script>
-
-  <script>
-    // sécurité : clés chargées depuis env.js
-    const SUPABASE_URL  = window.env?.SUPABASE_URL;
-    const SUPABASE_ANON = window.env?.SUPABASE_ANON;
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    const msgEl = document.getElementById('msg');
-    const info = (t, ok=false)=>{ msgEl.className = ok?'ok':'err'; msgEl.textContent = t; };
-
-    // Inscription
-    document.getElementById('signup').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-
-      const { error } = await supabase.auth.signUp({
-        email, password,
-        options: {
-          data: { full_name: name },
-          emailRedirectTo: `${location.origin}/login`
-        }
+  <header class="hero" style="padding:60px 0;text-align:center">
+    <h1>Connexion / Création de compte</h1>
+    <p class="muted">Connecte-toi pour réserver des cours et gérer tes inscriptions.</p>
+    <button class="btn" id="btnOpenIdentity">Se connecter / S’inscrire</button>
+  </header>
+<script>
+    document.getElementById('btnOpenIdentity').addEventListener('click', function(){
+      if (window.netlifyIdentity) window.netlifyIdentity.open();
+    });
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on('login', function(){
+        window.location.href = sessionStorage.getItem('afterLogin') || 'index.html';
       });
-      if (error) return info('❌ ' + error.message);
-      info('✅ Compte créé ! Vérifie ton e-mail pour confirmer.', true);
-    });
-
-    // Connexion
-    document.getElementById('login').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('lemail').value.trim();
-      const password = document.getElementById('lpass').value;
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return info('❌ ' + error.message);
-      info('✅ Connecté ! Redirection…', true);
-      location.href = '/membre';
-    });
-
-    // Reset password
-    document.getElementById('forgot').addEventListener('click', async (e)=>{
-      e.preventDefault();
-      const email = prompt('Ton email pour recevoir le lien de réinitialisation :');
-      if(!email) return;
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${location.origin}/reset.html`
-      });
-      if (error) return info('❌ ' + error.message);
-      info('✅ Lien envoyé (si l’email existe).', true);
-    });
+    }
   </script>
-</body>
-</html>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+
+<!-- HelpBot (RSL) -->
+<link rel="stylesheet" href="css/helpbot.css">
+<div id="hb-root">
+  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
+  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
+    <div class="hb-head">
+      <div class="title" id="hbTitle">Aide — RSL</div>
+      <div class="actions">
+        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
+        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
+      </div>
+    </div>
+    <div class="hb-body" id="hbBody"></div>
+    <div class="hb-foot">
+      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
+      <button id="hbSend" class="hb-send">Envoyer</button>
+    </div>
+  </div>
+</div>
+<script defer src="js/helpbot.js"></script>
+
+</body></html>

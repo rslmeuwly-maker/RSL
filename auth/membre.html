@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Espace membre</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;text-align:center}
+    button{padding:10px 14px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:600}
+  </style>
+</head>
+<body>
+  <h1>Espace membre</h1>
+  <p id="userLine">Chargement…</p>
+  <p><button id="logout">Se déconnecter</button></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/env.js"></script>
+  <script>
+    const sb = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+    (async () => {
+      const { data:{ session } } = await sb.auth.getSession();
+      if(!session){ location.href = "/auth/index.html"; return; }
+      document.getElementById('userLine').textContent = "Connecté : " + session.user.email;
+    })();
+    document.getElementById('logout').onclick = async()=>{ await sb.auth.signOut(); location.href = "/auth/index.html"; };
+  </script>
+</body>
+</html>

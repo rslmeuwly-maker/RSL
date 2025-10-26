@@ -9,18 +9,17 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Styles locaux (hero + carte + footer) -->
+  <!-- ===== Desktop (inchangé) ===== -->
   <style>
     .hero.hero-photo{position:relative;color:#fff;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08)}
     .hero.hero-photo::before{content:"";position:absolute;inset:0;background:
       linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.75)),url("images/lanoubc4.jpg") center/cover no-repeat;z-index:0}
     .hero.hero-photo .container{position:relative;z-index:1}
 
-    /* Carte + panneau filtres */
     #map{height:68vh;min-height:420px;border-radius:14px;border:1px solid #e6e9ee}
     .map-wrap{display:grid;grid-template-columns:260px 1fr;gap:16px}
     @media (max-width:900px){.map-wrap{grid-template-columns:1fr}}
-    .filters{border:1px solid #e6e9ee;border-radius:14px;padding:14px;height:68vh;min-height:420px;overflow:auto}
+    .filters{border:1px solid #e6e9ee;border-radius:14px;padding:14px;height:68vh;min-height:420px;overflow:auto;background:#fff}
     .filters h3{margin:0 0 8px}
     .legend{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:center;margin:10px 0}
     .dot{width:14px;height:14px;border-radius:50%}
@@ -28,7 +27,6 @@
     .filters label{display:flex;gap:8px;align-items:center;margin:8px 0;font-weight:600}
     .filters small{color:#4b5563}
 
-    /* Footer (identique) */
     .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}
     .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
     .foot .links-3cols ul{list-style:none;margin:0;padding:0}
@@ -42,19 +40,130 @@
     @media (max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
   </style>
 
+  <!-- Fonts + CSS globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/common.css"/>
   <link rel="stylesheet" href="css/fonts.css"/>
+
+  <!-- ===== Mobile only : hero plus petit + carte encore plus haute + centrage densité ===== -->
+  <style>
+    @media (max-width:900px){
+      /* Hero plus petit : carte bien visible dès l’arrivée */
+      .hero.hero-photo{min-height:40vh}
+      @supports (height:100dvh){ .hero.hero-photo{min-height:40dvh} }
+      .hero.hero-photo .hero-inner{
+        min-height:inherit;display:flex;align-items:flex-start;
+        padding:max(6px, calc(env(safe-area-inset-top) + 6px)) 14px 6px;
+      }
+      .hero h1{font-size:27px;margin:0 0 2px;text-shadow:0 2px 10px rgba(0,0,0,.55)}
+      .hero p{font-size:15px;margin:0 0 6px;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+      .hero .panel{
+        background:rgba(14,14,16,.58)!important;border:1px solid rgba(255,255,255,.12)!important;
+        border-radius:14px!important;padding:8px 10px!important;backdrop-filter:saturate(110%) blur(4px)
+      }
+
+      /* Carte quasi plein écran */
+      main.container{padding:4px 0 22px !important}
+      .map-frame{
+        margin:-4px auto 0;
+        width:calc(100% - max(14px,env(safe-area-inset-left)) - max(14px,env(safe-area-inset-right)));
+        border-radius:18px;border:1px solid rgba(255,255,255,.22);
+        box-shadow:0 18px 40px rgba(0,0,0,.35);overflow:hidden;background:#0e0e10;
+      }
+      /* -> calc : 100vh - hero(40vh) - petits paddings ≈ 58vh mini */
+      #map{height:calc(100vh - 42vh);min-height:58vh;border:none;border-radius:0;background:#0e0e10}
+
+      /* Sidebar -> sheet mobile */
+      .map-wrap{grid-template-columns:1fr}
+      .filters{display:none}
+
+      /* Contrôles Leaflet */
+      .leaflet-bottom.leaflet-left .leaflet-control{margin:0 0 10px 10px}
+      .leaflet-control-zoom a{
+        width:42px;height:42px;line-height:42px;font-size:22px;
+        border-radius:12px;border:1px solid rgba(255,255,255,.25);
+        background:rgba(0,0,0,.55);color:#fff;
+      }
+      .leaflet-control-zoom{box-shadow:none;border:none}
+
+      /* FABs filtres + position + home */
+      #filtersFab, #locateFab, #homeFab{
+        position:fixed;z-index:101;background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.18);
+        border-radius:14px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:saturate(110%) blur(4px);font-weight:700
+      }
+      #filtersFab{right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}
+      #locateFab{left:max(12px,env(safe-area-inset-left));bottom:max(14px,env(safe-area-inset-bottom))}
+      #homeFab{left:max(12px,env(safe-area-inset-left));bottom:max(62px,env(safe-area-inset-bottom))}
+
+      /* Sheet filtres */
+      #filtersDim{
+        position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
+        z-index:99;opacity:0;pointer-events:none;transition:opacity .18s ease
+      }
+      #filtersSheet{
+        position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));
+        width:min(88vw,360px);max-height:calc(100vh - 20px);
+        background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:16px;
+        padding:10px;overflow:auto;z-index:100;
+        transform:translateX(12px) translateY(-8px) scale(.98);opacity:0;pointer-events:none;
+        transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;box-shadow:0 20px 60px rgba(0,0,0,.5)
+      }
+      #filtersSheet .filters{display:block;background:transparent;border:none;color:#fff}
+      #filtersSheet .filters h3{color:#fff}
+      #filtersSheet .legend span:last-child{color:#e5e7eb}
+      #filtersSheet label{color:#e5e7eb}
+      .rsl-filters-open #filtersDim{opacity:1;pointer-events:auto}
+      .rsl-filters-open #filtersSheet{opacity:1;pointer-events:auto;transform:none}
+
+      /* Bottom sheet spot */
+      #spotSheet{
+        position:fixed;left:10px;right:10px;bottom:10px;z-index:102;
+        background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.18);border-radius:16px;
+        padding:12px 14px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);
+        transform:translateY(12px);opacity:0;pointer-events:none;
+        transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;backdrop-filter:saturate(110%) blur(4px)
+      }
+      #spotSheet.show{transform:none;opacity:1;pointer-events:auto}
+      #spotSheet h4{margin:0 0 6px;font-size:18px}
+      #spotSheet p{margin:0 0 6px;color:#e5e7eb}
+      #spotSheet .actions{display:flex;gap:8px;flex-wrap:wrap}
+      #spotSheet .btn{display:inline-block;padding:8px 12px;border-radius:12px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700}
+
+      /* Burger mobile (identique aux autres pages) */
+      .nav ul,.nav .cta{display:none}
+      .nav .brand span{display:none}
+      #rslMobileBurger{
+        position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));
+        z-index:110;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.15);
+        background:rgba(0,0,0,.55);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.35)
+      }
+      #rslMobileDim{
+        position:fixed;inset:0;z-index:108;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
+        opacity:0;pointer-events:none;transition:opacity .18s ease
+      }
+      #rslMobileSheet{
+        position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));
+        z-index:109;width:min(86vw,340px);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);
+        border-radius:16px;padding:10px;transform:translateX(12px) translateY(-8px) scale(.98);
+        opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;box-shadow:0 20px 60px rgba(0,0,0,.5)
+      }
+      #rslMobileSheet ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+      #rslMobileSheet a{display:block;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#cdd6ff;text-decoration:none}
+      .rsl-menu-open #rslMobileDim{opacity:1;pointer-events:auto}
+      .rsl-menu-open #rslMobileSheet{opacity:1;pointer-events:auto;transform:none}
+    }
+  </style>
 </head>
 <body>
 
   <!-- NAV -->
   <nav class="nav">
     <div class="container nav-inner">
-      <a class="brand" href="/"><img src="images/logo_rsl.png" alt="Logo RSL"><span><b>RSL — Romandie Scooter League</b></span></a>
+      <!-- ✅ lien corrigé vers l’index -->
+      <a class="brand" href="index.html"><img src="images/logo_rsl.png" alt="Logo RSL"><span><b>RSL — Romandie Scooter League</b></span></a>
       <ul>
         <li><a href="formation.html">Formation RSL</a></li>
         <li><a href="disciplines.html">Disciplines</a></li>
@@ -92,8 +201,8 @@
 
   <!-- CARTE + FILTRES -->
   <main class="container" style="padding:28px 0 40px">
-    <div class="map-wrap">
-      <aside class="filters" aria-label="Filtres carte">
+    <div class="map-wrap" id="mapWrap">
+      <aside class="filters" id="filtersAside" aria-label="Filtres carte">
         <h3>Filtres</h3>
         <div class="legend"><span class="dot green"></span><span>Cours RSL — <b>intérieur</b></span></div>
         <div class="legend"><span class="dot blue"></span><span>Cours RSL — <b>extérieur</b></span></div>
@@ -108,9 +217,14 @@
         <small>Astuce : clique un pin pour l’adresse et les infos.</small>
       </aside>
 
-      <div id="map" role="region" aria-label="Carte des spots"></div>
+      <div class="map-frame">
+        <div id="map" role="region" aria-label="Carte des spots"></div>
+      </div>
     </div>
   </main>
+
+  <!-- Bottom sheet spot (mobile) -->
+  <div id="spotSheet" aria-live="polite" aria-atomic="true"></div>
 
   <!-- FOOTER -->
   <footer class="foot">
@@ -127,87 +241,163 @@
     </div>
   </footer>
 
-  <!-- JS Carte -->
+  <!-- JS Carte + UX mobile -->
   <script>
   (function(){
-    /* ===== 1) Carte de base ===== */
+    /* ===== Map ===== */
     const map = L.map('map').setView([46.8, 8.2], 8);
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
-    osm.on('tileerror', () => {
-      L.tileLayer('https://tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap (FR)'}).addTo(map);
-    });
+    osm.on('tileerror', () => { L.tileLayer('https://tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap (FR)'}).addTo(map); });
 
-    /* ===== 2) Icônes par catégorie ===== */
     function pin(color, emoji){
       return L.divIcon({
         className:'rsl-marker',
-        html: '<div style="width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+color+';border:2px solid #fff;font-size:16px">'+emoji+'</div>',
-        iconSize:[30,30], iconAnchor:[15,15]
+        html:'<div style="width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+color+';border:2px solid #fff;font-size:18px">'+emoji+'</div>',
+        iconSize:[34,34],iconAnchor:[17,17]
       });
     }
-    const ICONS = {
-      int : pin('#16a34a','🏫'),     // indoor cours
-      ext : pin('#0ea5e9','🛼'),     // outdoor cours
-      shop: pin('#ef4444','🏪'),     // shops
-      park: pin('#7c3aed','🛹')      // skateparks
-    };
+    const ICONS={int:pin('#16a34a','🏫'),ext:pin('#0ea5e9','🛼'),shop:pin('#ef4444','🏪'),park:pin('#7c3aed','🛹')};
 
-    /* ===== 3) Données ===== 
-       - coords approximatives OK pour placer le pin.
-       - shops partenaires : Sportmania (St-Sulpice/VD), Adrelyx (Sion/VS), Surf Machine (Bulle/FR), JF Rideshop (Montreux/VD)
-    */
-    const spots = [
-      // — Cours RSL (indoor)
+    const spots=[
       {type:'int', name:'Cours RSL — Montreux (indoor)',   lat:46.433, lng:6.910, city:'Montreux', note:'Ouvert hors fériés/vacances', link:'cours.html'},
       {type:'int', name:'Cours RSL — Lausanne (La Fièvre, indoor)', lat:46.536, lng:6.626, city:'Lausanne', note:'Halle La Fièvre', link:'cours.html'},
-
-      // — Cours RSL (outdoor)
-      {type:'ext', name:'Cours RSL — Lausanne (Vidy, outdoor)', lat:46.523, lng:6.610, city:'Lausanne', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Bulle (outdoor)',     lat:46.616, lng:7.057, city:'Bulle', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Yverdon (outdoor)',   lat:46.778, lng:6.640, city:'Yverdon', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Martigny (outdoor)',  lat:46.103, lng:7.074, city:'Martigny', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Fribourg (outdoor)',  lat:46.802, lng:7.151, city:'Fribourg', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Genève (Plainpalais, outdoor)', lat:46.198, lng:6.142, city:'Genève', note:'Pas de cours en janv., févr., nov., déc.', link:'cours.html'},
-
-      // — Shops partenaires
+      {type:'ext', name:'Cours RSL — Lausanne (Vidy, outdoor)', lat:46.523, lng:6.610, city:'Lausanne', note:'Pause hiver', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Bulle (outdoor)',     lat:46.616, lng:7.057, city:'Bulle', note:'Pause hiver', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Yverdon (outdoor)',   lat:46.778, lng:6.640, city:'Yverdon', note:'Pause hiver', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Martigny (outdoor)',  lat:46.103, lng:7.074, city:'Martigny', note:'Pause hiver', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Fribourg (outdoor)',  lat:46.802, lng:7.151, city:'Fribourg', note:'Pause hiver', link:'cours.html'},
+      {type:'ext', name:'Cours RSL — Genève (Plainpalais, outdoor)', lat:46.198, lng:6.142, city:'Genève', note:'Pause hiver', link:'cours.html'},
       {type:'shop', name:'Sportmania (shop partenaire)', lat:46.512, lng:6.561, city:'St-Sulpice (VD)', note:'Chemin des Pâquis 7, 1025', url:'https://www.sportmania.ch'},
       {type:'shop', name:'Adrelyx (shop partenaire)',    lat:46.226, lng:7.353, city:'Sion (VS)', note:'Rue de la Drague 14, 1950', url:'https://www.adrelyx.ch'},
       {type:'shop', name:'Surf Machine (shop partenaire)', lat:46.617, lng:7.056, city:'Bulle (FR)', note:'Rue de Vevey 18, 1630', url:'https://www.surf-machine.ch'},
       {type:'shop', name:'JF Rideshop (shop partenaire)', lat:46.433, lng:6.910, city:'Montreux (VD)', note:'Rue de la Paix 3, 1820', url:'https://jfrideshop.ch'},
-
-      // — Skateparks (exemples)
-      {type:'park', name:'Skatepark de Sion',     lat:46.233, lng:7.360, city:'Sion',  note:'Park street/park'},
-      {type:'park', name:'Skatepark de Vevey',    lat:46.461, lng:6.844, city:'Vevey', note:'Bowl + street'},
-      {type:'park', name:'Skatepark de Nyon',     lat:46.383, lng:6.231, city:'Nyon',  note:'Street plaza'}
+      {type:'park', name:'Skatepark de Sion', lat:46.233, lng:7.360, city:'Sion', note:'Street & bowl'},
+      {type:'park', name:'Skatepark de Vevey', lat:46.461, lng:6.844, city:'Vevey', note:'Bowl + street'},
+      {type:'park', name:'Skatepark de Nyon',  lat:46.383, lng:6.231, city:'Nyon', note:'Plaza'}
     ];
 
-    /* ===== 4) Création des marqueurs et index par type ===== */
-    const layers = { int: L.layerGroup().addTo(map), ext: L.layerGroup().addTo(map), shop: L.layerGroup().addTo(map), park: L.layerGroup().addTo(map) };
+    const layers={int:L.layerGroup().addTo(map),ext:L.layerGroup().addTo(map),shop:L.layerGroup().addTo(map),park:L.layerGroup().addTo(map)};
+    function popupHtml(s){const link=s.url?`<a href="${s.url}" target="_blank" rel="noopener">Site</a>`:(s.link?`<a href="${s.link}">Infos & cours</a>`:'');return `<b>${s.name}</b><br>${s.city||''}${s.city?'<br>':''}${s.note||''}${link?'<br>'+link:''}`;}
+    spots.forEach(s=>{const m=L.marker([s.lat,s.lng],{icon:ICONS[s.type]}).bindPopup(popupHtml(s));m.on('click',()=>showSpot(s));layers[s.type].addLayer(m);});
 
-    function popupHtml(s){
-      const link = s.url ? `<a href="${s.url}" target="_blank" rel="noopener">Site</a>` : (s.link ? `<a href="${s.link}">Infos & cours</a>` : '');
-      return `<b>${s.name}</b><br>${s.city||''}${s.city?'<br>':''}${s.note||''}${link?'<br>'+link:''}`;
+    /* Filtres */
+    const fInt=document.getElementById('f-int'),fExt=document.getElementById('f-ext'),fShop=document.getElementById('f-shop'),fPark=document.getElementById('f-park');
+    function apply(){(fInt.checked?map.addLayer(layers.int):map.removeLayer(layers.int));(fExt.checked?map.addLayer(layers.ext):map.removeLayer(layers.ext));(fShop.checked?map.addLayer(layers.shop):map.removeLayer(layers.shop));(fPark.checked?map.addLayer(layers.park):map.removeLayer(layers.park));}
+    [fInt,fExt,fShop,fPark].forEach(el=>el.addEventListener('change',apply)); apply();
+
+    /* ===== Centrages : desktop vs mobile ===== */
+    const isMobile = ()=>window.matchMedia('(max-width:900px)').matches;
+
+    // Haversine helpers
+    function toRad(d){return d*Math.PI/180;}
+    function distKm(a,b){
+      const R=6371, dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+      const s1=Math.sin(dLat/2), s2=Math.sin(dLng/2);
+      const A=s1*s1 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*s2*s2;
+      return 2*R*Math.asin(Math.sqrt(A));
+    }
+    function densestCenter(points, radiusKm=40){
+      if(points.length===0) return null;
+      let bestIdx=0, bestCount=-1;
+      for(let i=0;i<points.length;i++){
+        let c=0;
+        for(let j=0;j<points.length;j++){
+          if(distKm(points[i], points[j])<=radiusKm) c++;
+        }
+        if(c>bestCount){bestCount=c; bestIdx=i;}
+      }
+      return {center:[points[bestIdx].lat, points[bestIdx].lng], count:bestCount};
     }
 
-    spots.forEach(s=>{
-      const m = L.marker([s.lat, s.lng], {icon: ICONS[s.type]}).bindPopup(popupHtml(s));
-      layers[s.type].addLayer(m);
-    });
-
-    /* ===== 5) Filtres ===== */
-    const fInt  = document.getElementById('f-int');
-    const fExt  = document.getElementById('f-ext');
-    const fShop = document.getElementById('f-shop');
-    const fPark = document.getElementById('f-park');
-
-    function applyFilters(){
-      (fInt.checked  ? map.addLayer(layers.int)  : map.removeLayer(layers.int));
-      (fExt.checked  ? map.addLayer(layers.ext)  : map.removeLayer(layers.ext));
-      (fShop.checked ? map.addLayer(layers.shop) : map.removeLayer(layers.shop));
-      (fPark.checked ? map.addLayer(layers.park) : map.removeLayer(layers.park));
+    function fitDesktop(){
+      const allLatLng = spots.map(s=>[s.lat,s.lng]);
+      const b = L.latLngBounds(allLatLng);
+      map.fitBounds(b.pad(0.12), {animate:false});
     }
-    [fInt,fExt,fShop,fPark].forEach(el=>el.addEventListener('change', applyFilters));
-    applyFilters();
+
+    function centerMobile(){
+      const dense = densestCenter(spots);
+      if(dense){
+        const z = dense.count >= 5 ? 11 : dense.count >=3 ? 10 : 9;
+        map.setView(dense.center, z, {animate:false});
+      }else{
+        map.setView([46.8,8.2], 8, {animate:false});
+      }
+    }
+
+    function applyResponsiveCenter(){
+      if(isMobile()) centerMobile(); else fitDesktop();
+    }
+    applyResponsiveCenter();
+    window.matchMedia('(max-width:900px)').addEventListener?.('change',applyResponsiveCenter);
+
+    /* FABs + sheet filtres (mobile) */
+    const mapWrap=document.getElementById('mapWrap'), filtersAside=document.getElementById('filtersAside'), placeholder=document.createComment('filters-placeholder');
+    let sheet,dim,fab,locFab,homeFab;
+
+    function buildFilterSheet(){
+      if(document.getElementById('filtersFab')) return;
+      fab=document.createElement('button');fab.id='filtersFab';fab.type='button';fab.textContent='Filtres';document.body.appendChild(fab);
+      locFab=document.createElement('button');locFab.id='locateFab';locFab.type='button';locFab.textContent='Ma position';document.body.appendChild(locFab);
+      homeFab=document.createElement('button');homeFab.id='homeFab';homeFab.type='button';homeFab.textContent='Romandie';document.body.appendChild(homeFab);
+      dim=document.createElement('div');dim.id='filtersDim';sheet=document.createElement('aside');sheet.id='filtersSheet';document.body.append(dim,sheet);
+      mapWrap.insertBefore(placeholder,filtersAside); sheet.appendChild(filtersAside);
+      const open=()=>{document.body.classList.add('rsl-filters-open');document.body.style.overflow='hidden';};
+      const close=()=>{document.body.classList.remove('rsl-filters-open');document.body.style.overflow='';};
+      fab.onclick=()=>document.body.classList.contains('rsl-filters-open')?close():open(); dim.onclick=close;
+      locFab.onclick=()=>{ if(!navigator.geolocation){alert('Géolocalisation indisponible.');return;}
+        navigator.geolocation.getCurrentPosition(p=>{
+          const {latitude,longitude}=p.coords;
+          L.circleMarker([latitude,longitude],{radius:6,color:'#38bdf8',fillColor:'#38bdf8',fillOpacity:.9,weight:2}).addTo(map);
+          map.setView([latitude,longitude],14,{animate:true});
+        },()=>alert("Impossible d'obtenir ta position."));
+      };
+      homeFab.onclick=()=>applyResponsiveCenter();
+      window.matchMedia('(max-width:900px)').addEventListener?.('change',e=>{if(!e.matches) close();});
+    }
+    function destroyFilterSheet(){
+      if(!document.getElementById('filtersFab')) return;
+      if(placeholder.parentNode){mapWrap.replaceChild(filtersAside,placeholder);}
+      ['filtersFab','filtersDim','filtersSheet','locateFab','homeFab'].forEach(id=>document.getElementById(id)?.remove());
+      document.body.classList.remove('rsl-filters-open');document.body.style.overflow='';
+    }
+    function initFiltersResponsive(){
+      isMobile()?buildFilterSheet():destroyFilterSheet();
+    }
+    initFiltersResponsive(); window.addEventListener('resize',initFiltersResponsive);
+
+    /* Bottom sheet spot */
+    const spotSheet=document.getElementById('spotSheet');
+    function showSpot(s){
+      if(!isMobile()) return; // desktop: popup Leaflet standard
+      const link=s.url?`<a class="btn" href="${s.url}" target="_blank" rel="noopener">Site</a>`:(s.link?`<a class="btn" href="${s.link}">Infos & cours</a>`:'');
+      spotSheet.innerHTML=`<h4>${s.name}</h4><p>${s.city? s.city+'<br>':''}${s.note||''}</p><div class="actions">${link||''}</div>`;
+      spotSheet.classList.add('show');
+      setTimeout(()=>{const hide=()=>spotSheet.classList.remove('show'); document.addEventListener('scroll',hide,{once:true,passive:true}); map.once('click',hide);},0);
+    }
+  })();
+  </script>
+
+  <!-- Burger mobile (identique aux autres pages) -->
+  <script>
+  (function(){
+    const isMobile=()=>window.matchMedia('(max-width: 900px)').matches;
+    function buildMenu(){
+      if(document.getElementById('rslMobileBurger')) return;
+      const nav=document.querySelector('.nav'), list=nav?.querySelector('ul'); if(!list) return;
+      const b=document.createElement('button'); b.id='rslMobileBurger'; b.textContent='☰'; b.type='button'; b.setAttribute('aria-label','Ouvrir le menu');
+      const dim=document.createElement('div'); dim.id='rslMobileDim';
+      const sheet=document.createElement('aside'); sheet.id='rslMobileSheet'; sheet.appendChild(list.cloneNode(true));
+      document.body.append(b,dim,sheet);
+      const open=()=>{document.body.classList.add('rsl-menu-open');document.body.style.overflow='hidden';};
+      const close=()=>{document.body.classList.remove('rsl-menu-open');document.body.style.overflow='';};
+      b.onclick=()=>document.body.classList.contains('rsl-menu-open')?close():open(); dim.onclick=close; sheet.querySelectorAll('a').forEach(a=>a.onclick=close);
+      window.matchMedia('(max-width: 900px)').addEventListener?.('change',e=>{ if(!e.matches) close(); });
+    }
+    function destroy(){['rslMobileBurger','rslMobileDim','rslMobileSheet'].forEach(id=>document.getElementById(id)?.remove());document.body.classList.remove('rsl-menu-open');document.body.style.overflow='';}
+    function init(){isMobile()?buildMenu():destroy();}
+    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);} else {init();}
+    window.addEventListener('resize',init);
   })();
   </script>
 
