@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Accueil — Romandie Scooter League</title>
+
+  <!-- Fonts + Styles globaux -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase + scripts du site -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
+
+  <style>
+    /* ====== Base ====== */
+    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Outfit,system-ui}
+    body{display:flex;flex-direction:column;overflow-x:hidden}
+
+    /* ====== Video fond ====== */
+    .bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+    .bg-dim{position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.82));z-index:-1}
+
+    /* ====== Navbar (identique) ====== */
+    nav.nav{background:rgba(0,0,0,.65);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
+    nav.nav .container{max-width:1320px;margin:0 auto;padding:12px 28px}
+    nav.nav .row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+    .brand img{height:48px;border-radius:10px;display:block}
+    .brand span{font-weight:800;letter-spacing:.2px;font-size:17px}
+    nav.nav ul{display:flex;align-items:center;gap:26px}
+    nav.nav ul li a{font-weight:600;color:#e8f0ea;transition:.2s ease;font-size:17px;letter-spacing:.2px;white-space:nowrap;text-decoration:none}
+    nav.nav ul li a:hover{color:#22c55e}
+    .cta{display:flex;align-items:center;gap:12px}
+    #menuBtn{display:none;align-items:center;justify-content:center;gap:8px;padding:10px 12px;font-size:18px;line-height:1;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(34,197,94,.12);color:#22c55e;cursor:pointer}
+    #menuBtn:hover{background:rgba(34,197,94,.22)}
+
+    /* ====== Menu mobile ====== */
+    .mobile-sheet{position:fixed;inset:0;display:none;z-index:120}
+    .mobile-sheet.open{display:block}
+    .mobile-dim{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+    .mobile-panel{position:absolute;top:0;right:0;height:100%;width:82vw;max-width:360px;background:#0b1220;padding:22px 18px;display:flex;flex-direction:column;gap:12px;border-left:1px solid rgba(255,255,255,.08);box-shadow:-12px 0 30px rgba(0,0,0,.35)}
+    .mobile-panel a{color:#eaf5ee;text-decoration:none;font-weight:700;padding:8px 0}
+    .mobile-panel hr{border:0;height:1px;background:rgba(255,255,255,.1);margin:10px 0}
+    .mobile-panel .coach-link{border-top:1px solid rgba(255,255,255,.12);margin-top:8px;padding-top:12px;font-weight:700}
+
+    @media (max-width:990px){
+      nav.nav ul{display:none!important}
+      .cta a,.cta #btnAccount,.cta #btnLogin{display:none!important}
+      #menuBtn{display:inline-flex}
+    }
+
+    /* ====== Section cartes accueil (comme avant) ====== */
+    .home-cards{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));max-width:1200px;margin:60px auto;padding:0 24px;position:relative;z-index:1}
+    .home-card{background:linear-gradient(180deg,#111827,#0f172a);color:#e5f2ea;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px 22px;box-shadow:0 8px 24px rgba(0,0,0,.25);text-align:center}
+
+    /* ====== Footer ====== */
+    .footer-mini .copy{text-align:center;color:#9aa5b1;font-size:14px;padding:24px 0 28px;margin:0;border-top:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.2)}
+
+    /* ====== FAB coach ====== */
+    .coach-fab{position:fixed;right:16px;bottom:16px;z-index:80;display:inline-flex;align-items:center;gap:8px;padding:12px 14px;border-radius:12px;background:linear-gradient(180deg,#22c55e,#16a34a);color:#062312;font-weight:800;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);border:0}
+    .coach-fab:hover{filter:brightness(1.05);transform:translateY(-1px);transition:.15s ease}
+    @media(max-width:990px){.coach-fab{display:none}}
+
+    /* ====== OVERLAY "CODE VERT" D’ACCUEIL ====== */
+    .gate{
+      position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+      pointer-events:auto;
+    }
+    .gate .scrim{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(1.5px)}
+    .gate-inner{
+      position:relative;z-index:1;text-align:center;max-width:960px;padding:0 20px;color:#b9f6ca;
+      text-shadow:0 0 10px rgba(34,197,94,.45);
+    }
+    .gate-pre{
+      display:inline-block;text-align:left;background:rgba(0,0,0,.45);border:1px solid rgba(34,197,94,.35);
+      border-radius:14px;padding:18px 20px;line-height:1.6;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      box-shadow:0 16px 40px rgba(0,0,0,.45), inset 0 0 60px rgba(34,197,94,.06);
+    }
+    .gate-pre .k{color:#86efac} .gate-pre .v{color:#22c55e} .gate-pre .c{color:#16a34a}
+    .gate-title{font-size:clamp(28px,5vw,48px);font-weight:800;margin:16px 0 6px;color:#eaffea}
+    .gate-sub{opacity:.95;margin:0 0 14px}
+    .gate-actions{display:flex;gap:10px;justify-content:center;margin-top:10px}
+    .scanline:before{
+      content:"";position:absolute;left:0;right:0;height:2px;top:0;background:linear-gradient(90deg,transparent,#22c55e,transparent);
+      animation:scan 4s linear infinite
+    }
+    @keyframes scan{0%{top:0}100%{top:100%}}
+
+    /* SVG rider en décor */
+    .rider-svg{
+      position:fixed;right:4%;top:10%;width:min(28vw,420px);opacity:.18;filter:drop-shadow(0 0 14px rgba(34,197,94,.25));z-index:0;pointer-events:none
+    }
+
+    /* ====== Modal inscription ====== */
+    .modal{position:fixed;inset:0;display:none;z-index:120}
+    .modal.open{display:block}
+    .modal .dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+    .modal .panel{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(92vw,520px);background:rgba(8,13,23,.92);border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.5);padding:20px 18px;color:#eaf5ee
+    }
+    .panel h3{margin:0 0 6px;font-weight:800}
+    .panel p{margin:0 0 12px;opacity:.9}
+    .form{display:flex;flex-direction:column;gap:10px}
+    .form input{width:100%;padding:12px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0b1628;color:#eaf5ee}
+    .form .row{display:flex;gap:10px}
+    .form .row > *{flex:1}
+    .form label{display:flex;align-items:center;gap:8px;font-size:14px;opacity:.9}
+    .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:800;border:1px solid rgba(255,255,255,.12);text-decoration:none}
+    .btn.dark{background:rgba(0,0,0,.5);color:#fff}
+    .btn.green{background:linear-gradient(180deg,#22c55e,#16a34a);color:#062312;border:none}
+    .btn.minor{background:transparent;color:#cde9d6}
+    .err{color:#fb7185;font-size:14px;margin-top:2px;display:none}
+  </style>
+</head>
+<body>
+
+  <!-- ===== Vidéo de fond ===== -->
+  <video class="bg-video" autoplay muted loop playsinline id="rslHeroVideo">
+    <source src="images/trottvideo.mp4" type="video/mp4">
+  </video>
+  <div class="bg-dim"></div>
+
+  <!-- ===== SVG décor rider ===== -->
+  <svg class="rider-svg" viewBox="0 0 400 400" fill="none" stroke="#22c55e" stroke-width="3">
+    <path d="M130 70c0 18 14 32 32 32s32-14 32-32-14-32-32-32-32 14-32 32Z" opacity=".6"/>
+    <path d="M110 150l40-20 44 18 30 36 26 50-24 12-24-44-30-14-20 10-34 80-26-8 28-86-10-24Z" opacity=".8"/>
+    <path d="M60 300h240" opacity=".35"/>
+    <circle cx="120" cy="300" r="26" opacity=".6"/>
+    <circle cx="260" cy="300" r="26" opacity=".6"/>
+    <path d="M120 300l86-38 54 38" opacity=".6"/>
+  </svg>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html" aria-label="Accueil RSL">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <!-- Menu PC -->
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== MENU MOBILE ===== -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="cours.html">Cours</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <hr/>
+      <a href="membres.html">Devenir membre</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
+  </div>
+
+  <!-- ===== OVERLAY D’ACCUEIL STYLE "CODE" ===== -->
+  <div class="gate" id="gate">
+    <div class="scrim scanline"></div>
+    <div class="gate-inner">
+      <pre class="gate-pre">
+<span class="c">// WELCOME TO RSL</span>
+<span class="k">const</span> league <span class="k">=</span> <span class="v">{</span>
+  name: <span class="v">'Romandie Scooter League'</span>,
+  motto: <span class="v">'Ride · Learn · Progress'</span>,
+  next:  <span class="v">'Create your account to enter'</span>
+<span class="v">}</span>;
+      </pre>
+      <h2 class="gate-title">WELCOME TO RSL</h2>
+      <p class="gate-sub">Make your account to get in • Courses • Events • Coaching</p>
+      <div class="gate-actions">
+        <a class="btn green" id="openSignupNow">Create account</a>
+        <a class="btn minor" id="skipGate">Skip (view only)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CONTENU D’ACCUEIL CLASSIQUE (sous l’overlay) ===== -->
+  <main>
+    <div class="home-cards">
+      <div class="home-card">
+        <h3>Cours</h3>
+        <p>Sessions encadrées par nos moniteurs.</p>
+        <a class="btn green" href="cours.html">Voir les cours</a>
+      </div>
+      <div class="home-card">
+        <h3>Devenir membre</h3>
+        <p>Tarifs préférentiels, priorité d’inscription, etc.</p>
+        <a class="btn dark" href="membres.html">Adhérer</a>
+      </div>
+      <div class="home-card">
+        <h3>Formation RSL</h3>
+        <p>Deviens moniteur certifié RSL.</p>
+        <a class="btn dark" href="formation.html">Découvrir</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
+
+  <!-- ===== FAB COACH ===== -->
+  <a href="coach.html" class="coach-fab" aria-label="Je suis coach">👨‍🏫 Devenir coach</a>
+
+  <!-- ===== MODAL INSCRIPTION ===== -->
+  <div class="modal" id="signupModal" aria-hidden="true">
+    <div class="dim"></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <h3 id="mTitle">Créer mon compte</h3>
+      <p>Accède aux pré-inscriptions, au suivi de cours et aux news.</p>
+      <form class="form" id="signupForm">
+        <div class="row">
+          <input type="text" id="fullName" placeholder="Nom complet" autocomplete="name" required>
+          <input type="text" id="nickname" placeholder="Pseudo (optionnel)" autocomplete="nickname">
+        </div>
+        <input type="email" id="email" placeholder="Email" autocomplete="email" required>
+        <div class="row">
+          <input type="password" id="password" placeholder="Mot de passe" autocomplete="new-password" required>
+          <input type="password" id="password2" placeholder="Confirmer" autocomplete="new-password" required>
+        </div>
+        <label><input type="checkbox" id="cgu" required> J’accepte les conditions RSL</label>
+        <div class="err" id="err"></div>
+        <div class="actions">
+          <button type="button" class="btn dark" id="cancelSignup">Annuler</button>
+          <button type="submit" class="btn green">Créer mon compte</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script>
+    // Burger mobile
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click',e=>{
+      e.stopPropagation(); mobile.classList.add('open'); mobile.setAttribute('aria-hidden','false');
+    });
+    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+      mobile.classList.remove('open'); mobile.setAttribute('aria-hidden','true');
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ mobile.classList.remove('open'); mobile.setAttribute('aria-hidden','true'); }
+    });
+
+    // Vidéo lente + pause onglet
+    window.addEventListener('DOMContentLoaded', () => {
+      const v=document.getElementById('rslHeroVideo');
+      if (!v) return;
+      const start=()=>{ try{ v.playbackRate=0.6; const p=v.play(); if(p?.catch) p.catch(()=>{});}catch(e){} };
+      start();
+      document.addEventListener('visibilitychange',()=>{ if(document.hidden) v.pause(); else start(); });
+    });
+
+    // ===== Gate (overlay) + timer 15s =====
+    const gate=document.getElementById('gate');
+    const openSignupNow=document.getElementById('openSignupNow');
+    const skipGate=document.getElementById('skipGate');
+    const signupModal=document.getElementById('signupModal');
+    const cancelSignup=document.getElementById('cancelSignup');
+
+    function openModal(){ signupModal.classList.add('open'); signupModal.setAttribute('aria-hidden','false'); }
+    function closeModal(){ signupModal.classList.remove('open'); signupModal.setAttribute('aria-hidden','true'); }
+
+    // Timer auto 15s -> open modal
+    setTimeout(()=>{ if(gate) openModal(); }, 15000);
+
+    // Actions
+    openSignupNow?.addEventListener('click',()=>openModal());
+    cancelSignup?.addEventListener('click',()=>closeModal());
+    signupModal?.querySelector('.dim')?.addEventListener('click',()=>closeModal());
+    skipGate?.addEventListener('click',()=>{ gate.style.display='none'; });
+
+    // Fermer l’overlay quand on ouvre la modale (pour “entrer”)
+    signupModal.addEventListener('transitionstart',()=>{});
+    // Si l’utilisateur ferme la modale sans s’inscrire, on laisse l’overlay visible
+
+    // ===== Inscription Supabase =====
+    const form=document.getElementById('signupForm');
+    const errEl=document.getElementById('err');
+    async function signUpSupabase(email,password,fullName,nickname){
+      if(typeof supabase==='undefined' || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY){
+        throw new Error("Supabase non configuré (js/env.js).");
+      }
+      const client = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      const { data, error } = await client.auth.signUp({
+        email,
+        password,
+        options:{ data:{ full_name: fullName, nickname } }
+      });
+      if(error) throw error;
+      return data;
+    }
+
+    form?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      errEl.style.display='none'; errEl.textContent='';
+      const fullName=document.getElementById('fullName').value.trim();
+      const nickname=document.getElementById('nickname').value.trim();
+      const email=document.getElementById('email').value.trim();
+      const pw=document.getElementById('password').value;
+      const pw2=document.getElementById('password2').value;
+      const cgu=document.getElementById('cgu').checked;
+
+      if(pw!==pw2){ errEl.textContent="Les mots de passe ne correspondent pas."; errEl.style.display='block'; return; }
+      if(!cgu){ errEl.textContent="Merci d’accepter les conditions."; errEl.style.display='block'; return; }
+
+      try{
+        await signUpSupabase(email,pw,fullName,nickname);
+        gate.style.display='none';
+        closeModal();
+        alert("Compte créé ! Vérifie tes emails pour confirmer. Tu peux maintenant accéder à ton compte.");
+        location.href = "compte.html";
+      }catch(err){
+        errEl.textContent = (err && err.message) ? err.message : "Erreur inconnue pendant l’inscription.";
+        errEl.style.display='block';
+      }
+    });
+  </script>
+</body>
+</html>

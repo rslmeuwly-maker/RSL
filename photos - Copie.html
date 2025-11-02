@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Galerie Photos HD — RSL</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    html, body { height:100%; }
+    body {
+      background: transparent !important;
+      margin:0;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    }
+
+    /* vidéo fond */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+    }
+
+    .container {
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 24px 80px;
+      position:relative;
+      z-index:10;
+    }
+
+    /* panneau compte */
+    .account-panel{
+      max-width:800px;
+      margin:24px auto 0;
+      background:linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+      border-radius:14px;
+      padding:16px 20px;
+      color:#fff;
+      font-size:14px;
+      line-height:1.4;
+      font-family:"Outfit",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .acc-left{
+      flex:1 1 auto;
+      min-width:200px;
+    }
+    .acc-left .acc-title{
+      font-weight:700;
+      font-size:15px;
+      color:#fff;
+      margin-bottom:4px;
+    }
+    .acc-left .acc-email{
+      font-size:13px;
+      color:#9aa5b1;
+    }
+    .acc-left .acc-email b{
+      color:#fff;
+      font-weight:600;
+    }
+    .logout-btn{
+      margin-top:10px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:8px;
+      color:#fff;
+      font-weight:600;
+      font-size:13px;
+      padding:8px 10px;
+      cursor:pointer;
+    }
+
+    .acc-right{
+      flex:1 1 260px;
+      min-width:240px;
+    }
+    .acc-right .pw-title{
+      font-weight:700;
+      font-size:14px;
+      color:#fff;
+      margin-bottom:8px;
+    }
+    .pw-field{
+      margin-bottom:8px;
+    }
+    .pw-input{
+      width:100%;
+      background:rgba(0,0,0,.6);
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:8px;
+      color:#fff;
+      font-size:13px;
+      font-weight:600;
+      padding:8px 10px;
+      outline:none;
+    }
+    .pw-input:focus{
+      border-color:#22c55e;
+      box-shadow:0 0 0 3px rgba(34,197,94,.25);
+    }
+
+    .pw-msg-err,
+    .pw-msg-ok{
+      display:none;
+      border-radius:8px;
+      font-size:12px;
+      font-weight:600;
+      line-height:1.4;
+      padding:8px 10px;
+      margin-bottom:8px;
+    }
+    .pw-msg-err{
+      background:rgba(255,80,80,.12);
+      border:1px solid rgba(255,80,80,.4);
+      color:#ff9f9f;
+    }
+    .pw-msg-ok{
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.4);
+      color:#7cffb0;
+    }
+
+    .pw-change-btn{
+      width:100%;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      border:0;
+      border-radius:10px;
+      color:#062312;
+      font-weight:800;
+      font-size:14px;
+      line-height:1.2;
+      padding:10px 12px;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      text-align:center;
+    }
+    .pw-change-btn:disabled{
+      filter:grayscale(1) brightness(.6);
+      cursor:default;
+    }
+
+    /* header page */
+    .page-intro{
+      color:#fff;
+      text-align:center;
+      padding:28px 0 8px;
+      max-width:800px;
+      margin:0 auto;
+    }
+    .eyebrow{
+      display:inline-block;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:800;
+      font-size:12px;
+      border-radius:8px;
+      padding:4px 8px;
+      margin-bottom:10px;
+      box-shadow:0 10px 24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .logo-wrap{
+      width:64px;
+      height:64px;
+      border-radius:14px;
+      background:#fff;
+      padding:8px;
+      margin:0 auto 10px;
+      box-shadow:0 6px 20px rgba(0,0,0,.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .logo-wrap img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+    .page-intro h1{
+      margin:10px 0 6px;
+      font-size:clamp(28px,4.2vw,42px);
+      font-weight:800;
+      line-height:1.15;
+    }
+    .badge-free{
+      font-size:12px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:6px;
+      padding:3px 6px;
+      display:inline-block;
+      margin-left:8px;
+    }
+    .page-intro p{
+      margin:10px 0 0;
+      opacity:.95;
+      font-size:clamp(15px,2.2vw,18px);
+      line-height:1.4;
+    }
+    .page-intro p b{color:#22c55e;}
+    .notice-top{
+      font-size:12px;
+      color:#cdd6ff;
+      line-height:1.4;
+      margin-top:14px;
+    }
+    .notice-top b{color:#fff;}
+
+    /* barre de sélection */
+    .batch-bar{
+      max-width:800px;
+      margin:24px auto;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap:12px;
+      background:linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      border-radius:12px;
+      padding:12px 16px;
+      font-size:14px;
+      line-height:1.4;
+      color:#fff;
+      text-align:center;
+    }
+    .batch-bar label{
+      font-weight:600;
+      color:#fff;
+      font-size:14px;
+    }
+    .batch-select{
+      appearance:none;
+      background-color: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding:10px 36px 10px 14px;
+      border-radius:10px;
+      font-size:15px;
+      font-weight:600;
+      min-width:200px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #22c55e 50%),
+        linear-gradient(135deg, #22c55e 50%, transparent 50%);
+      background-position:
+        calc(100% - 22px) center,
+        calc(100% - 17px) center;
+      background-size:6px 6px,6px 6px;
+      background-repeat:no-repeat;
+    }
+
+    /* grille */
+    .gallery-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:16px;
+      margin-top:24px;
+    }
+    .ph-card{
+      background:linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      color:#e7f2eb;
+    }
+    .ph-media{
+      background:#000;
+      width:100%;
+      aspect-ratio:4/3;
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
+    }
+    .ph-media img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      transition: transform .25s ease, filter .25s ease;
+      transform-origin:center;
+    }
+    .ph-media:hover img{
+      transform:scale(1.08);
+      filter:brightness(1.08);
+    }
+    .ph-info{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:14px;
+    }
+    .dl-btn{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:700;
+      font-size:14px;
+      border-radius:10px;
+      padding:10px 12px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      min-width:140px;
+      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      cursor:pointer;
+      border:0;
+    }
+    .dl-btn:hover{
+      filter:brightness(1.07);
+    }
+
+    .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:12px;
+      padding:40px 0 20px;
+      margin:40px 0 0;
+    }
+
+    /* lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      flex-direction: column;
+      padding: 24px;
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(0,0,0,.8);
+    }
+    .lightbox .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 95%;
+      max-width: 900px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      gap:16px;
+      color:#fff;
+    }
+    .close-btn,
+    .dl-big-btn{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:700;
+      font-size:15px;
+      border-radius:10px;
+      padding:12px 16px;
+      text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      cursor:pointer;
+      min-width:160px;
+      text-align:center;
+      border:0;
+    }
+    .close-btn{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      box-shadow:none;
+      border:1px solid rgba(255,255,255,.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="bgVid" poster="images/hero-poster.jpg">
+    <source src="images/trottvideo.mp4" type="video/mp4">
+  </video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
+
+  <!-- contenu -->
+  <main class="container">
+
+    <!-- panneau compte -->
+    <section class="account-panel" id="accountPanel">
+      <div class="acc-left">
+        <div class="acc-title">Mon accès photos</div>
+        <div class="acc-email">
+          Connecté en tant que <b id="accountEmail">(…)</b>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Se déconnecter</button>
+      </div>
+
+      <div class="acc-right">
+        <div class="pw-title">Changer mon mot de passe</div>
+
+        <div class="pw-field">
+          <input id="oldPass" class="pw-input" type="password" placeholder="Ancien mot de passe"/>
+        </div>
+
+        <div class="pw-field">
+          <input id="newPass1" class="pw-input" type="password" placeholder="Nouveau mot de passe (min 6 caractères)"/>
+        </div>
+
+        <div class="pw-field">
+          <input id="newPass2" class="pw-input" type="password" placeholder="Confirme le nouveau mot de passe"/>
+        </div>
+
+        <div id="pwMsgErr" class="pw-msg-err"></div>
+        <div id="pwMsgOk"  class="pw-msg-ok"></div>
+
+        <button class="pw-change-btn" id="pwChangeBtn">Mettre à jour mon mot de passe</button>
+      </div>
+    </section>
+
+    <section class="page-intro">
+      <div class="eyebrow">Montreux Scooter Contest 2025</div>
+
+      <div class="logo-wrap">
+        <img src="images/logo_rsl.png" alt="RSL">
+      </div>
+
+      <h1>
+        Galerie Photos HD
+        <span class="badge-free">téléchargement gratuit</span>
+      </h1>
+
+      <p>
+        Merci d’avoir ridé avec nous 💚<br/>
+        Si tu repostes une image, tag <b>@rsl_swiss</b>.
+      </p>
+
+      <div class="notice-top">
+        Tu veux qu’on retire une photo où tu apparais ?<br/>
+        Écris sur <b>Instagram @rsl_swiss</b> avec le numéro de la photo.
+      </div>
+    </section>
+
+    <!-- Sélecteur des lots -->
+    <section class="batch-bar">
+      <label for="batchSelect">Afficher :</label>
+      <select id="batchSelect" class="batch-select">
+        <option value="0">Photos 001 → 020</option>
+        <option value="1">Photos 021 → 040</option>
+        <option value="2">Photos 041 → 060</option>
+        <option value="3">Photos 061 → 080</option>
+        <option value="4">Photos 081 → 100</option>
+        <option value="5">Photos 101 → 120</option>
+        <option value="6">Photos 121 → 140</option>
+        <option value="7">Photos 141 → 160</option>
+        <option value="8">Photos 161 → 180</option>
+        <option value="9">Photos 181 → 200</option>
+        <option value="10">Photos 201 → 220</option>
+        <option value="11">Photos 221 → 240</option>
+        <option value="12">Photos 241 → 250</option>
+      </select>
+    </section>
+
+    <!-- GRID -->
+    <section>
+      <div id="galleryGrid" class="gallery-grid"></div>
+    </section>
+
+    <p class="copy">© 2025 — RSL Romandie Scooter League</p>
+  </main>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <img id="lightboxImg" src="" alt=""/>
+    <div class="actions">
+      <button class="dl-big-btn" id="downloadLightboxBtn">⬇ Télécharger</button>
+      <button class="close-btn" id="closeLightbox">✕ Fermer</button>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <script>
+    (function(){
+      // fond vidéo ralenti
+      const v=document.getElementById('bgVid');
+      if(v){
+        const start=()=>{try{v.playbackRate=0.6;v.play().catch(()=>{});}catch(e){}};
+        start();
+        document.addEventListener('visibilitychange',()=>{document.hidden?v.pause():start();});
+      }
+
+      // init supa
+      let supa=null;
+      try{
+        supa = supabase.createClient(
+          window.env?.SUPABASE_URL || '',
+          window.env?.SUPABASE_ANON || ''
+        );
+      }catch(e){
+        console.warn("Init supabase fail",e);
+      }
+
+      // protection d'accès
+      (async function guard(){
+        let localOK = false;
+        try{
+          localOK = localStorage.getItem('rsl_photos_ok') === '1';
+        }catch(_){}
+
+        let sessionOK = false;
+        let currentEmail = "";
+        if(supa){
+          try{
+            const { data:{ user } } = await supa.auth.getUser();
+            if(user){
+              sessionOK=true;
+              currentEmail=user.email||"";
+            }
+          }catch(_){}
+        }
+
+        // maj affichage email
+        const accountEmailEl = document.getElementById('accountEmail');
+        if(accountEmailEl){
+          accountEmailEl.textContent = currentEmail || "(non connecté)";
+        }
+
+        if(!(localOK && sessionOK)){
+          window.location.href = "access_photos.html";
+          return;
+        }
+      })();
+
+      const grid   = document.getElementById('galleryGrid');
+      const select = document.getElementById('batchSelect');
+
+      const lightbox            = document.getElementById('lightbox');
+      const lightboxImg         = document.getElementById('lightboxImg');
+      const closeLightboxBtn    = document.getElementById('closeLightbox');
+      const downloadLightboxBtn = document.getElementById('downloadLightboxBtn');
+
+      let currentFullUrl = "";
+
+      // LISTE PHOTOS HD
+      const allPhotos = [];
+      allPhotos.push({
+        src: "images/photos/hd/Flyers2025.jpg",
+        alt: "Flyer officiel RSL 2025"
+      });
+      for(let i=2;i<=250;i++){
+        const n = String(i).padStart(3,"0");
+        allPhotos.push({
+          src:`images/photos/hd/photo_${n}.jpg`,
+          alt:`RSL Photo ${n}`
+        });
+      }
+
+      function renderBatch(batchIndex){
+        const BATCH_SIZE = 20;
+        const startInList = batchIndex * BATCH_SIZE + 1;
+        const endInList   = startInList + BATCH_SIZE;
+        const slice=[allPhotos[0], ...allPhotos.slice(startInList, endInList)];
+
+        grid.innerHTML = slice.map(p=>{
+          const safe = encodeURI(p.src);
+          return `
+            <article class="ph-card">
+              <div class="ph-media">
+                <img
+                  src="${safe}"
+                  alt="${p.alt}"
+                  data-full="${safe}"
+                />
+              </div>
+              <div class="ph-info">
+                <div>${p.alt}</div>
+                <button class="dl-btn" data-full="${safe}">⬇ Télécharger</button>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        attachHandlers();
+      }
+
+      function attachHandlers(){
+        // ouvrir lightbox
+        grid.querySelectorAll('.ph-media img').forEach(img=>{
+          img.addEventListener('click',()=>{
+            const full = img.getAttribute('data-full') || "";
+            const alt  = img.getAttribute('alt') || "RSL Photo";
+            currentFullUrl = full;
+            lightboxImg.src = full;
+            lightboxImg.alt = alt;
+            lightbox.classList.add('open');
+          });
+        });
+
+        // download bouton sous la vignette
+        grid.querySelectorAll('.dl-btn').forEach(btn=>{
+          btn.addEventListener('click', async (e)=>{
+            e.preventDefault();
+            e.stopPropagation();
+            const full = btn.getAttribute('data-full') || "";
+            await forceDownloadSmart(full);
+          });
+        });
+      }
+
+      // fermer lightbox
+      function closeLightbox(){
+        lightbox.classList.remove('open');
+        lightboxImg.src = "";
+        currentFullUrl = "";
+      }
+      closeLightboxBtn.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', e=>{
+        if(e.target === lightbox){ closeLightbox(); }
+      });
+      document.addEventListener('keydown', e=>{
+        if(e.key === 'Escape'){ closeLightbox(); }
+      });
+
+      // download dans lightbox
+      downloadLightboxBtn.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        if(currentFullUrl){
+          await forceDownloadSmart(currentFullUrl);
+        }
+      });
+
+      // forcer le téléchargement
+      async function forceDownloadSmart(url){
+        try{
+          const response = await fetch(url);
+          if(!response.ok) throw new Error("fetch failed "+response.status);
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = url.split('/').pop() || 'photo.jpg';
+          a.style.display='none';
+          document.body.appendChild(a);
+          a.click();
+
+          setTimeout(()=>{
+            URL.revokeObjectURL(blobUrl);
+            a.remove();
+          },200);
+
+          return;
+        }catch(err){
+          console.warn("Blob download failed, fallback", err);
+        }
+
+        try{
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = url.split('/').pop() || 'photo.jpg';
+          a.target = "_self";
+          a.style.display='none';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(()=>a.remove(),200);
+          return;
+        }catch(err2){
+          console.warn("Direct download failed, fallback view only", err2);
+        }
+
+        window.location.href = url;
+      }
+
+      // =========================
+      // COMPTE : logout / change PW
+      // =========================
+      const logoutBtn      = document.getElementById('logoutBtn');
+      const pwChangeBtn    = document.getElementById('pwChangeBtn');
+      const oldPassInput   = document.getElementById('oldPass');
+      const newPass1Input  = document.getElementById('newPass1');
+      const newPass2Input  = document.getElementById('newPass2');
+      const pwMsgErr       = document.getElementById('pwMsgErr');
+      const pwMsgOk        = document.getElementById('pwMsgOk');
+      const accountEmailEl = document.getElementById('accountEmail');
+
+      function showPwErr(msg){
+        if(!pwMsgErr) return;
+        pwMsgErr.textContent = msg;
+        pwMsgErr.style.display='block';
+        if(pwMsgOk) pwMsgOk.style.display='none';
+      }
+      function showPwOk(msg){
+        if(!pwMsgOk) return;
+        pwMsgOk.textContent = msg;
+        pwMsgOk.style.display='block';
+        if(pwMsgErr) pwMsgErr.style.display='none';
+      }
+      function clearPwMsg(){
+        if(pwMsgErr) pwMsgErr.style.display='none';
+        if(pwMsgOk) pwMsgOk.style.display='none';
+      }
+
+      // logout
+      logoutBtn?.addEventListener('click', async ()=>{
+        try{
+          await supa.auth.signOut();
+        }catch(e){}
+        try{
+          localStorage.removeItem('rsl_photos_ok');
+        }catch(_){}
+        window.location.href = "access_photos.html";
+      });
+
+      // change PW
+      pwChangeBtn?.addEventListener('click', async ()=>{
+        clearPwMsg();
+
+        const oldP = (oldPassInput.value||"").trim();
+        const np1  = (newPass1Input.value||"").trim();
+        const np2  = (newPass2Input.value||"").trim();
+
+        if(np1.length < 6){
+          showPwErr("Nouveau mot de passe trop court (min 6 caractères).");
+          return;
+        }
+        if(np1 !== np2){
+          showPwErr("Le nouveau mot de passe ne correspond pas dans les deux champs.");
+          return;
+        }
+
+        // email actuel pour revalidation
+        let currentEmail = "";
+        try{
+          const { data:{ user } } = await supa.auth.getUser();
+          if(user){
+            currentEmail = user.email || "";
+          }
+        }catch(e){
+          console.warn(e);
+        }
+        if(!currentEmail){
+          showPwErr("Session expirée. Reconnecte-toi.");
+          return;
+        }
+
+        pwChangeBtn.disabled = true;
+
+        try{
+          // 1. Vérifier ancien mot de passe
+          const { error:checkErr } = await supa.auth.signInWithPassword({
+            email: currentEmail,
+            password: oldP
+          });
+          if(checkErr){
+            showPwErr("Ancien mot de passe incorrect.");
+            pwChangeBtn.disabled = false;
+            return;
+          }
+
+          // 2. Mettre à jour le mot de passe
+          const { error:updateErr } = await supa.auth.updateUser({
+            password: np1
+          });
+          if(updateErr){
+            showPwErr("Impossible de modifier le mot de passe.");
+            pwChangeBtn.disabled = false;
+            return;
+          }
+
+          // 3. Succès
+          showPwOk("Mot de passe mis à jour ✔");
+          oldPassInput.value="";
+          newPass1Input.value="";
+          newPass2Input.value="";
+          pwChangeBtn.disabled = false;
+
+        }catch(e){
+          console.warn(e);
+          showPwErr("Erreur technique, réessaie.");
+          pwChangeBtn.disabled = false;
+        }
+      });
+
+      // init affichage galerie
+      renderBatch(0);
+
+      // changement de lot
+      select.addEventListener('change', e=>{
+        const batchIndex = parseInt(e.target.value,10);
+        renderBatch(batchIndex);
+      });
+    })();
+  </script>
+</body>
+</html>

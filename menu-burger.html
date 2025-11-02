@@ -1,0 +1,32 @@
+// Burger mobile
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click',e=>{
+      e.stopPropagation();
+      mobile.classList.add('open');
+      mobile.setAttribute('aria-hidden','false');
+    });
+    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+      mobile.classList.remove('open');
+      mobile.setAttribute('aria-hidden','true');
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ mobile.classList.remove('open'); mobile.setAttribute('aria-hidden','true'); }
+    });
+
+    // Login ↔ Compte
+    (async function(){
+      if(typeof supabase==='undefined') return;
+      try{
+        const {data:{user}}=await supabase.auth.getUser();
+        const btnLogin=document.getElementById('btnLogin');
+        const btnAccount=document.getElementById('btnAccount');
+        function ui(u){
+          if(u){ btnAccount.style.display='inline-flex'; btnLogin.style.display='none'; }
+          else { btnAccount.style.display='none'; btnLogin.style.display='inline-flex'; btnLogin.textContent='Login'; }
+        }
+        ui(user);
+        btnLogin?.addEventListener('click',()=>location.href='compte.html');
+        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user??null));
+      }catch(e){}
+    })();

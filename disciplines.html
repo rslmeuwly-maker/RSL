@@ -3,282 +3,239 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Disciplines & Règlement — RSL</title>
+  <title>Disciplines & Règlement — Romandie Scooter League</title>
 
-  <!-- Fonts + style global -->
-<!-- Mini CSS local pour le hero + footer -->
+  <!-- Fonts + Styles globaux -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
+
   <style>
-    .hero.hero-photo{position:relative;color:#fff;overflow:hidden}
-    .hero.hero-photo::before{
-      content:"";position:absolute;inset:0;z-index:0;
-      background:
-        linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.75)),
-        url("images/lanoubc3.jpg") center/cover no-repeat;
+    /* ======= NAVBAR (identique à index) ======= */
+    nav.nav {
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 100;
     }
-    .hero.hero-photo .container{position:relative;z-index:1}
+    nav.nav .container { max-width: 1320px; margin: 0 auto; padding: 12px 28px; }
+    nav.nav .row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand { display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img { height:48px; border-radius:10px; display:block; }
+    .brand span { font-weight:800; letter-spacing:.2px; font-size:17px; }
+    nav.nav ul { display:flex; align-items:center; gap:26px; }
+    nav.nav ul li a { font-weight:600; color:#e8f0ea; transition:.2s ease; font-size:17px; letter-spacing:.2px; white-space:nowrap; }
+    nav.nav ul li a:hover { color:#22c55e; }
+    .cta { display:flex; align-items:center; gap:12px; }
+    #menuBtn{
+      display:none; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; font-size:18px; line-height:1;
+      border-radius:10px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12); color:#22c55e;
+      cursor:pointer; transition:.2s ease;
+    }
+    #menuBtn:hover { background:rgba(34,197,94,.22); }
 
-    /* === FOOTER demandé : 3 colonnes pleine largeur + bas à droite === */
-    .foot .links-3cols{
-      display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+    /* ======= HERO VIDÉO ======= */
+    .hero-video {
+      position:relative; color:#fff; min-height:65vh;
+      display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden;
+      margin-top:-4px;
     }
-    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
-    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
-    .foot .links-3cols li{margin:6px 0}
-    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
-    .foot .links-3cols a:hover{text-decoration:underline}
-    .foot .bottom.bottom-right{
-      border-top:1px solid rgba(255,255,255,0.08);
-      margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px
+    .hero-video::before {
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.85)); z-index:1;
     }
-    .foot .bottom.bottom-right p{margin:0}
-    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
-    .foot .bottom.bottom-right a:hover{text-decoration:underline}
-    @media (max-width: 900px){ .foot .links-3cols{grid-template-columns:1fr 1fr} }
-    @media (max-width: 600px){ .foot .links-3cols{grid-template-columns:1fr} .foot .bottom.bottom-right{justify-content:space-between} }
-  /* FOOTER : 3 colonnes + bloc bas à droite */
-  .foot .links-3cols{
-    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
-  }
-  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
-  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
-  .foot .links-3cols li{margin:6px 0}
-  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
-  .foot .links-3cols a:hover{text-decoration:underline}
-  .foot .bottom.bottom-right{
-    border-top:1px solid rgba(255,255,255,0.08);
-    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
-  }
-  .foot .bottom.bottom-right p{margin:0}
-  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
-  .foot .bottom.bottom-right a:hover{text-decoration:underline}
-  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
-  @media (max-width:600px){
-    .foot .links-3cols{grid-template-columns:1fr}
-    .foot .bottom.bottom-right{justify-content:space-between}
-  }
-</style>
+    .hero-video .bg-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .hero-video .hero-inner { position:relative; z-index:2; max-width:900px; padding:20px; margin-top:-40px; }
+    .hero-video h1 { font-size:clamp(36px,5vw,54px); font-weight:800; margin-bottom:8px; }
+    .hero-video p { font-size:clamp(16px,2vw,22px); opacity:.95; margin-bottom:0; }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css"/>
-<link rel="stylesheet" href="css/common.css"/>
-<link rel="stylesheet" href="css/fonts.css"/>
+    /* ======= SECTIONS ======= */
+    section.section { max-width:1200px; margin:40px auto; padding:0 24px; color:#e5f2ea; }
+    .section h2 { font-size:28px; font-weight:700; margin-bottom:14px; color:#22c55e; }
+    .card {
+      background: linear-gradient(180deg,#111827,#0f172a);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:24px 20px;
+      box-shadow:0 8px 24px rgba(0,0,0,.25);
+      text-align:left;
+    }
+    .grid-2 { display:grid; gap:24px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+    .badge { background:#22c55e; color:#062312; font-weight:700; border-radius:6px; padding:3px 8px; font-size:14px; margin-right:6px; }
+    ul.list { list-style:disc; margin-left:20px; line-height:1.6; font-size:16px; color:#d1d5db; }
+
+    /* ======= RÈGLEMENT ======= */
+    .reglement { background:#0b1220; padding:50px 24px; text-align:center; margin-top:30px; }
+    .reglement h2 { color:#22c55e; margin-bottom:12px; font-size:28px; }
+    .reglement ul { text-align:left; max-width:700px; margin:25px auto; color:#d1d5db; font-size:17px; line-height:1.7; }
+
+    /* ======= FOOTER ======= */
+    .footer-mini .copy {
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:20px 0 24px; margin:0;
+      border-top:1px solid rgba(255,255,255,.1);
+      background:rgba(0,0,0,.2);
+    }
+
+    /* ======= MENU MOBILE ======= */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-sheet .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-sheet .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-sheet .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-sheet .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+    .mobile-panel .coach-link { border-top:1px solid rgba(255,255,255,.12); margin-top:8px; padding-top:12px; font-weight:700; }
+
+    @media (max-width:990px){
+      nav.nav ul{display:none!important;}#menuBtn{display:inline-flex;}
+    }
+  </style>
 </head>
 <body>
 
-  <!-- NAV (identique à l’index) -->
+  <!-- ======= NAV ======= -->
   <nav class="nav">
-  <div class="container nav-inner">
-    <!-- corrigé ici -->
-    <a class="brand" href="index.html">
-      <img src="images/logo_rsl.png" alt="Logo RSL">
-      <span><b>RSL — Romandie Scooter League</b></span>
-    </a>
-    <ul>
-      <li><a href="formation.html">Formation RSL</a></li>
-      <li><a href="disciplines.html">Disciplines</a></li>
-      <li><a href="ou_rider.html">Où rider ?</a></li>
-      <li><a href="game.html">Games</a></li>
-      <li><a href="evenements.html">Événements</a></li>
-      <li><a href="comite.html">Comité</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    
-      <li><a href="cours.html">Cours</a></li>
-    </ul>
-    <div class="cta">
-      <button class="btn" id="btnIdentity">Se connecter</button>
-      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
-      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
-    </div>
-    <div class="cta">
-      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
-    </div>
-  </div>
-</nav>
-
-  <!-- HERO avec image lanoubc3 -->
-  <header class="hero hero-photo">
     <div class="container">
-      <h1>Disciplines & Règlement</h1>
-      <p>Les deux styles majeurs de la trottinette freestyle : <strong>Park</strong> & <strong>Street</strong>.<br>
-      Et les règles officielles des contests RSL.</p>
-    </div>
-  </header>
+      <div class="row">
+        <a class="brand" href="index.html" aria-label="Accueil RSL">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
 
-  <!-- DISCIPLINES -->
-  <section class="section">
-    <div class="container grid-2">
-      <!-- PARK -->
-      <article class="card">
-        <h2>Trottinette Freestyle — Park</h2>
-        <p class="muted">Skateparks avec bowls, spines et quarters. Amplitude, flow et gros airs.</p>
-
-        <div class="chips" style="margin:10px 0 14px">
-          <span class="badge">Bowls</span>
-          <span class="badge">Quarters</span>
-          <span class="badge">Funbox</span>
-          <span class="badge">Spines</span>
-        </div>
-
-        <ul class="list">
-          <li>Figures : backflips, tailwhips, bri flips, combos aériens</li>
-          <li>Critères de jugement : amplitude, style, propreté</li>
-          <li>Format : runs chronométrés (1–2 runs), meilleure note retenue</li>
+        <!-- Menu PC identique à index -->
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html" style="color:#22c55e">Disciplines</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
         </ul>
 
-        <h3 style="margin-top:14px">Catégories</h3>
-        <div class="chips" style="margin-top:6px">
-          <span class="badge">U12</span>
-          <span class="badge">U16</span>
-          <span class="badge">Open</span>
-          <span class="badge">Filles</span>
-          <span class="badge">Am</span>
-          <span class="badge">Pro</span>
+        <div class="cta">
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button class="btn dark" id="btnMon compte">Mon compte</button>
+          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======= MENU MOBILE ======= -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="cours.html">Cours</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <hr/>
+      <a href="membres.html">Devenir membre</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
+  </div>
+
+  <!-- ======= HERO VIDÉO ======= -->
+  <section class="hero-video">
+    <video class="bg-video" autoplay muted loop playsinline poster="images/hero-poster.jpg">
+      <source src="images/trottvideo.mp4" type="video/mp4">
+    </video>
+    <div class="hero-inner">
+      <h1>Disciplines & Règlement</h1>
+      <p>Les deux styles majeurs de la trottinette freestyle : <strong>Park</strong> & <strong>Street</strong></p>
+    </div>
+  </section>
+
+  <!-- ======= DISCIPLINES ======= -->
+  <section class="section">
+    <div class="grid-2">
+      <article class="card">
+        <h2>Trottinette Freestyle — Park</h2>
+        <p>Skateparks avec bowls, spines et quarters. Amplitude, flow et gros airs.</p>
+        <div style="margin:10px 0;">
+          <span class="badge">Bowls</span>
+          <span class="badge">Spines</span>
+          <span class="badge">Funbox</span>
+          <span class="badge">Quarters</span>
+        </div>
+        <ul class="list">
+          <li>Figures : backflips, tailwhips, bri flips, combos aériens</li>
+          <li>Critères : amplitude, style, propreté</li>
+          <li>Format : runs chronométrés, meilleure note retenue</li>
+        </ul>
       </article>
 
-      <!-- STREET -->
       <article class="card">
         <h2>Trottinette Freestyle — Street</h2>
-        <p class="muted">Rails, ledges, marches. Technique, précision et créativité urbaine.</p>
-
-        <div class="chips" style="margin:10px 0 14px">
+        <p>Rails, ledges, marches. Technique, précision et créativité urbaine.</p>
+        <div style="margin:10px 0;">
           <span class="badge">Rails</span>
           <span class="badge">Ledges</span>
           <span class="badge">Gaps</span>
           <span class="badge">Curbs</span>
         </div>
-
         <ul class="list">
           <li>Figures : grinds, slides, manuals, lignes techniques</li>
-          <li>Critères de jugement : difficulté, contrôle, originalité</li>
-          <li>Format : best line / best trick selon l’événement</li>
+          <li>Critères : difficulté, contrôle, originalité</li>
+          <li>Format : best line ou best trick</li>
         </ul>
-
-        <h3 style="margin-top:14px">Catégories</h3>
-        <div class="chips" style="margin-top:6px">
-          <span class="badge">U12</span>
-          <span class="badge">U16</span>
-          <span class="badge">Open</span>
-          <span class="badge">Filles</span>
-          <span class="badge">Am</span>
-          <span class="badge">Pro</span>
-        </div>
       </article>
     </div>
   </section>
 
-  <!-- RÈGLEMENT -->
-  <section class="section" style="background:#fafafa">
-    <div class="container">
-      <div class="section-head">
-        <h2>Règlement Officiel RSL</h2>
-        <span class="muted">Applicable sur toutes les manches officielles de la Romandie Scooter League</span>
-      </div>
-
-      <ul class="list" style="max-width:800px;margin:auto;line-height:1.8;font-size:17px">
-        <li>⚠️ <b>Casque obligatoire</b> pour tous les riders.</li>
-        <li>Qualifications : <b>2 runs (45–60s)</b> — le meilleur compte.</li>
-        <li>Finale : <b>2 runs</b> — le meilleur compte.</li>
-        <li>Grille de 100 points :
-          <ul style="margin-top:4px">
-            <li>Difficulté : 40</li>
-            <li>Exécution : 30</li>
-            <li>Style : 20</li>
-            <li>Créativité : 10</li>
-          </ul>
-        </li>
-        <li>Classement du tour : <b>2 meilleurs résultats sur 3 manches</b>.</li>
-        <li>Le port des protections supplémentaires est fortement recommandé.</li>
-        <li>Les juges sont choisis pour leur expérience et leur neutralité.</li>
-      </ul>
-    </div>
+  <!-- ======= RÈGLEMENT ======= -->
+  <section class="reglement">
+    <h2>Règlement Officiel RSL</h2>
+    <ul>
+      <li>⚠️ <b>Casque obligatoire</b> pour tous les riders.</li>
+      <li>Qualifications : 2 runs (45–60s) — le meilleur compte.</li>
+      <li>Finale : 2 runs — le meilleur compte.</li>
+      <li>Grille de 100 points : difficulté (40), exécution (30), style (20), créativité (10).</li>
+      <li>Classement du tour : 2 meilleurs résultats sur 3 manches.</li>
+      <li>Protections supplémentaires recommandées.</li>
+      <li>Juges choisis pour expérience et neutralité.</li>
+    </ul>
   </section>
 
-  <!-- FOOTER corrigé uniquement -->
-  <footer class="foot">
-  <div class="container">
-    <div class="links links-3cols">
-      <div class="col">
-        <h4>RSL</h4>
-        <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
-        </ul>
-      </div>
-      <div class="col">
-        <h4>Ressources</h4>
-        <ul>
-          <li><a href="membres.html">Adhésion</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
-        </ul>
-      </div>
-      <div class="col">
-        <h4>Contest</h4>
-        <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="bottom bottom-right">
-      <p class="tiny">© 2025 — Romandie Scooter League</p>
-      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
-    </div>
-  </div>
-</footer>
-<script>
-(function(){
-  function init(){
-    var idBtn = document.getElementById('btnIdentity');
-    var btnLogout = document.getElementById('btnLogout');
-    var btnAccount = document.getElementById('btnAccount');
-    function refresh(user){
-      var logged = !!user;
-      if(idBtn) idBtn.style.display = logged ? 'none' : '';
-      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
-      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
-    }
-    if(window.netlifyIdentity){
-      window.netlifyIdentity.on('init', function(user){ refresh(user); });
-      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
-      window.netlifyIdentity.on('logout', function(){ refresh(null); });
-      window.netlifyIdentity.init();
-    }
-    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
-    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
-    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
-  }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
-})();
-</script>
-<script defer src="js/site.js"></script>
-<script defer src="/.netlify/identity-widget.js"></script>
-<script defer src="js/auth.js"></script>
+  <!-- ======= FOOTER ======= -->
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
 
-<!-- HelpBot (RSL) -->
-<link rel="stylesheet" href="css/helpbot.css">
-<div id="hb-root">
-  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
-  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
-    <div class="hb-head">
-      <div class="title" id="hbTitle">Aide — RSL</div>
-      <div class="actions">
-        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
-        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
-      </div>
-    </div>
-    <div class="hb-body" id="hbBody"></div>
-    <div class="hb-foot">
-      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
-      <button id="hbSend" class="hb-send">Envoyer</button>
-    </div>
-  </div>
-</div>
-<script defer src="js/helpbot.js"></script>
-
-</body></html>
+  <!-- ======= SCRIPTS ======= -->
+  <script>
+    // Burger mobile
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click',e=>{
+      e.stopPropagation();
+      mobile.classList.add('open');
+      mobile.setAttribute('aria-hidden','false');
+    });
+    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+      mobile.classList.remove('open');
+      mobile.setAttribute('aria-hidden','true');
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      }
+    });
+  </script>
+</body>
+</html>

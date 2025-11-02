@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RSL — Virus Splash</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#040404;
+    --green:#22c55e;
+    --neon:#7cffb0;
+    --danger:#ff4d4f;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#e8ffe8;overflow:hidden}
+
+  /* full screen canvas for code */
+  #codeRain{position:fixed;inset:0;z-index:1}
+
+  /* central viral panel */
+  .splash{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;
+    pointer-events:none;
+  }
+  .card{
+    width:min(980px,94vw);max-width:980px;padding:28px;border-radius:16px;
+    background:linear-gradient(180deg, rgba(2,6,4,.72), rgba(3,8,6,.6));
+    border:1px solid rgba(255,255,255,.06);backdrop-filter: blur(6px) saturate(120%);
+    box-shadow:0 30px 80px rgba(0,0,0,.8);
+    pointer-events:auto; text-align:center; color:var(--neon);
+    overflow:hidden; position:relative;
+  }
+
+  .brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px}
+  .brand img{height:44px;border-radius:10px}
+  .title{font-size:clamp(20px,3.6vw,38px);font-weight:800;color:#fff;text-shadow:0 6px 28px rgba(34,197,94,.06)}
+  .subtitle{color:rgba(200,255,210,.9);opacity:.9;margin-bottom:12px}
+
+  /* fake terminal code block */
+  .term{
+    background:rgba(0,0,0,.42);border-radius:10px;padding:12px 14px;margin:12px auto 18px;max-width:900px;
+    border:1px solid rgba(34,197,94,.06); text-align:left; font-family:ui-monospace,monospace; color:var(--neon);
+    height:120px; overflow:hidden; position:relative;
+  }
+
+  .line{font-size:13px;line-height:1.25;white-space:nowrap;opacity:.95}
+
+  /* download area */
+  .download{
+    display:flex;align-items:center;gap:14px;justify-content:center;margin-top:4px;
+  }
+  .progress{
+    width:62%;height:14px;background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.04)
+  }
+  .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--green),#8ef9b6);box-shadow:0 6px 24px rgba(34,197,94,.08);transition:width .2s linear}
+  .pct{font-weight:800;color:#d6ffdc;min-width:64px;text-align:right}
+
+  /* big warning / glitch overlay used on freeze */
+  .glitch-overlay{
+    position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,20,20,.02), rgba(255,20,20,.06));
+    mix-blend-mode:screen; pointer-events:none; opacity:0; transition:opacity .25s;
+  }
+  .glitch{
+    position:absolute;inset:0;pointer-events:none; opacity:0; z-index:10;
+    background-image:
+      linear-gradient(0deg, rgba(0,0,0,0) 30%, rgba(255,255,255,.02) 31%, rgba(255,255,255,.02) 32%, rgba(0,0,0,0) 33%);
+    background-size:100% 6px;
+    animation:glitchScan .12s steps(1) infinite;
+  }
+  @keyframes glitchScan{0%{transform:translateY(0)}50%{transform:translateY(2px)}100%{transform:translateY(0)}}
+
+  /* welcome big card after freeze */
+  .welcome{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:12;opacity:0;pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .welcome.open{opacity:1;pointer-events:auto}
+  .welcome-card{
+    width:min(780px,94vw); padding:28px;border-radius:14px;background:linear-gradient(180deg,#021007,#06220f);
+    border:1px solid rgba(255,255,255,.06); text-align:center;color:#e9ffe9;box-shadow:0 30px 120px rgba(0,0,0,.7)
+  }
+  .welcome h1{font-size:38px;margin:0 0 8px}
+  .welcome p{margin:0 0 16px;color:#cfeed6}
+
+  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:10px 14px;border-radius:10px;font-weight:800;border:1px solid rgba(255,255,255,.06);cursor:pointer;background:rgba(255,255,255,.03);color:var(--neon)}
+  .btn.green{background:linear-gradient(180deg,var(--green),#8ef9b6);color:#062312;border:0}
+  .btn.alt{background:transparent;border:1px solid rgba(255,255,255,.08);color:#fff}
+
+  /* skip link top-right */
+  .skip{position:absolute;top:18px;right:18px;z-index:20; font-weight:800; color:rgba(255,255,255,.85); cursor:pointer; padding:8px 10px; border-radius:8px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.04)}
+
+  /* tiny footer copy under everything */
+  .footcopy{position:fixed;left:0;right:0;bottom:10px;text-align:center;color:rgba(180,210,190,.7);font-size:13px;z-index:20}
+</style>
+</head>
+<body>
+
+<!-- code rain canvas -->
+<canvas id="codeRain"></canvas>
+
+<!-- splash card -->
+<div class="splash" role="dialog" aria-modal="true" aria-label="RSL Splash">
+  <div class="card" id="card">
+    <div class="skip" id="skipBtn">Skip →</div>
+
+    <div class="brand">
+      <img src="images/logo_rsl.png" alt="RSL logo" onerror="this.style.display='none'">
+      <div>
+        <div class="title">Romandie Scooter League</div>
+        <div class="subtitle">...downloading core — VIRUS RSL</div>
+      </div>
+    </div>
+
+    <div class="term" id="term">
+      <div class="line" id="t1">[init] handshake with rsl-core... OK</div>
+      <div class="line" id="t2">[proc] loading modules: visuals, events, auth</div>
+      <div class="line" id="t3">[sys] injecting payload: "VIRUS_RSL.EXE"</div>
+      <div class="line" id="t4">[net] connecting to hub.rsl — 192.0.2.2</div>
+    </div>
+
+    <div class="download">
+      <div style="min-width:200px;font-weight:900;color:#bfffcf">VIRUS RSL — DOWNLOADING</div>
+      <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+      <div class="pct" id="pct">0%</div>
+    </div>
+
+    <div style="margin-top:12px;font-size:13px;color:rgba(200,255,210,.75)">
+      Attends... ou clique <button class="btn alt" id="openNow">Devenir membre</button>
+    </div>
+
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+    <div class="glitch" id="glitch"></div>
+  </div>
+</div>
+
+<!-- welcome after freeze -->
+<div class="welcome" id="welcome">
+  <div class="welcome-card">
+    <h1>WELCOME TO RSL</h1>
+    <p>Le "virus" est installé — rejoins la communauté, réserve tes cours et participe aux events !</p>
+    <div class="cta-row">
+      <button class="btn green" id="joinBtn">Devenir membre</button>
+      <button class="btn alt" id="enterBtn">Entrer dans le site</button>
+    </div>
+  </div>
+</div>
+
+<p class="footcopy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+
+<script>
+/* ===== code rain (canvas) ===== */
+(function(){
+  const canvas = document.getElementById('codeRain');
+  const ctx = canvas.getContext('2d');
+  let W, H, cols, size=16, drops;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    cols = Math.floor(W/size);
+    drops = new Array(cols).fill(1).map(()=>Math.floor(Math.random()*H/size));
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const letters = "01[]{}()<>=/*\\|-_@#$%^&*!;:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  function draw(){
+    ctx.fillStyle = "rgba(0,0,0,0.12)"; // trail dim
+    ctx.fillRect(0,0,W,H);
+    ctx.font = size + "px monospace";
+    for(let i=0;i<cols;i++){
+      const text = letters.charAt(Math.floor(Math.random()*letters.length));
+      const x = i*size, y = drops[i]*size;
+      ctx.fillStyle = (Math.random()<0.07) ? "rgba(255,255,255,.9)" : "rgba(34,197,94,0.95)";
+      ctx.fillText(text, x, y);
+      if(y > H && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ===== fake download progress + freeze/glitch/welcome ===== */
+(function(){
+  const bar = document.getElementById('bar');
+  const pct = document.getElementById('pct');
+  const glitchOverlay = document.getElementById('glitchOverlay');
+  const glitch = document.getElementById('glitch');
+  const welcome = document.getElementById('welcome');
+  const skipBtn = document.getElementById('skipBtn');
+  const openNow = document.getElementById('openNow');
+  const joinBtn = document.getElementById('joinBtn');
+  const enterBtn = document.getElementById('enterBtn');
+
+  let progress = 0;
+  let running = true;
+
+  function step(){
+    if(!running) return;
+    // progress step random to feel "downloading"
+    progress += (Math.random()*2.8 + 0.6);
+    if(progress>100) progress = 100;
+    bar.style.width = progress + '%';
+    pct.textContent = Math.round(progress) + '%';
+
+    // update terminal lines randomly
+    const tlines = [
+      '[init] handshake with rsl-core... OK',
+      '[proc] loading modules: visuals, events, auth',
+      '[sys] injecting payload: "VIRUS_RSL.EXE"',
+      '[net] connecting to hub.rsl — 192.0.2.2',
+      '[fs] writing /usr/local/share/rsl/flags',
+      '[dbg] launching renderers...',
+      '[ok] modules ready'
+    ];
+    const term = document.getElementById('term');
+    term.querySelectorAll('.line').forEach((el,i)=> el.textContent = tlines[(i + Math.floor(progress/12)) % tlines.length]);
+
+    if(progress < 100){
+      setTimeout(step, 280 + Math.random()*220);
+    } else {
+      // simulate freeze / glitch then show welcome
+      doGlitchAndOpen();
+    }
+  }
+
+  function doGlitchAndOpen(){
+    // flash + glitch
+    glitchOverlay.style.transition = 'opacity .12s';
+    glitchOverlay.style.opacity = 0.65;
+    glitch.style.opacity = 1;
+    // strong shake effect on card
+    const card = document.getElementById('card');
+    card.animate([
+      { transform: 'translateX(0) rotate(0)' },
+      { transform: 'translateX(-8px) rotate(-0.8deg)' },
+      { transform: 'translateX(10px) rotate(0.8deg)' },
+      { transform: 'translateX(-6px) rotate(-0.6deg)' },
+      { transform: 'translateX(0) rotate(0)' }
+    ], { duration: 650, iterations: 1, easing: 'ease-in-out' });
+
+    // flicker text: reduce opacity then show welcome
+    setTimeout(()=>{
+      glitchOverlay.style.opacity = 0;
+      glitch.style.opacity = 0;
+      // show welcome
+      welcome.classList.add('open');
+      // hide splash card after welcome opens
+      setTimeout(()=>{ document.querySelector('.splash').style.display='none'; }, 400);
+    }, 900);
+  }
+
+  // start download after small delay
+  setTimeout(step, 700);
+
+  // skip controls
+  skipBtn.addEventListener('click', ()=>{ running=false; bar.style.width='100%'; pct.textContent='100%'; doGlitchAndOpen(); });
+  openNow.addEventListener('click', ()=>{ window.location.href = 'membres.html'; });
+  joinBtn.addEventListener('click', ()=>{ window.location.href = 'membres.html'; });
+  enterBtn.addEventListener('click', ()=>{ window.location.href = 'ou_rider.html'; });
+
+  // prevent accidental selection
+  document.addEventListener('selectstart', e=>e.preventDefault());
+})();
+</script>
+</body>
+</html>

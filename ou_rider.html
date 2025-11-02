@@ -9,438 +9,272 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- ===== Desktop (inchangé) ===== -->
-  <style>
-    .hero.hero-photo{position:relative;color:#fff;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08)}
-    .hero.hero-photo::before{content:"";position:absolute;inset:0;background:
-      linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.75)),url("images/lanoubc4.jpg") center/cover no-repeat;z-index:0}
-    .hero.hero-photo .container{position:relative;z-index:1}
-
-    #map{height:68vh;min-height:420px;border-radius:14px;border:1px solid #e6e9ee}
-    .map-wrap{display:grid;grid-template-columns:260px 1fr;gap:16px}
-    @media (max-width:900px){.map-wrap{grid-template-columns:1fr}}
-    .filters{border:1px solid #e6e9ee;border-radius:14px;padding:14px;height:68vh;min-height:420px;overflow:auto;background:#fff}
-    .filters h3{margin:0 0 8px}
-    .legend{display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:center;margin:10px 0}
-    .dot{width:14px;height:14px;border-radius:50%}
-    .dot.green{background:#16a34a}.dot.blue{background:#0ea5e9}.dot.red{background:#ef4444}.dot.violet{background:#7c3aed}
-    .filters label{display:flex;gap:8px;align-items:center;margin:8px 0;font-weight:600}
-    .filters small{color:#4b5563}
-
-    .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}
-    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
-    .foot .links-3cols ul{list-style:none;margin:0;padding:0}
-    .foot .links-3cols li{margin:6px 0}
-    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
-    .foot .links-3cols a:hover{text-decoration:underline}
-    .foot .bottom.bottom-right{border-top:1px solid rgba(255,255,255,0.08);margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center}
-    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
-    .foot .bottom.bottom-right a:hover{text-decoration:underline}
-    @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
-    @media (max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}
-  </style>
-
-  <!-- Fonts + CSS globaux -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/common.css"/>
-  <link rel="stylesheet" href="css/fonts.css"/>
 
-  <!-- ===== Mobile only : hero plus petit + carte encore plus haute + centrage densité ===== -->
   <style>
-    @media (max-width:900px){
-      /* Hero plus petit : carte bien visible dès l’arrivée */
-      .hero.hero-photo{min-height:40vh}
-      @supports (height:100dvh){ .hero.hero-photo{min-height:40dvh} }
-      .hero.hero-photo .hero-inner{
-        min-height:inherit;display:flex;align-items:flex-start;
-        padding:max(6px, calc(env(safe-area-inset-top) + 6px)) 14px 6px;
-      }
-      .hero h1{font-size:27px;margin:0 0 2px;text-shadow:0 2px 10px rgba(0,0,0,.55)}
-      .hero p{font-size:15px;margin:0 0 6px;text-shadow:0 2px 8px rgba(0,0,0,.45)}
-      .hero .panel{
-        background:rgba(14,14,16,.58)!important;border:1px solid rgba(255,255,255,.12)!important;
-        border-radius:14px!important;padding:8px 10px!important;backdrop-filter:saturate(110%) blur(4px)
-      }
+    :root{ --g:#16a34a; --b:#0ea5e9; --r:#ef4444; --v:#7c3aed; }
 
-      /* Carte quasi plein écran */
-      main.container{padding:4px 0 22px !important}
-      .map-frame{
-        margin:-4px auto 0;
-        width:calc(100% - max(14px,env(safe-area-inset-left)) - max(14px,env(safe-area-inset-right)));
-        border-radius:18px;border:1px solid rgba(255,255,255,.22);
-        box-shadow:0 18px 40px rgba(0,0,0,.35);overflow:hidden;background:#0e0e10;
-      }
-      /* -> calc : 100vh - hero(40vh) - petits paddings ≈ 58vh mini */
-      #map{height:calc(100vh - 42vh);min-height:58vh;border:none;border-radius:0;background:#0e0e10}
+    html,body{height:100%;margin:0}
+    body{font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#000;display:flex;flex-direction:column}
+    main{flex:1}
 
-      /* Sidebar -> sheet mobile */
-      .map-wrap{grid-template-columns:1fr}
-      .filters{display:none}
+    /* ===== Vidéo de fond ===== */
+    .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .rsl-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;z-index:0}
+    .rsl-bg-dim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75))}
 
-      /* Contrôles Leaflet */
-      .leaflet-bottom.leaflet-left .leaflet-control{margin:0 0 10px 10px}
-      .leaflet-control-zoom a{
-        width:42px;height:42px;line-height:42px;font-size:22px;
-        border-radius:12px;border:1px solid rgba(255,255,255,.25);
-        background:rgba(0,0,0,.55);color:#fff;
-      }
-      .leaflet-control-zoom{box-shadow:none;border:none}
+    /* ===== NAV ===== */
+    nav.nav{position:sticky;top:0;z-index:1000;background:rgba(0,0,0,.65);backdrop-filter:blur(8px)}
+    nav.nav .container{max-width:1320px;margin:0 auto;padding:12px 28px}
+    nav.nav .row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+    .brand img{height:48px;border-radius:10px}
+    .brand span{font-weight:800;letter-spacing:.2px;font-size:17px}
+    nav.nav ul{display:flex;align-items:center;gap:26px}
+    nav.nav ul li a{font-weight:600;color:#e8f0ea;font-size:17px;letter-spacing:.2px;white-space:nowrap}
+    nav.nav ul li a:hover{color:#22c55e}
+    .cta{display:flex;align-items:center;gap:12px}
+    #menuBtn{display:none;align-items:center;justify-content:center;gap:8px;padding:10px 12px;font-size:18px;line-height:1;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(34,197,94,.12);color:#22c55e;cursor:pointer}
+    #menuBtn:hover{background:rgba(34,197,94,.22)}
+    @media (max-width:990px){nav.nav ul{display:none !important}.cta a{display:none !important}#menuBtn{display:inline-flex}}
 
-      /* FABs filtres + position + home */
-      #filtersFab, #locateFab, #homeFab{
-        position:fixed;z-index:101;background:rgba(0,0,0,.65);color:#fff;border:1px solid rgba(255,255,255,.18);
-        border-radius:14px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:saturate(110%) blur(4px);font-weight:700
-      }
-      #filtersFab{right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}
-      #locateFab{left:max(12px,env(safe-area-inset-left));bottom:max(14px,env(safe-area-inset-bottom))}
-      #homeFab{left:max(12px,env(safe-area-inset-left));bottom:max(62px,env(safe-area-inset-bottom))}
+    /* ===== Bandeau titre ===== */
+    .page-mini-hero{color:#fff;padding:18px 0 8px;position:relative;z-index:10}
+    .page-mini-hero .container{max-width:1200px;margin:0 auto;padding:0 24px}
+    .page-mini-hero h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);font-weight:800}
+    .page-mini-hero p{margin:0;opacity:.95}
 
-      /* Sheet filtres */
-      #filtersDim{
-        position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
-        z-index:99;opacity:0;pointer-events:none;transition:opacity .18s ease
-      }
-      #filtersSheet{
-        position:fixed;right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));
-        width:min(88vw,360px);max-height:calc(100vh - 20px);
-        background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:16px;
-        padding:10px;overflow:auto;z-index:100;
-        transform:translateX(12px) translateY(-8px) scale(.98);opacity:0;pointer-events:none;
-        transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;box-shadow:0 20px 60px rgba(0,0,0,.5)
-      }
-      #filtersSheet .filters{display:block;background:transparent;border:none;color:#fff}
-      #filtersSheet .filters h3{color:#fff}
-      #filtersSheet .legend span:last-child{color:#e5e7eb}
-      #filtersSheet label{color:#e5e7eb}
-      .rsl-filters-open #filtersDim{opacity:1;pointer-events:auto}
-      .rsl-filters-open #filtersSheet{opacity:1;pointer-events:auto;transform:none}
-
-      /* Bottom sheet spot */
-      #spotSheet{
-        position:fixed;left:10px;right:10px;bottom:10px;z-index:102;
-        background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.18);border-radius:16px;
-        padding:12px 14px;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);
-        transform:translateY(12px);opacity:0;pointer-events:none;
-        transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;backdrop-filter:saturate(110%) blur(4px)
-      }
-      #spotSheet.show{transform:none;opacity:1;pointer-events:auto}
-      #spotSheet h4{margin:0 0 6px;font-size:18px}
-      #spotSheet p{margin:0 0 6px;color:#e5e7eb}
-      #spotSheet .actions{display:flex;gap:8px;flex-wrap:wrap}
-      #spotSheet .btn{display:inline-block;padding:8px 12px;border-radius:12px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700}
-
-      /* Burger mobile (identique aux autres pages) */
-      .nav ul,.nav .cta{display:none}
-      .nav .brand span{display:none}
-      #rslMobileBurger{
-        position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));
-        z-index:110;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.15);
-        background:rgba(0,0,0,.55);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.35)
-      }
-      #rslMobileDim{
-        position:fixed;inset:0;z-index:108;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
-        opacity:0;pointer-events:none;transition:opacity .18s ease
-      }
-      #rslMobileSheet{
-        position:fixed;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));
-        z-index:109;width:min(86vw,340px);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);
-        border-radius:16px;padding:10px;transform:translateX(12px) translateY(-8px) scale(.98);
-        opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;box-shadow:0 20px 60px rgba(0,0,0,.5)
-      }
-      #rslMobileSheet ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-      #rslMobileSheet a{display:block;padding:12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#cdd6ff;text-decoration:none}
-      .rsl-menu-open #rslMobileDim{opacity:1;pointer-events:auto}
-      .rsl-menu-open #rslMobileSheet{opacity:1;pointer-events:auto;transform:none}
+    /* ===== Carte ===== */
+    main .container{max-width:1200px;margin:0 auto;padding:0 24px 90px;position:relative;z-index:10}
+    .map-wrap{position:relative}
+    #map{
+      height:73vh;
+      min-height:480px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#0b1220;
+      z-index:2;
     }
+    @media (max-width:900px){
+      main .container{padding:0 12px 90px}
+      #map{height:calc(100vh - 40vh);min-height:58vh}
+    }
+
+    .leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:2}
+
+    /* ===== Boutons carte ===== */
+    .map-controls{position:absolute;top:12px;right:12px;z-index:3000;display:flex;gap:10px}
+    .btn-tool{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;font-weight:800;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.65);color:#fff;backdrop-filter:saturate(110%) blur(4px);box-shadow:0 10px 30px rgba(0,0,0,.35);cursor:pointer}
+    @media (max-width:900px){.map-controls{display:none}}
+
+    /* ===== Filtres ===== */
+    #filtersDim{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .18s ease;backdrop-filter:blur(2px)}
+    #filtersSheet{position:fixed;top:10px;right:10px;z-index:4001;width:min(88vw,380px);max-height:calc(100vh - 20px);overflow:auto;background:rgba(0,0,0,.78);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:12px;transform:translateY(-8px) scale(.98);opacity:0;pointer-events:none;transition:.2s cubic-bezier(.2,.8,.2,1)}
+    .chip{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:8px 0;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);font-weight:700}
+    .chip input{width:18px;height:18px}
+    .dot{width:14px;height:14px;border-radius:50%;border:2px solid #fff}
+    .dot.g{background:var(--g)} .dot.b{background:var(--b)} .dot.r{background:var(--r)} .dot.v{background:var(--v)}
+    .show-filters #filtersDim{opacity:1;pointer-events:auto}
+    .show-filters #filtersSheet{opacity:1;pointer-events:auto;transform:none}
+
+    /* ===== Outils mobile ===== */
+    .mobile-tools{position:fixed;left:0;right:0;bottom:58px;z-index:3500;display:none;justify-content:center;gap:10px}
+    .mobile-tools .btn-tool{padding:10px 14px}
+    @media (max-width:900px){.mobile-tools{display:flex}}
+
+    /* ===== Footer & Coach ===== */
+    .footer-mini .copy{color:#9aa5b1;text-align:center;border-top:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.2);margin:0;padding:24px 0 28px;font-size:14px;z-index:10;position:relative}
+    .coach-fab{display:none;position:fixed;right:16px;bottom:16px;z-index:80;padding:12px 14px;border-radius:12px;background:linear-gradient(180deg,#22c55e,#16a34a);color:#062312;font-weight:800;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15)}
+    @media (min-width:991px){.coach-fab{display:inline-flex}}
+    
+    /* ===== Menu mobile (panneau) ===== */
+    .mobile-sheet{position:fixed;inset:0;display:none;z-index:3000}
+    .mobile-sheet.open{display:block}
+    .mobile-sheet .mobile-dim{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+    .mobile-sheet .mobile-panel{
+      position:absolute;top:0;right:0;height:100%;width:82vw;max-width:360px;
+      background:#0b1220;padding:22px 18px;display:flex;flex-direction:column;gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);box-shadow:-12px 0 30px rgba(0,0,0,.35)
+    }
+    .mobile-sheet .mobile-panel a{color:#eaf5ee;text-decoration:none;font-weight:700;padding:8px 0}
+    .mobile-sheet .mobile-panel hr{border:0;height:1px;background:rgba(255,255,255,.1);margin:10px 0}
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
+  <!-- ===== Vidéo de fond ===== -->
+  <div class="rsl-bg-wrap" aria-hidden="true">
+    <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto" poster="images/hero-poster.jpg">
+      <source src="images/trottvideo2.mp4" type="video/mp4">
+    </video>
+    <div class="rsl-bg-dim"></div>
+  </div>
+
+  <!-- ===== NAV ===== -->
   <nav class="nav">
-    <div class="container nav-inner">
-      <!-- ✅ lien corrigé vers l’index -->
-      <a class="brand" href="index.html"><img src="images/logo_rsl.png" alt="Logo RSL"><span><b>RSL — Romandie Scooter League</b></span></a>
-      <ul>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="game.html">Games</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="cours.html">Cours</a></li>
-      </ul>
-      <div class="cta">
-        <button class="btn" id="btnIdentity">Se connecter</button>
-        <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
-        <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html"><img src="images/logo_rsl.png" alt="Logo RSL"/><span>RSL — Romandie Scooter League</span></a>
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="cta">
+          <a class="btn dark" href="compte.html">Mon compte</a>
+          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn">☰</button>
+        </div>
       </div>
-      <div class="cta"><a class="btn" id="btnMembre" href="membres.html">Devenir membre</a></div>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <header class="hero hero-photo">
-    <div class="container hero-inner">
-      <div class="grid">
-        <div>
-          <h1>Où rider ?</h1>
-          <p class="muted">Carte des <b>skateparks</b>, <b>shops partenaires</b> et <b>lieux de cours RSL</b>.</p>
-        </div>
-        <div class="panel">
-          <strong>Filtres rapides</strong>
-          <p class="muted">Affiche ce qui t’intéresse (cours int./ext., shops, skateparks).</p>
-        </div>
-      </div>
+  <!-- ===== MENU MOBILE (manquait dans ta version précédente) ===== -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="cours.html">Cours</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <hr/>
+      <a href="membres.html">Devenir membre</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
+  </div>
+
+  <!-- Bandeau -->
+  <section class="page-mini-hero">
+    <div class="container">
+      <h1>Où rider ?</h1>
+      <p>Carte des <b>skateparks</b>, <b>shops partenaires</b> et <b>lieux de cours RSL</b>.</p>
     </div>
-  </header>
+  </section>
 
-  <!-- CARTE + FILTRES -->
-  <main class="container" style="padding:28px 0 40px">
-    <div class="map-wrap" id="mapWrap">
-      <aside class="filters" id="filtersAside" aria-label="Filtres carte">
-        <h3>Filtres</h3>
-        <div class="legend"><span class="dot green"></span><span>Cours RSL — <b>intérieur</b></span></div>
-        <div class="legend"><span class="dot blue"></span><span>Cours RSL — <b>extérieur</b></span></div>
-        <div class="legend"><span class="dot red"></span><span><b>Shops</b> partenaires</span></div>
-        <div class="legend"><span class="dot violet"></span><span><b>Skateparks</b></span></div>
-
-        <label><input type="checkbox" id="f-int" checked> Cours RSL (intérieur)</label>
-        <label><input type="checkbox" id="f-ext" checked> Cours RSL (extérieur)</label>
-        <label><input type="checkbox" id="f-shop" checked> Shops partenaires</label>
-        <label><input type="checkbox" id="f-park" checked> Skateparks</label>
-        <hr style="margin:12px 0">
-        <small>Astuce : clique un pin pour l’adresse et les infos.</small>
-      </aside>
-
-      <div class="map-frame">
-        <div id="map" role="region" aria-label="Carte des spots"></div>
+  <!-- ===== CARTE ===== -->
+  <main>
+    <div class="container">
+      <div class="map-wrap">
+        <div class="map-controls">
+          <button class="btn-tool" id="filtersTrigger">Filtres</button>
+          <button class="btn-tool" id="locateBtnPC">Ma position</button>
+        </div>
+        <div id="map"></div>
       </div>
     </div>
   </main>
 
-  <!-- Bottom sheet spot (mobile) -->
-  <div id="spotSheet" aria-live="polite" aria-atomic="true"></div>
+  <!-- Filtres -->
+  <div id="filtersDim"></div>
+  <aside id="filtersSheet" aria-label="Filtres carte">
+    <h3>Filtres</h3>
+    <div class="chip"><span class="dot g"></span><input type="checkbox" id="f-int" checked><label for="f-int">Cours RSL (intérieur)</label></div>
+    <div class="chip"><span class="dot b"></span><input type="checkbox" id="f-ext" checked><label for="f-ext">Cours RSL (extérieur)</label></div>
+    <div class="chip"><span class="dot r"></span><input type="checkbox" id="f-shop" checked><label for="f-shop">Shops partenaires</label></div>
+    <div class="chip"><span class="dot v"></span><input type="checkbox" id="f-park" checked><label for="f-park">Skateparks</label></div>
+  </aside>
 
-  <!-- FOOTER -->
-  <footer class="foot">
-    <div class="container">
-      <div class="links links-3cols">
-        <div class="col"><h4>RSL</h4><ul><li><a href="formation.html">Formation</a></li><li><a href="evenements.html">Événements</a></li><li><a href="reglement.html">Règlement</a></li></ul></div>
-        <div class="col"><h4>Ressources</h4><ul><li><a href="membres.html">Adhésion</a></li><li><a href="comite.html">Comité</a></li><li><a href="ou_rider.html">Où rider</a></li></ul></div>
-        <div class="col"><h4>Contest</h4><ul><li><a href="evenements.html">Événements</a></li><li><a href="inscriptions.html">Inscriptions</a></li><li><a href="resultats.html">Résultats</a></li></ul></div>
-      </div>
-      <div class="bottom bottom-right">
-        <p class="tiny">© 2025 — Romandie Scooter League</p>
-        <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- JS Carte + UX mobile -->
-  <script>
-  (function(){
-    /* ===== Map ===== */
-    const map = L.map('map').setView([46.8, 8.2], 8);
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(map);
-    osm.on('tileerror', () => { L.tileLayer('https://tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap (FR)'}).addTo(map); });
-
-    function pin(color, emoji){
-      return L.divIcon({
-        className:'rsl-marker',
-        html:'<div style="width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;background:'+color+';border:2px solid #fff;font-size:18px">'+emoji+'</div>',
-        iconSize:[34,34],iconAnchor:[17,17]
-      });
-    }
-    const ICONS={int:pin('#16a34a','🏫'),ext:pin('#0ea5e9','🛼'),shop:pin('#ef4444','🏪'),park:pin('#7c3aed','🛹')};
-
-    const spots=[
-      {type:'int', name:'Cours RSL — Montreux (indoor)',   lat:46.433, lng:6.910, city:'Montreux', note:'Ouvert hors fériés/vacances', link:'cours.html'},
-      {type:'int', name:'Cours RSL — Lausanne (La Fièvre, indoor)', lat:46.536, lng:6.626, city:'Lausanne', note:'Halle La Fièvre', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Lausanne (Vidy, outdoor)', lat:46.523, lng:6.610, city:'Lausanne', note:'Pause hiver', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Bulle (outdoor)',     lat:46.616, lng:7.057, city:'Bulle', note:'Pause hiver', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Yverdon (outdoor)',   lat:46.778, lng:6.640, city:'Yverdon', note:'Pause hiver', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Martigny (outdoor)',  lat:46.103, lng:7.074, city:'Martigny', note:'Pause hiver', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Fribourg (outdoor)',  lat:46.802, lng:7.151, city:'Fribourg', note:'Pause hiver', link:'cours.html'},
-      {type:'ext', name:'Cours RSL — Genève (Plainpalais, outdoor)', lat:46.198, lng:6.142, city:'Genève', note:'Pause hiver', link:'cours.html'},
-      {type:'shop', name:'Sportmania (shop partenaire)', lat:46.512, lng:6.561, city:'St-Sulpice (VD)', note:'Chemin des Pâquis 7, 1025', url:'https://www.sportmania.ch'},
-      {type:'shop', name:'Adrelyx (shop partenaire)',    lat:46.226, lng:7.353, city:'Sion (VS)', note:'Rue de la Drague 14, 1950', url:'https://www.adrelyx.ch'},
-      {type:'shop', name:'Surf Machine (shop partenaire)', lat:46.617, lng:7.056, city:'Bulle (FR)', note:'Rue de Vevey 18, 1630', url:'https://www.surf-machine.ch'},
-      {type:'shop', name:'JF Rideshop (shop partenaire)', lat:46.433, lng:6.910, city:'Montreux (VD)', note:'Rue de la Paix 3, 1820', url:'https://jfrideshop.ch'},
-      {type:'park', name:'Skatepark de Sion', lat:46.233, lng:7.360, city:'Sion', note:'Street & bowl'},
-      {type:'park', name:'Skatepark de Vevey', lat:46.461, lng:6.844, city:'Vevey', note:'Bowl + street'},
-      {type:'park', name:'Skatepark de Nyon',  lat:46.383, lng:6.231, city:'Nyon', note:'Plaza'}
-    ];
-
-    const layers={int:L.layerGroup().addTo(map),ext:L.layerGroup().addTo(map),shop:L.layerGroup().addTo(map),park:L.layerGroup().addTo(map)};
-    function popupHtml(s){const link=s.url?`<a href="${s.url}" target="_blank" rel="noopener">Site</a>`:(s.link?`<a href="${s.link}">Infos & cours</a>`:'');return `<b>${s.name}</b><br>${s.city||''}${s.city?'<br>':''}${s.note||''}${link?'<br>'+link:''}`;}
-    spots.forEach(s=>{const m=L.marker([s.lat,s.lng],{icon:ICONS[s.type]}).bindPopup(popupHtml(s));m.on('click',()=>showSpot(s));layers[s.type].addLayer(m);});
-
-    /* Filtres */
-    const fInt=document.getElementById('f-int'),fExt=document.getElementById('f-ext'),fShop=document.getElementById('f-shop'),fPark=document.getElementById('f-park');
-    function apply(){(fInt.checked?map.addLayer(layers.int):map.removeLayer(layers.int));(fExt.checked?map.addLayer(layers.ext):map.removeLayer(layers.ext));(fShop.checked?map.addLayer(layers.shop):map.removeLayer(layers.shop));(fPark.checked?map.addLayer(layers.park):map.removeLayer(layers.park));}
-    [fInt,fExt,fShop,fPark].forEach(el=>el.addEventListener('change',apply)); apply();
-
-    /* ===== Centrages : desktop vs mobile ===== */
-    const isMobile = ()=>window.matchMedia('(max-width:900px)').matches;
-
-    // Haversine helpers
-    function toRad(d){return d*Math.PI/180;}
-    function distKm(a,b){
-      const R=6371, dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
-      const s1=Math.sin(dLat/2), s2=Math.sin(dLng/2);
-      const A=s1*s1 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*s2*s2;
-      return 2*R*Math.asin(Math.sqrt(A));
-    }
-    function densestCenter(points, radiusKm=40){
-      if(points.length===0) return null;
-      let bestIdx=0, bestCount=-1;
-      for(let i=0;i<points.length;i++){
-        let c=0;
-        for(let j=0;j<points.length;j++){
-          if(distKm(points[i], points[j])<=radiusKm) c++;
-        }
-        if(c>bestCount){bestCount=c; bestIdx=i;}
-      }
-      return {center:[points[bestIdx].lat, points[bestIdx].lng], count:bestCount};
-    }
-
-    function fitDesktop(){
-      const allLatLng = spots.map(s=>[s.lat,s.lng]);
-      const b = L.latLngBounds(allLatLng);
-      map.fitBounds(b.pad(0.12), {animate:false});
-    }
-
-    function centerMobile(){
-      const dense = densestCenter(spots);
-      if(dense){
-        const z = dense.count >= 5 ? 11 : dense.count >=3 ? 10 : 9;
-        map.setView(dense.center, z, {animate:false});
-      }else{
-        map.setView([46.8,8.2], 8, {animate:false});
-      }
-    }
-
-    function applyResponsiveCenter(){
-      if(isMobile()) centerMobile(); else fitDesktop();
-    }
-    applyResponsiveCenter();
-    window.matchMedia('(max-width:900px)').addEventListener?.('change',applyResponsiveCenter);
-
-    /* FABs + sheet filtres (mobile) */
-    const mapWrap=document.getElementById('mapWrap'), filtersAside=document.getElementById('filtersAside'), placeholder=document.createComment('filters-placeholder');
-    let sheet,dim,fab,locFab,homeFab;
-
-    function buildFilterSheet(){
-      if(document.getElementById('filtersFab')) return;
-      fab=document.createElement('button');fab.id='filtersFab';fab.type='button';fab.textContent='Filtres';document.body.appendChild(fab);
-      locFab=document.createElement('button');locFab.id='locateFab';locFab.type='button';locFab.textContent='Ma position';document.body.appendChild(locFab);
-      homeFab=document.createElement('button');homeFab.id='homeFab';homeFab.type='button';homeFab.textContent='Romandie';document.body.appendChild(homeFab);
-      dim=document.createElement('div');dim.id='filtersDim';sheet=document.createElement('aside');sheet.id='filtersSheet';document.body.append(dim,sheet);
-      mapWrap.insertBefore(placeholder,filtersAside); sheet.appendChild(filtersAside);
-      const open=()=>{document.body.classList.add('rsl-filters-open');document.body.style.overflow='hidden';};
-      const close=()=>{document.body.classList.remove('rsl-filters-open');document.body.style.overflow='';};
-      fab.onclick=()=>document.body.classList.contains('rsl-filters-open')?close():open(); dim.onclick=close;
-      locFab.onclick=()=>{ if(!navigator.geolocation){alert('Géolocalisation indisponible.');return;}
-        navigator.geolocation.getCurrentPosition(p=>{
-          const {latitude,longitude}=p.coords;
-          L.circleMarker([latitude,longitude],{radius:6,color:'#38bdf8',fillColor:'#38bdf8',fillOpacity:.9,weight:2}).addTo(map);
-          map.setView([latitude,longitude],14,{animate:true});
-        },()=>alert("Impossible d'obtenir ta position."));
-      };
-      homeFab.onclick=()=>applyResponsiveCenter();
-      window.matchMedia('(max-width:900px)').addEventListener?.('change',e=>{if(!e.matches) close();});
-    }
-    function destroyFilterSheet(){
-      if(!document.getElementById('filtersFab')) return;
-      if(placeholder.parentNode){mapWrap.replaceChild(filtersAside,placeholder);}
-      ['filtersFab','filtersDim','filtersSheet','locateFab','homeFab'].forEach(id=>document.getElementById(id)?.remove());
-      document.body.classList.remove('rsl-filters-open');document.body.style.overflow='';
-    }
-    function initFiltersResponsive(){
-      isMobile()?buildFilterSheet():destroyFilterSheet();
-    }
-    initFiltersResponsive(); window.addEventListener('resize',initFiltersResponsive);
-
-    /* Bottom sheet spot */
-    const spotSheet=document.getElementById('spotSheet');
-    function showSpot(s){
-      if(!isMobile()) return; // desktop: popup Leaflet standard
-      const link=s.url?`<a class="btn" href="${s.url}" target="_blank" rel="noopener">Site</a>`:(s.link?`<a class="btn" href="${s.link}">Infos & cours</a>`:'');
-      spotSheet.innerHTML=`<h4>${s.name}</h4><p>${s.city? s.city+'<br>':''}${s.note||''}</p><div class="actions">${link||''}</div>`;
-      spotSheet.classList.add('show');
-      setTimeout(()=>{const hide=()=>spotSheet.classList.remove('show'); document.addEventListener('scroll',hide,{once:true,passive:true}); map.once('click',hide);},0);
-    }
-  })();
-  </script>
-
-  <!-- Burger mobile (identique aux autres pages) -->
-  <script>
-  (function(){
-    const isMobile=()=>window.matchMedia('(max-width: 900px)').matches;
-    function buildMenu(){
-      if(document.getElementById('rslMobileBurger')) return;
-      const nav=document.querySelector('.nav'), list=nav?.querySelector('ul'); if(!list) return;
-      const b=document.createElement('button'); b.id='rslMobileBurger'; b.textContent='☰'; b.type='button'; b.setAttribute('aria-label','Ouvrir le menu');
-      const dim=document.createElement('div'); dim.id='rslMobileDim';
-      const sheet=document.createElement('aside'); sheet.id='rslMobileSheet'; sheet.appendChild(list.cloneNode(true));
-      document.body.append(b,dim,sheet);
-      const open=()=>{document.body.classList.add('rsl-menu-open');document.body.style.overflow='hidden';};
-      const close=()=>{document.body.classList.remove('rsl-menu-open');document.body.style.overflow='';};
-      b.onclick=()=>document.body.classList.contains('rsl-menu-open')?close():open(); dim.onclick=close; sheet.querySelectorAll('a').forEach(a=>a.onclick=close);
-      window.matchMedia('(max-width: 900px)').addEventListener?.('change',e=>{ if(!e.matches) close(); });
-    }
-    function destroy(){['rslMobileBurger','rslMobileDim','rslMobileSheet'].forEach(id=>document.getElementById(id)?.remove());document.body.classList.remove('rsl-menu-open');document.body.style.overflow='';}
-    function init(){isMobile()?buildMenu():destroy();}
-    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);} else {init();}
-    window.addEventListener('resize',init);
-  })();
-  </script>
-
-  <!-- Identité (inchangé) -->
-  <script>
-  (function(){
-    function init(){
-      var idBtn=document.getElementById('btnIdentity');
-      var btnLogout=document.getElementById('btnLogout');
-      var btnAccount=document.getElementById('btnAccount');
-      function refresh(user){var logged=!!user;
-        if(idBtn) idBtn.style.display=logged?'none':'';
-        if(btnLogout) btnLogout.style.display=logged?'':'none';
-        if(btnAccount) btnAccount.style.display=logged?'':'none';
-      }
-      if(window.netlifyIdentity){
-        window.netlifyIdentity.on('init',function(user){refresh(user);});
-        window.netlifyIdentity.on('login',function(user){refresh(user);window.netlifyIdentity.close();});
-        window.netlifyIdentity.on('logout',function(){refresh(null);});
-        window.netlifyIdentity.init();
-      }
-      if(idBtn) idBtn.addEventListener('click',function(){if(window.netlifyIdentity) window.netlifyIdentity.open();});
-      if(btnLogout) btnLogout.addEventListener('click',function(){if(window.netlifyIdentity) window.netlifyIdentity.logout();});
-      if(btnAccount) btnAccount.addEventListener('click',function(e){e.preventDefault();if(window.netlifyIdentity) window.netlifyIdentity.open('settings');});
-    }
-    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);} else {init();}
-  })();
-  </script>
-  <script defer src="js/site.js"></script>
-  <script defer src="/.netlify/identity-widget.js"></script>
-  <script defer src="js/auth.js"></script>
-
-  <!-- HelpBot -->
-  <link rel="stylesheet" href="css/helpbot.css">
-  <div id="hb-root">
-    <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
-    <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
-      <div class="hb-head"><div class="title" id="hbTitle">Aide — RSL</div><div class="actions"><button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button><button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button></div></div>
-      <div class="hb-body" id="hbBody"></div>
-      <div class="hb-foot"><input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question…"><button id="hbSend" class="hb-send">Envoyer</button></div>
-    </div>
+  <!-- Mobile tools -->
+  <div class="mobile-tools">
+    <button class="btn-tool" id="filtersFab">Filtres</button>
+    <button class="btn-tool" id="locateFab">Ma position</button>
   </div>
-  <script defer src="js/helpbot.js"></script>
 
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer-mini"><p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p></footer>
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+
+  <script>
+  // ===== Vidéo =====
+  window.addEventListener('DOMContentLoaded', () => {
+    const v=document.getElementById('rslBg');
+    if(!v) return;
+    const start=()=>{ try{ v.playbackRate=0.6; const p=v.play(); if(p?.catch) p.catch(()=>{});}catch(e){} };
+    start();
+    document.addEventListener('visibilitychange',()=>{ if(document.hidden) v.pause(); else start(); });
+  });
+
+  // ===== Carte Leaflet =====
+  let map;
+  try{
+    map=L.map('map').setView([46.8,8.2],8);
+    const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    osm.on('tileerror',()=>{ L.tileLayer('https://tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap (FR)'}).addTo(map); });
+  }catch(err){
+    console.error('Erreur init Leaflet:', err);
+  }
+
+  const icon=(c,e)=>L.divIcon({className:'rsl-marker',html:`<div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${c};border:2px solid #fff;color:#fff;font-size:18px">${e}</div>`,iconSize:[34,34],iconAnchor:[17,17]});
+  const icons={int:icon('#16a34a','🏫'),ext:icon('#0ea5e9','🛼'),shop:icon('#ef4444','🏪'),park:icon('#7c3aed','🛹')};
+  const spots=[
+    {t:'int',n:'Cours RSL — Montreux (indoor)',lat:46.433,lng:6.910},
+    {t:'int',n:'Cours RSL — Lausanne (La Fièvre)',lat:46.536,lng:6.626},
+    {t:'ext',n:'Cours RSL — Vidy (outdoor)',lat:46.523,lng:6.610},
+    {t:'ext',n:'Cours RSL — Bulle',lat:46.616,lng:7.057},
+    {t:'ext',n:'Cours RSL — Yverdon',lat:46.778,lng:6.640},
+    {t:'shop',n:'JF Rideshop',lat:46.433,lng:6.910},
+    {t:'shop',n:'Sportmania',lat:46.512,lng:6.561},
+    {t:'park',n:'Skatepark de Sion',lat:46.233,lng:7.360},
+    {t:'park',n:'Skatepark de Vevey',lat:46.461,lng:6.844}
+  ];
+  const layers={int:L.layerGroup().addTo(map),ext:L.layerGroup().addTo(map),shop:L.layerGroup().addTo(map),park:L.layerGroup().addTo(map)};
+  spots.forEach(s=>L.marker([s.lat,s.lng],{icon:icons[s.t]}).bindPopup(`<b>${s.n}</b>`).addTo(layers[s.t]));
+  const chks={int:document.getElementById('f-int'),ext:document.getElementById('f-ext'),shop:document.getElementById('f-shop'),park:document.getElementById('f-park')};
+  const apply=()=>{for(const k in layers){chks[k].checked?map.addLayer(layers[k]):map.removeLayer(layers[k]);}};Object.values(chks).forEach(c=>c.addEventListener('change',apply));apply();
+
+  // ===== Filtres & position =====
+  const body=document.body,dim=document.getElementById('filtersDim');
+  const close=()=>body.classList.remove('show-filters');
+  document.getElementById('filtersFab').onclick=()=>body.classList.toggle('show-filters');
+  document.getElementById('filtersTrigger').onclick=()=>body.classList.toggle('show-filters');
+  dim.onclick=close;
+  const locate=()=>{if(!navigator.geolocation)return alert('Géolocalisation indisponible.');
+    navigator.geolocation.getCurrentPosition(p=>{const {latitude,longitude}=p.coords;
+      L.circleMarker([latitude,longitude],{radius:6,color:'#38bdf8',fillColor:'#38bdf8',fillOpacity:.9,weight:2}).addTo(map);
+      map.setView([latitude,longitude],14);
+    },()=>alert("Impossible d'obtenir ta position."));
+  };
+  document.getElementById('locateFab').onclick=locate;
+  document.getElementById('locateBtnPC').onclick=locate;
+
+  // ===== Contour de la Suisse (vert RSL) =====
+  fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+    .then(res => res.json())
+    .then(data => {
+      const suisse = data.features.find(f => f.properties.ADMIN === 'Switzerland');
+      if (!suisse) return;
+      L.geoJSON(suisse, {
+        style: {
+          color: '#22c55e',
+          weight: 3.5,
+          opacity: 0.95,
+          fillColor: '#22c55e',
+          fillOpacity: 7.20
+        }
+      }).addTo(map);
+    })
+    .catch(err => console.error('Erreur contour Suisse:', err));
+
+  // ===== Menu burger =====
+  const menuBtn=document.getElementById('menuBtn');
+  const mobile=document.getElementById('mobileMenu');
+  menuBtn?.addEventListener('click',e=>{e.stopPropagation();mobile.classList.add('open');mobile.setAttribute('aria-hidden','false');});
+  mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{mobile.classList.remove('open');mobile.setAttribute('aria-hidden','true');});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){mobile.classList.remove('open');mobile.setAttribute('aria-hidden','true');}});
+  </script>
 </body>
 </html>

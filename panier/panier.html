@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Panier — RSL</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family:"Outfit",sans-serif;
+      background:#060a0d;
+      color:#fff;
+      margin:0;
+    }
+
+    .wrap {
+      max-width:1200px;
+      margin:0 auto;
+      padding:30px 20px 120px;
+      display:grid;
+      grid-template-columns:1fr 420px;
+      gap:20px;
+    }
+    @media(max-width:990px){ .wrap{grid-template-columns:1fr;} }
+
+    h1 {
+      font-size:32px;
+      font-weight:800;
+      margin:0 0 8px;
+    }
+    p.sub { color:#9ca3af; margin:0 0 24px; }
+
+    /* bloc récap */
+    .chosen-list {
+      background:rgba(0,0,0,.4);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      box-shadow:0 20px 40px rgba(0,0,0,.6);
+      padding:20px;
+    }
+    .chosen-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .chosen-header h2 {
+      font-size:18px;
+      font-weight:700;
+      margin:0;
+    }
+    .chosen-header small {
+      color:#9ca3af;
+      font-size:13px;
+      font-weight:500;
+    }
+    details summary {
+      cursor:pointer;
+      padding:10px 0;
+      font-weight:700;
+      color:#22c55e;
+    }
+    details summary:hover { opacity:.8; }
+
+    .session-card {
+      background:rgba(9,13,23,.78);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      color:#e7f2eb;
+      box-shadow:0 8px 24px rgba(0,0,0,.5);
+      padding:14px;
+      margin-bottom:12px;
+      font-size:14px;
+      display:flex;
+      justify-content:space-between;
+    }
+
+    /* bloc formulaire */
+    .side-box {
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      box-shadow:0 20px 40px rgba(0,0,0,.6),0 0 40px rgba(34,197,94,.08);
+      padding:22px;
+    }
+    .side-box h2 {
+      font-size:20px;
+      font-weight:700;
+      margin:0 0 6px;
+    }
+    .side-box p.small { color:#9ca3af; font-size:14px; margin:0 0 16px; }
+
+    .form-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media(max-width:600px){ .form-grid{grid-template-columns:1fr;} }
+
+    label { font-size:13px; font-weight:600; color:#fff; }
+    input {
+      background-color:rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.25);
+      border-radius:10px;
+      padding:10px 12px;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      outline:none;
+    }
+    input:focus {
+      border-color:#22c55e;
+      box-shadow:0 0 0 3px rgba(34,197,94,0.25);
+    }
+
+    /* cases légales */
+    .legal {
+      margin-top:16px;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .legal label {
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      margin-bottom:8px;
+      cursor:pointer;
+    }
+    .legal input[type="checkbox"] {
+      accent-color:#22c55e;
+      margin-top:3px;
+      flex-shrink:0;
+    }
+    .legal a {
+      color:#22c55e;
+      text-decoration:underline;
+      font-weight:600;
+    }
+
+    .price-line {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-top:1px solid rgba(255,255,255,.15);
+      padding-top:14px;
+      margin-top:20px;
+      font-weight:600;
+    }
+    .price-big {
+      color:#22c55e;
+      font-weight:800;
+      font-size:20px;
+      text-shadow:0 0 8px rgba(34,197,94,.3);
+    }
+
+    .confirm-btn {
+      width:100%;
+      margin-top:20px;
+      background:#22c55e;
+      color:#062312;
+      font-weight:800;
+      font-size:16px;
+      border:0;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      box-shadow:0 12px 28px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .confirm-btn[disabled] {
+      opacity:.4;
+      cursor:not-allowed;
+    }
+    .confirm-btn:hover:not([disabled]) {
+      filter:brightness(1.05);
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="wrap">
+    <!-- Colonne gauche -->
+    <section>
+      <h1>Récapitulatif de tes cours</h1>
+      <p class="sub">Vérifie les dates et lieux. Tu peux retirer un cours avant la validation.</p>
+
+      <div class="chosen-list">
+        <div class="chosen-header">
+          <h2>Mes cours sélectionnés</h2>
+          <small id="chosenCount">0 cours sélectionné(s)</small>
+        </div>
+
+        <details open>
+          <summary>Voir / masquer la liste</summary>
+          <div id="chosenSessions"></div>
+        </details>
+
+        <div class="price-line">
+          <span>Total (estimation)</span>
+          <span class="price-big" id="totalEst">CHF 0.–</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Colonne droite -->
+    <aside class="side-box">
+      <h2>Infos du rider</h2>
+      <p class="small">Dis-nous qui vient rouler. On t’enverra la confirmation par message.</p>
+
+      <div class="form-grid">
+        <div><label>Prénom</label><input id="riderFirst"></div>
+        <div><label>Nom</label><input id="riderLast"></div>
+      </div>
+
+      <div class="form-grid">
+        <div><label>Téléphone (parent)</label><input id="parentPhone" placeholder="+41 ..."></div>
+        <div><label>Email</label><input id="parentEmail" placeholder="mail@example.ch"></div>
+      </div>
+
+      <label>Remarque médicale / allergie (optionnel)</label>
+      <input id="noteMed" placeholder="Rien de spécial">
+
+      <div class="legal">
+        <label><input type="checkbox" id="repLegal"> J’atteste être le représentant légal et j’autorise la participation.</label>
+        <label><input type="checkbox" id="discharge"> J’accepte la décharge RSL (hors faute grave) et l’intervention en cas d’urgence médicale.</label>
+        <label><input type="checkbox" id="photoOk"> J’autorise l’utilisation de photos / vidéos (optionnel).</label>
+        <p>En validant, j’accepte le <a href="../reglement.html" target="_blank">règlement / conditions de participation</a>.</p>
+      </div>
+
+      <div class="price-line">
+        <span>Total</span>
+        <span class="price-big" id="totalRight">CHF 0.–</span>
+      </div>
+
+      <button class="confirm-btn" id="confirmBtn" disabled>Envoyer la demande d'inscription</button>
+    </aside>
+  </main>
+
+  <script>
+    const chosenSessions=document.getElementById("chosenSessions");
+    const chosenCount=document.getElementById("chosenCount");
+    const totalEst=document.getElementById("totalEst");
+    const totalRight=document.getElementById("totalRight");
+    const confirmBtn=document.getElementById("confirmBtn");
+
+    const reqs=[riderFirst,riderLast,parentPhone,repLegal,discharge];
+
+    function panier(){return JSON.parse(localStorage.getItem("rsl_panier_courses")||"[]");}
+
+    function render(){
+      const data=panier();
+      chosenCount.textContent=data.length+" cours sélectionné(s)";
+      if(!data.length){
+        chosenSessions.innerHTML="<p>Aucun cours sélectionné.</p>";
+        totalEst.textContent=totalRight.textContent="CHF 0.–";
+        confirmBtn.disabled=true;
+        return;
+      }
+      const total=data.length*30;
+      totalEst.textContent=totalRight.textContent="CHF "+total+".–";
+      chosenSessions.innerHTML=data.map(c=>{
+        return `<div class="session-card">
+          <div><div><b>${c.location||'Lieu inconnu'}</b></div>
+          <div>${c.date||''}</div></div>
+          <button onclick="remove(${c.id})">Retirer</button>
+        </div>`;
+      }).join("");
+      checkValid();
+    }
+
+    function remove(id){
+      let d=panier().filter(x=>x.id!==id);
+      localStorage.setItem("rsl_panier_courses",JSON.stringify(d));
+      render();
+    }
+
+    function checkValid(){
+      const filled=riderFirst.value.trim()&&riderLast.value.trim()&&parentPhone.value.trim();
+      const ok=filled&&repLegal.checked&&discharge.checked&&panier().length>0;
+      confirmBtn.disabled=!ok;
+    }
+
+    reqs.forEach(e=>{
+      e.addEventListener("input",checkValid);
+      e.addEventListener("change",checkValid);
+    });
+
+    confirmBtn.addEventListener("click",()=>{
+      alert("Demande envoyée ✅");
+      localStorage.removeItem("rsl_panier_courses");
+      window.location.href="../compte.html";
+    });
+
+    render();
+  </script>
+</body>
+</html>

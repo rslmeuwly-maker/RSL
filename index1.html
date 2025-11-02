@@ -1,551 +1,295 @@
 <!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Accueil — Romandie Scooter League</title>
 
-<html lang="fr">  
-<head>  
-  <meta charset="utf-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />  
-  <title>RSL — Romandie Scooter League (Trottinette Freestyle)</title>    <!-- === STYLES === -->    <style>  
-    html,body{height:100%}  
-  
-    /* HERO */  
-    .hero.hero-photo{position:relative;color:#fff;overflow:hidden}  
-    .hero.hero-photo::before{  
-      content:"";position:absolute;inset:0;z-index:0;  
-      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),url("images/lanoubc_noir.jpg") center/cover no-repeat  
-    }  
-    .hero.hero-photo .hero-inner{position:relative;z-index:1}  
-  
-    /* FOOTER */  
-    .foot .links-3cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start}  
-    .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}  
-    .foot .links-3cols ul{list-style:none;margin:0;padding:0}  
-    .foot .links-3cols li{margin:6px 0}  
-    .foot .links-3cols a{color:#cdd6ff;text-decoration:none}  
-    .foot .links-3cols a:hover{text-decoration:underline}  
-    .foot .bottom.bottom-right{border-top:1px solid rgba(255,255,255,.08);margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;align-items:center;gap:14px}  
-    .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}  
-    .foot .bottom.bottom-right a:hover{text-decoration:underline}  
-    @media(max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}  
-    @media(max-width:600px){.foot .links-3cols{grid-template-columns:1fr}.foot .bottom.bottom-right{justify-content:space-between}}  
-  
-    /* ====== GATE / ACCÈS ====== */  
-    .rsl-gate{  
-      position:fixed;inset:0;z-index:9999;display:none;color:#fff;  
-      background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,.85)),url("images/lanoubc_noir.jpg") center/cover no-repeat;  
-      overflow-y:auto; -webkit-overflow-scrolling:touch;  
-      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));  
-    }  
-    .rsl-gate .gate-inner{  
-      max-width:960px; margin:0 auto;  
-      min-height:100vh;  
-    }  
-    @supports (height: 100dvh){ .rsl-gate .gate-inner{ min-height:100dvh; } }  
-    .rsl-gate .banner{  
-      background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.15);  
-      border-radius:14px;padding:14px 18px;margin-bottom:16px;text-align:center  
-    }  
-    .rsl-gate .grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}  
-    @media(max-width:820px){.rsl-gate .grid{grid-template-columns:1fr}}  
-  
-    .rsl-card{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px}  
-    .rsl-card h3{margin:0 0 8px}  
-    .rsl-card label{display:block;font-size:14px;margin:8px 0 6px}  
-    .rsl-input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff}  
-    .rsl-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}  
-    .btn{cursor:pointer;border:none;padding:10px 14px;border-radius:10px;background:#2563eb;color:#fff;font-weight:600}  
-    .btn.dark{background:#0f172a}  
-    .btn.red{background:#dc2626}  
-    .muted{opacity:.85}  
-    .tiny{font-size:12px;opacity:.8}  
-  
-    /* Signature */  
-    .sig-wrap{border:1px dashed rgba(255,255,255,.35);border-radius:12px;overflow:hidden;background:#0b0b0b}  
-    #rslSignature{display:block;width:100%;height:160px;touch-action:none;cursor:crosshair}  
-  
-    /* Logo sous mot de passe (fond blanc, responsive) */  
-    .rsl-logo-box{margin-top:14px;text-align:right}  
-    .rsl-logo-box img{max-width:140px;width:50%;background:#fff;border-radius:12px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.25)}  
-    @media(max-width:720px){.rsl-logo-box{text-align:center}.rsl-logo-box img{width:60%;max-width:180px}}  
-  
-    /* Cases à cocher */  
-    .rsl-check{display:flex;gap:10px;align-items:flex-start;margin-top:10px}  
-    .rsl-check input[type="checkbox"]{width:22px;height:22px;flex:0 0 22px;margin-top:2px}  
-    .rsl-check label{flex:1;line-height:1.3}  
-    .error{color:#ffb4b4;margin-top:6px;display:none}  
-  
-    /* ====== MOBILE ONLY ====== */  
-    @media (max-width: 900px){  
-      /* HERO plein écran bord à bord */  
-      .hero.hero-photo{min-height:100vh}  
-      @supports (height: 100dvh){ .hero.hero-photo{min-height:100dvh} }  
-      .hero.hero-photo .container{max-width:none;padding-left:0;padding-right:0}  
-      .hero.hero-photo .hero-inner{  
-        min-height:inherit;  
-        display:flex;align-items:center;  
-        padding:0 20px;  
-      }  
-      .hero.hero-photo::before{  
-        left:0;right:0;top:0;bottom:0;  
-        background-size:cover;background-position:center;  
-      }  
-      /* Grilles → 1 colonne pour lisibilité */  
-      .hero .grid{display:grid;grid-template-columns:1fr;gap:14px;width:100%}  
-      .cards{display:grid;grid-template-columns:1fr;gap:14px}  
-      .grid-3{display:grid;grid-template-columns:1fr;gap:14px}  
-      .committee{display:grid;grid-template-columns:1fr 1fr;gap:14px}  
-      @media (max-width:640px){ .committee{grid-template-columns:1fr} }  
-  
-      /* Look “rsl-card” façon page mot de passe */  
-      .panel, .card, .committee .member{  
-        background:rgba(0,0,0,.55)!important;  
-        border:1px solid rgba(255,255,255,.12)!important;  
-        border-radius:16px!important;  
-      }  
-  
-      /* Nav desktop masquée; burger injecté en JS */  
-      .nav ul{display:none}  
-      .nav .cta{display:none}  
-  
-      /* Bouton burger + overlay + sheet (crées en JS) */  
-      #rslMobileBurger{  
-        position:fixed; top:max(10px,env(safe-area-inset-top)); right:max(10px,env(safe-area-inset-right));  
-        z-index:100; width:44px; height:44px; display:flex; align-items:center; justify-content:center;  
-        border-radius:12px; border:1px solid rgba(255,255,255,.15);  
-        background:rgba(0,0,0,.55); color:#fff; font-size:22px; backdrop-filter:blur(6px) saturate(120%);  
-      }  
-      #rslMobileDim{  
-        position:fixed; inset:0; z-index:98; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);  
-        opacity:0; pointer-events:none; transition:opacity .18s ease;  
-      }  
-      #rslMobileSheet{  
-        position:fixed; top:max(10px,env(safe-area-inset-top)); right:max(10px,env(safe-area-inset-right));  
-        z-index:99; width:min(86vw,340px);  
-        background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.12);  
-        border-radius:16px; padding:10px;  
-        transform:translateX(12px) translateY(-8px) scale(.98);  
-        opacity:0; pointer-events:none;  
-        transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;  
-        box-shadow:0 20px 60px rgba(0,0,0,.5);  
-      }  
-      #rslMobileSheet ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}  
-      #rslMobileSheet a{  
-        display:block;padding:12px;border-radius:12px;  
-        background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);  
-        color:#cdd6ff;text-decoration:none  
-      }  
-      .rsl-menu-open #rslMobileDim{opacity:1;pointer-events:auto}  
-      .rsl-menu-open #rslMobileSheet{opacity:1;pointer-events:auto;transform:none}  
-    }  
-  </style>    <!-- Fonts + externes -->    <link rel="preconnect" href="https://fonts.googleapis.com">  
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>  
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">  
-  <link rel="stylesheet" href="css/style.css"/>  
-  <link rel="stylesheet" href="css/common.css"/>  
-  <link rel="stylesheet" href="css/fonts.css"/>  
-  <link rel="stylesheet" href="css/helpbot.css"/>  
-</head>  <body>    <!-- NAVBAR -->    <nav class="nav">  
-    <div class="container nav-inner">  
-      <a class="brand" href="index.html">  
-        <img src="images/logo_rsl.png" alt="Logo RSL">  
-        <span><b>RSL — Romandie Scooter League</b></span>  
-      </a>  
-      <ul>  
-        <li><a href="formation.html">Formation RSL</a></li>  
-        <li><a href="disciplines.html">Disciplines</a></li>  
-        <li><a href="ou_rider.html">Où rider ?</a></li>  
-        <li><a href="game.html">Games</a></li>  
-        <li><a href="evenements.html">Événements</a></li>  
-        <li><a href="comite.html">Comité</a></li>  
-        <li><a href="contact.html">Contact</a></li>  
-        <li><a href="cours.html">Cours</a></li>  
-      </ul>  
-      <div class="cta"><a class="btn" id="btnMembre" href="membres.html">Devenir membre</a></div>  
-    </div>  
-  </nav>    <!-- HERO -->    <header class="hero hero-photo">  
-    <div class="container hero-inner">  
-      <div class="grid">  
-        <div>  
-          <h1>Romandie Scooter League</h1>  
-          <p>Association romande dédiée à la <b>trottinette freestyle</b> — Park & Street.</p>  
-          <div class="panel"><div class="chip">Montreux — berceau historique • Saison officielle 2026</div></div>  
-        </div>  
-        <div class="panel">  
-          <strong>Prochain rendez-vous</strong>  
-          <p class="muted">Montreux Scooter Contest — 6 décembre 2025</p>  
-          <a class="btn red" href="evenements.html">Inscriptions</a>  
-        </div>  
-      </div>  
-    </div>  
-  </header>    <!-- DISCIPLINES -->    <section>  
-    <div class="container">  
-      <div class="section-head">  
-        <h2>Disciplines</h2>  
-        <span class="muted">Trottinette Freestyle — Park • Street</span>  
-      </div>  
-      <div class="cards">  
-        <article class="card"><h3>Trottinette Freestyle (Park)</h3><p class="muted">Figures aériennes, quarters, spines, bowls.</p></article>  
-        <article class="card"><h3>Trottinette Freestyle (Street)</h3><p class="muted">Rails, ledges, gaps : créativité & technique.</p></article>  
-        <article class="card"><h3>Prof Formé RSL</h3><p class="muted">Encadrants certifiés RSL : sécurité et pédagogie.</p></article>  
-      </div>  
-    </div>  
-  </section>    <!-- ACTUALITÉS -->    <section>  
-    <div class="container">  
-      <div class="section-head">  
-        <h2>Actualités & événements</h2>  
-        <a class="muted" href="evenements.html">Voir tout</a>  
-      </div>  
-      <div class="grid-3">  
-        <article class="card"><div class="chip">04.10.2025</div><h3>Ouverture cours trottinette RSL</h3></article>  
-        <article class="card"><div class="chip">06.12.2025</div><h3>Montreux Scooter Contest — 20e édition</h3></article>  
-        <article class="card"><div class="chip">Jan 2026</div><h3>Formation Moniteurs RSL</h3></article>  
-      </div>  
-    </div>  
-  </section>    <!-- COMITÉ -->    <section id="comite">  
-    <div class="container">  
-      <div class="section-head"><h2>Comité RSL</h2></div>  
-      <div class="committee">  
-        <div class="member"><img src="images/comite_joel.png" alt="Joël Meuwly"><h3>Joël Meuwly</h3><p class="muted">Président · Coordination · Sponsors</p></div>  
-        <div class="member"><img src="images/comite_william.png" alt="William Maurer"><h3>William Maurer</h3><p class="muted">Trésorier</p></div>  
-        <div class="member"><img src="images/comite_florian.png" alt="Florian Barbezat"><h3>Florian Barbezat</h3><p class="muted">Médias · Prof RSL</p></div>  
-        <div class="member"><img src="images/comite_louis.png" alt="Louis Zanolli"><h3>Louis Zanolli</h3><p class="muted">Co-médias · Prof RSL</p></div>  
-      </div>  
-    </div>  
-  </section>    <!-- POP-UP (après accès) -->    <dialog id="dlg">  
-    <div class="modal-card" style="text-align:center">  
-      <h3>Rejoindre la RSL</h3>  
-      <p class="muted">Choisis ton activité : formation ou cours.</p>  
-      <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">  
-        <a href="formation.html" class="btn">Formation</a>  
-        <a href="cours.html" class="btn">Cours</a>  
-        <button class="btn dark" id="btnClose">Fermer</button>  
-      </div>  
-    </div>  
-  </dialog>    <!-- FOOTER -->    <footer class="foot">  
-    <div class="container">  
-      <div class="links links-3cols">  
-        <div><h4>RSL</h4><ul><li><a href="formation.html">Formation</a></li><li><a href="evenements.html">Événements</a></li><li><a href="reglement.html">Règlement</a></li></ul></div>  
-        <div><h4>Ressources</h4><ul><li><a href="membres.html">Adhésion</a></li><li><a href="comite.html">Comité</a></li><li><a href="ou_rider.html">Où rider</a></li></ul></div>  
-        <div><h4>Contest</h4><ul><li><a href="inscriptions.html">Inscriptions</a></li><li><a href="resultats.html">Résultats</a></li></ul></div>  
-      </div>  
-      <div class="bottom bottom-right"><p class="tiny">© 2025 — Romandie Scooter League</p><p class="tiny"><a href="reglement.html">Conditions générales</a></p></div>  
-    </div>  
-  </footer>    <!-- ====== GATE ACCÈS + FORM ====== -->    <div class="rsl-gate" id="rslGate" role="dialog" aria-modal="true" aria-labelledby="rslGateTitle">  
-    <div class="gate-inner">  
-      <div class="banner" id="rslGateTitle"><b>Bienvenue sur le site d'RSL</b> — ouverture officielle janvier 2026</div>  
-      <div class="grid">  
-        <!-- Mot de passe -->  
-        <div class="rsl-card">  
-          <h3>Membre de la RSL et du comité</h3>  
-          <p class="muted">Entre le mot de passe pour accéder au site.</p>  
-          <form id="rslPassForm" autocomplete="off">  
-            <label>Mot de passe  
-              <input class="rsl-input" type="password" id="rslPass" placeholder="••••••••" required>  
-            </label>  
-            <div class="rsl-actions"><button type="submit" class="btn">Entrer</button></div>  
-            <p id="passMsg" class="tiny" style="margin-top:8px;display:none"></p>  
-            <div class="rsl-logo-box"><img src="images/logo_rsl.png" alt="Logo RSL"></div>  
-          </form>  
-          <p class="tiny" style="margin-top:10px;opacity:.7">Le code doit être ressaisi à chaque visite (sécurité).</p>  
-        </div>  <!-- Pré-inscription (Formspree + anti-spam) -->  
-    <div class="rsl-card">  
-      <h3>Pré-inscription</h3>  
-      <p class="muted">Laisse tes coordonnées et signe ci-dessous pour être prévenu à l’ouverture.</p>  
-      <form id="rslPreForm" method="POST" action="https://formspree.io/f/xovparwe" novalidate>  
-        <!-- Honeypot -->  
-        <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-5000px;opacity:.01" aria-hidden="true">  
-        <label>Nom<input class="rsl-input" type="text" name="Nom" autocomplete="family-name" required></label>  
-        <label>Prénom<input class="rsl-input" type="text" name="Prénom" autocomplete="given-name" required></label>  
-        <label>Email<input class="rsl-input" type="email" name="Email" placeholder="ton@email.ch" required></label>  
-        <div class="rsl-check"><input type="checkbox" id="chkHuman" required><label for="chkHuman">Je ne suis pas un robot</label></div>  
-        <div class="rsl-check"><input type="checkbox" id="chkConsent" required><label for="chkConsent">J’accepte d’être contacté par la RSL concernant ma pré-inscription.</label></div>  
-        <p id="preErr" class="error">Merci de cocher les cases et de compléter correctement le formulaire.</p>  
-        <input type="hidden" name="_subject" value="Pré-inscription RSL">  
-        <input type="hidden" name="SignaturePNG" id="rslSigData">  
-        <label>Signature</label>  
-        <div class="sig-wrap"><canvas id="rslSignature"></canvas></div>  
-        <div class="rsl-actions"><button type="button" class="btn dark" id="sigClear">Effacer</button><button type="submit" class="btn">Envoyer</button></div>  
-        <p id="preMsg" class="tiny" style="margin-top:8px;display:none"></p>  
-      </form>  
-    </div>  
-  </div>  
-</div>
+  <!-- Fonts + Styles globaux -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
 
-  </div>    <!-- === JS === -->    <!-- Pop-up d’accueil (ne s’ouvre qu’après accès) -->    <script>  
-    (function(){  
-      const dlg=document.getElementById('dlg');  
-      const closeBtn=document.getElementById('btnClose');  
-      function openWelcome(){ if(dlg?.showModal && !dlg.open) dlg.showModal(); }  
-      window.rslOpenWelcome=openWelcome;  
-      closeBtn?.addEventListener('click',()=>dlg.close());  
-    })();  
-  </script>    <!-- Gate + signature + anti-spam + reset accès + chat différé -->    <script>  
-    (function(){  
-      const ACCESS_KEY='rsl_access', ACCESS_OK='ok', PASSCODE='RSL2026';  
-  
-      const gate=document.getElementById('rslGate');  
-      const passForm=document.getElementById('rslPassForm');  
-      const passInput=document.getElementById('rslPass');  
-      const passMsg=document.getElementById('passMsg');  
-  
-      const preForm=document.getElementById('rslPreForm');  
-      const preErr=document.getElementById('preErr');  
-      const preMsg=document.getElementById('preMsg');  
-      const sigCanvas=document.getElementById('rslSignature');  
-      const sigClear=document.getElementById('sigClear');  
-      const sigHidden=document.getElementById('rslSigData');  
-      const chkHuman=document.getElementById('chkHuman');  
-      const chkConsent=document.getElementById('chkConsent');  
-  
-      const hbRoot=document.getElementById('hb-root'); // conteneur tchat (masqué au départ)  
-      let helpbotLoaded=false;  
-  
-      /* Charger le chat SEULEMENT après l’accès */  
-      function loadHelpbot(){  
-        if(helpbotLoaded) return;  
-        const s=document.createElement('script');  
-        s.src='js/helpbot.js';  
-        s.defer=true;  
-        s.onload=()=>{ if(hbRoot) hbRoot.style.display=''; };  
-        document.body.appendChild(s);  
-        helpbotLoaded=true;  
-      }  
-  
-      /* Scroll lock pendant gate */  
-      function lockScroll(){ document.body.style.overflow='hidden'; document.documentElement.style.overflow='hidden'; }  
-      function unlockScroll(){ document.body.style.overflow=''; document.documentElement.style.overflow=''; }  
-  
-      /* Gate show/hide */  
-      function showGate(){  
-        gate.style.display='block';  
-        hbRoot && (hbRoot.style.display='none'); // chat invisible  
-        lockScroll();  
-        resizeSignature(); // s'assure que le canvas a une taille valide  
-      }  
-      function hideGate(){  
-        gate.style.display='none';  
-        unlockScroll();  
-        window.scrollTo({top:0,behavior:'instant'});  
-        loadHelpbot(); // charge le tchat maintenant  
-      }  
-      function openWelcomeDelayed(ms){ if(typeof window.rslOpenWelcome==='function') setTimeout(()=>window.rslOpenWelcome(),ms); }  
-  
-      function initGate(){  
-        let hasAccess=false; try{ hasAccess = localStorage.getItem(ACCESS_KEY)===ACCESS_OK; }catch(e){}  
-        if(!hasAccess){ showGate(); } else { hideGate(); openWelcomeDelayed(10000); }  
-  
-        passForm?.addEventListener('submit',e=>{  
-          e.preventDefault();  
-          const val=(passInput?.value||'').trim();  
-          if(val===PASSCODE){  
-            try{ localStorage.setItem(ACCESS_KEY,ACCESS_OK); }catch(e){}  
-            passMsg.style.display='none';  
-            hideGate(); openWelcomeDelayed(400);  
-          }else{  
-            passMsg.textContent='Mot de passe incorrect.'; passMsg.style.display='block';  
-          }  
-        });  
-      }  
-  
-      /* Signature (Pointer Events + mobile) */  
-      let ctx=null, drawing=false;  
-      function ensureSigCss(){ if(sigCanvas && !sigCanvas.style.height) sigCanvas.style.height='160px'; }  
-      function resizeSignature(){  
-        if(!sigCanvas) return;  
-        requestAnimationFrame(()=>{  
-          const ratio=Math.max(1,window.devicePixelRatio||1);  
-          const w=sigCanvas.clientWidth||300;  
-          const h=sigCanvas.clientHeight||160;  
-          if(!ctx) ctx=sigCanvas.getContext('2d',{willReadFrequently:true});  
-          sigCanvas.width=Math.floor(w*ratio);  
-          sigCanvas.height=Math.floor(h*ratio);  
-          ctx.setTransform(ratio,0,0,ratio,0,0);  
-          ctx.fillStyle='#0b0b0b'; ctx.fillRect(0,0,w,h);  
-          ctx.lineWidth=2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#fff';  
-        });  
-      }  
-      function getPos(e){  
-        const r=sigCanvas.getBoundingClientRect();  
-        const t=e.touches?e.touches[0]:e;  
-        return {x:(t.clientX??t.pageX)-r.left,y:(t.clientY??t.pageY)-r.top};  
-      }  
-      function sigStart(e){  
-        drawing=true;  
-        if(e.pointerId!=null) try{ sigCanvas.setPointerCapture(e.pointerId); }catch(_){}  
-        const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);  
-        e.preventDefault?.();  
-      }  
-      function sigMove(e){  
-        if(!drawing) return;  
-        const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();  
-        e.preventDefault?.();  
-      }  
-      function sigEnd(e){  
-        drawing=false;  
-        if(e && e.pointerId!=null) try{ sigCanvas.releasePointerCapture(e.pointerId); }catch(_){}  
-      }  
-      function initSignature(){  
-        if(!sigCanvas) return;  
-        ensureSigCss(); resizeSignature(); setTimeout(resizeSignature,0);  
-        window.addEventListener('resize', resizeSignature);  
-        ['touchstart','touchmove','touchend','touchcancel'].forEach(evt=>{  
-          sigCanvas.addEventListener(evt, e=>e.preventDefault(), {passive:false});  
-        });  
-        if('onpointerdown' in window){  
-          sigCanvas.addEventListener('pointerdown', sigStart, {passive:false});  
-          sigCanvas.addEventListener('pointermove',  sigMove,  {passive:false});  
-          window.addEventListener('pointerup',       sigEnd,   {passive:false});  
-          window.addEventListener('pointercancel',   sigEnd,   {passive:false});  
-        }else{  
-          sigCanvas.addEventListener('mousedown', sigStart);  
-          sigCanvas.addEventListener('mousemove', sigMove);  
-          window.addEventListener('mouseup', sigEnd);  
-          sigCanvas.addEventListener('touchstart', sigStart, {passive:false});  
-          sigCanvas.addEventListener('touchmove',  sigMove,  {passive:false});  
-          sigCanvas.addEventListener('touchend',   sigEnd,   {passive:false});  
-        }  
-        sigClear?.addEventListener('click', ()=>{  
-          const w=sigCanvas.clientWidth||300, h=sigCanvas.clientHeight||160;  
-          ctx.fillStyle='#0b0b0b'; ctx.fillRect(0,0,w,h);  
-          ctx.beginPath(); ctx.strokeStyle='#ffffff';  
-        });  
-      }  
-  
-      /* Pré-inscription : Anti-spam + Envoi Formspree */  
-      let formShownAt = Date.now();  
-      function initPreForm(){  
-        preForm?.addEventListener('submit', async e=>{  
-          e.preventDefault();  
-          preErr.style.display='none';  
-  
-          // délai anti-bot  
-          if(Date.now() - formShownAt < 3000){  
-            preErr.textContent="Soumission trop rapide — merci de réessayer.";  
-            preErr.style.display='block'; return;  
-          }  
-          // honeypot  
-          const hp=preForm.querySelector('input[name="website"]');  
-          if(hp && hp.value.trim()!==""){  
-            preErr.textContent="Détection anti-spam — merci de réessayer.";  
-            preErr.style.display='block'; return;  
-          }  
-          // cases  
-          if(!chkHuman.checked || !chkConsent.checked){  
-            preErr.textContent="Merci de cocher « je ne suis pas un robot » et « j’accepte d’être contacté ».";  
-            preErr.style.display='block'; return;  
-          }  
-          // signature → PNG  
-          try{ if(sigCanvas && sigHidden){ sigHidden.value = sigCanvas.toDataURL('image/png'); } }catch(_){}  
-  
-          const formData=new FormData(preForm);  
-          try{  
-            const resp=await fetch(preForm.action,{method:'POST',headers:{'Accept':'application/json'},body:formData});  
-            if(resp.ok){  
-              preMsg.textContent='Merci ! Pré-inscription envoyée ✅';  
-              preMsg.style.display='block';  
-              preForm.reset(); chkHuman.checked=false; chkConsent.checked=false;  
-              formShownAt=Date.now();  
-            }else{  
-              preErr.textContent="Oups, envoi impossible pour le moment. Réessaie plus tard.";  
-              preErr.style.display='block';  
-            }  
-          }catch{  
-            preErr.textContent="Erreur réseau — réessaie.";  
-            preErr.style.display='block';  
-          }  
-        });  
-      }  
-  
-      /* Init + reset accès */  
-      function init(){ initGate(); initSignature(); initPreForm(); }  
-      if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }  
-      window.addEventListener('pagehide',()=>{ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} });  
-      window.addEventListener('beforeunload',()=>{ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} });  
-      document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ try{ localStorage.removeItem(ACCESS_KEY); }catch(e){} }});  
-    })();  
-  </script>    <!-- HelpBot (RSL) — masqué et SANS script chargé avant accès -->    <div id="hb-root" style="display:none">  
-    <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>  
-    <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">  
-      <div class="hb-head">  
-        <div class="title" id="hbTitle">Aide — RSL</div>  
-        <div class="actions">  
-          <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>  
-          <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>  
-        </div>  
-      </div>  
-      <div class="hb-body" id="hbBody"></div>  
-      <div class="hb-foot">  
-        <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">  
-        <button id="hbSend" class="hb-send">Envoyer</button>  
-      </div>  
-    </div>  
-  </div>  
-  <!-- IMPORTANT : ne pas inclure <script src="js/helpbot.js"> ici ; il est injecté après l’accès -->    <!-- ====== JS MOBILE : burger + menu off-canvas (desktop intact) ====== -->    <script>  
-    (function(){  
-      const isMobile = () => window.matchMedia('(max-width: 900px)').matches;  
-  
-      function buildMobileMenu(){  
-        if(document.getElementById('rslMobileBurger')) return; // déjà créé  
-  
-        const nav = document.querySelector('.nav');  
-        const list = nav?.querySelector('ul');  
-        if(!nav || !list) return;  
-  
-        // Burger  
-        const burger = document.createElement('button');  
-        burger.id = 'rslMobileBurger';  
-        burger.type = 'button';  
-        burger.setAttribute('aria-label','Ouvrir le menu');  
-        burger.setAttribute('aria-expanded','false');  
-        burger.textContent = '☰';  
-  
-        // Overlay + sheet  
-        const dim = document.createElement('div'); dim.id = 'rslMobileDim';  
-        const sheet = document.createElement('aside'); sheet.id = 'rslMobileSheet';  
-  
-        // Clone de la nav + CTA en tête  
-        const cloned = list.cloneNode(true);  
-        const memberHref = document.getElementById('btnMembre')?.getAttribute('href') || 'membres.html';  
-        const li = document.createElement('li'); const a = document.createElement('a');  
-        a.href = memberHref; a.innerHTML = '<b>Devenir membre</b>'; li.appendChild(a);  
-        cloned.prepend(li);  
-        sheet.appendChild(cloned);  
-  
-        // Injection  
-        document.body.appendChild(burger);  
-        document.body.appendChild(dim);  
-        document.body.appendChild(sheet);  
-  
-        // Open/Close  
-        const open = () => { document.body.classList.add('rsl-menu-open'); burger.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; };  
-        const close = () => { document.body.classList.remove('rsl-menu-open'); burger.setAttribute('aria-expanded','false'); document.body.style.overflow=''; };  
-  
-        burger.addEventListener('click', ()=> document.body.classList.contains('rsl-menu-open') ? close() : open());  
-        dim.addEventListener('click', close);  
-        sheet.querySelectorAll('a').forEach(x => x.addEventListener('click', close));  
-  
-        // Auto-clean si retour desktop  
-        const mq = window.matchMedia('(max-width: 900px)');  
-        mq.addEventListener?.('change', e=>{ if(!e.matches) destroyMobileMenu(); });  
-      }  
-  
-      function destroyMobileMenu(){  
-        document.getElementById('rslMobileBurger')?.remove();  
-        document.getElementById('rslMobileDim')?.remove();  
-        document.getElementById('rslMobileSheet')?.remove();  
-        document.body.classList.remove('rsl-menu-open');  
-        document.body.style.overflow='';  
-      }  
-  
-      function init(){  
-        if(isMobile()) buildMobileMenu(); else destroyMobileMenu();  
-      }  
-  
-      if(document.readyState === 'loading'){  
-        document.addEventListener('DOMContentLoaded', init);  
-      }else{  
-        init();  
-      }  
-      window.addEventListener('resize', ()=>{ if(isMobile()) buildMobileMenu(); else destroyMobileMenu(); });  
-    })();  
-  </script>  </body>  
+  <!-- Supabase + scripts du site -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
+
+  <style>
+    /* ======= NAVBAR ======= */
+    nav.nav {
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    nav.nav .container { max-width: 1320px; margin: 0 auto; padding: 12px 28px; }
+    nav.nav .row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+
+    .brand { display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img { height:48px; border-radius:10px; display:block; }
+    .brand span { font-weight:800; letter-spacing:.2px; font-size:17px; }
+
+    nav.nav ul { display:flex; align-items:center; gap:26px; }
+    nav.nav ul li a { font-weight:600; color:#e8f0ea; transition:.2s ease; font-size:17px; letter-spacing:.2px; white-space:nowrap; }
+    nav.nav ul li a:hover { color:#22c55e; }
+
+    .cta { display:flex; align-items:center; gap:12px; }
+
+    #menuBtn{
+      display:none; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; font-size:18px; line-height:1;
+      border-radius:10px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12); color:#22c55e;
+      cursor:pointer; transition:.2s ease;
+    }
+    #menuBtn:hover { background:rgba(34,197,94,.22); }
+
+    /* ======= HERO ======= */
+    .hero-video { position:relative; color:#fff; min-height:90vh;
+      display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; }
+    .hero-video::before { content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)); z-index:1; }
+    .hero-video .bg-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .hero-video .hero-inner { position:relative; z-index:2; max-width:800px; padding:0 20px; }
+    .hero-logo{ width:64px; height:64px; border-radius:14px; object-fit:cover; display:block; margin:0 auto 10px }
+    .hero-video h1 { font-size:clamp(36px,5vw,58px); font-weight:800; margin:10px 0 8px; }
+    .hero-video p { font-size:clamp(16px,2vw,22px); opacity:.95; margin-bottom:20px; }
+    .hero-video .cta-row { gap:16px; justify-content:center; display:flex; flex-wrap:wrap; }
+
+    /* ======= CARTES ======= */
+    .home-cards { display:grid; gap:20px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      max-width:1200px; margin:60px auto; padding:0 24px; }
+    .home-card { background: linear-gradient(180deg,#111827,#0f172a); color:#e5f2ea;
+      border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:28px 22px;
+      box-shadow:0 8px 24px rgba(0,0,0,.25); text-align:center; }
+
+    /* ======= FOOTER ======= */
+    .footer-mini .copy { text-align:center; color:#9aa5b1; font-size:14px;
+      padding:24px 0 28px; margin:0; border-top:1px solid rgba(255,255,255,.1); background:rgba(0,0,0,.2); }
+
+    /* ======= FAB COACH ======= */
+    .coach-fab{
+      position: fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:12px 14px; border-radius:12px;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312; font-weight:800; text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      border:0;
+    }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+
+    /* ======= MENU MOBILE ======= */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-sheet .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-sheet .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-sheet .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-sheet .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+    .mobile-panel .coach-link { border-top:1px solid rgba(255,255,255,.12); margin-top:8px; padding-top:12px; font-weight:700; }
+
+    /* ======= RESPONSIVE ======= */
+    @media (max-width:990px) {
+      nav.nav .container { padding:10px 14px; }
+      .brand span { display:inline; font-size:15px; }   /* le texte reste visible */
+      nav.nav ul { display:none !important; }
+      .cta a, .cta #btnAccount, .cta #btnLogin { display:none !important; }
+      #menuBtn { display:inline-flex; }
+      .coach-fab { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ======= NAVBAR ======= -->
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html" aria-label="Accueil RSL">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <!-- Menu PC -->
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======= MENU MOBILE ======= -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="cours.html">Cours</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <hr/>
+      <a href="membres.html">Devenir membre</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
+  </div>
+
+  <!-- ======= HERO VIDÉO ======= -->
+  <section class="hero-video">
+    <!-- on laisse la balise video mais sans <source> en dur,
+         on va injecter Supabase en JS -->
+    <video class="bg-video" autoplay muted loop playsinline poster="images/hero-poster.jpg" id="rslHeroVideo"></video>
+
+    <div class="hero-inner">
+      <img class="hero-logo" src="images/logo_rsl.png" alt="RSL">
+      <h1>Romandie Scooter League</h1>
+      <p>Courses · Événements · Formation</p>
+      <div class="cta-row">
+        <a class="btn green" href="cours.html">Voir les cours</a>
+        <a class="btn dark" href="membres.html">Devenir membre</a>
+      </div>
+      <div class="cta-row" style="margin-top:18px;">
+        <a class="btn green" href="cours.html">Cours RSL</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= 3 CARTES ======= -->
+  <main>
+    <div class="home-cards">
+      <div class="home-card">
+        <h3>Cours</h3>
+        <p>Sessions encadrées par nos moniteurs.</p>
+        <a class="btn green" href="cours.html">Voir les cours</a>
+      </div>
+
+      <div class="home-card">
+        <h3>Devenir membre</h3>
+        <p>Tarifs préférentiels, priorité d’inscription, etc.</p>
+        <a class="btn dark" href="membres.html">Adhérer</a>
+      </div>
+
+      <div class="home-card">
+        <h3>Formation RSL</h3>
+        <p>Deviens moniteur certifié RSL.</p>
+        <a class="btn dark" href="formation.html">Découvrir</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======= FOOTER ======= -->
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
+
+  <!-- ======= BOUTON FLOTTANT COACH (PC) ======= -->
+  <a href="coach.html" class="coach-fab" aria-label="Je suis coach">👨‍🏫 Je suis coach</a>
+
+  <!-- ======= SCRIPTS ======= -->
+  <script>
+    // Burger mobile
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click',e=>{
+      e.stopPropagation();
+      mobile.classList.add('open');
+      mobile.setAttribute('aria-hidden','false');
+    });
+    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+      mobile.classList.remove('open');
+      mobile.setAttribute('aria-hidden','true');
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      }
+    });
+
+    // Login ↔ Compte
+    (async function(){
+      if(typeof supabase==='undefined') return;
+      try{
+        const {data:{user}}=await supabase.auth.getUser();
+        const btnLogin=document.getElementById('btnLogin');
+        const btnAccount=document.getElementById('btnAccount');
+        function ui(u){
+          if(u){
+            btnAccount.style.display='inline-flex';
+            btnLogin.style.display='none';
+          } else {
+            btnAccount.style.display='none';
+            btnLogin.style.display='inline-flex';
+            btnLogin.textContent='Login';
+          }
+        }
+        ui(user);
+        btnLogin?.addEventListener('click',()=>location.href='compte.html');
+        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user??null));
+      }catch(e){}
+    })();
+
+    // ====== VIDÉO SUPABASE (aléatoire) ======
+    window.addEventListener('DOMContentLoaded', () => {
+      const v = document.getElementById('rslHeroVideo');
+      if (!v) return;
+
+      // Tes 2 vidéos stockées dans Supabase
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+
+      // Choisir une vidéo au hasard
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+
+      // Créer le <source> dynamiquement
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = "video/mp4";
+      v.appendChild(s);
+
+      // Lecture lente + pause quand onglet pas visible
+      const start = () => {
+        try {
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if (p && p.catch) { p.catch(()=>{}); }
+        } catch(e){}
+      };
+      start();
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden){
+          v.pause();
+        } else {
+          start();
+        }
+      });
+    });
+  </script>
+</body>
 </html>

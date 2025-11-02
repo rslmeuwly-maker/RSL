@@ -1,283 +1,274 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Événements 2026 — RSL</title>
-<script defer src="js/main.js"></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Événements — Romandie Scooter League</title>
 
-<style>
-  /* HERO avec image lanoubc40 */
-  .hero.hero-photo {
-    position: relative;
-    color: #fff;
-    overflow: hidden;
-  }
-  .hero.hero-photo::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background:
-      linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.75)),
-      url("images/lanoubc40.jpg") center/cover no-repeat;
-  }
-  .hero.hero-photo .container {
-    position: relative;
-    z-index: 1;
-    padding: 80px 0;
-  }
+  <!-- Fonts + Styles globaux -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
 
-  /* FOOTER : 3 colonnes + bloc bas à droite */
-  .foot .links-3cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 36px 6vw;
-    align-items: start;
-  }
-  .foot .links-3cols h4 {
-    margin: 0 0 8px;
-    color: #fff;
-    font-weight: 700;
-  }
-  .foot .links-3cols ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .foot .links-3cols li {
-    margin: 6px 0;
-  }
-  .foot .links-3cols a {
-    color: #cdd6ff;
-    text-decoration: none;
-  }
-  .foot .links-3cols a:hover {
-    text-decoration: underline;
-  }
-  .foot .bottom.bottom-right {
-    border-top: 1px solid rgba(255,255,255,0.08);
-    margin-top: 14px;
-    padding: 10px 0;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 14px;
-  }
-  .foot .bottom.bottom-right a {
-    color: #cdd6ff;
-    text-decoration: none;
-  }
-  .foot .bottom.bottom-right a:hover {
-    text-decoration: underline;
-  }
+  <!-- Supabase + scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
 
-  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
-  @media (max-width:600px){
-    .foot .links-3cols{grid-template-columns:1fr}
-    .foot .bottom.bottom-right{justify-content:space-between}
-  }
-/* FOOTER : 3 colonnes + bloc bas à droite */
-  .foot .links-3cols{
-    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
-  }
-  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
-  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
-  .foot .links-3cols li{margin:6px 0}
-  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
-  .foot .links-3cols a:hover{text-decoration:underline}
-  .foot .bottom.bottom-right{
-    border-top:1px solid rgba(255,255,255,0.08);
-    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
-  }
-  .foot .bottom.bottom-right p{margin:0}
-  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
-  .foot .bottom.bottom-right a:hover{text-decoration:underline}
-  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
-  @media (max-width:600px){
-    .foot .links-3cols{grid-template-columns:1fr}
-    .foot .bottom.bottom-right{justify-content:space-between}
-  }
-</style>
+  <style>
+    /* ======= STRUCTURE GLOBALE ======= */
+    html,body { height:100%; margin:0; font-family:"Outfit",system-ui; color:#fff; background:#000; overflow-x:hidden; }
+    body { display:flex; flex-direction:column; position:relative; z-index:1; }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css"/>
-<link rel="stylesheet" href="css/common.css"/>
-<link rel="stylesheet" href="css/fonts.css"/>
+    /* ======= VIDÉO DE FOND ======= */
+    .video-bg {
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:-2;
+    }
+    .video-overlay {
+      position:fixed; inset:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+      z-index:-1;
+    }
+
+    /* ======= NAVBAR ======= */
+    nav.nav {
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index:10;
+    }
+    nav.nav .container { max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand { display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img { height:48px; border-radius:10px; display:block; }
+    .brand span { font-weight:800; font-size:17px; }
+
+    nav.nav ul { display:flex; align-items:center; gap:26px; }
+    nav.nav ul li a { font-weight:600; color:#e8f0ea; font-size:17px; text-decoration:none; }
+    nav.nav ul li a:hover { color:#22c55e; }
+
+    .cta { display:flex; align-items:center; gap:12px; }
+    #menuBtn{
+      display:none; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; font-size:18px;
+      border-radius:10px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
+    }
+    #menuBtn:hover { background:rgba(34,197,94,.25); }
+
+    /* ======= CARTES COMPACTES ======= */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 60px 20px 40px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .cards {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, .82);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 16px;
+      padding: 18px 16px 20px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+      backdrop-filter: blur(5px);
+    }
+
+    .card h3 {
+      color: #22c55e;
+      font-weight: 800;
+      margin: 0 0 4px;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .meta {
+      font-size: 14px;
+      opacity: .9;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 15px;
+      margin: 0 0 12px;
+    }
+
+    .card .btn {
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    /* ======= FOOTER ======= */
+    footer.footer-mini {
+      border-top:1px solid rgba(255,255,255,.1);
+      background:rgba(0,0,0,.3);
+      text-align:center; padding:24px 0;
+      color:#9aa5b1; font-size:14px;
+      z-index:3;
+    }
+
+    /* ======= FAB ======= */
+    .coach-fab{
+      position:fixed; right:16px; bottom:16px; z-index:20;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:12px 14px; border-radius:12px;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312; font-weight:800; text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.35);
+    }
+    .coach-fab:hover{ filter:brightness(1.1); transform:translateY(-1px); transition:.15s ease; }
+
+    /* ======= MENU MOBILE ======= */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:50; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px;
+      display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+
+    @media(max-width:990px){
+      nav.nav ul{display:none!important;}
+      .cta a,.cta #btnAccount,.cta #btnLogin{display:none!important;}
+      #menuBtn{display:inline-flex;}
+      .coach-fab{display:none;}
+    }
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="container nav-inner">
-    <!-- ✅ corrigé ici -->
-    <a class="brand" href="index.html">
-      <img src="images/logo_rsl.png" alt="Logo RSL">
-      <span><b>RSL — Romandie Scooter League</b></span>
-    </a>
-    <ul>
-      <li><a href="formation.html">Formation RSL</a></li>
-      <li><a href="disciplines.html">Disciplines</a></li>
-      <li><a href="ou_rider.html">Où rider ?</a></li>
-      <li><a href="game.html">Games</a></li>
-      <li><a href="evenements.html">Événements</a></li>
-      <li><a href="comite.html">Comité</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    
-      <li><a href="cours.html">Cours</a></li>
-    </ul>
-    <div class="cta">
-      <button class="btn" id="btnIdentity">Se connecter</button>
-      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
-      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
-    </div>
-    <div class="cta">
-      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
-    </div>
-  </div>
-</nav>
+  <!-- VIDÉO DE FOND -->
+  <video class="video-bg" autoplay muted loop playsinline id="rslHeroVideo">
+    <source src="images/trottvideo.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
 
-<!-- HERO avec image -->
-<header class="hero hero-photo">
-  <div class="container">
-    <h1>Événements 2026</h1>
-    <p class="muted">Calendrier détaillé à venir — Montreux (Vaud), Valais, Fribourg.</p>
-  </div>
-</header>
-
-<!-- FR -->
-<section class="section">
-  <div class="container">
-    <h2>Calendrier — 2026</h2>
-    <div class="cards">
-      <article class="card">
-        <h3>Montreux (Vaud)</h3>
-        <p>Étape RSL à Montreux (canton de Vaud). Programme, catégories et inscription en ligne. Date officielle à annoncer.</p>
-        <a class="btn" href="formation.html">Infos & inscriptions</a>
-      </article>
-      <article class="card">
-        <h3>Valais</h3>
-        <p>Étape RSL en Valais. Lieu exact et programme seront annoncés prochainement. Inscriptions ouvertes dès la publication.</p>
-        <a class="btn" href="formation.html">Infos & inscriptions</a>
-      </article>
-      <article class="card">
-        <h3>Fribourg</h3>
-        <p>Étape RSL dans le canton de Fribourg. Détails logistiques, catégories et juge·s communiqués ultérieurement.</p>
-        <a class="btn" href="formation.html">Infos & inscriptions</a>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- EN -->
-<section class="section">
-  <div class="container">
-    <h2>Schedule — 2026 (EN)</h2>
-    <div class="cards">
-      <article class="card">
-        <h3>Montreux (Vaud)</h3>
-        <p>RSL stop in Montreux (canton of Vaud). Full program, divisions and online registration. Official date to be announced.</p>
-        <a class="btn" href="formation.html">Info & registration</a>
-      </article>
-      <article class="card">
-        <h3>Valais</h3>
-        <p>RSL stop in Valais. Exact venue and program to be announced soon. Registration opens once details are published.</p>
-        <a class="btn" href="formation.html">Info & registration</a>
-      </article>
-      <article class="card">
-        <h3>Fribourg</h3>
-        <p>RSL stop in the canton of Fribourg. Logistics, divisions and judging panel to be communicated later on.</p>
-        <a class="btn" href="formation.html">Info & registration</a>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="foot">
-  <div class="container">
-    <div class="links links-3cols">
-      <div class="col">
-        <h4>RSL</h4>
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
         <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
-        </ul>
-      </div>
-      <div class="col">
-        <h4>Ressources</h4>
-        <ul>
-          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html" aria-current="page">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
           <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
+          <li><a href="contact.html">Contact</a></li>
         </ul>
-      </div>
-      <div class="col">
-        <h4>Contest</h4>
-        <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
-        </ul>
+        <div class="cta">
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
       </div>
     </div>
-    <div class="bottom bottom-right">
-      <p class="tiny">© 2025 — Romandie Scooter League</p>
-      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
-    </div>
-  </div>
-</footer>
-<script>
-(function(){
-  function init(){
-    var idBtn = document.getElementById('btnIdentity');
-    var btnLogout = document.getElementById('btnLogout');
-    var btnAccount = document.getElementById('btnAccount');
-    function refresh(user){
-      var logged = !!user;
-      if(idBtn) idBtn.style.display = logged ? 'none' : '';
-      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
-      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
-    }
-    if(window.netlifyIdentity){
-      window.netlifyIdentity.on('init', function(user){ refresh(user); });
-      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
-      window.netlifyIdentity.on('logout', function(){ refresh(null); });
-      window.netlifyIdentity.init();
-    }
-    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
-    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
-    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
-  }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
-})();
-</script>
-<script defer src="js/site.js"></script>
-<script defer src="/.netlify/identity-widget.js"></script>
-<script defer src="js/auth.js"></script>
+  </nav>
 
-<!-- HelpBot (RSL) -->
-<link rel="stylesheet" href="css/helpbot.css">
-<div id="hb-root">
-  <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
-  <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
-    <div class="hb-head">
-      <div class="title" id="hbTitle">Aide — RSL</div>
-      <div class="actions">
-        <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
-        <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
-      </div>
-    </div>
-    <div class="hb-body" id="hbBody"></div>
-    <div class="hb-foot">
-      <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
-      <button id="hbSend" class="hb-send">Envoyer</button>
-    </div>
+  <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="cours.html">Cours</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html" aria-current="page">Événements</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <hr/>
+      <a href="membres.html">Devenir membre</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
   </div>
-</div>
-<script defer src="js/helpbot.js"></script>
 
-</body></html>
+  <!-- CONTENU -->
+  <main>
+    <div class="cards">
+      <article class="card">
+        <h3>Montreux Scooter Contest — 20e édition</h3>
+        <div class="meta">📍 Montreux — 6 décembre 2025</div>
+        <p>Le plus grand contest de Suisse romande fête ses 20 ans !</p>
+        <a class="btn green" href="#">Infos</a>
+      </article>
+
+      <article class="card">
+        <h3>Jam RSL — Lausanne Vidy</h3>
+        <div class="meta">📍 Vidy — Mars 2026</div>
+        <p>Session chill, best tricks & cadeaux. Ouvert à tous.</p>
+        <a class="btn dark" href="#">Pré-inscription</a>
+      </article>
+
+      <article class="card">
+        <h3>RSL Street Day — Genève</h3>
+        <div class="meta">📍 Plainpalais — Printemps 2026</div>
+        <p>Tour street RSL sur plusieurs spots, sécurité assurée.</p>
+        <a class="btn dark" href="#">Participer</a>
+      </article>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
+
+  <!-- FAB COACH -->
+  <a href="coach.html" class="coach-fab">👨‍🏫 Devenir coach</a>
+
+  <!-- SCRIPT -->
+  <script>
+    // MENU BURGER
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click',e=>{
+      e.stopPropagation();
+      mobile.classList.add('open');
+      mobile.setAttribute('aria-hidden','false');
+    });
+    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+      mobile.classList.remove('open');
+      mobile.setAttribute('aria-hidden','true');
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){mobile.classList.remove('open');mobile.setAttribute('aria-hidden','true');}
+    });
+
+    // VIDEO LENTE
+    window.addEventListener('DOMContentLoaded',()=>{
+      const v=document.getElementById('rslHeroVideo');
+      if(!v)return;
+      const start=()=>{try{v.playbackRate=0.6;v.play().catch(()=>{});}catch(e){}};
+      start();
+      document.addEventListener('visibilitychange',()=>{if(document.hidden)v.pause();else start();});
+    });
+  </script>
+</body>
+</html>

@@ -1,352 +1,290 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Formation — Romandie Scooter League</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Formation RSL — Romandie Scooter League</title>
 
-  <!-- Fonts + Style -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/common.css"/>
-  <link rel="stylesheet" href="css/fonts.css"/>
+
+  <!-- Supabase + scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
 
   <style>
-    /* === HERO image === */
-    .hero.hero-photo { position:relative; color:#fff; overflow:hidden; }
-    .hero.hero-photo::before{
-      content:""; position:absolute; inset:0; z-index:0;
-      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.75)),
-                 url("images/lanoubc1.jpg") center/cover no-repeat;
+    html, body { height:100%; }
+    body { background: transparent !important; display:flex; flex-direction:column; }
+    main { flex:1; }
+
+    /* ======= Vidéo de fond ======= */
+    .site-bg-video{
+      position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2;
+      background:#000;
     }
-    .hero.hero-photo .hero-inner{ position:relative; z-index:1; }
-
-    /* === FOOTER (desktop) === */
-    .foot .links-3cols{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:36px 6vw; align-items:start; }
-    .foot .links-3cols h4{ margin:0 0 8px; color:#fff; font-weight:700; }
-    .foot .links-3cols ul{ list-style:none; margin:0; padding:0; }
-    .foot .links-3cols li{ margin:6px 0; }
-    .foot .links-3cols a{ color:#cdd6ff; text-decoration:none; }
-    .foot .links-3cols a:hover{ text-decoration:underline; }
-    .foot .bottom.bottom-right{
-      border-top:1px solid rgba(255,255,255,.08);
-      margin-top:14px; padding:10px 0; display:flex; justify-content:flex-end; align-items:center; gap:14px;
+    .site-bg-dim{
+      position:fixed; inset:0; z-index:-1;
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
     }
-    .foot .bottom.bottom-right p{ margin:0; }
 
-    /* ======== MOBILE OPTI + MENU ======== */
-    @media (max-width:900px){
-      /* HERO plein écran bord à bord */
-      .hero.hero-photo{ min-height:100vh; }
-      @supports(height:100dvh){ .hero.hero-photo{ min-height:100dvh; } }
-      .hero.hero-photo .container{ max-width:none; padding-left:0; padding-right:0; }
-      .hero.hero-photo .hero-inner{
-        min-height:inherit; display:flex; align-items:center; padding:0 18px 22px;
-      }
-      .hero.hero-photo::before{ background-size:cover; background-position:center; }
-      .hero .grid{ display:grid; grid-template-columns:1fr; gap:14px; width:100%; }
-      .hero h1{ font-size:28px; line-height:1.15; margin:0 0 8px; }
-      .hero p{ font-size:16px; line-height:1.5; margin:0 0 10px; }
-
-      /* Layout app */
-      .grid-2,.cards,.grid-3{ display:grid; grid-template-columns:1fr; gap:16px; }
-      .section .container{ padding:0 18px; }
-
-      /* Cartes “app” propres */
-      .panel,.card{
-        background:rgba(14,14,16,.6)!important;
-        border:1px solid rgba(255,255,255,.10)!important;
-        border-radius:16px!important;
-        box-shadow:0 6px 22px rgba(0,0,0,.28);
-        padding:14px!important; backdrop-filter:saturate(110%) blur(4px);
-      }
-      .card h3{ margin:2px 0 10px; font-size:18px; letter-spacing:.2px; text-transform:uppercase; opacity:.95; }
-      .list{ margin:0; padding:0; list-style:none; }
-      .list li{ padding:10px 0; border-top:1px solid rgba(255,255,255,.06); }
-      .list li:first-child{ border-top:none; }
-
-      /* Formulaire tactile */
-      .rsl-form .form-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
-      .rsl-form label{ display:block; font-size:14px; margin:0 0 6px; }
-      .rsl-form input,.rsl-form select{
-        width:100%; padding:12px 14px; border-radius:12px;
-        border:1px solid rgba(255,255,255,.18); background:rgba(0,0,0,.35); color:#fff;
-      }
-      .form-actions .btn{ width:100%; padding:12px 16px; border-radius:12px; }
-
-      /* Masquer la nav desktop, logo texte off pour look clean */
-      .nav ul{ display:none; }
-      .nav .cta{ display:none; }
-      .nav .brand span{ display:none; }
-
-      /* ===== MENU MOBILE (burger + overlay + sheet) ===== */
-      #rslMobileBurger{
-        position:fixed; top:max(10px,env(safe-area-inset-top)); right:max(10px,env(safe-area-inset-right));
-        z-index:100; width:44px; height:44px; border-radius:12px;
-        border:1px solid rgba(255,255,255,.15);
-        background:rgba(0,0,0,.55); color:#fff; font-size:22px;
-        display:flex; align-items:center; justify-content:center;
-        box-shadow:0 6px 18px rgba(0,0,0,.35);
-      }
-      #rslMobileDim{
-        position:fixed; inset:0; z-index:98;
-        background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
-        opacity:0; pointer-events:none; transition:opacity .18s ease;
-      }
-      #rslMobileSheet{
-        position:fixed; top:max(10px,env(safe-area-inset-top)); right:max(10px,env(safe-area-inset-right));
-        z-index:99; width:min(86vw,340px);
-        background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.12);
-        border-radius:16px; padding:10px;
-        transform:translateX(12px) translateY(-8px) scale(.98);
-        opacity:0; pointer-events:none;
-        transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
-        box-shadow:0 20px 60px rgba(0,0,0,.5);
-      }
-      #rslMobileSheet ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
-      #rslMobileSheet a{
-        display:block; padding:12px; border-radius:12px;
-        background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
-        color:#cdd6ff; text-decoration:none;
-      }
-      .rsl-menu-open #rslMobileDim{ opacity:1; pointer-events:auto; }
-      .rsl-menu-open #rslMobileSheet{ opacity:1; pointer-events:auto; transform:none; }
-
-      /* Footer colonne unique + espace pour fab/chat éventuel */
-      .foot .links-3cols{ grid-template-columns:1fr; gap:10px; }
-      .foot .bottom.bottom-right{ justify-content:space-between; }
-      body{ padding-bottom:84px; }
+    /* ======= NAV ======= */
+    nav.nav{
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      position: sticky; top:0; z-index:100;
     }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:48px; border-radius:10px; display:block; }
+    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
+    nav.nav ul{ display:flex; align-items:center; gap:26px; }
+    nav.nav ul li a{ font-weight:600; color:#e8f0ea; font-size:17px; letter-spacing:.2px; white-space:nowrap; }
+    nav.nav ul li a:hover{ color:#22c55e; }
+    .cta{ display:flex; align-items:center; gap:12px; }
+    #menuBtn{
+      display:none; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; font-size:18px; line-height:1; border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
+    }
+
+    /* ======= Intro page ======= */
+    .container{ max-width:1200px; margin:0 auto; padding:0 24px; }
+    .page-intro{ color:#fff; padding:28px 0 18px; }
+    .page-intro h1{ font-size:clamp(28px,4.2vw,42px); font-weight:800; margin:8px 0 6px; }
+    .badges{ display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 18px; }
+
+    .badge{
+      display:inline-flex; align-items:center; gap:8px; padding:10px 14px;
+      border-radius:999px; font-weight:800; border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,#0e1526,#0b1220); color:#eaf2ed;
+    }
+    .badge.green{ background:linear-gradient(180deg,#22c55e,#16a34a); color:#062312; }
+    .badge.red{ background:transparent; color:#ef4444; border:2px solid #ef4444; }
+
+    /* ======= Grille programme / inscription ======= */
+    .formation-grid{
+      display:grid; grid-template-columns:1.1fr .9fr; gap:18px; margin-bottom:30px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px; padding:18px; color:#e7f2eb;
+      box-shadow:0 8px 24px rgba(0,0,0,.25);
+    }
+    .card h3{ margin:0 0 12px; font-size:20px; font-weight:800; }
+    .slot{ display:flex; gap:14px; padding:10px 0; border-top:1px dashed rgba(255,255,255,.09); }
+    .slot:first-child{ border-top:0; }
+    .time{ width:120px; color:#bfe6c9; font-weight:800; }
+    .desc{ flex:1; }
+
+    /* ======= Formulaire ======= */
+    .form-row{ display:flex; flex-direction:column; gap:8px; margin:10px 0; }
+    .label{ font-weight:700; color:#eaf2ed; }
+    .input, .select{
+      width:100%; padding:12px 14px; border-radius:12px; font-weight:600;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06); color:#fff;
+      transition:.2s ease;
+    }
+    .input:focus, .select:focus{ outline:none; border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.25); }
+
+    .select{
+      appearance:none; padding-right:42px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #22c55e 50%),
+        linear-gradient(135deg, #22c55e 50%, transparent 50%);
+      background-position: calc(100% - 24px) center, calc(100% - 18px) center;
+      background-size: 7px 7px, 7px 7px; background-repeat:no-repeat;
+    }
+    select option{ background:#0b1220; color:#fff; }
+
+    .btn.primary{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:100%; padding:12px 14px; border-radius:14px; font-weight:800;
+      background:linear-gradient(180deg,#22c55e,#16a34a); color:#062312; border:0;
+      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      cursor:pointer;
+    }
+    .hint{ color:#d6e6db; opacity:.9; font-size:14px; margin-top:8px; }
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      .cta a, .cta #btnAccount, .cta #btnLogin{ display:none !important; }
+      #menuBtn{ display:inline-flex; }
+      .formation-grid{ grid-template-columns:1fr; }
+      .formation-inscription{ order:-1; }
+    }
+
+    /* ======= Menu mobile ======= */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-sheet .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-sheet .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-sheet .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-sheet .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+    .mobile-panel .coach-link{ border-top:1px solid rgba(255,255,255,.12); margin-top:8px; padding-top:12px; font-weight:700; }
+
+    /* ======= Footer ======= */
+    .footer-mini .copy{
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:24px 0 28px; margin:0;
+      border-top:1px solid rgba(255,255,255,.1);
+      background:transparent;
+    }
+
+    /* ======= Bouton coach ======= */
+    .coach-fab{
+      position: fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:12px 14px; border-radius:12px;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312; font-weight:800; text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      border:0;
+    }
+    @media (max-width:990px){ .coach-fab{ display:none; } }
   </style>
 </head>
-
 <body>
+
+  <!-- Fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg">
+    <source src="images/trottvideo.mp4" type="video/mp4">
+  </video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
   <!-- NAV -->
   <nav class="nav">
-    <div class="container nav-inner">
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL">
-        <span><b>RSL — Romandie Scooter League</b></span>
-      </a>
-      <ul>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="game.html">Games</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="cours.html">Cours</a></li>
-      </ul>
-      <div class="cta"><a class="btn" id="btnMembre" href="membres.html">Devenir membre</a></div>
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html" aria-label="Accueil RSL">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
+      </div>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <header class="hero hero-photo">
-    <div class="container hero-inner">
-      <div class="grid">
-        <div>
-          <h1>Formation <b>Moniteur RSL</b></h1>
-          <p>Journée complète (6–7h) avec <b>éducatrice spécialisée</b> + <b>module Samaritains</b> : pédagogie, sécurité, pratique, <b>examen</b> et <b>certificat</b>.</p>
-          <div class="price">
-            <span class="now">30.–</span>
-            <span class="was">99.–</span>
-            <span class="note">prix de lancement</span>
-          </div>
-          <div class="panel">
-            <div class="chip">Certificat RSL</div>
-            <div class="chip">1ʳᵉ session 2026</div>
-            <a class="chip" href="docs/formation-horaire.pdf" download>Télécharger l’horaire (.pdf)</a>
-          </div>
-        </div>
-
-        <div class="panel enroll">
-          <strong>Choisis ta date (1er samedi du mois — 2026)</strong>
-          <form class="rsl-form" action="https://formspree.io/f/xrbylkqk" method="POST" onsubmit="alert('Merci ! Inscription envoyée.');">
-            <p class="muted small">Capacité : 20 inscrits par date.</p>
-            <div class="form-row">
-              <label for="formationDate">Date</label>
-              <select id="formationDate" name="date_choisie" required>
-                <option value="">— Sélectionne —</option>
-                <option value="2026-03-07">Samedi 07 mars 2026</option>
-                <option value="2026-04-04">Samedi 04 avril 2026</option>
-                <option value="2026-05-02">Samedi 02 mai 2026</option>
-                <option value="2026-06-06">Samedi 06 juin 2026</option>
-                <option value="2026-07-04">Samedi 04 juillet 2026</option>
-                <option value="2026-10-03">Samedi 03 octobre 2026</option>
-                <option value="2026-11-07">Samedi 07 novembre 2026</option>
-                <option value="2026-12-05">Samedi 05 décembre 2026</option>
-              </select>
-            </div>
-            <div class="form-grid">
-              <div class="form-row">
-                <label for="nom">Nom et prénom</label>
-                <input id="nom" name="nom" required placeholder="Nom et prénom" />
-              </div>
-              <div class="form-row">
-                <label for="email">Email</label>
-                <input id="email" type="email" name="email" required placeholder="ton@email.ch" />
-              </div>
-              <div class="form-row">
-                <label for="naissance">Date de naissance</label>
-                <input id="naissance" type="date" name="date_naissance" required />
-              </div>
-            </div>
-            <input type="hidden" name="subject" value="Inscription Formation RSL 2026" />
-            <div class="form-actions"><button class="btn" type="submit">Je m’inscris</button></div>
-            <p class="tiny">Astuce : ajoute l’événement dans ton agenda après confirmation.</p>
-          </form>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- Menu mobile -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="cours.html">Cours</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <hr/>
+      <a href="membres.html">Devenir membre</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
+  </div>
 
   <!-- CONTENU -->
-  <section class="section">
-    <div class="container grid-2">
-      <div class="card">
+  <main class="container">
+    <div class="page-intro">
+      <div class="badges">
+        <span class="badge green">30.–</span>
+        <span class="badge red">90.–</span>
+        <span class="badge">prix de lancement</span>
+      </div>
+      <h1>Formation Moniteur RSL</h1>
+      <p>Journée complète (6–7h) avec éducatrice spécialisée + module Samaritains : pédagogie, sécurité, pratique, examen & certificats.</p>
+      <div class="badges">
+        <a class="badge" href="#">Certificat RSL</a>
+        <span class="badge">1re session 2026</span>
+        <a class="badge" href="docs/horaire-formation.pdf" target="_blank" rel="noopener">Télécharger l’horaire (.pdf)</a>
+      </div>
+    </div>
+
+    <section class="formation-grid">
+      <!-- Programme -->
+      <article class="card formation-programme">
         <h3>Programme (exemple 6–7h)</h3>
-        <ul class="list">
-          <li><b>09:00 – 09:15</b> Accueil & présentation RSL</li>
-          <li><b>09:15 – 10:00</b> Rôle du moniteur : attitude, responsabilité</li>
-          <li><b>10:00 – 10:45</b> Pédagogie & progression : structurer un cours</li>
-          <li><b>11:00 – 12:30</b> <b>Module Samaritains</b> : sécuriser la zone, 144, plaies/entorses/trauma</li>
-          <li><b>12:30 – 13:15</b> Pause</li>
-          <li><b>13:15 – 14:15</b> Sécurité & gestion des risques au skatepark</li>
-          <li><b>14:15 – 15:15</b> Communication positive avec les jeunes</li>
-          <li><b>15:30 – 16:30</b> Mise en pratique : chacun anime un mini-cours</li>
-          <li><b>16:30 – 17:00</b> Examen & certificats</li>
-        </ul>
-      </div>
+        <div class="slot"><div class="time">09:00 – 09:15</div><div class="desc"><b>Accueil & présentation RSL</b></div></div>
+        <div class="slot"><div class="time">09:15 – 10:00</div><div class="desc"><b>Rôle du moniteur :</b> attitude, responsabilité</div></div>
+        <div class="slot"><div class="time">10:00 – 10:45</div><div class="desc"><b>Pédagogie & progression :</b> structurer un cours</div></div>
+        <div class="slot"><div class="time">11:00 – 12:30</div><div class="desc"><b>Module Samaritains :</b> sécuriser la zone, 144, plaies/entorses/trauma</div></div>
+        <div class="slot"><div class="time">12:30 – 13:15</div><div class="desc"><b>Pause</b></div></div>
+        <div class="slot"><div class="time">13:15 – 14:15</div><div class="desc"><b>Sécurité & gestion des risques</b> au skatepark</div></div>
+        <div class="slot"><div class="time">14:15 – 15:15</div><div class="desc"><b>Communication positive</b> avec les jeunes</div></div>
+        <div class="slot"><div class="time">15:30 – 16:30</div><div class="desc"><b>Mise en pratique :</b> chacun anime un mini-cours</div></div>
+        <div class="slot"><div class="time">16:30 – 17:00</div><div class="desc"><b>Examen & certificats</b></div></div>
+      </article>
 
-      <div class="card">
-        <h3>Après la formation</h3>
-        <ul class="list">
-          <li><b>Certificat « Moniteur RSL »</b> (si réussite)</li>
-          <li><b>Référencement</b> : profil sur le site RSL</li>
-          <li><b>Contact direct</b> : clubs/parents via la RSL</li>
-          <li><b>Accès</b> : ressources pédagogiques & mises à jour</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+      <!-- Inscription -->
+      <aside class="card formation-inscription">
+        <h3>Choisis ta date (1er samedi du mois — 2026)</h3>
+        <p style="margin-top:-6px">Capacité : 20 inscrits par date.</p>
 
-  <!-- FOOTER -->
-  <footer class="foot">
-    <div class="container">
-      <div class="links links-3cols">
-        <div class="col">
-          <h4>RSL</h4>
-          <ul>
-            <li><a href="formation.html">Formation</a></li>
-            <li><a href="evenements.html">Événements</a></li>
-            <li><a href="reglement.html">Règlement</a></li>
-          </ul>
+        <div class="form-row">
+          <label class="label" for="dateSelect">Date</label>
+          <select id="dateSelect" class="select">
+            <option value="">— Sélectionne —</option>
+            <option value="2026-01-03">sam. 03.01.2026</option>
+            <option value="2026-02-07">sam. 07.02.2026</option>
+            <option value="2026-03-07">sam. 07.03.2026</option>
+          </select>
         </div>
-        <div class="col">
-          <h4>Ressources</h4>
-          <ul>
-            <li><a href="membres.html">Adhésion</a></li>
-            <li><a href="comite.html">Comité</a></li>
-            <li><a href="ou_rider.html">Où rider</a></li>
-          </ul>
+
+        <div class="form-row">
+          <label class="label" for="nom">Nom et prénom</label>
+          <input id="nom" class="input" type="text" placeholder="Nom et prénom"/>
         </div>
-        <div class="col">
-          <h4>Contest</h4>
-          <ul>
-            <li><a href="evenements.html">Événements</a></li>
-            <li><a href="inscriptions.html">Inscriptions</a></li>
-            <li><a href="resultats.html">Résultats</a></li>
-          </ul>
+
+        <div class="form-row">
+          <label class="label" for="email">Email</label>
+          <input id="email" class="input" type="email" placeholder="ton@email.ch"/>
         </div>
-      </div>
-      <div class="bottom bottom-right">
-        <p class="tiny">© 2025 — Romandie Scooter League</p>
-        <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
-      </div>
-    </div>
+
+        <div class="form-row">
+          <label class="label" for="dob">Date de naissance</label>
+          <input id="dob" class="input" type="text" inputmode="numeric" placeholder="jj.mm.aaaa"/>
+        </div>
+
+        <div class="form-row">
+          <button class="btn primary" id="btnFormInscrire">Je m’inscris</button>
+          <p class="hint">Astuce : ajoute l’événement dans ton agenda après confirmation.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- ===== JS MENU MOBILE ===== -->
-  <script>
-    (function(){
-      const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
-
-      function buildMobileMenu(){
-        if(document.getElementById('rslMobileBurger')) return;
-
-        const nav = document.querySelector('.nav');
-        const list = nav?.querySelector('ul');
-        if(!nav || !list) return;
-
-        // Burger
-        const burger = document.createElement('button');
-        burger.id = 'rslMobileBurger';
-        burger.type = 'button';
-        burger.setAttribute('aria-label','Ouvrir le menu');
-        burger.setAttribute('aria-expanded','false');
-        burger.textContent = '☰';
-
-        // Overlay + panel
-        const dim = document.createElement('div'); dim.id = 'rslMobileDim';
-        const sheet = document.createElement('aside'); sheet.id = 'rslMobileSheet';
-
-        // Clone nav + CTA en tête
-        const cloned = list.cloneNode(true);
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.href = document.getElementById('btnMembre')?.getAttribute('href') || 'membres.html';
-        a.innerHTML = '<b>Devenir membre</b>';
-        li.appendChild(a);
-        cloned.prepend(li);
-        sheet.appendChild(cloned);
-
-        // Inject DOM
-        document.body.appendChild(burger);
-        document.body.appendChild(dim);
-        document.body.appendChild(sheet);
-
-        // Open / Close
-        const open = () => {
-          document.body.classList.add('rsl-menu-open');
-          burger.setAttribute('aria-expanded','true');
-          document.body.style.overflow='hidden';
-        };
-        const close = () => {
-          document.body.classList.remove('rsl-menu-open');
-          burger.setAttribute('aria-expanded','false');
-          document.body.style.overflow='';
-        };
-
-        burger.addEventListener('click', () =>
-          document.body.classList.contains('rsl-menu-open') ? close() : open()
-        );
-        dim.addEventListener('click', close);
-        sheet.querySelectorAll('a').forEach(x => x.addEventListener('click', close));
-
-        // Si on revient desktop, on ferme
-        const mq = window.matchMedia('(max-width: 900px)');
-        mq.addEventListener?.('change', e => { if(!e.matches) close(); });
-      }
-
-      function destroyMobileMenu(){
-        document.getElementById('rslMobileBurger')?.remove();
-        document.getElementById('rslMobileDim')?.remove();
-        document.getElementById('rslMobileSheet')?.remove();
-        document.body.classList.remove('rsl-menu-open');
-        document.body.style.overflow='';
-      }
-
-      function init(){ if(isMobile()) buildMobileMenu(); else destroyMobileMenu(); }
-      if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
-      window.addEventListener('resize', ()=>{ if(isMobile()) buildMobileMenu(); else destroyMobileMenu(); });
-    })();
-  </script>
-
-</body>
-</html>
+  <a href="coach.html" class="coach-f

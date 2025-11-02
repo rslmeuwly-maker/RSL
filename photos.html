@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Galerie Photos HD — RSL</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    html, body { height:100%; }
+    body {
+      background: transparent !important;
+      margin:0;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    }
+
+    /* vidéo fond plein écran */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+    }
+
+    /* conteneur contenu */
+    .container {
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 24px 80px;
+      position:relative;
+      z-index:10;
+    }
+
+    /* header de la page */
+    .page-intro{
+      color:#fff;
+      text-align:center;
+      padding:28px 0 8px;
+      max-width:800px;
+      margin:0 auto;
+    }
+    .eyebrow{
+      display:inline-block;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:800;
+      font-size:12px;
+      border-radius:8px;
+      padding:4px 8px;
+      margin-bottom:10px;
+      box-shadow:0 10px 24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .logo-wrap{
+      width:64px;
+      height:64px;
+      border-radius:14px;
+      background:#fff;
+      padding:8px;
+      margin:0 auto 10px;
+      box-shadow:0 6px 20px rgba(0,0,0,.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .logo-wrap img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+    .page-intro h1{
+      margin:10px 0 6px;
+      font-size:clamp(28px,4.2vw,42px);
+      font-weight:800;
+      line-height:1.15;
+    }
+    .badge-free{
+      font-size:12px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:6px;
+      padding:3px 6px;
+      display:inline-block;
+      margin-left:8px;
+    }
+    .page-intro p{
+      margin:10px 0 0;
+      opacity:.95;
+      font-size:clamp(15px,2.2vw,18px);
+      line-height:1.4;
+    }
+    .page-intro p b{color:#22c55e;}
+    .notice-top{
+      font-size:12px;
+      color:#cdd6ff;
+      line-height:1.4;
+      margin-top:14px;
+    }
+    .notice-top b{color:#fff;}
+
+    /* barre de sélection (choix du lot m1→m20 etc.) */
+    .batch-bar{
+      max-width:800px;
+      margin:24px auto;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap:12px;
+      background:linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      border-radius:12px;
+      padding:12px 16px;
+      font-size:14px;
+      line-height:1.4;
+      color:#fff;
+      text-align:center;
+    }
+    .batch-bar label{
+      font-weight:600;
+      color:#fff;
+      font-size:14px;
+    }
+    .batch-select{
+      appearance:none;
+      background-color: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding:10px 36px 10px 14px;
+      border-radius:10px;
+      font-size:15px;
+      font-weight:600;
+      min-width:200px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #22c55e 50%),
+        linear-gradient(135deg, #22c55e 50%, transparent 50%);
+      background-position:
+        calc(100% - 22px) center,
+        calc(100% - 17px) center;
+      background-size:6px 6px,6px 6px;
+      background-repeat:no-repeat;
+    }
+
+    /* grille de vignettes */
+    .gallery-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:16px;
+      margin-top:24px;
+    }
+    .ph-card{
+      background:linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.6);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      color:#e7f2eb;
+    }
+    .ph-media{
+      background:#000;
+      width:100%;
+      aspect-ratio:4/3;
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
+    }
+    .ph-media img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      transition: transform .25s ease, filter .25s ease;
+      transform-origin:center;
+    }
+    .ph-media:hover img{
+      transform:scale(1.08);
+      filter:brightness(1.08);
+    }
+    .ph-info{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:14px;
+    }
+    .dl-btn{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:700;
+      font-size:14px;
+      border-radius:10px;
+      padding:10px 12px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      min-width:140px;
+      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      cursor:pointer;
+      border:0;
+    }
+    .dl-btn:hover{
+      filter:brightness(1.07);
+    }
+
+    /* footer */
+    .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:12px;
+      padding:40px 0 20px;
+      margin:40px 0 0;
+    }
+
+    /* lightbox fullscreen */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      flex-direction: column;
+      padding: 24px;
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(0,0,0,.8);
+    }
+    .lightbox .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 95%;
+      max-width: 900px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      gap:16px;
+      color:#fff;
+    }
+    .close-btn,
+    .dl-big-btn{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:700;
+      font-size:15px;
+      border-radius:10px;
+      padding:12px 16px;
+      text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      cursor:pointer;
+      min-width:160px;
+      text-align:center;
+      border:0;
+    }
+    .close-btn{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      box-shadow:none;
+      border:1px solid rgba(255,255,255,.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="bgVid" poster="images/hero-poster.jpg">
+    <!-- la <source> vidéo est injectée en JS depuis Supabase -->
+  </video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
+
+  <!-- contenu principal -->
+  <main class="container">
+    <section class="page-intro">
+      <div class="eyebrow">Montreux Scooter Contest 2025</div>
+
+      <div class="logo-wrap">
+        <img src="images/logo_rsl.png" alt="RSL">
+      </div>
+
+      <h1>
+        Galerie Photos HD
+        <span class="badge-free">téléchargement gratuit</span>
+      </h1>
+
+      <p>
+        Merci d’avoir ridé avec nous 💚<br/>
+        Si tu repostes une image, tag <b>@rsl_swiss</b>.
+      </p>
+
+      <div class="notice-top">
+        Tu veux qu’on retire une photo où tu apparais ?<br/>
+        Écris sur <b>Instagram @rsl_swiss</b> avec le numéro de la photo.
+      </div>
+    </section>
+
+    <!-- Sélecteur du lot -->
+    <section class="batch-bar">
+      <label for="batchSelect">Afficher :</label>
+      <select id="batchSelect" class="batch-select">
+        <option value="0">Photos m1 → m20</option>
+        <option value="1">Photos m21 → m40</option>
+        <option value="2">Photos m41 → m60</option>
+        <option value="3">Photos m61 → m80</option>
+        <option value="4">Photos m81 → m100</option>
+        <option value="5">Photos m101 → m120</option>
+        <option value="6">Photos m121 → m140</option>
+        <option value="7">Photos m141 → m160</option>
+        <option value="8">Photos m161 → m180</option>
+        <option value="9">Photos m181 → m200</option>
+      </select>
+    </section>
+
+    <!-- grille des miniatures -->
+    <section>
+      <div id="galleryGrid" class="gallery-grid"></div>
+    </section>
+
+    <p class="copy">© 2025 — RSL Romandie Scooter League</p>
+  </main>
+
+  <!-- Lightbox plein écran -->
+  <div class="lightbox" id="lightbox">
+    <img id="lightboxImg" src="" alt=""/>
+    <div class="actions">
+      <button class="dl-big-btn" id="downloadLightboxBtn">⬇ Télécharger</button>
+      <button class="close-btn" id="closeLightbox">✕ Fermer</button>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <script>
+  (function(){
+
+    /* ================== VIDÉO DE FOND (depuis Supabase) ================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      const v = document.getElementById('bgVid');
+      if(!v) return;
+
+      // Vidéos hébergées dans ton bucket Supabase public "videos_rsl"
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+
+      const srcEl = document.createElement('source');
+      srcEl.src = pick;
+      srcEl.type = "video/mp4";
+      v.appendChild(srcEl);
+
+      const start = () => {
+        try {
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch){ p.catch(()=>{}); }
+        }catch(e){}
+      };
+      start();
+
+      document.addEventListener('visibilitychange',()=>{
+        if(document.hidden){
+          v.pause();
+        } else {
+          start();
+        }
+      });
+    });
+
+    /* ================== ACCÈS PROTÉGÉ (auth + localStorage) ================== */
+    let supa = null;
+    try{
+      supa = supabase.createClient(
+        window.env?.SUPABASE_URL || '',
+        window.env?.SUPABASE_ANON || ''
+      );
+    }catch(e){
+      console.warn("Init supabase fail",e);
+    }
+
+    (async function guard(){
+      let localOK = false;
+      try{
+        localOK = localStorage.getItem('rsl_photos_ok') === '1';
+      }catch(_){}
+      let sessionOK = false;
+      if(supa){
+        try{
+          const { data:{ user } } = await supa.auth.getUser();
+          if(user) sessionOK = true;
+        }catch(_){}
+      }
+      if(!(localOK && sessionOK)){
+        window.location.href = "access_photos.html";
+        return;
+      }
+    })();
+
+    /* ================== GALERIE ================== */
+    const grid   = document.getElementById('galleryGrid');
+    const select = document.getElementById('batchSelect');
+
+    const lightbox            = document.getElementById('lightbox');
+    const lightboxImg         = document.getElementById('lightboxImg');
+    const closeLightboxBtn    = document.getElementById('closeLightbox');
+    const downloadLightboxBtn = document.getElementById('downloadLightboxBtn');
+
+    let currentFullUrl = "";
+
+    // base URL de ton bucket public pour les photos du contest
+    const BASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/contest_photos_2025";
+
+    // on construit la liste :
+    // index 0 = flyer officiel
+    const allPhotos = [];
+    allPhotos.push({
+      src: `${BASE_URL}/Flyer_Montreux_2025.jpg`,
+      alt: "Flyer officiel Montreux Scooter Contest 2025"
+    });
+
+    // puis m1.jpg -> m200.jpg
+    for(let i=1;i<=200;i++){
+      allPhotos.push({
+        src: `${BASE_URL}/m${i}.jpg`,
+        alt: `RSL Photo m${i}`
+      });
+    }
+
+    // Rend un lot de 20 photos à partir de m1, m21, m41, etc.
+    function renderBatch(batchIndex){
+      const BATCH_SIZE = 20;
+
+      // ex batchIndex=0 => m1 à m20
+      // ex batchIndex=1 => m21 à m40
+      const startPhotoNumber = (batchIndex * BATCH_SIZE) + 1;
+      const endPhotoNumber   = startPhotoNumber + BATCH_SIZE; // exclusif
+
+      const slice = [];
+
+      // Toujours afficher le flyer en premier
+      slice.push(allPhotos[0]);
+
+      // Puis les mX du lot
+      for(let num = startPhotoNumber; num < endPhotoNumber; num++){
+        const item = allPhotos[num];
+        if(item){ slice.push(item); }
+      }
+
+      grid.innerHTML = slice.map(p=>{
+        const safe = encodeURI(p.src);
+        const alt  = p.alt || "RSL Photo";
+        return `
+          <article class="ph-card">
+            <div class="ph-media">
+              <img
+                src="${safe}"
+                alt="${alt}"
+                data-full="${safe}"
+              />
+            </div>
+            <div class="ph-info">
+              <div>${alt}</div>
+              <button class="dl-btn" data-full="${safe}">⬇ Télécharger</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      attachHandlers();
+    }
+
+    function attachHandlers(){
+      // ouvrir la lightbox quand tu cliques sur l'image
+      grid.querySelectorAll('.ph-media img').forEach(img=>{
+        img.addEventListener('click',()=>{
+          const full = img.getAttribute('data-full') || "";
+          const alt  = img.getAttribute('alt') || "RSL Photo";
+          currentFullUrl = full;
+          lightboxImg.src = full;
+          lightboxImg.alt = alt;
+          lightbox.classList.add('open');
+        });
+      });
+
+      // bouton "télécharger" sous chaque vignette
+      grid.querySelectorAll('.dl-btn').forEach(btn=>{
+        btn.addEventListener('click', async (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          const full = btn.getAttribute('data-full') || "";
+          await forceDownloadSmart(full);
+        });
+      });
+    }
+
+    function closeLightbox(){
+      lightbox.classList.remove('open');
+      lightboxImg.src = "";
+      currentFullUrl = "";
+    }
+
+    closeLightboxBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e=>{
+      if(e.target === lightbox){ closeLightbox(); }
+    });
+    document.addEventListener('keydown', e=>{
+      if(e.key === 'Escape'){ closeLightbox(); }
+    });
+
+    downloadLightboxBtn.addEventListener('click', async (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      if(currentFullUrl){
+        await forceDownloadSmart(currentFullUrl);
+      }
+    });
+
+    // essaie de forcer un vrai "save as" côté navigateur
+    async function forceDownloadSmart(url){
+      try{
+        const response = await fetch(url);
+        if(!response.ok) throw new Error("fetch failed "+response.status);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = url.split('/').pop() || 'photo.jpg';
+        a.style.display='none';
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(()=>{
+          URL.revokeObjectURL(blobUrl);
+          a.remove();
+        },200);
+
+        return;
+      }catch(err){
+        console.warn("Blob download failed, fallback", err);
+      }
+
+      try{
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = url.split('/').pop() || 'photo.jpg';
+        a.target = "_self";
+        a.style.display='none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(()=>a.remove(),200);
+        return;
+      }catch(err2){
+        console.warn("Direct download failed, fallback view only", err2);
+      }
+
+      window.location.href = url;
+    }
+
+    // afficher le premier lot par défaut (m1 → m20)
+    renderBatch(0);
+
+    // quand on change le lot
+    select.addEventListener('change', e=>{
+      const batchIndex = parseInt(e.target.value,10);
+      renderBatch(batchIndex);
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

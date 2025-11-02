@@ -3,568 +3,457 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RSL — Romandie Scooter League</title>
+<title>RSL — Accès</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --bg:#040404;
+    --bg:#000;
+    --panel:#0f172aee;
+    --border:rgba(255,255,255,.18);
+    --text:#fff;
     --green:#22c55e;
-    --neon:#7cffb0;
+    --green-dark:#16a34a;
     --danger:#ff4d4f;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;margin:0;padding:0}
   html,body{
     height:100%;
-    margin:0;
-    background:var(--bg);
-    font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    color:#e8ffe8;
+    background:#000;
+    font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    color:var(--text);
+  }
+
+  /* ===== vidéo fond ===== */
+  .bg-video-wrap{
+    position:fixed;
+    inset:0;
+    z-index:0;
     overflow:hidden;
+    background:#000;
   }
-
-  /* full screen canvas code rain */
-  #codeRain{position:fixed;inset:0;z-index:1}
-
-  /* splash card (download / intro) */
-  .splash{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;
-    pointer-events:none;
-  }
-  .card{
-    width:min(980px,94vw);max-width:980px;padding:28px;border-radius:16px;
-    background:linear-gradient(180deg, rgba(2,6,4,.72), rgba(3,8,6,.6));
-    border:1px solid rgba(255,255,255,.06);backdrop-filter: blur(6px) saturate(120%);
-    box-shadow:0 30px 80px rgba(0,0,0,.8);
-    pointer-events:auto; text-align:center; color:var(--neon);
-    overflow:hidden; position:relative;
-  }
-
-  .brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px}
-  .brand img{height:44px;border-radius:10px}
-  .title{
-    font-size:clamp(20px,3.6vw,38px);
-    font-weight:800;
-    color:#fff;
-    text-shadow:0 6px 28px rgba(34,197,94,.06)
-  }
-  .subtitle{
-    color:rgba(200,255,210,.9);
-    opacity:.9;
-    margin-bottom:12px;
-    font-size:14px;
-    font-weight:600;
-    letter-spacing:.3px;
-  }
-
-  /* terminal fake */
-  .term{
-    background:rgba(0,0,0,.42);
-    border-radius:10px;
-    padding:12px 14px;
-    margin:12px auto 18px;
-    max-width:900px;
-    border:1px solid rgba(34,197,94,.06);
-    text-align:left;
-    font-family:ui-monospace,monospace;
-    color:var(--neon);
-    height:120px;
-    overflow:hidden;
-    position:relative;
-  }
-  .line{font-size:13px;line-height:1.25;white-space:nowrap;opacity:.95}
-
-  /* download area */
-  .download{
-    display:flex;align-items:center;gap:14px;justify-content:center;margin-top:4px;flex-wrap:wrap;
-    color:#d6ffdc;font-size:13px;font-weight:600;text-align:center;
-  }
-  .progress{
-    width:220px;
-    height:14px;
-    background:rgba(255,255,255,.06);
-    border-radius:8px;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,.04)
-  }
-  .bar{
+  .bg-video-wrap video{
+    position:absolute;
+    inset:0;
+    width:100%;
     height:100%;
-    width:0%;
-    background:linear-gradient(90deg,var(--green),#8ef9b6);
-    box-shadow:0 6px 24px rgba(34,197,94,.08);
-    transition:width .2s linear
+    object-fit:cover;
+    filter:brightness(.35) saturate(1.1);
   }
-  .pct{font-weight:800;color:#d6ffdc;min-width:48px;text-align:right;font-size:14px}
-
-  /* glitch overlay when we "explode" */
-  .glitch-overlay{
-    position:absolute;inset:0;
-    background:linear-gradient(180deg, rgba(255,20,20,.02), rgba(255,20,20,.06));
-    mix-blend-mode:screen;
+  .bg-dim{
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 50% 30%, rgba(34,197,94,.18) 0%, rgba(0,0,0,.8) 60%);
     pointer-events:none;
-    opacity:0;
-    transition:opacity .25s;
-  }
-  .glitch{
-    position:absolute;inset:0;pointer-events:none;opacity:0;z-index:10;
-    background-image:
-      linear-gradient(0deg, rgba(0,0,0,0) 30%, rgba(255,255,255,.02) 31%, rgba(255,255,255,.02) 32%, rgba(0,0,0,0) 33%);
-    background-size:100% 6px;
-    animation:glitchScan .12s steps(1) infinite;
-  }
-  @keyframes glitchScan{
-    0%{transform:translateY(0)}
-    50%{transform:translateY(2px)}
-    100%{transform:translateY(0)}
   }
 
-  /* welcome state (après l'onde de choc) */
-  .welcome{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:12;
-    opacity:0;pointer-events:none;
-    transition:opacity .3s ease;
-  }
-  .welcome.open{opacity:1;pointer-events:auto}
-  .welcome-card{
-    width:min(780px,94vw);
-    padding:28px;
-    border-radius:14px;
-    background:linear-gradient(180deg,#021007,#06220f);
-    border:1px solid rgba(255,255,255,.06);
-    text-align:center;
-    color:#e9ffe9;
-    box-shadow:0 30px 120px rgba(0,0,0,.7);
-  }
-  .welcome-card h1{
-    font-size:32px;
-    margin:0 0 8px;
-    font-weight:800;
-    color:#fff;
-  }
-  .welcome-card p{
-    margin:0 0 16px;
-    color:#cfeed6;
-    font-size:15px;
-    line-height:1.4;
-  }
-
-  /* form zone */
-  .join-wrap{
+  /* ===== layout ===== */
+  .page-wrap{
+    position:relative;
+    z-index:10;
+    min-height:100%;
     display:flex;
-    flex-direction:column;
-    gap:12px;
-    text-align:left;
-    max-width:340px;
-    margin:0 auto 20px;
-    color:#eaffef;
-    font-size:14px;
-    font-weight:500;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
   }
-  .join-wrap label{font-size:13px;font-weight:600;color:#cfeed6;display:block;margin-bottom:4px}
-  .join-wrap input[type="email"],
-  .join-wrap input[type="password"],
-  .join-wrap input[type="text"]{
+  .gate-card{
+    width:100%;
+    max-width:980px;
+    background:rgba(0,0,0,.55);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:16px;
+    box-shadow:0 30px 80px rgba(0,0,0,.8);
+    padding:20px;
+    color:#fff;
+    backdrop-filter:blur(6px) saturate(140%);
+  }
+
+  .gate-header{text-align:center;margin-bottom:20px;}
+  .badge-top{
+    display:inline-block;
+    background:linear-gradient(180deg,var(--green),var(--green-dark));
+    color:#062312;
+    font-size:13px;
+    font-weight:800;
+    padding:6px 10px;
+    line-height:1.2;
+    border-radius:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 20px rgba(34,197,94,.4);
+  }
+  .gate-small{
+    color:#cdd6ff;
+    font-size:13px;
+    font-weight:500;
+    margin-top:8px;
+  }
+  .gate-small b{color:#fff;font-weight:700;}
+
+  .cols{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+  }
+  @media(max-width:720px){
+    .cols{grid-template-columns:1fr}
+  }
+
+  /* ===== panels ===== */
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+  }
+  .panel h2{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 12px;
+  }
+  .panel-desc{
+    font-size:13px;
+    line-height:1.4;
+    color:#cdd6ff;
+    font-weight:500;
+    margin-bottom:14px;
+  }
+
+  .field{margin-bottom:12px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:#fff;
+    margin-bottom:6px;
+  }
+  .input{
     width:100%;
     background:rgba(0,0,0,.6);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:8px;
-    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:10px;
     color:#fff;
-    font-family:inherit;
     font-size:14px;
     font-weight:600;
+    padding:10px 12px;
     outline:none;
   }
-  .human-check{
-    display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#cfeed6;font-weight:600;line-height:1.3;
+  .input:focus{
+    border-color:var(--green);
+    box-shadow:0 0 0 3px rgba(34,197,94,.25);
   }
-  .human-check input{margin-top:2px;width:16px;height:16px}
 
+  .btn-main{
+    background:linear-gradient(180deg,var(--green),var(--green-dark));
+    border:0;
+    border-radius:10px;
+    color:#062312;
+    font-weight:800;
+    font-size:14px;
+    line-height:1.2;
+    padding:11px 14px;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(0,0,0,.5);
+  }
+  .btn-main:disabled{
+    filter:grayscale(1) brightness(.6);
+    cursor:default;
+  }
+
+  .msg-err,
+  .msg-ok{
+    display:none;
+    margin-top:10px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.4;
+    padding:10px 12px;
+  }
+  .msg-err{
+    background:rgba(255,80,80,.12);
+    border:1px solid rgba(255,80,80,.4);
+    color:#ff9f9f;
+  }
   .msg-ok{
     background:rgba(34,197,94,.12);
     border:1px solid rgba(34,197,94,.4);
     color:#7cffb0;
-    font-weight:600;
-    font-size:13px;
-    border-radius:8px;
-    padding:10px 12px;
-    line-height:1.4;
-    display:none;
   }
 
-  .cta-row{
-    display:flex;
-    gap:12px;
-    justify-content:center;
-    flex-wrap:wrap;
+  .rsl-logo-box{text-align:left;margin-top:16px;}
+  .rsl-logo-box img{
+    max-width:120px;
+    background:#fff;
+    border-radius:10px;
+    padding:8px;
+  }
+
+  .muted-note{
+    font-size:11px;
+    color:#9aa5b1;
     margin-top:10px;
-  }
-  .btn{
-    padding:10px 14px;
-    border-radius:10px;
-    font-weight:800;
-    border:1px solid rgba(255,255,255,.06);
-    cursor:pointer;
-    background:rgba(255,255,255,.03);
-    color:var(--neon);
-    font-size:14px;
-    line-height:1.2;
-  }
-  .btn.green{
-    background:linear-gradient(180deg,var(--green),#8ef9b6);
-    color:#062312;
-    border:0;
-  }
-  .btn.alt{
-    background:transparent;
-    border:1px solid rgba(255,255,255,.08);
-    color:#fff;
-  }
-
-  /* skip link */
-  .skip{
-    position:absolute;top:18px;right:18px;z-index:20;
-    font-weight:800;
-    color:rgba(255,255,255,.85);
-    cursor:pointer;
-    padding:8px 10px;
-    border-radius:8px;
-    background:rgba(0,0,0,.45);
-    border:1px solid rgba(255,255,255,.04);
-    font-size:13px;
-    line-height:1.2;
-    user-select:none;
-  }
-
-  /* tiny footer */
-  .footcopy{
-    position:fixed;left:0;right:0;bottom:10px;
-    text-align:center;
-    color:rgba(180,210,190,.7);
-    font-size:13px;
-    z-index:20
-  }
-
-  /* code/pass bloc in welcome */
-  .access-block{
-    background:rgba(0,0,0,.5);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:10px;
-    padding:16px;
     text-align:left;
-    margin:0 auto 20px;
-    max-width:340px;
   }
-  .access-block h2{
-    margin:0 0 8px;
-    font-size:14px;
-    font-weight:700;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .access-block small{
-    font-size:11px;
-    font-weight:600;
-    color:#9affc0;
-    line-height:1.4;
-    display:block;
-    margin-bottom:10px;
-  }
-  .hint-pass{
-    font-size:11px;
-    font-weight:600;
-    color:#9affc0;
-    text-align:right;
+
+  .footcopy{
+    text-align:center;
+    font-size:12px;
+    color:#9aa5b1;
+    margin-top:24px;
   }
 </style>
 </head>
 <body>
 
-<!-- background matrix -->
-<canvas id="codeRain"></canvas>
-
-<!-- splash intro -->
-<div class="splash" role="dialog" aria-modal="true" aria-label="RSL Intro">
-  <div class="card" id="card">
-    <div class="skip" id="skipBtn">Passer →</div>
-
-    <div class="brand">
-      <img src="images/logo_rsl.png" alt="RSL logo" onerror="this.style.display='none'">
-      <div>
-        <div class="title">Romandie Scooter League</div>
-        <div class="subtitle">Initialisation du core RSL...</div>
-      </div>
-    </div>
-
-    <div class="term" id="term">
-      <div class="line" id="t1">[init] handshake with rsl-core... OK</div>
-      <div class="line" id="t2">[proc] loading modules: visuals, events, auth</div>
-      <div class="line" id="t3">[sys] preparing environment</div>
-      <div class="line" id="t4">[net] connecting to hub.rsl — 192.0.2.2</div>
-    </div>
-
-    <div class="download">
-      <div style="font-weight:900;color:#bfffcf;font-size:13px;letter-spacing:.3px">CHARGEMENT RSL</div>
-      <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
-      <div class="pct" id="pct">0%</div>
-    </div>
-
-    <div style="margin-top:12px;font-size:12px;color:rgba(200,255,210,.75);font-weight:500;line-height:1.4;text-align:center;">
-      Attends le chargement,<br/>ou clique
-      <button class="btn alt" id="openNow" style="font-size:12px;padding:6px 8px;line-height:1.2">Devenir membre</button>
-    </div>
-
-    <div class="glitch-overlay" id="glitchOverlay"></div>
-    <div class="glitch" id="glitch"></div>
-  </div>
+<!-- ====== VIDÉO FOND ====== -->
+<div class="bg-video-wrap">
+  <video id="bgVideo" autoplay muted playsinline loop></video>
+  <div class="bg-dim"></div>
 </div>
 
-<!-- welcome / accès -->
-<div class="welcome" id="welcome">
-  <div class="welcome-card">
-    <h1>Bienvenue sur RSL</h1>
-    <p>Tu fais partie des premiers. Ouverture officielle 2026.<br/>
-    Ton compte membre est créé, mais l'accès complet n'est pas encore actif.</p>
-
-    <!-- bloc d'accès par code -->
-    <div class="access-block">
-      <h2>
-        Accès direct
-        <span class="hint-pass">Ctrl+8</span>
-      </h2>
-      <small>Entre le code d'accès pour passer directement au site complet.</small>
-
-      <label for="passcode">Code d'accès</label>
-      <input id="passcode" type="password" placeholder="********" autocomplete="off"/>
-
-      <div class="cta-row" style="margin-top:12px;justify-content:flex-end">
-        <button class="btn green" id="unlockBtn" style="font-size:13px;padding:8px 10px;">Entrer</button>
-      </div>
+<main class="page-wrap">
+  <section class="gate-card">
+    <div class="gate-header">
+      <div class="badge-top">Bienvenue sur le site officiel de la RSL</div>
+      <div class="gate-small">Ouverture prévue <b>2026</b> • Pré-inscription ci-dessous.</div>
     </div>
 
-    <!-- préinscription / devenir membre -->
-    <form class="join-wrap" id="joinForm" autocomplete="off" novalidate>
-      <div>
-        <label for="emailJoin">Email</label>
-        <input id="emailJoin" type="email" placeholder="ton.email@example.com" required/>
-      </div>
+    <div class="cols">
+      <!-- STAFF / COMITÉ -->
+      <form class="panel" id="staffForm">
+        <h2>
+          <span>Staff / Comité RSL</span>
+          <span style="color:#22c55e;font-size:12px;">Accès interne</span>
+        </h2>
 
-      <div class="human-check">
-        <input id="humanCheck" type="checkbox" required/>
-        <label for="humanCheck">Je confirme que je suis un humain et que je veux rejoindre RSL.</label>
-      </div>
+        <div class="panel-desc">Entre le mot de passe pour accéder au site interne.</div>
 
-      <button class="btn green" id="btnJoinNow" type="submit" style="width:100%;text-align:center;justify-content:center">
-        Valider l'inscription
-      </button>
+        <div class="field">
+          <label for="staffPass">Mot de passe</label>
+          <input id="staffPass" class="input" type="password" placeholder="••••••••" required/>
+        </div>
 
-      <div class="msg-ok" id="joinMsg">
-        Merci de vous être inscrit.<br/>
-        Ouverture officielle 2026.<br/>
-        Ton compte membre est créé mais pas encore activé.
-      </div>
-    </form>
+        <button class="btn-main" type="submit">Entrer</button>
 
-    <div class="cta-row">
-      <button class="btn alt" id="enterBtn">Entrer sur le site</button>
+        <div id="staffMsgErr" class="msg-err"></div>
+
+        <div class="rsl-logo-box">
+          <img src="images/logo_rsl.png" alt="RSL">
+        </div>
+
+        <p class="muted-note">
+          Le code est le même pour tout le staff : <b>rsl2015#</b>
+        </p>
+      </form>
+
+      <!-- RIDER / PRÉ-INSCRIPTION -->
+      <form class="panel" id="riderForm">
+        <h2>
+          <span>Pré-inscription rider</span>
+          <span style="font-size:12px;background:rgba(255,255,255,.1);border-radius:6px;padding:3px 6px;">Gratuit</span>
+        </h2>
+
+        <div class="panel-desc">
+          Laisse tes infos. On te contactera quand la ligue ouvre officiellement.
+        </div>
+
+        <div class="field">
+          <label for="riderNom">Nom</label>
+          <input id="riderNom" class="input" type="text" required/>
+        </div>
+
+        <div class="field">
+          <label for="riderPrenom">Prénom</label>
+          <input id="riderPrenom" class="input" type="text" required/>
+        </div>
+
+        <div class="field">
+          <label for="riderEmail">Email</label>
+          <input id="riderEmail" class="input" type="email" placeholder="ton@email.ch" required/>
+        </div>
+
+        <div class="field">
+          <label for="riderCode">Ton code perso (mot de passe futur)</label>
+          <input id="riderCode" class="input" type="password" placeholder="Choisis ton code" required minlength="4"/>
+        </div>
+
+        <button class="btn-main" id="riderSubmitBtn" type="submit">Envoyer</button>
+
+        <div id="riderMsgErr" class="msg-err"></div>
+        <div id="riderMsgOk" class="msg-ok"></div>
+
+        <p class="muted-note">
+          Tu ne peux pas encore te connecter au site.<br/>
+          On t’enverra ton accès à l’ouverture officielle.
+        </p>
+      </form>
     </div>
-  </div>
-</div>
 
-<p class="footcopy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+    <p class="footcopy">© 2026 — Romandie Scooter League</p>
+  </section>
+</main>
+
+<!-- Supabase (pour créer l'utilisateur et donc stocker l'email dans auth.users) -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/env.js"></script>
 
 <script>
-/* ===================== MATRIX / CODE RAIN ===================== */
+// ==== VIDÉO SUPABASE ALÉATOIRE ====
 (function(){
-  const canvas = document.getElementById('codeRain');
-  const ctx = canvas.getContext('2d');
-  let W, H, cols, size=16, drops;
+  const vids=[
+    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+  ];
+  const pick=vids[Math.floor(Math.random()*vids.length)];
+  const vEl=document.getElementById("bgVideo");
+  if(vEl){
+    const s=document.createElement("source");
+    s.src=pick;
+    s.type="video/mp4";
+    vEl.appendChild(s);
 
-  function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    cols = Math.floor(W/size);
-    drops = new Array(cols).fill(1).map(()=>Math.floor(Math.random()*H/size));
-  }
-  window.addEventListener('resize', resize);
-  resize();
+    const slowPlay=()=>{
+      try{
+        vEl.playbackRate=0.6;
+        const p=vEl.play();
+        if(p && p.catch){ p.catch(()=>{}); }
+      }catch(e){}
+    };
+    slowPlay();
 
-  const letters = "01[]{}()<>=/*\\|-_@#$%^&*!;:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  function draw(){
-    ctx.fillStyle = "rgba(0,0,0,0.12)";
-    ctx.fillRect(0,0,W,H);
-    ctx.font = size + "px monospace";
-    for(let i=0;i<cols;i++){
-      const text = letters.charAt(Math.floor(Math.random()*letters.length));
-      const x = i*size, y = drops[i]*size;
-      ctx.fillStyle = (Math.random()<0.07) ? "rgba(255,255,255,.9)" : "rgba(34,197,94,0.95)";
-      ctx.fillText(text, x, y);
-      if(y > H && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-
-/* ===================== INTRO / PROGRESS / GLITCH ===================== */
-(function(){
-  const bar = document.getElementById('bar');
-  const pct = document.getElementById('pct');
-  const glitchOverlay = document.getElementById('glitchOverlay');
-  const glitch = document.getElementById('glitch');
-  const welcome = document.getElementById('welcome');
-  const skipBtn = document.getElementById('skipBtn');
-  const openNow = document.getElementById('openNow');
-
-  let progress = 0;
-  let running = true;
-
-  function step(){
-    if(!running) return;
-
-    progress += (Math.random()*2.8 + 0.6);
-    if(progress>100) progress = 100;
-    bar.style.width = progress + '%';
-    pct.textContent = Math.round(progress) + '%';
-
-    const tlines = [
-      '[init] handshake with rsl-core... OK',
-      '[proc] loading modules: visuals, events, auth',
-      '[sys] preparing environment',
-      '[net] connecting to hub.rsl — 192.0.2.2',
-      '[fs] writing /usr/local/share/rsl/flags',
-      '[dbg] launching renderers...',
-      '[ok] modules ready'
-    ];
-    const term = document.getElementById('term');
-    term.querySelectorAll('.line').forEach((el,i)=> {
-      el.textContent = tlines[(i + Math.floor(progress/12)) % tlines.length];
+    document.addEventListener("visibilitychange",()=>{
+      if(document.hidden){
+        vEl.pause();
+      }else{
+        slowPlay();
+      }
     });
-
-    if(progress < 100){
-      setTimeout(step, 280 + Math.random()*220);
-    } else {
-      openWelcome();
-    }
   }
+})();
 
-  function openWelcome(){
-    // glitch flash
-    glitchOverlay.style.transition = 'opacity .12s';
-    glitchOverlay.style.opacity = 0.65;
-    glitch.style.opacity = 1;
+// ==== ACCÈS STAFF ====
+(function(){
+  const PASS="rsl2015#";
+  const form=document.getElementById("staffForm");
+  const input=document.getElementById("staffPass");
+  const err=document.getElementById("staffMsgErr");
 
-    // shake card
-    const card = document.getElementById('card');
-    card.animate([
-      { transform: 'translateX(0) rotate(0)' },
-      { transform: 'translateX(-8px) rotate(-0.8deg)' },
-      { transform: 'translateX(10px) rotate(0.8deg)' },
-      { transform: 'translateX(-6px) rotate(-0.6deg)' },
-      { transform: 'translateX(0) rotate(0)' }
-    ], { duration: 650, iterations: 1, easing: 'ease-in-out' });
-
-    setTimeout(()=>{
-      glitchOverlay.style.opacity = 0;
-      glitch.style.opacity = 0;
-      welcome.classList.add('open');
-      setTimeout(()=>{ document.querySelector('.splash').style.display='none'; }, 400);
-    }, 900);
-  }
-
-  // démarrage pseudo-download
-  setTimeout(step, 700);
-
-  // skip direct
-  skipBtn.addEventListener('click', ()=>{
-    running=false;
-    bar.style.width='100%';
-    pct.textContent='100%';
-    openWelcome();
-  });
-
-  // "devenir membre" pendant le chargement -> on ouvre déjà l'écran welcome (préinscription)
-  openNow.addEventListener('click', ()=>{
-    running=false;
-    openWelcome();
-  });
-
-  // raccourci clavier Ctrl+8 : accès direct au site
-  document.addEventListener('keydown', (e)=>{
-    if(e.ctrlKey && (e.key === '8' || e.key === 'Digit8')){
-      window.location.href='index.html';
+  form.addEventListener("submit",e=>{
+    e.preventDefault();
+    if(input.value.trim()===PASS){
+      // staff a le droit d'entrer tout de suite
+      window.location.href="index1.html";
+    }else{
+      err.textContent="Mot de passe incorrect.";
+      err.style.display="block";
+      input.style.borderColor="var(--danger)";
+      setTimeout(()=>{input.style.borderColor="rgba(255,255,255,.25)";},1000);
     }
   });
 })();
 
-/* ===================== WELCOME LOGIC (form + code) ===================== */
+// ==== PRÉ-INSCRIPTION RIDER -> ENREGISTRE DANS SUPABASE AUTH ====
 (function(){
-  const unlockBtn = document.getElementById('unlockBtn');
-  const passcodeInput = document.getElementById('passcode');
+  // init supabase client avec tes variables d'env
+  let supa=null;
+  try{
+    supa = supabase.createClient(
+      window.env?.SUPABASE_URL || '',
+      window.env?.SUPABASE_ANON || ''
+    );
+  }catch(e){
+    console.warn("Init Supabase raté:",e);
+  }
 
-  const enterBtn = document.getElementById('enterBtn');
+  const form           = document.getElementById("riderForm");
+  const btn            = document.getElementById("riderSubmitBtn");
+  const nom            = document.getElementById("riderNom");
+  const prenom         = document.getElementById("riderPrenom");
+  const email          = document.getElementById("riderEmail");
+  const code           = document.getElementById("riderCode");
+  const ok             = document.getElementById("riderMsgOk");
+  const err            = document.getElementById("riderMsgErr");
 
-  const joinForm = document.getElementById('joinForm');
-  const emailJoin = document.getElementById('emailJoin');
-  const humanCheck = document.getElementById('humanCheck');
-  const joinMsg = document.getElementById('joinMsg');
-
-  // bouton "Entrer sur le site" sans rien -> index direct
-  enterBtn.addEventListener('click', ()=>{
-    window.location.href='index.html';
-  });
-
-  // bouton "Entrer" avec le code d'accès
-  unlockBtn.addEventListener('click', ()=>{
-    const val = passcodeInput.value.trim();
-    if(val === 'RSL2026#'){
-      window.location.href='index.html';
-    } else {
-      passcodeInput.style.borderColor='var(--danger)';
-      passcodeInput.style.outline='2px solid var(--danger)';
-      setTimeout(()=>{
-        passcodeInput.style.borderColor='rgba(255,255,255,.12)';
-        passcodeInput.style.outline='none';
-      },1000);
-    }
-  });
-
-  // préinscription membre
-  joinForm.addEventListener('submit', (e)=>{
+  form.addEventListener("submit", async e=>{
     e.preventDefault();
 
-    const emailVal = emailJoin.value.trim();
-    const okHuman = humanCheck.checked;
+    ok.style.display="none";
+    err.style.display="none";
 
-    if(!emailVal || !okHuman){
-      // feedback rouge basique
-      if(!emailVal){
-        emailJoin.style.borderColor='var(--danger)';
-        emailJoin.style.outline='2px solid var(--danger)';
-        setTimeout(()=>{
-          emailJoin.style.borderColor='rgba(255,255,255,.12)';
-          emailJoin.style.outline='none';
-        },1000);
-      }
-      if(!okHuman){
-        humanCheck.style.outline='2px solid var(--danger)';
-        setTimeout(()=>{ humanCheck.style.outline='none'; },1000);
-      }
+    // validation côté front
+    if(
+      !nom.value.trim() ||
+      !prenom.value.trim() ||
+      !email.value.trim() ||
+      !code.value.trim()
+    ){
+      err.textContent="Merci de remplir tous les champs.";
+      err.style.display="block";
+      return;
+    }
+    if(code.value.trim().length < 4){
+      err.textContent="Code perso trop court (min 4).";
+      err.style.display="block";
       return;
     }
 
-    // ICI tu pourras brancher Supabase ou envoi email, etc.
-    // pour l'instant on simule: compte créé mais pas encore accès
-    joinMsg.style.display='block';
+    // désactive le bouton le temps d'envoyer
+    btn.disabled = true;
 
-    // reset form visuel
-    emailJoin.value='';
-    humanCheck.checked=false;
+    // on crée un compte Supabase pour qu'il apparaisse dans auth.users
+    // email = riderEmail
+    // password = riderCode
+    // metadata = nom / prénom / préinscription
+    try{
+      if(!supa){
+        throw new Error("Supabase pas prêt");
+      }
+
+      const { error: signErr } = await supa.auth.signUp({
+        email: email.value.trim(),
+        password: code.value.trim(),
+        options:{
+          data:{
+            nom: nom.value.trim(),
+            prenom: prenom.value.trim(),
+            preinscription_rsl: true,
+            statut: "waiting_open_2026"
+          }
+        }
+      });
+
+      if(signErr){
+        console.warn(signErr);
+        err.textContent="Impossible d'enregistrer. (Email déjà utilisé ?)";
+        err.style.display="block";
+        btn.disabled=false;
+        return;
+      }
+
+      // succès visuel
+      ok.textContent="Merci ! On te contactera à l’ouverture officielle.";
+      ok.style.display="block";
+
+      // reset du form
+      nom.value="";
+      prenom.value="";
+      email.value="";
+      code.value="";
+
+    }catch(ex){
+      console.warn(ex);
+      err.textContent="Erreur technique, réessaie.";
+      err.style.display="block";
+    }
+
+    btn.disabled = false;
   });
 })();
 </script>

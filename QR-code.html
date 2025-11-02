@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>RSL — Accès</title>
+
+  <style>
+    :root {
+      /* Mets ici le vert EXACT de tes boutons du site */
+      --rsl-green: #00ff66; /* <-- remplace cette valeur par ton vert */
+      --bg-dark: #0f0f0f;
+      --text-main: #f2f2f2;
+      --text-dim: #a5a5a5;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Outfit","Inter",Roboto,Arial,sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Glow vert discret en fond (respire "RSL / Spotify") */
+    .bg-glow {
+      position: absolute;
+      width: 60vmin;
+      height: 60vmin;
+      background: radial-gradient(circle at 50% 50%, rgba(0,255,102,0.18) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(40px);
+      opacity: .6;
+      pointer-events: none;
+      animation: pulse 3s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity:.5; }
+      50%{ transform: scale(1.07); opacity:.8; }
+      100%{ transform: scale(1); opacity:.5; }
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+    }
+
+    /* zone anim principale */
+    .stage {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    /* QR visible au début */
+    .qr-start {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      border-radius: .5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      animation: qrPop .5s ease-out both,
+                 qrHold 1.4s linear both;
+    }
+    .qr-start img {
+      width: 80%;
+      height: auto;
+    }
+    @keyframes qrPop {
+      0%   { opacity:0; transform: scale(.6) translateY(20px); box-shadow:0 0 0 rgba(0,0,0,0); }
+      100% { opacity:1; transform: scale(1) translateY(0);     box-shadow:0 30px 80px rgba(0,0,0,.6); }
+    }
+    @keyframes qrHold {
+      0%   { filter: none; }
+      100% { filter: none; }
+    }
+
+    /* Particules (canvas) */
+    canvas#particles {
+      position: absolute;
+      inset: 0;
+      width: 220px;
+      height: 220px;
+      display: block;
+      opacity: 0;
+      transition: opacity .15s linear;
+      image-rendering: pixelated;
+    }
+
+    /* texte RSL après l'onde de choc */
+    .rsl-logo-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 3rem;
+      line-height: 1;
+      color: var(--rsl-green);
+      text-shadow:
+        0 0 20px rgba(0,255,102,.4),
+        0 0 40px rgba(0,255,102,.2),
+        0 0 80px rgba(0,255,102,.15);
+      letter-spacing: -0.04em;
+      opacity: 0;
+      transform: scale(.6);
+      animation: rslImpact 0.4s cubic-bezier(.2,1.4,.4,1) forwards;
+      animation-delay: 1.6s; /* arrive après l'explosion */
+    }
+    @keyframes rslImpact {
+      0%   { opacity:0; transform: scale(.4) translateY(20px); filter: blur(10px); }
+      70%  { opacity:1; transform: scale(1.15) translateY(-4px); filter: blur(0); }
+      100% { opacity:1; transform: scale(1) translateY(0); }
+    }
+
+    /* Texte d'accueil */
+    .welcome-block {
+      color: var(--text-main);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: .5rem;
+      opacity: 0;
+      animation: fadeDrop .4s cubic-bezier(.2,1.4,.4,1) forwards;
+      animation-delay: 2.1s;
+    }
+    @keyframes fadeDrop {
+      0%   { opacity:0; transform: translateY(-10px) scale(.95); }
+      70%  { opacity:1; transform: translateY(2px) scale(1.03); }
+      100% { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    .subtext {
+      color: var(--text-dim);
+      font-size: .9rem;
+      line-height: 1.4;
+      max-width: 300px;
+      margin: 0 auto 2rem auto;
+      opacity: 0;
+      text-wrap: balance;
+      animation: fadeIn .5s ease forwards;
+      animation-delay: 2.4s;
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform: translateY(6px); }
+      to   { opacity:1; transform: translateY(0);   }
+    }
+
+    /* bouton d'entrée */
+    .enter-btn {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      background-color: var(--rsl-green);
+      color: #000;
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.2;
+      padding: .8rem 1.2rem .9rem;
+      min-width: 180px;
+      cursor: pointer;
+      box-shadow:
+        0 18px 40px rgba(0,255,102,0.25),
+        0 2px 4px rgba(0,0,0,.8);
+      opacity: 0;
+      transform: translateY(10px) scale(.97);
+      animation: btnIn .4s ease forwards;
+      animation-delay: 2.8s;
+    }
+    @keyframes btnIn {
+      to { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .enter-btn:active { transform: scale(.97); }
+
+    .foot {
+      margin-top: 1.5rem;
+      font-size: .7rem;
+      line-height: 1.4;
+      color: var(--text-dim);
+      text-align: center;
+    }
+    .foot strong {
+      color: var(--rsl-green);
+      font-weight: 600;
+    }
+
+    /* onde de choc */
+    .shockwave {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(0,255,102,0.9) 0%, rgba(0,0,0,0) 70%);
+      box-shadow:
+        0 0 60px rgba(0,255,102,.6),
+        0 0 200px rgba(0,255,102,.3);
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      z-index: 3;
+    }
+    .shockwave.boom {
+      animation: shockExpand 0.5s cubic-bezier(.2,1,.4,1) forwards;
+    }
+    @keyframes shockExpand {
+      0%   { opacity: 1; transform: translate(-50%, -50%) scale(0);    filter: blur(6px); }
+      70%  { opacity: 1; transform: translate(-50%, -50%) scale(40);   filter: blur(2px); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(70);   filter: blur(12px); }
+    }
+
+    /* flash vert sur tout l'écran */
+    .flash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,255,102,0.6) 0%, rgba(0,0,0,0) 70%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 4;
+    }
+    .flash.active {
+      animation: flashBang .2s ease-out forwards;
+    }
+    @keyframes flashBang {
+      0%   { opacity: 0; }
+      20%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* secousse écran */
+    .shake {
+      animation: screenShake .15s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes screenShake {
+      0%   { transform: translate(0, 0); }
+      20%  { transform: translate(-4px, 2px); }
+      40%  { transform: translate(3px, -3px); }
+      60%  { transform: translate(-2px, 4px); }
+      80%  { transform: translate(2px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* masque QR après l'explosion */
+    .hide {
+      opacity: 0 !important;
+      filter: blur(20px);
+      transition: opacity .2s linear, filter .2s linear;
+    }
+  </style>
+</head>
+<body>
+  <!-- glow derrière -->
+  <div class="bg-glow"></div>
+
+  <!-- onde de choc / flash -->
+  <div class="shockwave" id="shockwave"></div>
+  <div class="flash" id="flashFX"></div>
+
+  <div class="wrapper">
+    <div class="stage">
+      <!-- QR de départ -->
+      <div class="qr-start" id="qrStart">
+        <img src="images/qr-rsl.png" alt="QR RSL">
+      </div>
+
+      <!-- particules -->
+      <canvas id="particles" width="220" height="220"></canvas>
+
+      <!-- texte RSL bam -->
+      <div class="rsl-logo-text">RSL</div>
+    </div>
+
+    <div class="welcome-block">Bienvenue sur le site RSL</div>
+    <div class="subtext">Accès validé via QR officiel. Clique pour entrer.</div>
+
+    <button class="enter-btn" id="enterBtn">ENTRER SUR LE SITE</button>
+
+    <div class="foot">
+      Romandie Scooter League<br>
+      <strong>rsl-swiss.ch</strong>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // 1. Explosion particules + onde de choc + flash
+    // =========================
+    const qrStart   = document.getElementById('qrStart');
+    const canvas    = document.getElementById('particles');
+    const ctx       = canvas.getContext('2d');
+    const shockwave = document.getElementById('shockwave');
+    const flashFX   = document.getElementById('flashFX');
+    const bodyEl    = document.body;
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // paramètres particules
+    const PARTICLE_COUNT = 75;
+    const particles = [];
+
+    function rand(min,max){ return Math.random()*(max-min)+min }
+
+    // on prépare les particules
+    for (let i=0; i<PARTICLE_COUNT; i++){
+        particles.push({
+          x: W/2,
+          y: H/2,
+          vx: rand(-2.5,2.5),
+          vy: rand(-2.5,2.5),
+          life: rand(0.8,1.2),
+          age: 0
+        });
+    }
+
+    let startTime = null;
+    let exploded  = false;
+
+    function drawFrame(ts){
+      if(!startTime) startTime = ts;
+      const dt = (ts - startTime)/1000; // secondes
+
+      ctx.clearRect(0,0,W,H);
+
+      // explosion à ~0.9s
+      if (dt > 0.9 && !exploded){
+        exploded = true;
+
+        // 1. cacher le QR
+        qrStart.classList.add('hide');
+
+        // 2. onde de choc
+        shockwave.classList.add('boom');
+
+        // 3. flash + shake
+        flashFX.classList.add('active');
+        bodyEl.classList.add('shake');
+
+        // 4. particules visibles
+        canvas.style.opacity = '1';
+      }
+
+      // si explosion active -> on anime les particules
+      if (exploded){
+        const green = getComputedStyle(document.documentElement)
+          .getPropertyValue('--rsl-green').trim() || '#00ff66';
+
+        ctx.fillStyle = green;
+
+        particles.forEach(p=>{
+          p.age += 1/60;
+          p.x += p.vx;
+          p.y += p.vy;
+
+          const alpha = Math.max(0, 1 - (p.age / p.life));
+          if(alpha>0){
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+            ctx.fill();
+          }
+        });
+      }
+
+      // couper les particules après ~2.2s total
+      if (dt > 2.2){
+        canvas.style.opacity = '0';
+      } else {
+        requestAnimationFrame(drawFrame);
+      }
+    }
+
+    requestAnimationFrame(drawFrame);
+
+    // =========================
+    // 2. Bouton entrer -> index
+    // =========================
+    document.getElementById('enterBtn').addEventListener('click', () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

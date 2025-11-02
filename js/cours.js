@@ -1,191 +1,228 @@
-// ===== Config Stripe
-const STRIPE_PK    = "pk_live_51SHkA04CyXBvyjQ00N7zRHQgtLlgeEcB7ohw0ISTC7ozijz1KFJoag2EVZN3JQs3aWAV1tPvM6Tx061sb9eyVMCi00j2Dgy94j";
-const PRICE_PUBLIC = "price_1SL40q4CyXBvyjQ0WchOzKhv"; // 30.–
-const PRICE_MEMBRE = "price_1SL41X4CyXBvyj0Qg15rUxD4"; // 20.–
-const stripe = Stripe(STRIPE_PK);
+// ===== Supabase init =====
+const { createClient } = supabase;
+let supa = null;
+try {
+  supa = createClient(window.env?.SUPABASE_URL || '', window.env?.SUPABASE_ANON || '');
+} catch (_) {}
 
-// ===== Supabase client (avec fallback démo offline)
-const DEMO_MODE = !window.env || !window.env.SUPABASE_URL || !window.env.SUPABASE_ANON;
-let supabase = null;
-if (!DEMO_MODE) {
-  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm');
-  supabase = createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+// ===== Panier helpers =====
+function getPanier() {
+  return JSON.parse(localStorage.getItem("rsl_panier_courses") || "[]");
 }
-
-// ===== DOM
-const dlg         = document.getElementById('dlg');
-const lieuSelect  = document.getElementById('lieuSelect');
-const daysGrid    = document.getElementById('daysGrid');
-const recap       = document.getElementById('recap');
-const totauxEl    = document.getElementById('totaux');
-const emailInput  = document.getElementById('email');
-const form        = document.getElementById('formRSL');
-
-const fmt = (iso) => new Date(iso).toLocaleString('fr-CH',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-
-// ===== State
-const selected = new Map();   // id -> {starts_at, location, pricePreview?}
-const takenByIso = new Map(); // iso -> id
-
-// ===== DEMO generator (offline)
-function saturdays2026At(hour="09"){
-  const out=[]; let d = new Date(Date.UTC(2026,0,1,12,0,0));
-  while (d.getUTCFullYear()===2026){
-    if (d.getUTCDay()===6){
-      out.push(new Date(Date.UTC(2026,d.getUTCMonth(),d.getUTCDate(),Number(hour),0,0)).toISOString());
-    }
-    d.setUTCDate(d.getUTCDate()+1);
-  }
-  return out;
+function savePanier(p) {
+  localStorage.setItem("rsl_panier_courses", JSON.stringify(p));
 }
-const DEMO_DB = (() => {
-  const base = {
-    "Montreux":             { hour:"09" },
-    "Lausanne — La Fièvre": { hour:"09" },
-    "Lausanne — Vidy":      { hour:"10", outdoor:true },
-    "Bulle":                { hour:"09", outdoor:true },
-    "Yverdon":              { hour:"09", outdoor:true },
-    "Martigny":             { hour:"09", outdoor:true },
-    "Fribourg":             { hour:"09", outdoor:true },
-    "Genève — Plainpalais": { hour:"09", outdoor:true },
-  };
-  const obj={};
-  for (const [loc, conf] of Object.entries(base)){
-    obj[loc] = saturdays2026At(conf.hour).filter(iso=>{
-      if (!conf.outdoor) return true;
-      const m = (new Date(iso)).getUTCMonth()+1;
-      return ![1,2,11,12].includes(m); // pas janv/févr/nov/déc
-    }).map((iso,i)=>({ id:`${loc}-${i}`, location:loc, starts_at:iso, remaining:15 }));
-  }
-  return obj;
-})();
+function updateBasketBar() {
+  const bar  = document.getElementById("basketBar");
+  const info = document.getElementById("basketInfo");
+  if (!bar || !info) return;
 
-// ===== UI build
-async function loadAndBuild(){
-  daysGrid.innerHTML = '<span class="muted">Chargement…</span>';
-  const loc = lieuSelect.value;
-
-  let rows=[];
-  if (DEMO_MODE) {
-    rows = DEMO_DB[loc] || [];
+  const panier = getPanier();
+  if (panier.length > 0) {
+    bar.style.display = "flex";
+    info.textContent =
+      panier.length + (panier.length > 1 ? " cours sélectionnés" : " cours sélectionné");
   } else {
-    const { data, error } = await supabase
-      .from('courses_with_remaining')
-      .select('id, location, starts_at, remaining')
-      .eq('location', loc)
-      .gte('starts_at','2026-01-01T00:00:00Z')
-      .lt('starts_at', '2027-01-01T00:00:00Z')
-      .order('starts_at',{ascending:true});
-    if (error){ daysGrid.innerHTML = '<p class="muted">Erreur de chargement.</p>'; console.error(error); return; }
-    rows = data || [];
+    bar.style.display = "none";
+    info.textContent = "0 cours sélectionné";
+  }
+}
+
+// ===== Chargement + rendu des cours =====
+async function loadCourses(){
+  const list      = document.getElementById('courseList');
+  const monthSel  = document.getElementById('filtreMois');
+  const lieuSel   = document.getElementById('filtreLieu');
+  const onlyFree  = document.getElementById('filtreDispo');
+
+  list.innerHTML = '<div class="item"><b>Chargement...</b></div>';
+
+  try {
+    if(!supa) throw new Error('No Supabase env');
+    let { data, error } = await supa
+      .from('courses')
+      .select('id,location,starts_at,capacity,enrollments(id)')
+      .order('starts_at');
+
+    if(error) throw error;
+
+    render(data);
+    localStorage.setItem('rsl_courses_cache', JSON.stringify(data));
+  } catch(e) {
+    // fallback cache local
+    const cache = localStorage.getItem('rsl_courses_cache');
+    if(cache){
+      render(JSON.parse(cache), true);
+    } else {
+      list.innerHTML = '<div class="item">Impossible de charger les cours (pas de cache).</div>';
+    }
   }
 
-  daysGrid.innerHTML = '';
-  rows.forEach(c=>{
-    const iso = new Date(c.starts_at).toISOString();
-    const btn = document.createElement('button');
-    btn.className = 'pill'; btn.type='button';
-    btn.textContent = `${fmt(iso)} — ${c.remaining} pl.`;
-    btn.dataset.id = c.id; btn.dataset.iso=iso; btn.dataset.loc=c.location;
+  function render(data){
+    const mois = monthSel.value;
+    const lieu = lieuSel.value;
+    const only = onlyFree.checked;
 
-    if (c.remaining<=0){ btn.classList.add('disabled'); btn.disabled = true; }
-    if (selected.has(c.id)) btn.classList.add('on');
-
-    btn.addEventListener('click', ()=>{
-      const existing = takenByIso.get(iso);
-      if (existing && existing !== c.id) return; // anti-doublon même date/heure
-      if (selected.has(c.id)){
-        selected.delete(c.id); takenByIso.delete(iso); btn.classList.remove('on');
-      }else{
-        selected.set(c.id,{ starts_at:iso, location:c.location });
-        takenByIso.set(iso,c.id); btn.classList.add('on');
-      }
-      refreshRecap();
+    // filtre des cours
+    const filt = data.filter(c=>{
+      const d  = new Date(c.starts_at);
+      const mm = (d.getMonth()+1).toString().padStart(2,'0');
+      const r  = c.capacity - (c.enrollments?.length||0); // places restantes
+      return (mois==='all' || mm===mois)
+          && (lieu==='all' || c.location===lieu)
+          && (!only || r>0);
     });
 
-    daysGrid.appendChild(btn);
-  });
+    // remplir le <select> des lieux
+    const uniqLieux = [...new Set(data.map(c=>c.location))].sort();
+    lieuSel.innerHTML =
+      '<option value="all">Tous les lieux</option>' +
+      uniqLieux.map(l=>`<option ${l===lieu?'selected':''}>${l}</option>`).join('');
 
-  refreshRecap();
+    // panier actuel (pour marquer "Ajouté ✅")
+    const panier = getPanier();
+
+    // génération HTML pour chaque cours filtré
+    list.innerHTML = filt.map(c=>{
+      const d   = new Date(c.starts_at);
+
+      // ex: "sam., 03.01."
+      const dd  = d.toLocaleDateString('fr-CH', {
+        weekday:'short',
+        day:'2-digit',
+        month:'2-digit'
+      });
+
+      // heure style "10h00"
+      const hh   = String(d.getHours()).padStart(2,'0');
+      const min  = String(d.getMinutes()).padStart(2,'0');
+      const niceDate = dd;
+      const niceTime = hh + "h" + min;
+
+      // date ISO (AAAA-MM-JJ) -> utilisée pour bloquer deux cours le même jour
+      const dateISO = d.toISOString().split('T')[0];
+
+      // places restantes
+      const rest = c.capacity - (c.enrollments?.length||0);
+      const full = rest <= 0;
+
+      // est-ce que ce cours est déjà dans le panier ?
+      const inPanier = panier.some(item => String(item.id) === String(c.id));
+
+      // texte / état bouton
+      let btnLabel   = full ? "Complet" : (inPanier ? "Ajouté ✅" : "S’inscrire");
+      let btnDisable = full ? "disabled" : "";
+      let btnExtraCl = inPanier ? "selected" : "";
+
+      return `
+        <div class="item" style="background:linear-gradient(180deg,rgba(9,13,23,.78),rgba(7,10,18,.78));border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;color:#e7f2eb;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-bottom:12px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+              <b style="color:#fff;font-weight:700;font-size:15px;line-height:1.3;">
+                ${c.location}
+              </b>
+              <span class="badge" style="display:inline-block;border-radius:8px;border:1px solid rgba(255,255,255,.12);padding:4px 8px;font-size:12px;line-height:1.2;font-weight:600;
+                ${full
+                  ? "background:rgba(239,68,68,.15);color:#f87171;"
+                  : "background:rgba(34,197,94,.12);color:#22c55e;"}">
+                ${full ? 'Complet' : rest+' places'}
+              </span>
+            </div>
+
+            <div class="muted" style="color:#cbd5e1;font-size:14px;line-height:1.3;margin-top:4px;">
+              ${niceDate} — ${niceTime}
+            </div>
+          </div>
+
+          <div style="margin-top:10px;display:flex;justify-content:flex-start;align-items:center;gap:8px;">
+            <button
+              class="btn green inscrire-btn ${btnExtraCl}"
+              data-id="${c.id}"
+              data-date="${dateISO}"
+              style="background:#22c55e;color:#062312;font-weight:700;border-radius:8px;padding:8px 12px;font-size:14px;line-height:1.2;border:0;cursor:${full?'not-allowed':'pointer'};min-width:90px;"
+              ${btnDisable}
+            >${btnLabel}</button>
+
+            <span class="conflict-msg" style="display:none;color:#f87171;font-size:12px;font-weight:600;">
+              Déjà un cours ce jour-là
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // après affichage, mettre à jour la barre panier en bas
+    updateBasketBar();
+  }
 }
 
-function refreshRecap(){
-  recap.innerHTML = '';
-  const arr = [...selected.entries()].map(([id,info])=>({id, ...info}))
-    .sort((a,b)=> new Date(a.starts_at)-new Date(b.starts_at));
-
-  arr.forEach(it=>{
-    const row = document.createElement('div');
-    row.className='item';
-    row.innerHTML = `<span>${fmt(it.starts_at)}</span><span>${it.location}</span>
-    <button class="btn small red" data-rm="${it.id}">Retirer</button>`;
-    recap.appendChild(row);
+// ===== Démarrage + filtres =====
+window.addEventListener('DOMContentLoaded', ()=>{
+  ['filtreMois','filtreLieu','filtreDispo'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('change', loadCourses);
   });
-
-  recap.querySelectorAll('[data-rm]').forEach(b=>{
-    b.addEventListener('click', ()=>{
-      const id = b.dataset.rm;
-      const iso = new Date(selected.get(id).starts_at).toISOString();
-      selected.delete(id); takenByIso.delete(iso);
-      refreshRecap();
-      daysGrid.querySelectorAll('.pill').forEach(p=>{ if(p.dataset.id===id) p.classList.remove('on'); });
-    });
-  });
-
-  totauxEl.textContent = `Sélection : ${arr.length} cours${DEMO_MODE?' (lecture seule/hors-ligne)':''}`;
-}
-
-// boutons “S’inscrire”
-document.querySelectorAll('button[data-open]').forEach(b=>{
-  b.addEventListener('click', async ()=>{
-    lieuSelect.value = b.dataset.open;
-    await loadAndBuild();
-    dlg.showModal();
-  });
+  loadCourses();
 });
-lieuSelect.addEventListener('change', loadAndBuild);
 
-// Submit → RPC + Stripe
-form.addEventListener('submit', async (e)=>{
-  e.preventDefault();
+// ===== Multi-sélection clic sur "S’inscrire" =====
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".inscrire-btn");
+  if (!btn) return;
 
-  const ids = [...selected.keys()];
-  if (ids.length===0){ alert('Choisis au moins une date.'); return; }
+  const id   = btn.dataset.id;
+  const date = btn.dataset.date; // "2026-01-03"
+  if (!id || !date) return;
 
-  if (DEMO_MODE){
-    alert('Hors-ligne: affichage seulement. Connecte le site à Supabase pour réserver.');
+  // panier actuel
+  let panier = getPanier();
+
+  // est-ce qu'on a déjà un cours ce jour-là dans le panier ?
+  const sameDay = panier.find(c => c.date === date);
+
+  // est-ce que ce cours précis est déjà dans le panier ?
+  const already = panier.find(c => String(c.id) === String(id));
+
+  // si on essaie d'ajouter un cours différent mais le même jour -> interdit
+  if (!already && sameDay && String(sameDay.id) !== String(id)) {
+    const msg = btn.parentElement.querySelector('.conflict-msg');
+    if (msg) {
+      msg.style.display = 'inline';
+      setTimeout(()=>{ msg.style.display='none'; }, 2500);
+    }
     return;
   }
 
-  const { data:auth, error:authErr } = await supabase.auth.getUser();
-  if (authErr || !auth?.user){ alert('Connecte-toi (bouton “Se connecter”).'); return; }
-  const userId = auth.user.id;
-
-  const { data, error } = await supabase.rpc('book_courses', { p_user: userId, p_course_ids: ids });
-  if (error){ alert(error.message); console.error(error); return; }
-
-  const total = data.length ? data[data.length-1].total_to_pay : 0;
-  const c20 = data.filter(x=>x.price_chf===20).length;
-  const c30 = data.filter(x=>x.price_chf===30).length;
-
-  if (total<=0){
-    alert('Réservation confirmée (tarif 0.–).');
-    dlg.close(); selected.clear(); takenByIso.clear(); refreshRecap(); await loadAndBuild();
-    return;
+  // toggle
+  if (already) {
+    // enlever du panier
+    panier = panier.filter(c => String(c.id) !== String(id));
+    btn.textContent = "S’inscrire";
+    btn.classList.remove("selected");
+  } else {
+    // ajouter dans le panier
+    panier.push({ id, date });
+    btn.textContent = "Ajouté ✅";
+    btn.classList.add("selected");
   }
 
-  const lineItems=[];
-  if (c20>0) lineItems.push({ price: PRICE_MEMBRE, quantity: c20 });
-  if (c30>0) lineItems.push({ price: PRICE_PUBLIC, quantity: c30 });
+  // sauvegarder
+  savePanier(panier);
 
-  stripe.redirectToCheckout({
-    mode:'payment',
-    lineItems,
-    successUrl: `${location.origin}/success.html`,
-    cancelUrl: `${location.origin}/cours.html#cancel`,
-    customerEmail: (emailInput.value || undefined),
-    billingAddressCollection:'auto'
-  }).then(res=>{ if(res && res.error){ alert(res.error.message || "Paiement interrompu."); } });
+  // mettre à jour barre panier
+  updateBasketBar();
 });
 
-// Premier rendu si la modale est déjà ouverte (pas nécessaire mais safe)
+// ===== Reset complet du panier (bouton "Annuler toutes les sélections") =====
+document.getElementById('basketClear')?.addEventListener('click', () => {
+  // vider le panier
+  localStorage.setItem("rsl_panier_courses", "[]");
+
+  // barre panier -> vide
+  updateBasketBar();
+
+  // visuel des boutons
+  document.querySelectorAll('.inscrire-btn.selected').forEach(btn => {
+    btn.classList.remove('selected');
+    btn.textContent = "S’inscrire";
+  });
+});
