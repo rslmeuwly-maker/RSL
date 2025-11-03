@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Spot — RSL</title>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --border:rgba(255,255,255,.15);
+    --panel:rgba(15,23,42,.8);
+    --txt-main:#fff;
+    --txt-dim:#9aa5b1;
+    --txt-soft:#cdd6ff;
+    --green:#22c55e;
+    --green-dark:#16a34a;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:#000;
+    color:var(--txt-main);
+    font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  }
+
+  header{
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:1000;
+  }
+  header .brand{
+    display:flex;
+    align-items:center;
+  }
+  header .brand img{
+    height:34px;
+    width:34px;
+    border-radius:8px;
+    background:#fff;
+    padding:4px;
+  }
+
+  header .ttl{font-weight:800;font-size:14px}
+  header a{
+    color:var(--green);
+    font-weight:700;
+    text-decoration:none;
+    font-size:14px;
+  }
+
+  .wrap{
+    max-width:900px;
+    margin:16px auto 90px;
+    padding:0 16px;
+  }
+
+  .flag{
+    display:inline-block;
+    margin:0 0 12px;
+    padding:6px 8px;
+    border-radius:8px;
+    font:800 12px Outfit;
+    box-shadow:0 20px 60px rgba(0,0,0,.8);
+  }
+  .flag.park{
+    background:linear-gradient(180deg,#7c3aed,#4c1d95);
+    color:#fff;
+    text-shadow:0 0 18px rgba(124,58,237,.5);
+  }
+  .flag.street{
+    background:linear-gradient(180deg,#f97316,#b45309);
+    color:#1f1308;
+    text-shadow:0 0 18px rgba(251,146,60,.5);
+  }
+
+  h1{
+    margin:0 0 6px;
+    font-size:clamp(22px,3.2vw,30px);
+    font-weight:800;
+  }
+  .loc{
+    color:var(--txt-dim);
+    font:600 14px Outfit;
+    margin:0 0 12px;
+  }
+  .desc{
+    color:var(--txt-soft);
+    font:500 15px/1.55 Outfit;
+    margin:0 0 18px;
+    white-space:pre-line;
+  }
+
+  #miniMap{
+    width:100%;
+    height:300px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#0b1220;
+    margin:0 0 18px;
+    box-shadow:0 30px 80px rgba(0,0,0,.8);
+  }
+
+  .soon{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px;
+    font:500 14px Outfit;
+    color:#fff;
+    box-shadow:0 30px 80px rgba(0,0,0,.8);
+  }
+  .soon .hint{
+    color:var(--txt-dim);
+    font-size:12px;
+    margin-top:8px;
+  }
+
+  /* Bottom nav (même style que feed / ou_rider / recherche) */
+  .tabbar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:2000;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    padding:10px 12px;
+    border-top:1px solid var(--border);
+    background:rgba(0,0,0,.78);
+    backdrop-filter:blur(10px);
+  }
+  .tab{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    text-decoration:none;
+  }
+  .tab .ic{font-size:20px}
+  .tab span{font-size:11px;color:#e5e7eb;font-weight:700}
+  .tab.active span{color:#22c55e}
+  @media(min-width:900px){ .tab span{font-size:12px} }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="brand" href="ou_rider.html">
+    <img src="images/logo_rsl.png" alt="RSL"/>
+  </a>
+  <div class="ttl">RSL • Spot</div>
+  <a class="back" href="ou_rider.html">← Carte</a>
+</header>
+
+<main class="wrap">
+  <div id="flag" class="flag" style="display:none"></div>
+  <h1 id="name">Chargement…</h1>
+  <div id="loc" class="loc"></div>
+  <div id="desc" class="desc"></div>
+
+  <div id="miniMap"></div>
+
+  <section class="soon">
+    <b>Feed du spot (bientôt)</b><br/>
+    • Dernières photos / vidéos (20s max)<br/>
+    • Qui a ridé ici<br/>
+    • Défis / tricks validés
+    <div class="hint">
+      Pour poster ici, connecte-toi avec ton compte RSL puis publie via l’onglet <b>Feed</b>.
+    </div>
+  </section>
+</main>
+
+<!-- Bottom nav -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab active" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Vidéos">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<!-- env.js pour tes vraies clés, comme sur les autres pages -->
+<script src="js/env.js"></script>
+<script>
+const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const params   = new URLSearchParams(location.search);
+const spotId   = params.get("id");
+const isStreet = params.get("street") === "1";
+
+const elName = document.getElementById('name');
+const elLoc  = document.getElementById('loc');
+const elDesc = document.getElementById('desc');
+const elFlag = document.getElementById('flag');
+
+async function loadSpot(){
+  if(!spotId){
+    elName.textContent = "Spot introuvable";
+    elLoc.textContent  = "";
+    elDesc.textContent = "";
+    return;
+  }
+
+  let row = null;
+  if(isStreet){
+    const { data } = await supa.from('bunny').select('*').eq('id', spotId).maybeSingle();
+    row = data;
+  }else{
+    const { data } = await supa.from('spots').select('*').eq('id', spotId).maybeSingle();
+    row = data;
+  }
+
+  if(!row){
+    elName.textContent = "Spot introuvable";
+    elLoc.textContent  = "";
+    elDesc.textContent = "";
+    return;
+  }
+
+  elName.textContent = row.nom || "Sans nom";
+  elLoc.textContent  = `${row.ville || ''} (${row.canton || ''})`;
+  elDesc.textContent = row.description || row.type || '';
+
+  elFlag.textContent = isStreet ? "Street / Rider spot ⚠" : "Skatepark / Pumptrack";
+  elFlag.className   = "flag " + (isStreet ? "street" : "park");
+  elFlag.style.display = "inline-block";
+
+  if(row.lat && row.lng){
+    const map = L.map('miniMap',{zoomControl:false}).setView([row.lat,row.lng],15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19,
+      attribution:'© OpenStreetMap'
+    }).addTo(map);
+
+    const color = isStreet ? '#f97316' : '#7c3aed';
+    const icon = L.divIcon({
+      className:'rsl-marker',
+      html:`<div style="
+        width:40px;height:40px;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        background:${color};
+        border:2px solid #fff;
+        color:#fff;
+        font-size:18px;
+        box-shadow:0 20px 40px rgba(0,0,0,.8);
+      ">🛹</div>`,
+      iconSize:[40,40],
+      iconAnchor:[20,20]
+    });
+
+    L.marker([row.lat,row.lng],{icon}).addTo(map);
+  }
+}
+
+loadSpot();
+</script>
+</body>
+</html>

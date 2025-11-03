@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Recherche — RSL</title>
+
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --green:#22c55e; --green-dark:#16a34a;
+    --panel:#0b1220; --border:rgba(255,255,255,.15); --dim:#9aa5b1;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:#000;color:#fff;
+    font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  }
+
+  /* BG vidéo, assombrie */
+  .bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .bg-video{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;
+    filter:brightness(.48) saturate(1.05);
+  }
+
+  /* Header mini */
+  header{
+    position:sticky;top:0;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;border-bottom:1px solid var(--border);
+    background:rgba(0,0,0,.6);backdrop-filter:blur(8px)
+  }
+  header .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+  header .brand img{height:34px;width:34px;border-radius:8px;background:#fff;padding:4px}
+  header .brand b{font-size:16px}
+
+  /* Wrap */
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:14px 12px 96px}
+
+  /* Barre de recherche + filtres */
+  .search{
+    background:rgba(0,0,0,.6);border:1px solid var(--border);border-radius:14px;
+    padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.8);margin-bottom:12px
+  }
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .input,.select{
+    flex:1 1 200px;min-width:160px;padding:10px 12px;border-radius:10px;
+    background:#0b1220;border:1px solid var(--border);color:#fff;font:600 14px Outfit
+  }
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:linear-gradient(180deg,var(--green),var(--green-dark));color:#062312;border:0;border-radius:10px;
+    font-weight:800;font-size:14px;line-height:1.2;padding:11px 14px;cursor:pointer
+  }
+  .muted{font-size:12px;color:var(--dim)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;cursor:pointer;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font:800 12px Outfit
+  }
+  .chip input{width:16px;height:16px}
+
+  /* Résultats */
+  .results{margin-top:12px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+
+  .card{
+    background:rgba(0,0,0,.6);border:1px solid var(--border);border-radius:14px;padding:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.75)
+  }
+  .title{font:800 15px Outfit;margin:0 0 4px}
+  .meta{font:700 12px Outfit;color:#9aa5b1;margin-bottom:6px}
+  .desc{font:500 13px/1.45 Outfit;color:#e5e7eb}
+  .badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .badge{font:900 11px Outfit;border:1px solid var(--border);padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.04)}
+  .go{display:inline-block;margin-top:8px;font:900 12px Outfit;text-decoration:none;
+      background:linear-gradient(180deg,var(--green),var(--green-dark));color:#062312;padding:8px 10px;border-radius:10px}
+
+  .count{margin:0 0 8px;font:800 13px Outfit;color:#c9f3d5}
+
+  /* Tabbar */
+  .tabbar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:2000;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    padding:10px 12px;
+    border-top:1px solid var(--border);
+    background:rgba(0,0,0,.78);
+    backdrop-filter:blur(10px);
+  }
+  .tab{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    text-decoration:none;
+  }
+  .tab .ic{font-size:20px}
+  .tab span{font-size:11px;color:#e5e7eb;font-weight:700}
+  .tab.active span{color:#22c55e}
+  @media(min-width:900px){ .tab span{font-size:12px} }
+</style>
+</head>
+<body>
+
+<!-- BG video -->
+<div class="bg-wrap" aria-hidden="true">
+  <video class="bg-video" id="bgVid" autoplay muted loop playsinline preload="auto"></video>
+</div>
+
+<header>
+  <a class="brand" href="ou_rider.html">
+    <img src="images/logo_rsl.png" alt="RSL"/>
+    <b>RSL — Recherche</b>
+  </a>
+  <span class="muted">Trouve un park, un street spot ou un shop partenaire</span>
+</header>
+
+<div class="wrap">
+
+  <!-- Barre de recherche -->
+  <section class="search">
+    <div class="row">
+      <input id="q" class="input" placeholder="Rechercher (nom, ville, type : bowl, rail, pumptrack…)" />
+      <select id="country" class="select">
+        <option value="">Pays (tous)</option>
+        <option value="CH">Suisse</option>
+        <option value="FR">France</option>
+        <option value="DE">Allemagne</option>
+        <option value="EU">Autres Europe</option>
+        <option value="WORLD">Monde</option>
+      </select>
+      <select id="canton" class="select">
+        <option value="">Canton (CH)</option>
+      </select>
+      <select id="sort" class="select">
+        <option value="best">Pertinence</option>
+        <option value="az">A → Z</option>
+        <option value="za">Z → A</option>
+        <option value="vc">Ville A → Z</option>
+      </select>
+      <button id="btnClear" class="btn">Réinitialiser</button>
+    </div>
+
+    <div class="chips" role="group" aria-label="Types">
+      <label class="chip"><input type="checkbox" id="tParks" checked/> Parks</label>
+      <label class="chip"><input type="checkbox" id="tStreet" checked/> Street</label>
+      <label class="chip"><input type="checkbox" id="tShops" checked/> Shops</label>
+    </div>
+  </section>
+
+  <!-- Résultats -->
+  <section class="results">
+    <p class="count" id="count">0 résultat</p>
+    <div id="grid" class="grid"></div>
+  </section>
+</div>
+
+<!-- Tabbar (même que les autres pages) -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Vidéos">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab active" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<script>
+/* ====== Supabase init ====== */
+const SUPABASE_URL_FALLBACK = "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(
+  window.env?.SUPABASE_URL || SUPABASE_URL_FALLBACK,
+  window.env?.SUPABASE_ANON || SUPABASE_ANON_FALLBACK
+);
+
+/* ====== BG video (mêmes sources que les autres pages) ====== */
+(function(){
+  const vids = [
+    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+  ];
+  const v = document.getElementById('bgVid');
+  if(!v) return;
+  const s = document.createElement('source');
+  s.src = vids[Math.floor(Math.random()*vids.length)];
+  s.type="video/mp4";
+  v.appendChild(s);
+  const play=()=>{ try{ v.playbackRate=0.6; const p=v.play(); if(p&&p.catch) p.catch(()=>{});}catch(e){} };
+  play();
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) v.pause(); else play(); });
+})();
+
+/* ====== DOM ====== */
+const elQ       = document.getElementById('q');
+const elCountry = document.getElementById('country');
+const elCanton  = document.getElementById('canton');
+const elSort    = document.getElementById('sort');
+const elClear   = document.getElementById('btnClear');
+
+const tParks  = document.getElementById('tParks');
+const tStreet = document.getElementById('tStreet');
+const tShops  = document.getElementById('tShops');
+
+const grid  = document.getElementById('grid');
+const count = document.getElementById('count');
+
+/* ====== Canton list CH (fixe) ====== */
+const CANTONS_ALL = [
+  "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW",
+  "SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"
+];
+elCanton.innerHTML = '<option value="">Canton (CH)</option>' + CANTONS_ALL.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+/* Afficher/masquer Canton selon Pays */
+function updateCantonVisibility(){
+  const isCH = elCountry.value === 'CH';
+  elCanton.parentElement.style.display = isCH ? '' : 'none';
+  if(!isCH) elCanton.value = '';
+}
+elCountry.addEventListener('change', updateCantonVisibility);
+updateCantonVisibility();
+
+/* ====== State ====== */
+let cache = { parks:[], streets:[], shops:[] };
+
+/* ====== Charger les 3 sources ====== */
+async function loadAll(){
+  // parks
+  try{
+    const { data } = await supa.from('spots').select('id,nom,ville,canton,country,description,type');
+    cache.parks = (data||[]).map(r=>({
+      kind:'park', id:r.id, nom:r.nom||'Spot', ville:r.ville||'', canton:r.canton||'',
+      country:r.country||'CH', desc:r.description||r.type||''
+    }));
+  }catch(_){ cache.parks=[]; }
+
+  // streets
+  try{
+    const { data } = await supa.from('bunny').select('id,nom,ville,canton,country,description,type');
+    cache.streets = (data||[]).map(r=>({
+      kind:'street', id:r.id, nom:r.nom||'Street spot', ville:r.ville||'', canton:r.canton||'',
+      country:r.country||'CH', desc:r.description||r.type||''
+    }));
+  }catch(_){ cache.streets=[]; }
+
+  // shops
+  try{
+    const { data } = await supa.from('shops').select('id,nom,ville,canton,country,description,site');
+    cache.shops = (data||[]).map(r=>({
+      kind:'shop', id:r.id, nom:r.nom||'Shop', ville:r.ville||'', canton:r.canton||'',
+      country:r.country||'CH', desc:r.description||'', site:r.site||''
+    }));
+  }catch(_){ cache.shops=[]; }
+
+  filterAndRender();
+}
+
+/* ====== Filtrer + Trier + Render ====== */
+function normalize(txt){ return (txt||'').toLowerCase(); }
+
+function filterAndRender(){
+  const q = normalize(elQ.value);
+  const want = {
+    park:  tParks.checked,
+    street:tStreet.checked,
+    shop:  tShops.checked
+  };
+  const country = (elCountry.value||'').trim();
+  const canton  = (elCanton.value||'').trim();
+
+  let list = [];
+  if(want.park)   list = list.concat(cache.parks);
+  if(want.street) list = list.concat(cache.streets);
+  if(want.shop)   list = list.concat(cache.shops);
+
+  list = list.filter(it=>{
+    if(country && it.country !== country) return false;
+    if(country === 'CH' && canton && it.canton !== canton) return false;
+    if(q){
+      const blob = `${it.nom} ${it.ville} ${it.canton} ${it.desc}`.toLowerCase();
+      return blob.includes(q);
+    }
+    return true;
+  });
+
+  // tri
+  const mode = elSort.value;
+  if(mode==='az')  list.sort((a,b)=>a.nom.localeCompare(b.nom));
+  if(mode==='za')  list.sort((a,b)=>b.nom.localeCompare(a.nom));
+  if(mode==='vc')  list.sort((a,b)=>a.ville.localeCompare(b.ville));
+  // 'best' = pas de tri (ordre de chargement)
+
+  // render
+  count.textContent = `${list.length} résultat${list.length>1?'s':''}`;
+  grid.innerHTML = list.map(renderCard).join('') || `<div class="card"><div class="desc">Aucun résultat. Essaie un autre mot-clé ou retire des filtres.</div></div>`;
+}
+
+function renderCard(it){
+  const badge = it.kind==='shop' ? 'Shop' : (it.kind==='street' ? 'Street' : 'Park');
+  const link  = it.kind==='shop'
+    ? (it.site ? `<a class="go" href="${escapeAttr(it.site)}" target="_blank" rel="noopener">Site du shop →</a>` : '')
+    : `<a class="go" href="spot.html?id=${it.id}${it.kind==='street'?'&street=1':''}">Voir la fiche →</a>`;
+  return `
+  <article class="card">
+    <h3 class="title">${escapeHTML(it.nom)}</h3>
+    <div class="meta">${escapeHTML(it.ville)}${it.canton? ' ('+escapeHTML(it.canton)+')':''} — ${escapeHTML(it.country||'')}</div>
+    ${it.desc ? `<div class="desc">${escapeHTML(it.desc)}</div>` : ''}
+    <div class="badges"><span class="badge">${badge}</span></div>
+    ${link}
+  </article>`;
+}
+
+/* ====== Utils ====== */
+function escapeHTML(s){return (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+function escapeAttr(s){return escapeHTML(s)}
+
+/* ====== Events ====== */
+['input','change'].forEach(ev=>{
+  [elQ,elCountry,elCanton,elSort,tParks,tStreet,tShops].forEach(el=>el.addEventListener(ev,filterAndRender));
+});
+elClear.addEventListener('click', ()=>{
+  elQ.value=''; elCountry.value=''; elCanton.value=''; elSort.value='best';
+  tParks.checked=tStreet.checked=tShops.checked=true;
+  updateCantonVisibility(); filterAndRender();
+});
+
+/* ====== Bootstrap ====== */
+loadAll();
+</script>
+</body>
+</html>

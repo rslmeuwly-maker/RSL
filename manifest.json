@@ -1,0 +1,20 @@
+{
+  "name": "Où Rider — RSL",
+  "short_name": "Où Rider",
+  "start_url": "ou_rider.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#22c55e",
+  "icons": [
+    {
+      "src": "images/logo_rsl.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/logo_rsl.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

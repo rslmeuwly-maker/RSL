@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin Spots — RSL</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --green:#22c55e; --red:#ef4444; --amber:#f59e0b; }
+  body{margin:0;background:#0b0e14;color:#fff;font-family:Outfit,system-ui}
+  header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+  header .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#fff;
+    text-decoration:none;
+  }
+  header .brand img{
+    height:30px;
+    width:30px;
+    border-radius:8px;
+    background:#fff;
+    padding:4px;
+  }
+
+  header b{font-weight:800}
+  .wrap{max-width:1100px;margin:20px auto;padding:0 18px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tabs button{border:1px solid rgba(255,255,255,.18);background:#121826;color:#fff;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+  .tabs button.active{background:linear-gradient(180deg,#22c55e,#16a34a);color:#062312;border:0}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .input,select{background:#0b1220;border:1px solid rgba(255,255,255,.18);border-radius:10px;color:#fff;padding:8px 10px;font:600 14px Outfit}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px solid rgba(255,255,255,.1);padding:10px 8px;text-align:left;font-size:14px}
+  .tag{font-weight:800;font-size:12px;padding:4px 8px;border-radius:999px;display:inline-block}
+  .tag.pending{background:#1f2937;color:#fff;border:1px solid rgba(255,255,255,.18)}
+  .tag.approved{background:#064e3b;color:#a7f3d0;border:1px solid #059669}
+  .tag.rejected{background:#3f1d1d;color:#fecaca;border:1px solid #ef4444}
+  .btn{cursor:pointer;border-radius:8px;padding:8px 10px;font-weight:800;border:1px solid rgba(255,255,255,.18);background:#111827;color:#fff}
+  .btn.green{background:linear-gradient(180deg,#22c55e,#16a34a);color:#062312;border:0}
+  .btn.red{background:#7f1d1d;border-color:#ef4444}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="ou_rider.html">
+    <img src="images/logo_rsl.png" alt="RSL"/>
+    <b>RSL — Admin Spots</b>
+  </a>
+  <div id="adminWho" style="opacity:.8"></div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button id="tabP" class="active">Parks (spots)</button>
+    <button id="tabS">Street (bunny)</button>
+    <label style="margin-left:auto;display:flex;align-items:center;gap:6px">
+      <input type="checkbox" id="showApproved"> Voir aussi “approved”
+    </label>
+  </div>
+
+  <div class="filters">
+    <input id="q" class="input" placeholder="Filtre texte (nom, ville, canton, description)…"/>
+    <select id="cantonSel" class="input">
+      <option value="">Canton (tous)</option>
+      <option>VD</option><option>VS</option><option>FR</option><option>GE</option><option>NE</option><option>JU</option><option>BE</option><option>TI</option><option>ZG</option><option>ZH</option>
+    </select>
+    <select id="statusSel" class="input">
+      <option value="">Statut: pending/rejected (+approved si coché)</option>
+      <option>pending</option><option>rejected</option><option>approved</option>
+    </select>
+    <button id="refresh" class="btn">Rafraîchir</button>
+  </div>
+
+  <div id="tableWrap"></div>
+</div>
+
+<script>
+const SUPABASE_URL  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const adminWho = document.getElementById('adminWho');
+const tabP = document.getElementById('tabP');
+const tabS = document.getElementById('tabS');
+const showApproved = document.getElementById('showApproved');
+const q = document.getElementById('q');
+const cantonSel = document.getElementById('cantonSel');
+const statusSel = document.getElementById('statusSel');
+const tableWrap = document.getElementById('tableWrap');
+const refreshBtn = document.getElementById('refresh');
+
+let currentTable = 'spots'; // or 'bunny'
+
+async function mustBeAdmin(){
+  const { data: { user } } = await supa.auth.getUser();
+  if(!user){ alert("Connecte-toi (admin requis)."); window.location.href = "compte.html"; return; }
+  const { data: prof } = await supa.from('profiles').select('full_name,is_admin,email').eq('id', user.id).maybeSingle();
+  if(!prof || !prof.is_admin){ alert("Accès refusé (admin)."); window.location.href = "ou_rider.html"; return; }
+  adminWho.textContent = (prof.full_name || prof.email) + " (admin)";
+}
+mustBeAdmin();
+
+tabP.onclick = ()=>{ tabP.classList.add('active'); tabS.classList.remove('active'); currentTable='spots'; loadData(); };
+tabS.onclick = ()=>{ tabS.classList.add('active'); tabP.classList.remove('active'); currentTable='bunny'; loadData(); };
+[showApproved, q, cantonSel, statusSel].forEach(el=> el.addEventListener('change', loadData));
+refreshBtn.onclick = loadData;
+
+function rowHtml(r){
+  const tagClass = r.status==='approved'?'approved':(r.status==='rejected'?'rejected':'pending');
+  return `
+    <tr data-id="${r.id}">
+      <td><span class="tag ${tagClass}">${r.status||'pending'}</span></td>
+      <td><input class="input in-nom" value="${r.nom||''}"/></td>
+      <td><input class="input in-ville" value="${r.ville||''}" style="width:120px"/></td>
+      <td><input class="input in-canton" value="${r.canton||''}" style="width:70px"/></td>
+      <td style="width:35%"><input class="input in-desc" value="${(r.description||r.type||'').replace(/"/g,'&quot;')}"/></td>
+      <td>${r.lat?.toFixed ? r.lat.toFixed(5): r.lat}, ${r.lng?.toFixed ? r.lng.toFixed(5): r.lng}</td>
+      <td class="row">
+        <button class="btn green act-approve">Approuver</button>
+        <button class="btn act-reject">Rejeter</button>
+        <button class="btn red act-delete">Supprimer</button>
+        <button class="btn act-save">Sauver</button>
+      </td>
+    </tr>`;
+}
+
+async function loadData(){
+  let qy = supa.from(currentTable).select('*').order('created_at',{ascending:false});
+  if(!showApproved.checked){
+    qy = qy.in('status',['pending','rejected']);
+  }
+  if(statusSel.value) qy = qy.eq('status', statusSel.value);
+  const { data, error } = await qy;
+  if(error){ tableWrap.innerHTML = `<p style="color:#fca5a5">Erreur: ${error.message}</p>`; return; }
+
+  let rows = data || [];
+  const t = (q.value||'').trim().toLowerCase();
+  const cant = (cantonSel.value||'').trim();
+  if(t){
+    rows = rows.filter(r => (`${r.nom||''} ${r.ville||''} ${r.canton||''} ${r.description||r.type||''}`).toLowerCase().includes(t));
+  }
+  if(cant){
+    rows = rows.filter(r => (r.canton||'') === cant);
+  }
+
+  const head = `
+    <table>
+      <thead>
+        <tr>
+          <th>Statut</th><th>Nom</th><th>Ville</th><th>CH</th><th>Description/Type</th><th>Lat/Lng</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(rowHtml).join('')}
+      </tbody>
+    </table>`;
+  tableWrap.innerHTML = head;
+
+  tableWrap.querySelectorAll('.act-approve').forEach(btn=> btn.onclick = ()=> changeStatus(btn,'approved'));
+  tableWrap.querySelectorAll('.act-reject').forEach(btn=> btn.onclick = ()=> changeStatus(btn,'rejected'));
+  tableWrap.querySelectorAll('.act-delete').forEach(btn=> btn.onclick = ()=> removeRow(btn));
+  tableWrap.querySelectorAll('.act-save').forEach(btn=> btn.onclick = ()=> saveRow(btn));
+}
+
+async function changeStatus(btn, status){
+  const tr = btn.closest('tr'); const id = tr.dataset.id;
+  const { error } = await supa.from(currentTable).update({ status }).eq('id', id);
+  if(error){ alert(error.message); return; }
+  await loadData();
+}
+async function removeRow(btn){
+  if(!confirm("Supprimer définitivement ?")) return;
+  const tr = btn.closest('tr'); const id = tr.dataset.id;
+  const { error } = await supa.from(currentTable).delete().eq('id', id);
+  if(error){ alert(error.message); return; }
+  tr.remove();
+}
+async function saveRow(btn){
+  const tr = btn.closest('tr'); const id = tr.dataset.id;
+  const nom=tr.querySelector('.in-nom').value.trim();
+  const ville=tr.querySelector('.in-ville').value.trim();
+  const canton=tr.querySelector('.in-canton').value.trim().toUpperCase();
+  const description=tr.querySelector('.in-desc').value.trim();
+  const { error } = await supa.from(currentTable).update({ nom, ville, canton, description }).eq('id', id);
+  if(error){ alert(error.message); return; }
+  btn.textContent='Sauvé ✓'; setTimeout(()=>btn.textContent='Sauver',800);
+}
+
+loadData();
+</script>
+</body>
+</html>
