@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#22c55e">
+  <title>Profil — RIDLY</title>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#22c55e;
+      --green-dark:#16a34a;
+
+      /* valeurs par défaut, écrasées par theme-dark / theme-light */
+      --bg:#000000;
+      --panel:#0b1220;
+      --panel-soft:#020617;
+      --text:#ffffff;
+      --dim:#9aa5b1;
+      --border:rgba(255,255,255,.15);
+    }
+
+    /* ===== THEMES ===== */
+    body.theme-dark{
+      --bg:#000000;
+      --panel:#0b1220;
+      --panel-soft:#020617;
+      --text:#ffffff;
+      --dim:#9aa5b1;
+      --border:rgba(255,255,255,.15);
+    }
+    body.theme-light{
+      --bg:#f3f4f6;
+      --panel:#ffffff;
+      --panel-soft:#e5e7eb;
+      --text:#020617;
+      --dim:#4b5563;
+      --border:rgba(15,23,42,.12);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+    main{flex:1}
+
+    /* ===== BG vidéo ===== */
+    .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .rsl-bg-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;background:#000;
+      filter:brightness(.48) saturate(1.05);
+    }
+    .rsl-bg-dim{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6));
+    }
+    body.theme-light .rsl-bg-dim{
+      background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.96));
+    }
+
+    /* ===== NAV top (unifiée) ===== */
+    nav.nav{
+      position:sticky;top:0;z-index:1000;
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    body.theme-light nav.nav{
+      background:rgba(243,244,246,.9);
+      border-bottom:1px solid rgba(15,23,42,.1);
+    }
+    nav .row{
+      max-width:1200px;margin:0 auto;
+      padding:12px 20px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    nav .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      color:var(--text);
+      text-decoration:none;
+    }
+    nav .brand img{
+      height:52px;
+      width:52px;
+      border-radius:12px;
+      background:#000;
+      padding:6px;
+      box-shadow:0 0 14px rgba(34,197,94,.6);
+    }
+    nav .brand span{font-size:18px}
+    nav a{color:var(--text);text-decoration:none;font-weight:700}
+    nav a:hover{color:var(--green)}
+
+    .nav-tools{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-left:auto;
+    }
+    .icon-btn{
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.8);
+      color:var(--text);
+      border-radius:999px;
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      font-size:16px;
+      text-decoration:none;
+      position:relative;
+    }
+    body.theme-light .icon-btn{
+      background:#e5e7eb;
+    }
+    .icon-btn:hover{
+      border-color:var(--green);
+      color:var(--green);
+    }
+    .chat-dot{
+      position:absolute;
+      top:5px;
+      right:6px;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 8px rgba(34,197,94,.9);
+      opacity:0;
+    }
+
+    /* ===== Mini hero ===== */
+    .page-mini-hero{position:relative;z-index:10;padding:16px 0 6px}
+    .page-mini-hero .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .page-mini-hero h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);font-weight:800}
+    .page-mini-hero p{margin:0;color:var(--dim);font-size:14px;max-width:720px}
+
+    /* ===== Contenu profil ===== */
+    main .container{
+      max-width:980px;
+      margin:0 auto 110px;
+      padding:0 20px 40px;
+      position:relative;
+      z-index:10;
+    }
+
+    .card{
+      background:rgba(0,0,0,.7);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);
+      padding:16px;
+    }
+    body.theme-light .card{
+      background:var(--panel);
+      box-shadow:0 18px 45px rgba(15,23,42,.15);
+    }
+
+    .p-head{
+      display:grid;
+      grid-template-columns:84px 1fr auto;
+      gap:14px;
+      align-items:center;
+    }
+    .avatar{
+      width:84px;
+      height:84px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      background:#0b1220;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    body.theme-light .avatar{
+      background:#e5e7eb;
+    }
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .name{font-size:22px;font-weight:800;margin:0;color:var(--text)}
+    .sub{color:var(--dim);font-weight:600;font-size:13px;margin-top:4px}
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:800;
+      font-size:14px;
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+    }
+    body.theme-light .btn{
+      background:#e5e7eb;
+    }
+    .btn.green{
+      background:linear-gradient(180deg,var(--green),var(--green-dark));
+      color:#062312;
+      border:0;
+      box-shadow:0 10px 24px rgba(0,0,0,.5);
+    }
+    .stat{font-size:13px;color:#cdd6ff;margin-right:12px}
+    .bio{margin-top:10px;color:#cdd6ff;white-space:pre-line;font-size:14px}
+    .links a{color:var(--text);text-decoration:none;font-weight:700}
+    .links a:hover{color:#22c55e}
+
+    .flash-strip{
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      overflow:auto;
+      padding-bottom:6px;
+    }
+    .flash{flex:0 0 auto;width:70px}
+    .flash .ring{
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      padding:3px;
+      background:conic-gradient(#ffd54a,#ff7b54,#ff5478,#8b5cf6,#ffd54a);
+    }
+    .flash .inner{
+      width:100%;
+      height:100%;
+      border-radius:50%;
+      overflow:hidden;
+      background:#000;
+      border:2px solid #000;
+    }
+    .flash img,.flash video{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter:brightness(.95);
+    }
+    .flash .cap{
+      font-size:11px;
+      text-align:center;
+      margin-top:6px;
+      color:#cdd6ff;
+    }
+
+    .edit{margin-top:14px;display:none}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row .full{grid-column:1/-1}
+    label{display:block;font-size:12px;font-weight:700;color:#e2e8f0;margin:6px 0 6px}
+    .input,textarea.input{
+      width:100%;
+      background:#0b1220;
+      border:1px solid var(--border);
+      border-radius:10px;
+      color:#fff;
+      padding:10px 12px;
+      font-size:14px;
+    }
+    body.theme-light .input,
+    body.theme-light textarea.input{
+      background:#f9fafb;
+      color:#020617;
+      border-color:rgba(15,23,42,.15);
+    }
+
+    .post-grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+    @media (max-width:720px){
+      .post-grid{grid-template-columns:repeat(2,1fr)}
+      .p-head{grid-template-columns:64px 1fr}
+    }
+    .thumb{
+      position:relative;
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid var(--border);
+      background:#000;
+    }
+    .thumb img,.thumb video{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      aspect-ratio:1/1;
+    }
+    .thumb .tag{
+      position:absolute;
+      left:6px;
+      top:6px;
+      font-size:11px;
+      font-weight:800;
+      background:rgba(0,0,0,.55);
+      border:1px solid var(--border);
+      padding:3px 6px;
+      border-radius:8px;
+    }
+    .empty{color:#9aa5b1;text-align:center;margin:18px 0 8px}
+
+    /* ===== Tabbar ===== */
+    .tabbar{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      z-index:2000;
+      display:flex;
+      align-items:center;
+      justify-content:space-around;
+      padding:14px 18px;
+      border-top:1px solid var(--border);
+      background:rgba(0,0,0,.78);
+      backdrop-filter:blur(10px);
+    }
+    body.theme-light .tabbar{
+      background:rgba(243,244,246,.96);
+    }
+    .tab{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      text-decoration:none;
+    }
+    .tab .ic{font-size:24px}
+    .tab span{font-size:13px;color:#e5e7eb;font-weight:700}
+    body.theme-light .tab span{color:#111827}
+    .tab.active span{color:#22c55e}
+    @media(min-width:900px){ .tab span{font-size:12px} }
+  </style>
+</head>
+<body>
+
+<!-- BG vidéo RIDLY -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
+</div>
+
+<!-- Nav top unifiée -->
+<nav class="nav">
+  <div class="row">
+    <a class="brand" href="ou_rider.html">
+      <img src="image/1logo_ridly.png" alt="RIDLY"/>
+      <span>RIDLY</span>
+    </a>
+    <div class="nav-tools">
+      <button type="button" class="icon-btn" id="btnTheme" title="Mode clair / sombre">🌙</button>
+      <a href="chat.html" class="icon-btn" id="btnChat" title="Chat riders">
+        <span class="chat-dot" id="chatDot"></span>
+        💬
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Mini hero -->
+<section class="page-mini-hero">
+  <div class="container">
+    <h1>Profil rider</h1>
+    <p>
+      Gère ton profil RIDLY, tes stories (flashs) et tes posts dans le feed.
+    </p>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <!-- Carte profil -->
+    <section class="card">
+      <div class="p-head">
+        <div class="avatar">
+          <img id="avatarImg" alt="avatar" src="image/logo_pn360.png"/>
+        </div>
+        <div>
+          <h1 class="name" id="pName">—</h1>
+          <div class="sub" id="pSub">—</div>
+          <div class="links" id="pLinks"></div>
+          <div class="bio" id="pBio"></div>
+          <div style="margin-top:8px">
+            <span class="stat" id="statPosts">0 posts</span>
+            <span class="stat" id="statFlashes">0 flashs</span>
+          </div>
+        </div>
+        <div class="p-actions" id="actionsBox"></div>
+      </div>
+
+      <div id="flashStrip" class="flash-strip"></div>
+
+      <form id="editForm" class="edit">
+        <div class="row">
+          <div>
+            <label for="fUsername">Pseudo</label>
+            <input id="fUsername" class="input" type="text" placeholder="rider_name"/>
+          </div>
+          <div>
+            <label for="fFullname">Nom complet</label>
+            <input id="fFullname" class="input" type="text" placeholder="Prénom Nom"/>
+          </div>
+          <div>
+            <label for="fCity">Ville</label>
+            <input id="fCity" class="input" type="text" placeholder="Montreux"/>
+          </div>
+          <div>
+            <label for="fCanton">Canton</label>
+            <input id="fCanton" class="input" type="text" placeholder="VD"/>
+          </div>
+          <div class="full">
+            <label for="fInsta">Instagram (URL)</label>
+            <input id="fInsta" class="input" type="url" placeholder="https://instagram.com/moncompte"/>
+          </div>
+          <div class="full">
+            <label for="fBio">Bio</label>
+            <textarea id="fBio" class="input" rows="3" placeholder="Quelques lignes sur toi…"></textarea>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+          <label class="btn" for="fAvatar">Changer l’avatar</label>
+          <input id="fAvatar" type="file" accept="image/*" style="display:none"/>
+          <button class="btn green" id="btnSave" type="submit">Enregistrer</button>
+          <span id="saveMsg" style="color:#9aa5b1;font-size:12px"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- Posts -->
+    <section class="card" style="margin-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h2 style="margin:0;font-size:16px;font-weight:800">Posts</h2>
+        <button class="btn" id="btnNewPost" style="display:none">+ Nouveau post</button>
+      </div>
+      <div id="postGrid" class="post-grid"></div>
+      <p id="postsEmpty" class="empty" style="display:none">Aucun post pour l’instant.</p>
+    </section>
+  </div>
+</main>
+
+<!-- Tabbar -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Feed">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="games.html" title="Games">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
+  </a>
+  <a class="tab active" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<script>
+/* ===== THEME (clair / sombre) ===== */
+(function(){
+  const saved = localStorage.getItem('ridlyTheme') || 'dark';
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = (saved === 'light' || saved === 'dark') ? saved : (prefersDark ? 'dark' : 'light');
+  document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+
+  const btnTheme = document.getElementById('btnTheme');
+  const updateIcon = () => {
+    const isLight = document.body.classList.contains('theme-light');
+    btnTheme.textContent = isLight ? '☀️' : '🌙';
+  };
+  updateIcon();
+
+  btnTheme.addEventListener('click', ()=>{
+    const isLight = document.body.classList.contains('theme-light');
+    document.body.classList.toggle('theme-light', !isLight);
+    document.body.classList.toggle('theme-dark',  isLight);
+    localStorage.setItem('ridlyTheme', isLight ? 'dark' : 'light');
+    updateIcon();
+  });
+})();
+</script>
+
+<script>
+/* ===== Supabase init ===== */
+const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* BG vidéo RIDLY */
+(function(){
+  const v = document.getElementById('rslBg');
+  if(!v) return;
+  const s = document.createElement('source');
+  s.src = SUPABASE_URL + "/storage/v1/object/public/ridly/ridly.mp4";
+  s.type = "video/mp4";
+  v.appendChild(s);
+  const play = ()=>{ try{ v.playbackRate = 0.6; const p=v.play(); if(p&&p.catch) p.catch(()=>{});}catch(e){} };
+  play();
+  document.addEventListener('visibilitychange',()=>{ document.hidden ? v.pause() : play(); });
+})();
+</script>
+
+<script>
+/* ===== Profil / data ===== */
+const params = new URLSearchParams(location.search);
+const qId    = params.get('id');
+const qUser  = params.get('u');
+
+const avatarImg   = document.getElementById('avatarImg');
+const pName       = document.getElementById('pName');
+const pSub        = document.getElementById('pSub');
+const pLinks      = document.getElementById('pLinks');
+const pBio        = document.getElementById('pBio');
+const statPosts   = document.getElementById('statPosts');
+const statFlashes = document.getElementById('statFlashes');
+const actionsBox  = document.getElementById('actionsBox');
+const editForm    = document.getElementById('editForm');
+const saveMsg     = document.getElementById('saveMsg');
+const flashStrip  = document.getElementById('flashStrip');
+const postGrid    = document.getElementById('postGrid');
+const postsEmpty  = document.getElementById('postsEmpty');
+const btnNewPost  = document.getElementById('btnNewPost');
+const chatDot     = document.getElementById('chatDot');
+
+const avatarInput = document.getElementById('fAvatar');
+const fUsername   = document.getElementById('fUsername');
+const fFullname   = document.getElementById('fFullname');
+const fCity       = document.getElementById('fCity');
+const fCanton     = document.getElementById('fCanton');
+const fInsta      = document.getElementById('fInsta');
+const fBio        = document.getElementById('fBio');
+
+let sessionUser   = null;
+let profileUserId = null;
+let isOwn         = false;
+
+(async function init(){
+  const { data:{ user } } = await supa.auth.getUser();
+  sessionUser = user || null;
+
+  if(sessionUser && chatDot) chatDot.style.opacity = 1;
+
+  if(qId){
+    profileUserId = qId;
+  }else if(qUser){
+    const { data } = await supa.from('profiles').select('id').eq('username', qUser).maybeSingle();
+    profileUserId = data?.id || null;
+  }else{
+    profileUserId = sessionUser?.id || null;
+  }
+
+  if(!profileUserId){
+    pName.textContent = "Profil introuvable";
+    return;
+  }
+
+  isOwn = !!(sessionUser && sessionUser.id === profileUserId);
+
+  await loadProfile();
+  await loadFlashes();
+  await loadPosts();
+  buildActions();
+})();
+
+async function loadProfile(){
+  const { data:prof } = await supa.from('profiles').select('*').eq('id', profileUserId).maybeSingle();
+  if(!prof){
+    pName.textContent = "Profil introuvable";
+    return;
+  }
+
+  pName.textContent = prof.username || (prof.full_name || "Rider");
+  pSub.textContent  = `${prof.city || '—'}${prof.canton ? ' ('+prof.canton+')' : ''}`;
+  pBio.textContent  = prof.bio || "";
+  avatarImg.src     = prof.avatar_url || "image/logo_pn360.png";
+  pLinks.innerHTML  = prof.insta_url
+    ? `<a href="${prof.insta_url}" target="_blank" rel="noopener">@instagram</a>`
+    : "";
+
+  if(isOwn){
+    fUsername.value = prof.username || "";
+    fFullname.value = prof.full_name || "";
+    fCity.value     = prof.city || "";
+    fCanton.value   = prof.canton || "";
+    fInsta.value    = prof.insta_url || "";
+    fBio.value      = prof.bio || "";
+  }
+}
+
+function buildActions(){
+  actionsBox.innerHTML = "";
+  if(isOwn){
+    actionsBox.append(
+      makeBtn("✏️ Éditer", toggleEdit),
+      (()=>{ const b = makeBtn("+ Flash", addFlash); b.classList.add('green'); return b; })(),
+      makeBtn("Déconnexion", async ()=>{ await supa.auth.signOut(); location.reload(); })
+    );
+    btnNewPost.style.display = "inline-block";
+    btnNewPost.onclick = ()=>location.href="ajouter.html";
+  }else{
+    actionsBox.append(makeBtn("Suivre (bientôt)", ()=>{}));
+  }
+}
+
+function makeBtn(txt, fn){
+  const b = document.createElement('button');
+  b.type = "button";
+  b.className = "btn";
+  b.textContent = txt;
+  b.onclick = fn;
+  return b;
+}
+
+function toggleEdit(){
+  editForm.style.display = (editForm.style.display === "block") ? "none" : "block";
+}
+
+editForm?.addEventListener('submit', async e=>{
+  e.preventDefault();
+  saveMsg.textContent = "Enregistrement…";
+
+  const up = {
+    username:(fUsername.value||"").trim() || null,
+    full_name:(fFullname.value||"").trim() || null,
+    city:(fCity.value||"").trim() || null,
+    canton:(fCanton.value||"").trim() || null,
+    insta_url:(fInsta.value||"").trim() || null,
+    bio:(fBio.value||"").trim() || null
+  };
+
+  const { error } = await supa.from('profiles').update(up).eq('id', profileUserId);
+  if(error){
+    saveMsg.textContent = "Erreur : " + error.message;
+    return;
+  }
+  saveMsg.textContent = "OK ✓";
+  await loadProfile();
+});
+
+avatarInput?.addEventListener('change', async ()=>{
+  if(!avatarInput.files?.length) return;
+  const f = avatarInput.files[0];
+  const safeName = f.name.replace(/[^\w.\-]+/g,'_');
+  const path = `${profileUserId}/${Date.now()}-${safeName}`;
+
+  const { error:upErr } = await supa.storage.from('avatars').upload(path, f, { upsert:false });
+  if(upErr){
+    saveMsg.textContent = "Upload échoué.";
+    return;
+  }
+  const { data:pub } = supa.storage.from('avatars').getPublicUrl(path);
+  const url = pub?.publicUrl;
+  if(url){
+    await supa.from('profiles').update({ avatar_url:url }).eq('id', profileUserId);
+    avatarImg.src = url;
+    saveMsg.textContent = "Avatar mis à jour ✓";
+  }
+});
+
+async function loadFlashes(){
+  const { data:fl } = await supa
+    .from('flashes')
+    .select('id,media_url,caption,created_at,expires_at')
+    .eq('user_id', profileUserId)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending:false })
+    .limit(20);
+
+  const list = fl || [];
+  flashStrip.innerHTML = "";
+  list.forEach(f=>{
+    const d = document.createElement('div');
+    d.className = "flash";
+    const isVideo = /\.(mp4|webm|mov)$/i.test(f.media_url||"");
+    d.innerHTML = `
+      <div class="ring">
+        <div class="inner">
+          ${isVideo
+            ? `<video src="${f.media_url}" muted playsinline></video>`
+            : `<img src="${f.media_url}" alt="">`}
+        </div>
+      </div>
+      <div class="cap">${(f.caption||"").slice(0,18)}</div>
+    `;
+    d.onclick = ()=>window.open(f.media_url, '_blank');
+    flashStrip.appendChild(d);
+  });
+  statFlashes.textContent = `${list.length} flashs`;
+}
+
+async function addFlash(){
+  const inp = document.createElement('input');
+  inp.type = "file";
+  inp.accept = "image/*,video/*";
+  inp.onchange = async ()=>{
+    if(!inp.files?.length) return;
+    const f = inp.files[0];
+    const safeName = f.name.replace(/[^\w.\-]+/g,'_');
+    const path = `${profileUserId}/${Date.now()}-${safeName}`;
+
+    const { error:upErr } = await supa.storage.from('flashes').upload(path, f, { upsert:false });
+    if(upErr){
+      alert("Upload échoué");
+      return;
+    }
+    const { data:pub } = supa.storage.from('flashes').getPublicUrl(path);
+    const url = pub?.publicUrl;
+    if(url){
+      await supa.from('flashes').insert([{ user_id:profileUserId, media_url:url, caption:"" }]);
+      loadFlashes();
+    }
+  };
+  inp.click();
+}
+
+async function loadPosts(){
+  const { data:posts } = await supa
+    .from('spot_posts')
+    .select('id,media_url,caption,spot_type,created_at')
+    .eq('user_id', profileUserId)
+    .order('created_at', { ascending:false })
+    .limit(60);
+
+  const list = posts || [];
+  postGrid.innerHTML = "";
+
+  if(!list.length){
+    postsEmpty.style.display = "block";
+    statPosts.textContent = "0 posts";
+    return;
+  }
+
+  postsEmpty.style.display = "none";
+  statPosts.textContent = `${list.length} posts`;
+
+  list.forEach(p=>{
+    const isVideo = /\.(mp4|webm|mov)$/i.test(p.media_url||"");
+    const a = document.createElement('a');
+    a.className = "thumb";
+    a.href = p.media_url;
+    a.target = "_blank";
+    a.innerHTML = `
+      ${isVideo
+        ? `<video src="${p.media_url}" muted playsinline></video>`
+        : `<img src="${p.media_url}" alt="">`}
+      <span class="tag">${p.spot_type==='street'?'Street':'Park'}</span>
+    `;
+    postGrid.appendChild(a);
+  });
+}
+</script>
+
+</body>
+</html>

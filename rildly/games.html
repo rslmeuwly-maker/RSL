@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#22c55e">
+  <title>Game of Scoot — RIDLY</title>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#22c55e;
+      --green-soft:rgba(34,197,94,.15);
+
+      /* valeurs par défaut, écrasées par theme-dark / theme-light */
+      --bg:#000000;
+      --panel:#020617;
+      --panel-soft:#020617;
+      --text:#ffffff;
+      --dim:#9aa5b1;
+      --border:rgba(148,163,184,.4);
+    }
+
+    /* THEMES */
+    body.theme-dark{
+      --bg:#000000;
+      --panel:#020617;
+      --panel-soft:#020617;
+      --text:#ffffff;
+      --dim:#9aa5b1;
+      --border:rgba(148,163,184,.4);
+    }
+    body.theme-light{
+      --bg:#f3f4f6;
+      --panel:#ffffff;
+      --panel-soft:#e5e7eb;
+      --text:#020617;
+      --dim:#4b5563;
+      --border:rgba(148,163,184,.25);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+    main{flex:1}
+
+    /* BG vidéo RIDLY */
+    .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .rsl-bg-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;background:#000;
+      filter:brightness(.48) saturate(1.05);
+    }
+    .rsl-bg-dim{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6));
+    }
+    body.theme-light .rsl-bg-dim{
+      background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.96));
+    }
+
+    /* NAV top (comme les autres pages) */
+    nav.nav{
+      position:sticky;top:0;z-index:1000;
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    body.theme-light nav.nav{
+      background:rgba(243,244,246,.9);
+      border-bottom:1px solid rgba(15,23,42,.1);
+    }
+    nav .row{
+      max-width:1200px;margin:0 auto;
+      padding:12px 20px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    nav .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      color:var(--text);
+      text-decoration:none;
+    }
+    nav .brand img{
+      height:52px;
+      width:52px;
+      border-radius:12px;
+      background:#000;
+      padding:6px;
+      box-shadow:0 0 14px rgba(34,197,94,.6);
+    }
+    nav .brand span{font-size:18px}
+
+    .nav-tools{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-left:auto;
+    }
+    .icon-btn{
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.8);
+      color:var(--text);
+      border-radius:999px;
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      font-size:16px;
+      text-decoration:none;
+      position:relative;
+    }
+    body.theme-light .icon-btn{
+      background:#e5e7eb;
+    }
+    .icon-btn:hover{
+      border-color:var(--green);
+      color:var(--green);
+    }
+    .chat-dot{
+      position:absolute;
+      top:5px;
+      right:6px;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 8px rgba(34,197,94,.9);
+      opacity:0;
+    }
+
+    /* Mini hero */
+    .page-mini-hero{position:relative;z-index:10;padding:16px 0 6px}
+    .page-mini-hero .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .page-mini-hero h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);font-weight:800}
+    .page-mini-hero p{margin:0;color:var(--dim);font-size:14px;max-width:720px}
+
+    /* Contenu principal */
+    main .container{
+      max-width:980px;
+      margin:0 auto 110px;
+      padding:0 16px 40px;
+      position:relative;
+      z-index:10;
+    }
+
+    .status-main{
+      font-size:13px;
+      color:var(--dim);
+      margin:0 0 10px;
+    }
+
+    .panel{
+      background:var(--panel);
+      border-radius:16px;
+      border:1px solid var(--border);
+      padding:16px;
+      margin-bottom:16px;
+      box-shadow:0 30px 60px rgba(0,0,0,.85);
+    }
+    body.theme-light .panel{
+      box-shadow:0 18px 45px rgba(15,23,42,.15);
+    }
+    h2,h3{margin:0 0 10px;}
+    .btn{
+      appearance:none;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--panel-soft);
+      color:var(--text);
+      padding:8px 16px;
+      font:600 14px Outfit;
+      cursor:pointer;
+    }
+    .btn.green{
+      background:var(--green);
+      color:#000;
+      border-color:var(--green);
+    }
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input{
+      background:var(--panel-soft);
+      border-radius:10px;
+      border:1px solid var(--border);
+      padding:8px 10px;
+      color:var(--text);
+      font:500 14px Outfit;
+      min-width:0;
+    }
+    .players{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+    .player-card{
+      flex:1;
+      min-width:130px;
+      padding:12px;
+      border-radius:12px;
+      background:var(--panel-soft);
+      border:1px solid var(--border);
+    }
+    .letters{
+      display:flex;
+      gap:4px;
+      margin-top:6px;
+    }
+    .letter{
+      width:24px;
+      height:24px;
+      border-radius:6px;
+      border:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:13px;
+      color:var(--dim);
+    }
+    .letter.on{
+      background:var(--green-soft);
+      color:var(--green);
+      border-color:var(--green);
+    }
+    .status{font-size:13px;color:var(--dim);margin-bottom:6px;}
+    .round-log{
+      max-height:220px;
+      overflow:auto;
+      font-size:13px;
+      color:var(--dim);
+      padding-top:4px;
+    }
+    .round-log div{padding:2px 0;border-bottom:1px solid rgba(15,23,42,1);}
+
+    /* Tabbar (comme les autres) */
+    .tabbar{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      z-index:2000;
+      display:flex;
+      align-items:center;
+      justify-content:space-around;
+      padding:14px 18px;
+      border-top:1px solid var(--border);
+      background:rgba(0,0,0,.78);
+      backdrop-filter:blur(10px);
+    }
+    body.theme-light .tabbar{
+      background:rgba(243,244,246,.96);
+    }
+    .tab{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      text-decoration:none;
+    }
+    .tab .ic{font-size:24px}
+    .tab span{font-size:13px;color:#e5e7eb;font-weight:700}
+    body.theme-light .tab span{color:#111827}
+    .tab.active span{color:#22c55e}
+    @media(min-width:900px){ .tab span{font-size:12px} }
+  </style>
+</head>
+<body>
+
+<!-- BG vidéo -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
+</div>
+
+<!-- Nav top -->
+<nav class="nav">
+  <div class="row">
+    <a class="brand" href="ou_rider.html">
+      <img src="image/1logo_ridly.png" alt="RIDLY"/>
+      <span>RIDLY</span>
+    </a>
+    <div class="nav-tools">
+      <button type="button" class="icon-btn" id="btnTheme" title="Mode clair / sombre">🌙</button>
+      <a href="chat.html" class="icon-btn" id="btnChat" title="Chat riders">
+        <span class="chat-dot" id="chatDot"></span>
+        💬
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="page-mini-hero">
+  <div class="container">
+    <h1>Game of Scoot</h1>
+    <p>
+      Crée une partie, partage le code à ton pote, et suivez vos lettres SCOOT en direct.
+    </p>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <p class="status-main" id="statusText">
+      Connexion en cours…
+    </p>
+
+    <div class="panel">
+      <h2>Lancer une partie</h2>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn green" id="btnCreateGame">Créer une partie</button>
+        <span id="createdCode" style="font-size:13px;color:var(--dim);"></span>
+      </div>
+
+      <h3 style="margin-top:10px;">Rejoindre une partie</h3>
+      <div class="row">
+        <input id="joinCode" placeholder="Code de partie (ex: ABC123)" style="flex:1;max-width:220px"/>
+        <button class="btn" id="btnJoinGame">Rejoindre</button>
+      </div>
+    </div>
+
+    <div class="panel" id="gamePanel" style="display:none;">
+      <div class="players">
+        <div class="player-card">
+          <div id="p1Name">Player 1</div>
+          <div class="letters" id="p1Letters"></div>
+        </div>
+        <div class="player-card">
+          <div id="p2Name">Player 2</div>
+          <div class="letters" id="p2Letters"></div>
+        </div>
+      </div>
+
+      <div class="status" id="gameStatus"></div>
+
+      <div class="row" style="margin-bottom:8px;">
+        <input id="trickName" placeholder="Nom du trick (optionnel)" style="flex:1;"/>
+      </div>
+      <div class="row" style="margin-bottom:10px;">
+        <button class="btn" id="btnP1Miss">P1 prend une lettre</button>
+        <button class="btn" id="btnP2Miss">P2 prend une lettre</button>
+      </div>
+
+      <div class="round-log" id="roundLog"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Tabbar -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Feed">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab active" href="games.html" title="Game of Scoot">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<script>
+/* THEME (clair / sombre, partagé) */
+(function(){
+  const saved = localStorage.getItem('ridlyTheme') || 'dark';
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = (saved === 'light' || saved === 'dark') ? saved : (prefersDark ? 'dark' : 'light');
+  document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+
+  const btnTheme = document.getElementById('btnTheme');
+  const updateIcon = () => {
+    const isLight = document.body.classList.contains('theme-light');
+    btnTheme.textContent = isLight ? '☀️' : '🌙';
+  };
+  updateIcon();
+
+  btnTheme.addEventListener('click', ()=>{
+    const isLight = document.body.classList.contains('theme-light');
+    document.body.classList.toggle('theme-light', !isLight);
+    document.body.classList.toggle('theme-dark',  isLight);
+    localStorage.setItem('ridlyTheme', isLight ? 'dark' : 'light');
+    updateIcon();
+  });
+})();
+</script>
+
+<script>
+  /* Supabase init */
+  const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+  const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+  const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  /* BG vidéo */
+  (function(){
+    const v=document.getElementById('rslBg');
+    if(!v) return;
+    const s=document.createElement('source');
+    s.src=SUPABASE_URL + "/storage/v1/object/public/ridly/ridly.mp4";
+    s.type="video/mp4";
+    v.appendChild(s);
+    const play=()=>{try{v.playbackRate=0.6;const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}};
+    play();
+    document.addEventListener('visibilitychange',()=>{document.hidden?v.pause():play();});
+  })();
+
+  let currentUser = null;
+  let currentGame = null;
+  let channel = null;
+  const letters = ['S','C','O','O','T'];
+
+  const statusText   = document.getElementById('statusText');
+  const gamePanel    = document.getElementById('gamePanel');
+  const p1NameEl     = document.getElementById('p1Name');
+  const p2NameEl     = document.getElementById('p2Name');
+  const p1LettersEl  = document.getElementById('p1Letters');
+  const p2LettersEl  = document.getElementById('p2Letters');
+  const gameStatusEl = document.getElementById('gameStatus');
+  const roundLog     = document.getElementById('roundLog');
+  const chatDot      = document.getElementById('chatDot');
+
+  async function init(){
+    try{
+      const { data:{ user } } = await supa.auth.getUser();
+      if(!user){
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = user;
+      statusText.textContent = "Tu es connecté en tant que " + (user.email || user.id);
+      if(chatDot) chatDot.style.opacity = 1;
+    }catch(e){
+      console.error(e);
+      window.location.href = 'index.html';
+    }
+  }
+
+  function renderLetters(container, count){
+    container.innerHTML = '';
+    for(let i=0;i<letters.length;i++){
+      const div = document.createElement('div');
+      div.className = 'letter' + (i < count ? ' on':'');
+      div.textContent = letters[i];
+      container.appendChild(div);
+    }
+  }
+
+  function renderGame(){
+    if(!currentGame) return;
+    gamePanel.style.display = 'block';
+    p1NameEl.textContent = currentGame.player1_name || 'Rider 1';
+    p2NameEl.textContent = currentGame.player2_name || 'Rider 2';
+    renderLetters(p1LettersEl, currentGame.letters_p1 || 0);
+    renderLetters(p2LettersEl, currentGame.letters_p2 || 0);
+
+    if(currentGame.status === 'finished'){
+      const winner = currentGame.winner_name || 'un rider';
+      gameStatusEl.textContent = "Partie terminée — " + winner + " a gagné.";
+    }else{
+      gameStatusEl.textContent = "Partie en cours — code: " + currentGame.code;
+    }
+  }
+
+  async function loadRounds(gameId){
+    const { data, error } = await supa
+      .from('scoot_rounds')
+      .select('*')
+      .eq('game_id', gameId)
+      .order('round_number', { ascending:true });
+    if(error){ console.error(error); return; }
+    roundLog.innerHTML = '';
+    (data||[]).forEach(r => {
+      const div = document.createElement('div');
+      const t = r.trick_name ? r.trick_name + " — " : "";
+      div.textContent = "#" + r.round_number + " " + t +
+        "P1 lettres: " + (r.letters_p1_after ?? '?') +
+        " / P2 lettres: " + (r.letters_p2_after ?? '?');
+      roundLog.appendChild(div);
+    });
+  }
+
+  function subscribeGame(gameId){
+    if(channel){
+      supa.removeChannel(channel);
+    }
+    channel = supa
+      .channel('scoot_game_' + gameId)
+      .on('postgres_changes',{
+        event:'UPDATE', schema:'public', table:'scoot_games',
+        filter:'id=eq.'+gameId
+      }, payload => {
+        Object.assign(currentGame, payload.new);
+        renderGame();
+      })
+      .on('postgres_changes',{
+        event:'INSERT', schema:'public', table:'scoot_rounds',
+        filter:'game_id=eq.'+gameId
+      }, payload => {
+        loadRounds(gameId);
+      })
+      .subscribe();
+  }
+
+  document.getElementById('btnCreateGame').addEventListener('click', async () => {
+    if(!currentUser) return;
+    const code = Math.random().toString(36).slice(2,8).toUpperCase();
+    const displayName = currentUser.user_metadata?.full_name || currentUser.email || 'Rider 1';
+
+    const { data, error } = await supa
+      .from('scoot_games')
+      .insert({
+        code,
+        player1_id: currentUser.id,
+        player1_name: displayName,
+        status: 'waiting'
+      })
+      .select('*')
+      .single();
+    if(error){ console.error(error); alert("Erreur création partie"); return; }
+
+    document.getElementById('createdCode').textContent =
+      "Partage ce code à ton adversaire : " + code;
+    currentGame = data;
+    renderGame();
+    subscribeGame(currentGame.id);
+    loadRounds(currentGame.id);
+  });
+
+  document.getElementById('btnJoinGame').addEventListener('click', async () => {
+    if(!currentUser) return;
+    const code = document.getElementById('joinCode').value.trim().toUpperCase();
+    if(!code) return;
+    const displayName = currentUser.user_metadata?.full_name || currentUser.email || 'Rider 2';
+
+    const { data, error } = await supa
+      .from('scoot_games')
+      .update({ player2_id: currentUser.id, player2_name: displayName, status:'in_progress' })
+      .eq('code', code)
+      .is('player2_id', null)
+      .select('*')
+      .single();
+    if(error || !data){ alert("Code invalide ou partie déjà pleine."); return; }
+    currentGame = data;
+    renderGame();
+    subscribeGame(currentGame.id);
+    loadRounds(currentGame.id);
+  });
+
+  document.getElementById('btnP1Miss').addEventListener('click', async () => {
+    if(!currentGame) return;
+    const nextLetters = Math.min((currentGame.letters_p1 || 0) + 1, 5);
+    const roundNum = (currentGame.round_count || 0) + 1;
+
+    const { error: e1 } = await supa.from('scoot_games')
+      .update({
+        letters_p1: nextLetters,
+        status: nextLetters >= 5 ? 'finished' : 'in_progress',
+        winner_id: nextLetters >= 5 ? currentGame.player2_id : null
+      })
+      .eq('id', currentGame.id);
+
+    const { error: e2 } = await supa.from('scoot_rounds')
+      .insert({
+        game_id: currentGame.id,
+        round_number: roundNum,
+        trick_name: document.getElementById('trickName').value || null,
+        letters_p1_after: nextLetters,
+        letters_p2_after: currentGame.letters_p2 || 0
+      });
+
+    if(e1 || e2){ console.error(e1||e2); }
+    loadRounds(currentGame.id);
+  });
+
+  document.getElementById('btnP2Miss').addEventListener('click', async () => {
+    if(!currentGame) return;
+    const nextLetters = Math.min((currentGame.letters_p2 || 0) + 1, 5);
+    const roundNum = (currentGame.round_count || 0) + 1;
+
+    const { error: e1 } = await supa.from('scoot_games')
+      .update({
+        letters_p2: nextLetters,
+        status: nextLetters >= 5 ? 'finished' : 'in_progress',
+        winner_id: nextLetters >= 5 ? currentGame.player1_id : null
+      })
+      .eq('id', currentGame.id);
+
+    const { error: e2 } = await supa.from('scoot_rounds')
+      .insert({
+        game_id: currentGame.id,
+        round_number: roundNum,
+        trick_name: document.getElementById('trickName').value || null,
+        letters_p1_after: currentGame.letters_p1 || 0,
+        letters_p2_after: nextLetters
+      });
+
+    if(e1 || e2){ console.error(e1||e2); }
+    loadRounds(currentGame.id);
+  });
+
+  init();
+</script>
+
+<script>
+  // Service worker (PWA)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  }
+</script>
+
+</body>
+</html>

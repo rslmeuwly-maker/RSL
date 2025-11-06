@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Connexion RIDLY / RSL</title>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#22c55e;
+      --green-dark:#16a34a;
+      --border:rgba(255,255,255,.15);
+      --dim:#9aa5b1;
+      --bg:#020617;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      background:#000;
+      color:#fff;
+      font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* BG léger */
+    body::before{
+      content:"";
+      position:fixed;inset:0;
+      background:
+        radial-gradient(circle at top,#064e3b 0,#020617 40%,#000 100%);
+      opacity:.9;
+      z-index:-1;
+    }
+
+    /* Header simple */
+    header{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 18px;
+      background:rgba(0,0,0,.7);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.15);
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      text-decoration:none;color:#fff;
+    }
+    .brand img{
+      width:36px;height:36px;border-radius:10px;background:#fff;padding:3px;
+    }
+    .brand span{font-weight:800;font-size:17px;letter-spacing:.08em;}
+    header a.link-small{
+      font-size:12px;color:var(--dim);text-decoration:none;font-weight:600;
+    }
+    header a.link-small:hover{color:var(--green);}
+
+    main{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:30px 16px 70px;
+    }
+    .shell{
+      width:100%;
+      max-width:460px;
+    }
+    .title{
+      font-size:24px;
+      font-weight:800;
+      margin-bottom:4px;
+    }
+    .subtitle{
+      font-size:13px;
+      color:var(--dim);
+      margin-bottom:14px;
+    }
+
+    .card{
+      background:rgba(0,0,0,.8);
+      border-radius:18px;
+      border:1px solid var(--border);
+      box-shadow:0 30px 70px rgba(0,0,0,.85);
+      padding:16px 16px 18px;
+    }
+
+    /* Onglets membre / nouveau */
+    .tabs{
+      display:inline-flex;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.5);
+      background:#020617;
+      padding:2px;
+      margin-bottom:14px;
+    }
+    .tab-btn{
+      border:0;
+      background:transparent;
+      color:#9ca3af;
+      font-size:12px;
+      font-weight:700;
+      padding:6px 12px;
+      border-radius:999px;
+      cursor:pointer;
+    }
+    .tab-btn.active{
+      background:#020617;
+      color:#fff;
+      box-shadow:0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .field{
+      margin-bottom:10px;
+    }
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:#e5e7eb;
+      margin-bottom:4px;
+    }
+    .input{
+      width:100%;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      color:#fff;
+      padding:9px 12px;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .input:focus{outline:none;border-color:var(--green);}
+    .hint{font-size:11px;color:var(--dim);margin-top:2px;}
+
+    .btn-primary{
+      width:100%;
+      border-radius:10px;
+      border:0;
+      background:linear-gradient(135deg,var(--green),var(--green-dark));
+      color:#062312;
+      font-size:14px;
+      font-weight:800;
+      padding:10px 14px;
+      margin-top:8px;
+      cursor:pointer;
+      box-shadow:0 12px 30px rgba(0,0,0,.75);
+    }
+    .btn-primary:disabled{opacity:.6;cursor:default;}
+
+    .msg{
+      font-size:12px;
+      margin-top:8px;
+      min-height:16px;
+    }
+
+    /* Étape pseudo */
+    #stepPseudo{display:none;}
+    .pseudo-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+    .pseudo-text{font-size:13px;color:var(--dim);margin-bottom:12px;}
+    .pseudo-preview{font-size:13px;color:#bbf7d0;margin-top:4px;}
+
+    footer{
+      text-align:center;
+      font-size:11px;
+      color:var(--dim);
+      padding:0 10px 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <img src="image/logo_pn360.png" alt="RIDLY"/>
+    <span>RIDLY</span>
+  </a>
+  <a href="https://rsl-swiss.ch" class="link-small" target="_blank" rel="noopener">
+    Retour site RSL
+  </a>
+</header>
+
+<main>
+  <div class="shell">
+    <div class="title">Connexion RIDLY</div>
+    <div class="subtitle">
+      Membre RSL : utilise ton email habituel.  
+      Nouveau ? Crée un compte gratuit pour accéder à l’app.
+    </div>
+
+    <!-- Étape 1 : connexion / création -->
+    <section id="stepAuth" class="card">
+      <div class="tabs">
+        <button id="tabMember"  class="tab-btn active" type="button">Je suis membre RSL</button>
+        <button id="tabNew"     class="tab-btn"        type="button">Je crée mon compte</button>
+      </div>
+
+      <form id="authForm">
+        <div id="fieldFullname" class="field" style="display:none">
+          <label for="fullName">Nom et prénom</label>
+          <input id="fullName" class="input" type="text" autocomplete="name" placeholder="Prénom Nom">
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" class="input" type="email" autocomplete="email" placeholder="ton.email@exemple.ch" required>
+        </div>
+
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <input id="password" class="input" type="password" autocomplete="current-password" placeholder="Mot de passe" required>
+          <div class="hint">
+            Même mot de passe que sur la zone membre RSL (ou crée-en un nouveau si c’est ta première fois).
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="btnSubmitAuth">
+          Continuer
+        </button>
+        <div class="msg" id="authMsg"></div>
+      </form>
+    </section>
+
+    <!-- Étape 2 : choix du pseudo RIDLY -->
+    <section id="stepPseudo" class="card">
+      <div class="pseudo-title">Choisis ton pseudo RIDLY</div>
+      <p class="pseudo-text">
+        C’est ce nom qui apparaîtra dans le feed, les commentaires, le Game of Scoot, etc.
+        Tu peux utiliser par exemple <b>@tonblaz</b>.
+      </p>
+
+      <div class="field">
+        <label for="pseudo">Pseudo (3–20 caractères)</label>
+        <input id="pseudo" class="input" type="text" placeholder="@monpseudo">
+        <div class="hint">Lettres, chiffres, _ et . autorisés. Un pseudo = unique.</div>
+        <div class="pseudo-preview" id="pseudoPreview"></div>
+      </div>
+
+      <button type="button" class="btn-primary" id="btnSavePseudo">
+        Valider mon pseudo et entrer dans RIDLY
+      </button>
+      <div class="msg" id="pseudoMsg"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  RIDLY utilise ton compte RSL existant. Si tu n’en as pas, tu peux en créer un gratuitement ici.
+</footer>
+
+<script>
+  /* ===== Supabase init ===== */
+  const supa = supabase.createClient(
+    window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co",
+    window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4"
+  );
+
+  const stepAuth   = document.getElementById('stepAuth');
+  const stepPseudo = document.getElementById('stepPseudo');
+
+  const tabMember  = document.getElementById('tabMember');
+  const tabNew     = document.getElementById('tabNew');
+  const fieldFullname = document.getElementById('fieldFullname');
+  const authForm   = document.getElementById('authForm');
+  const authMsg    = document.getElementById('authMsg');
+  const btnSubmitAuth = document.getElementById('btnSubmitAuth');
+
+  const inputFull  = document.getElementById('fullName');
+  const inputEmail = document.getElementById('email');
+  const inputPass  = document.getElementById('password');
+
+  const pseudoSection = document.getElementById('stepPseudo');
+  const pseudoInput   = document.getElementById('pseudo');
+  const pseudoMsg     = document.getElementById('pseudoMsg');
+  const pseudoPrev    = document.getElementById('pseudoPreview');
+  const btnSavePseudo = document.getElementById('btnSavePseudo');
+
+  let mode = "member"; // "member" ou "new"
+
+  function setMode(newMode){
+    mode = newMode;
+    tabMember.classList.toggle('active', mode==="member");
+    tabNew.classList.toggle('active',    mode==="new");
+    fieldFullname.style.display = (mode==="new") ? "block" : "none";
+  }
+  tabMember.onclick = ()=>setMode("member");
+  tabNew.onclick    = ()=>setMode("new");
+
+  /* ========== Étape 0 : voir si l'utilisateur est déjà connecté ========== */
+  (async function bootstrap(){
+    try{
+      const { data:{ user } } = await supa.auth.getUser();
+      if(!user){
+        // pas connecté -> reste sur le formulaire
+        return;
+      }
+      // déjà connecté -> on vérifie si pseudo déjà défini
+      await checkProfileAndRedirect(user);
+    }catch(e){
+      console.warn(e);
+    }
+  })();
+
+  /* ========== Étape 1 : connexion / création ========== */
+  authForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    authMsg.style.color = "#9aa5b1";
+    authMsg.textContent = "Vérification en cours…";
+    btnSubmitAuth.disabled = true;
+
+    const email = (inputEmail.value||"").trim();
+    const password = inputPass.value;
+    const fullName = (inputFull.value||"").trim() || null;
+
+    try{
+      let user = null;
+
+      if(mode === "member"){
+        // connexion simple
+        const { data, error } = await supa.auth.signInWithPassword({ email, password });
+        if(error) throw error;
+        user = data.user;
+      }else{
+        // création de compte gratuit
+        const { data, error } = await supa.auth.signUp({
+          email,
+          password,
+          options:{
+            data:{ full_name: fullName }
+          }
+        });
+        if(error) throw error;
+        user = data.user;
+      }
+
+      if(!user){
+        throw new Error("Connexion impossible");
+      }
+
+      authMsg.style.color = "#22c55e";
+      authMsg.textContent = "Connexion OK. Préparation de ton profil…";
+
+      await ensureProfileRow(user, fullName);
+      await checkProfileAndRedirect(user);
+    }catch(err){
+      console.error(err);
+      authMsg.style.color = "#f97373";
+      authMsg.textContent = "Erreur : " + (err.message || "connexion impossible");
+    }finally{
+      btnSubmitAuth.disabled = false;
+    }
+  });
+
+  async function ensureProfileRow(user, fullNameHint){
+    // on vérifie qu'il y a bien une ligne dans "profiles"
+    const { data:prof, error } = await supa
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if(error){
+      console.warn(error);
+      return;
+    }
+    if(!prof){
+      await supa.from('profiles').insert([{
+        id: user.id,
+        full_name: fullNameHint || user.user_metadata?.full_name || null,
+        email: user.email || null
+      }]).catch(()=>{});
+    }
+  }
+
+  async function checkProfileAndRedirect(user){
+    const { data:prof, error } = await supa
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if(error){
+      console.warn(error);
+    }
+
+    const pseudo = prof?.username;
+    if(pseudo){
+      // pseudo déjà défini -> accès direct
+      window.location.href = "ou_rider.html";
+      return;
+    }
+
+    // pas encore de pseudo -> afficher étape 2
+    stepAuth.style.display = "none";
+    stepPseudo.style.display = "block";
+  }
+
+  /* ========== Étape 2 : pseudo RIDLY ========== */
+  pseudoInput.addEventListener('input', ()=>{
+    const raw = pseudoInput.value.trim();
+    const clean = normalizePseudo(raw);
+    if(raw !== clean) pseudoInput.value = clean;
+    if(clean){
+      pseudoPrev.textContent = "Ton pseudo apparaîtra comme : @" + clean;
+    }else{
+      pseudoPrev.textContent = "";
+    }
+  });
+
+  function normalizePseudo(str){
+    // autorise lettres, chiffres, _, .
+    return (str||"")
+      .replace(/^@+/,"")            // enlève les @ au début
+      .replace(/[^a-zA-Z0-9_.]/g,"")
+      .toLowerCase();
+  }
+
+  btnSavePseudo.addEventListener('click', async ()=>{
+    pseudoMsg.style.color = "#9aa5b1";
+    pseudoMsg.textContent = "Vérification du pseudo…";
+    btnSavePseudo.disabled = true;
+
+    let val = normalizePseudo(pseudoInput.value);
+    pseudoInput.value = val;
+
+    if(!val || val.length < 3){
+      pseudoMsg.style.color = "#f97373";
+      pseudoMsg.textContent = "Le pseudo doit faire au moins 3 caractères.";
+      btnSavePseudo.disabled = false;
+      return;
+    }
+    if(val.length > 20){
+      pseudoMsg.style.color = "#f97373";
+      pseudoMsg.textContent = "Le pseudo doit faire max 20 caractères.";
+      btnSavePseudo.disabled = false;
+      return;
+    }
+
+    try{
+      const { data:{ user } } = await supa.auth.getUser();
+      if(!user) throw new Error("Tu n'es plus connecté.");
+
+      // vérifie qu'il n'existe pas déjà
+      const { data:exists } = await supa
+        .from('profiles')
+        .select('id')
+        .eq('username', val)
+        .maybeSingle();
+
+      if(exists && exists.id !== user.id){
+        pseudoMsg.style.color = "#f97373";
+        pseudoMsg.textContent = "Ce pseudo est déjà pris. Essaie-en un autre.";
+        btnSavePseudo.disabled = false;
+        return;
+      }
+
+      const { error } = await supa
+        .from('profiles')
+        .update({ username: val })
+        .eq('id', user.id);
+
+      if(error) throw error;
+
+      pseudoMsg.style.color = "#22c55e";
+      pseudoMsg.textContent = "Parfait, bienvenue sur RIDLY !";
+      setTimeout(()=>{ window.location.href = "ou_rider.html"; }, 600);
+    }catch(err){
+      console.error(err);
+      pseudoMsg.style.color = "#f97373";
+      pseudoMsg.textContent = "Erreur : " + (err.message || "impossible d'enregistrer le pseudo");
+      btnSavePseudo.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>

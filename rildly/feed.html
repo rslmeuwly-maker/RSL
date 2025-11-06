@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#22c55e">
+  <title>Feed Riders — RIDLY</title>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#22c55e;
+      --green-dark:#16a34a;
+
+      --bg:#000000;
+      --panel:#0b1220;
+      --panel-soft:#020617;
+      --text:#ffffff;
+      --dim:#9aa5b1;
+      --border:rgba(255,255,255,.15);
+    }
+
+    /* Thèmes */
+    body.theme-dark{
+      --bg:#000000;
+      --panel:#0b1220;
+      --panel-soft:#020617;
+      --text:#ffffff;
+      --dim:#9aa5b1;
+      --border:rgba(255,255,255,.15);
+    }
+    body.theme-light{
+      --bg:#f3f4f6;
+      --panel:#ffffff;
+      --panel-soft:#e5e7eb;
+      --text:#020617;
+      --dim:#4b5563;
+      --border:rgba(15,23,42,.12);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+    main{flex:1}
+
+    /* BG vidéo */
+    .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .rsl-bg-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;background:#000;
+      filter:brightness(.48) saturate(1.05);
+    }
+    .rsl-bg-dim{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6));
+    }
+    body.theme-light .rsl-bg-dim{
+      background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.96));
+    }
+
+    /* NAV top (même que recherche) */
+    nav.nav{
+      position:sticky;top:0;z-index:1000;
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    body.theme-light nav.nav{
+      background:rgba(243,244,246,.9);
+      border-bottom:1px solid rgba(15,23,42,.1);
+    }
+    nav .row{
+      max-width:1200px;margin:0 auto;
+      padding:12px 20px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    nav .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      color:var(--text);
+      text-decoration:none;
+    }
+    nav .brand img{
+      height:52px;
+      width:52px;
+      border-radius:12px;
+      background:#000;
+      padding:6px;
+      box-shadow:0 0 14px rgba(34,197,94,.6);
+    }
+    nav .brand span{font-size:18px}
+    nav a{color:var(--text);text-decoration:none;font-weight:700}
+    nav a:hover{color:var(--green)}
+
+    .nav-tools{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-left:auto;
+    }
+    .icon-btn{
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.8);
+      color:var(--text);
+      border-radius:999px;
+      width:34px;height:34px;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      font-size:16px;
+      text-decoration:none;
+      position:relative;
+    }
+    body.theme-light .icon-btn{
+      background:#e5e7eb;
+    }
+    .icon-btn:hover{
+      border-color:var(--green);
+      color:var(--green);
+    }
+    .chat-dot{
+      position:absolute;
+      top:5px;
+      right:6px;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 8px rgba(34,197,94,.9);
+      opacity:0;
+    }
+
+    /* Mini hero */
+    .page-mini-hero{position:relative;z-index:10;padding:16px 0 6px}
+    .page-mini-hero .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .page-mini-hero h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);font-weight:800}
+    .page-mini-hero p{margin:0;color:var(--dim);font-size:14px;max-width:720px}
+
+    /* Contenu */
+    main .container{
+      max-width:980px;
+      margin:0 auto 110px;
+      padding:0 16px 40px;
+      position:relative;
+      z-index:10;
+    }
+
+    /* Flashs (stories top) */
+    .flash-bar{
+      display:flex;
+      gap:12px;
+      overflow-x:auto;
+      padding:8px 2px 2px 2px;
+      margin-bottom:10px;
+      scroll-snap-type:x proximity;
+    }
+    .flash{
+      scroll-snap-align:start;
+      min-width:76px;width:76px;text-align:center;user-select:none;cursor:pointer;
+    }
+    .flash .ring{
+      width:66px;height:66px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;
+      background:
+        radial-gradient(farthest-side,rgba(0,0,0,.7) 60%,transparent 62%) top/100% 100%,
+        conic-gradient(#22c55e, #16a34a, #22c55e);
+      padding:3px;
+    }
+    .flash .ring img{
+      width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #000;
+    }
+    .flash .name{
+      font-size:12px;line-height:1.2;font-weight:700;color:var(--text);max-width:72px;margin:0 auto;
+    }
+    .flash.me .ring{
+      background:
+        radial-gradient(farthest-side,rgba(0,0,0,.7) 60%,transparent 62%) top/100% 100%,
+        conic-gradient(#60a5fa,#22c55e,#60a5fa);
+    }
+
+    /* Lightbox flash */
+    .lightbox{
+      position:fixed;inset:0;z-index:50;display:none;
+      align-items:center;justify-content:center;
+      background:rgba(0,0,0,.8);
+    }
+    .lightbox.open{display:flex}
+    .lightbox .content{
+      max-width:min(92vw,780px);max-height:80vh;
+      background:#000;border:1px solid var(--border);
+      border-radius:12px;overflow:hidden;
+    }
+    .lightbox header{
+      position:relative;top:auto;background:#000;border:0;
+      padding:10px 12px;display:flex;align-items:center;gap:8px
+    }
+    .lightbox .media{display:block;max-width:100%;max-height:70vh;margin:0 auto;background:#000}
+    .lightbox .cap{padding:10px 12px;font-size:13px;color:#e5e7eb;border-top:1px solid var(--border)}
+    .lightbox .close{
+      position:absolute;right:12px;top:10px;font-weight:800;
+      color:#fff;background:transparent;border:0;font-size:18px;cursor:pointer;
+    }
+
+    /* Posts */
+    .post{
+      background:rgba(0,0,0,.75);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      margin:14px 0;
+      box-shadow:0 30px 80px rgba(0,0,0,.85);
+    }
+    body.theme-light .post{
+      background:var(--panel);
+      box-shadow:0 18px 45px rgba(15,23,42,.18);
+    }
+    .post .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .post .ava{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #000;background:#111}
+    .post .who{font-weight:800;font-size:14px;color:var(--text)}
+    .post .spot{font-size:12px;color:var(--dim);font-weight:700}
+    .media-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
+    .media{display:block;width:100%;max-height:64vh;object-fit:cover}
+    .cap{font-size:14px;line-height:1.5;margin:8px 2px 0;color:#e5e7eb}
+    body.theme-light .cap{color:#111827}
+    .meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+    .wheels{display:flex;gap:6px}
+    .wheel{
+      width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+      border:2px solid #fff;background:#1f2937;cursor:pointer;font-weight:900;font-size:12px;
+      color:#f9fafb;
+    }
+    .wheel.on{background:#22c55e;color:#062312;border-color:#22c55e}
+    .avg{font-size:12px;color:#9ddbb0;font-weight:800}
+
+    /* Tabbar */
+    .tabbar{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      z-index:2000;
+      display:flex;
+      align-items:center;
+      justify-content:space-around;
+      padding:14px 18px;
+      border-top:1px solid var(--border);
+      background:rgba(0,0,0,.78);
+      backdrop-filter:blur(10px);
+    }
+    body.theme-light .tabbar{
+      background:rgba(243,244,246,.96);
+    }
+    .tab{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      text-decoration:none;
+    }
+    .tab .ic{font-size:24px}
+    .tab span{font-size:13px;color:#e5e7eb;font-weight:700}
+    body.theme-light .tab span{color:#111827}
+    .tab.active span{color:#22c55e}
+    @media(min-width:900px){ .tab span{font-size:12px} }
+  /* NAV RIDLY FIXE PARTOUT */
+nav.nav{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+body.theme-light nav.nav{
+  background:rgba(243,244,246,.9);
+  border-bottom:1px solid rgba(15,23,42,.1);
+}
+
+nav.nav .row{
+  max-width:1200px;
+  margin:0 auto;
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+nav.nav .brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  color:var(--text);
+  text-decoration:none;
+}
+
+nav.nav .brand img{
+  height:40px !important;
+  width:40px !important;
+  border-radius:12px;
+  background:#000;
+  padding:4px;
+  box-shadow:0 0 10px rgba(34,197,94,.6);
+}
+
+nav.nav .brand span{
+  font-size:18px !important;
+}
+
+nav.nav a{
+  color:var(--text);
+  text-decoration:none;
+  font-weight:700;
+}
+nav.nav a:hover{
+  color:var(--green);
+}
+</style>
+</head>
+<body>
+
+<!-- BG vidéo -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
+</div>
+
+<!-- Nav top -->
+<nav class="nav">
+  <div class="row">
+    <a class="brand" href="ou_rider.html">
+      <img src="image/1logo_ridly.png" alt="RIDLY"/>
+      <span>RIDLY</span>
+    </a>
+    <div class="nav-tools">
+      <button type="button" class="icon-btn" id="btnTheme" title="Mode clair / sombre">🌙</button>
+      <a href="chat.html" class="icon-btn" id="btnChat" title="Chat riders">
+        <span class="chat-dot" id="chatDot"></span>
+        💬
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="page-mini-hero">
+  <div class="container">
+    <h1>Feed Riders</h1>
+    <p>
+      Découvre les derniers clips et photos RIDLY, note les tricks et motive-toi avant ta session.
+    </p>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <!-- Barre stories -->
+    <div class="flash-bar" id="flashBar"></div>
+
+    <!-- Feed -->
+    <section id="feedList">
+      <p style="color:var(--dim)">Chargement du feed…</p>
+    </section>
+  </div>
+</main>
+
+<!-- Lightbox Flash -->
+<div class="lightbox" id="flashBox" role="dialog" aria-modal="true">
+  <div class="content">
+    <header>
+      <div id="flashUser" class="who">Rider</div>
+      <button class="close" id="flashClose">✕</button>
+    </header>
+    <img id="flashImg" class="media" alt="" style="display:none"/>
+    <video id="flashVid" class="media" controls playsinline style="display:none"></video>
+    <div id="flashCap" class="cap"></div>
+  </div>
+</div>
+
+<!-- Tabbar -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab active" href="feed.html" title="Feed">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="games.html" title="Games">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<script>
+/* ===== Thème clair/sombre (même logique que recherche) ===== */
+(function(){
+  const saved = localStorage.getItem('ridlyTheme') || 'dark';
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = (saved === 'light' || saved === 'dark') ? saved : (prefersDark ? 'dark' : 'light');
+  document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+
+  const btnTheme = document.getElementById('btnTheme');
+  const updateIcon = () => {
+    const isLight = document.body.classList.contains('theme-light');
+    btnTheme.textContent = isLight ? '☀️' : '🌙';
+  };
+  updateIcon();
+
+  btnTheme.addEventListener('click', ()=>{
+    const isLight = document.body.classList.contains('theme-light');
+    document.body.classList.toggle('theme-light', !isLight);
+    document.body.classList.toggle('theme-dark',  isLight);
+    localStorage.setItem('ridlyTheme', isLight ? 'dark' : 'light');
+    updateIcon();
+  });
+})();
+</script>
+
+<script>
+/* ===== Supabase init ===== */
+const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* BG vidéo */
+(function(){
+  const v = document.getElementById('rslBg');
+  if(!v) return;
+  const s = document.createElement('source');
+  s.src = SUPABASE_URL + "/storage/v1/object/public/ridly/ridly.mp4";
+  s.type = "video/mp4";
+  v.appendChild(s);
+  const play = ()=>{ try{ v.playbackRate = 0.6; const p=v.play(); if(p&&p.catch) p.catch(()=>{});}catch(e){} };
+  play();
+  document.addEventListener('visibilitychange',()=>{ document.hidden ? v.pause() : play(); });
+})();
+</script>
+
+<script>
+/* ===== Auth guard + chat dot ===== */
+let me = null;
+const chatDot = document.getElementById('chatDot');
+
+(async()=>{
+  try{
+    const { data:{ user } } = await supa.auth.getUser();
+    if(!user){
+      window.location.href = 'index.html';
+      return;
+    }
+    me = user;
+    if(chatDot) chatDot.style.opacity = 1;
+    await loadFlashes();
+    await loadFeed();
+  }catch(e){
+    console.error(e);
+    window.location.href = 'index.html';
+  }
+})();
+
+/* ===== DOM feed ===== */
+const flashBar   = document.getElementById('flashBar');
+const feedList   = document.getElementById('feedList');
+const flashBox   = document.getElementById('flashBox');
+const flashUser  = document.getElementById('flashUser');
+const flashImg   = document.getElementById('flashImg');
+const flashVid   = document.getElementById('flashVid');
+const flashCap   = document.getElementById('flashCap');
+const flashClose = document.getElementById('flashClose');
+
+/* ===== Flashes ===== */
+async function loadFlashes(){
+  flashBar.innerHTML='';
+  const nowIso=new Date().toISOString();
+  try{
+    const { data:fl } = await supa
+      .from('flashes')
+      .select('id,user_id,media_url,caption,created_at,expires_at,profiles!inner(full_name,avatar_url)')
+      .gt('expires_at',nowIso)
+      .order('created_at',{ascending:false})
+      .limit(40);
+
+    const list=fl||[];
+    if(me){
+      const my=document.createElement('div');
+      my.className='flash me';
+      my.innerHTML=`<div class="ring"><img src="${me.user_metadata?.avatar_url||'image/avatar_default.png'}" alt="Me"></div><div class="name">Moi</div>`;
+      my.title='Pour ajouter une story : onglet "Ajouter".';
+      flashBar.appendChild(my);
+    }
+
+    list.forEach(f=>{
+      const name=f.profiles?.full_name || 'Rider';
+      const ava=f.profiles?.avatar_url || 'image/avatar_default.png';
+      const el=document.createElement('div');
+      el.className='flash';
+      el.innerHTML=`<div class="ring"><img src="${ava}" alt=""></div><div class="name">${name}</div>`;
+      el.onclick=()=>openFlash(f);
+      flashBar.appendChild(el);
+    });
+  }catch(e){
+    console.error(e);
+  }
+}
+
+function openFlash(f){
+  flashUser.textContent=f.profiles?.full_name || 'Rider';
+  flashCap.textContent=f.caption || '';
+  flashImg.style.display='none'; flashVid.style.display='none';
+  if(/\.(mp4|webm|mov)$/i.test(f.media_url||'')){
+    flashVid.src=f.media_url; flashVid.style.display='block'; flashVid.currentTime=0; flashVid.play().catch(()=>{});
+  }else{
+    flashImg.src=f.media_url||''; flashImg.style.display='block';
+  }
+  flashBox.classList.add('open');
+}
+flashClose.onclick=()=>{flashBox.classList.remove('open');flashVid.pause();};
+flashBox.addEventListener('click',e=>{
+  if(e.target===flashBox){flashBox.classList.remove('open');flashVid.pause();}
+});
+
+/* ===== Feed ===== */
+async function loadFeed(){
+  feedList.innerHTML='<p style="color:var(--dim)">Chargement…</p>';
+  try{
+    const { data:posts } = await supa
+      .from('spot_posts')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(50);
+
+    if(!posts || !posts.length){
+      feedList.innerHTML='<p style="color:var(--dim)">Encore aucun post. Sois le premier 👑</p>';
+      return;
+    }
+
+    let html='';
+    for(const p of posts){
+      let spotLabel='Spot non lié';
+      if(p.spot_type==='park' && p.spot_id){
+        const { data:sp } = await supa.from('spots').select('nom,ville,canton').eq('id',p.spot_id).maybeSingle();
+        if(sp) spotLabel=`${sp.nom} — ${sp.ville} (${sp.canton})`;
+      }else if(p.spot_type==='street' && p.spot_id){
+        const { data:sp } = await supa.from('bunny').select('nom,ville,canton').eq('id',p.spot_id).maybeSingle();
+        if(sp) spotLabel=`${sp.nom} — ${sp.ville} (${sp.canton})`;
+      }
+
+      let avgTxt='';
+      try{
+        const { data:likes } = await supa.from('post_likes').select('rating').eq('post_id',p.id);
+        if(likes?.length){
+          const sum=likes.reduce((a,b)=>a+(b.rating||0),0);
+          const avg=sum/likes.length;
+          avgTxt=`Moy: ${avg.toFixed(1)} / 5 (${likes.length})`;
+        }else avgTxt='Pas encore noté';
+      }catch(_){
+        avgTxt='—';
+      }
+
+      const isVideo=/\.(mp4|webm|mov)$/i.test(p.media_url||'');
+
+      html+=`
+      <article class="post">
+        <div class="head">
+          <img class="ava" src="image/avatar_default.png" alt="">
+          <div>
+            <div class="who">${escapeHTML(p.user_display||'Rider')}</div>
+            <div class="spot">${escapeHTML(spotLabel)}</div>
+          </div>
+        </div>
+        <div class="media-wrap">
+          ${isVideo
+            ? `<video class="media" controls playsinline src="${escapeAttr(p.media_url||'')}"></video>`
+            : `<img class="media" src="${escapeAttr(p.media_url||'')}" alt="">`}
+        </div>
+        ${p.caption ? `<div class="cap">${escapeHTML(p.caption)}</div>` : ''}
+        <div class="meta">
+          <div class="wheels" data-post="${p.id}">
+            ${[1,2,3,4,5].map(n=>`<button class="wheel" data-val="${n}" title="${n} roues">${n}</button>`).join('')}
+          </div>
+          <div class="avg" id="avg-${p.id}">${avgTxt}</div>
+        </div>
+      </article>`;
+    }
+    feedList.innerHTML=html;
+
+    document.querySelectorAll('.wheels').forEach(box=>{
+      box.addEventListener('click',async ev=>{
+        const btn=ev.target.closest('.wheel'); if(!btn) return;
+        if(!me){ alert('Connecte-toi pour noter.'); return; }
+        const postId=Number(box.getAttribute('data-post'));
+        const rating=Number(btn.getAttribute('data-val'));
+        try{
+          await supa.from('post_likes').upsert(
+            [{post_id:postId,user_id:me.id,rating}],
+            {onConflict:'post_id,user_id'}
+          );
+          const { data:likes } = await supa.from('post_likes').select('rating').eq('post_id',postId);
+          if(likes?.length){
+            const sum=likes.reduce((a,b)=>a+(b.rating||0),0);
+            const avg=sum/likes.length;
+            const el=document.getElementById('avg-'+postId);
+            if(el) el.textContent=`Moy: ${avg.toFixed(1)} / 5 (${likes.length})`;
+          }
+          box.querySelectorAll('.wheel').forEach(w=>w.classList.remove('on'));
+          btn.classList.add('on');
+        }catch(e){
+          console.error(e);
+          alert('Impossible de noter pour le moment.');
+        }
+      });
+    });
+  }catch(e){
+    console.error(e);
+    feedList.innerHTML='<p style="color:#ef4444">Erreur chargement feed.</p>';
+  }
+}
+
+/* Utils */
+function escapeHTML(s){return (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+function escapeAttr(s){return escapeHTML(s)}
+</script>
+
+<script>
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  }
+</script>
+
+</body>
+</html>

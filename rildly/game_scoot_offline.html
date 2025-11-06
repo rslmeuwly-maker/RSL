@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Game of SCOOT — Multilingue, Plaqué/Loupé, Highlights + Sons + Logo</title>
+  <style>
+    :root{
+      --ink:#0f172a; --muted:#64748b; --bg:#ffffff; --soft:#f1f5f9;
+      --border:#e2e8f0; --shadow:0 12px 30px rgba(2,6,23,.08);
+      --blue:#007BFF;   /* Tirer */
+      --green:#28a745;  /* Plaqué */
+      --red:#dc3545;    /* Loupé */
+      --grey:#ffffff;
+      --current:#0ea5e9; /* highlight lanceur */
+      --next:#f59e0b;    /* highlight prochain */
+    }
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink);background:#fff}
+    .wrap{max-width:980px;margin:0 auto;padding:16px}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+    h1{font-size:clamp(22px,4.5vw,32px);line-height:1.15;margin:0}
+    .muted{color:var(--muted);font-size:14px}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+    .pill{display:inline-flex;align-items:center;gap:8px;background:var(--soft);border:1px solid var(--border);border-radius:999px;padding:6px 10px;font-size:13px}
+    input, textarea, select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;font:14px/1.4 ui-sans-serif,system-ui}
+    .players{display:grid;grid-template-columns:1fr;gap:8px}
+    @media(min-width:640px){.players{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:900px){.players{grid-template-columns:repeat(3,1fr)}}
+    .p{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;transition:box-shadow .2s, transform .08s}
+    .p .name{font-weight:700}
+    .letters{font-weight:900;letter-spacing:.5px;min-width:72px;text-align:center}
+    .dead{opacity:.55}
+    .is-current{border-color:var(--current); box-shadow:0 0 0 3px rgba(14,165,233,.18)}
+    .is-next{border-color:var(--next); box-shadow:0 0 0 3px rgba(245,158,11,.18)}
+    .slot{display:grid;place-items:center;position:relative;height:3.2em;overflow:hidden;border-radius:14px;border:1px dashed var(--border);background:linear-gradient(180deg,#fff,#fafbfc);font-size:clamp(22px,5vw,40px);font-weight:800;margin:8px 0}
+    .slot span{display:block;will-change:transform}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    .pulse{animation:pulse .22s ease-out}
+    .list{max-height:320px;overflow:auto;border:1px dashed var(--border);border-radius:12px;padding:8px}
+    .title-sm{font-size:15px;margin:8px 0 6px}
+    .topbar{display:flex;gap:8px;align-items:center;margin-left:auto}
+    /* Boutons */
+    .btn{border:0;border-radius:14px;padding:12px 16px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);transition:transform .06s ease, filter .15s ease}
+    .btn:active{transform:translateY(1px)}
+    .btn.blue{background:var(--blue);color:#fff}
+    .btn.green{background:var(--green);color:#fff}
+    .btn.red{background:var(--red);color:#fff}
+    .btn.ghost{background:var(--grey);border:1px solid var(--border);color:var(--ink)}
+    .btn[disabled]{opacity:.5;filter:saturate(.6);cursor:not-allowed}
+    @keyframes glow{0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 0 6px rgba(0,123,255,.12)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}}
+    .prime{animation:glow 1.2s ease-out infinite}
+    /* Banner turn indicator */
+    .turnbar{display:flex;gap:8px;align-items:center;margin:6px 0 2px}
+    .badge{display:inline-block;background:var(--soft);border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px}
+    .chip.current{border-color:var(--current);background:rgba(14,165,233,.08)}
+    .chip.next{border-color:var(--next);background:rgba(245,158,11,.08)}
+    /* Simple logo RSL (vector) */
+    .logo{width:44px;height:44px;border-radius:12px;background:#0f1a24;display:grid;place-items:center;color:#fff;font-weight:900;letter-spacing:.5px}
+    .logo svg{width:28px;height:28px;display:block}
+  /* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/pn360.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+  <div class="wrap">
+    <header class="hero">
+      <!-- Logo RSL à gauche -->
+      <div class="logo" title="RSL">
+        <!-- petit monogramme vectoriel -->
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="21" height="21" rx="5" stroke="#3ee08f" stroke-width="1.5"/>
+          <path d="M5.2 16.8V7.3h4.1c1.9 0 3 .9 3 2.5 0 1.2-.7 2-1.8 2.3l2.2 4.7h-2.1l-2-4.3H7.3v4.3H5.2Zm2.1-5.9h1.9c.9 0 1.4-.4 1.4-1.1 0-.7-.5-1.1-1.4-1.1H7.3v2.2Z" fill="#ffffff"/>
+          <path d="M18.8 17H12v-1.8h6.8V17Z" fill="#3ee08f"/>
+        </svg>
+      </div>
+      <h1 id="title">Game of SCOOT</h1>
+      <div class="topbar">
+        <label class="pill"><span id="i18n_auto_lbl">Auto-langue</span> <input type="checkbox" id="autoLang" checked></label>
+        <select id="langSelect" class="pill">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="it">Italiano</option>
+          <option value="es">Español</option>
+        </select>
+        <label class="pill"><input type="checkbox" id="sound"> <span id="lbl_sound">Son 8‑bit</span></label>
+      </div>
+      <div class="muted" id="subtitle">Simple & mobile. Choisis les joueurs, ta liste de tricks, et joue.</div>
+    </header>
+
+    <!-- Setup -->
+    <section class="card">
+      <div class="row">
+        <div class="pill"><span id="lbl_players">Joueurs</span>
+          <select id="playerCount">
+            <option>2</option><option>3</option><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+          </select>
+        </div>
+        <button class="btn ghost" id="fillDefault">Noms auto</button>
+        <button class="btn blue" id="applyPlayers">Appliquer</button>
+        <label class="pill"><input type="checkbox" id="twoTries"> <span id="lbl_twoTries">2 essais sur la dernière lettre</span></label>
+        <label class="pill"><input type="checkbox" id="noRepeat" checked> <span id="lbl_noRepeat">Sans répétitions</span></label>
+      </div>
+      <div class="players" id="playerInputs"></div>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <strong id="lbl_tricks">Liste des tricks</strong>
+        <button class="btn ghost" id="loadDefault">Par défaut</button>
+        <span class="muted" id="lbl_onePerLine">1 par ligne</span>
+      </div>
+      <textarea id="tricks" rows="6"></textarea>
+      <div class="row">
+        <button class="btn blue" id="start">🎮 <span id="btn_start">Lancer la partie</span></button>
+      </div>
+    </section>
+
+    <!-- Game -->
+    <section class="card">
+      <div class="turnbar">
+        <span class="badge" id="lbl_turn">Tour :</span>
+        <span class="chip current">🧭 <span id="lanceurChip">—</span></span>
+        <span class="chip next">⏭️ <span id="nextChip">—</span></span>
+      </div>
+
+      <div class="row">
+        <div class="pill"><span id="lbl_lanceur">Lanceur</span> : <strong id="lanceurName">—</strong></div>
+        <div class="pill"><span id="lbl_rider">Rider</span> : <strong id="riderName">—</strong></div>
+        <div class="pill"><span id="lbl_next">Prochain</span> : <strong id="nextName">—</strong></div>
+        <button class="btn ghost" id="forceNextLanceur"><span id="btn_forceNext">Passer au suivant</span></button>
+      </div>
+
+      <div class="row" style="margin:10px 0">
+        <button class="btn blue prime" id="draw"><span id="btn_draw">Tirer un trick</span></button>
+        <button class="btn green" id="lanceurOk" disabled><span id="btn_lanceurOk">Plaqué ✅</span></button>
+        <button class="btn red" id="lanceurFail" disabled><span id="btn_lanceurFail">Loupé ❌</span></button>
+      </div>
+
+      <div class="slot"><span id="result">—</span></div>
+      <div class="muted" id="status">Prêt.</div>
+
+      <div class="row" id="defenseControls" style="display:none">
+        <span class="pill"><span id="lbl_currentRider">Rider actuel</span> : <span id="defNow">—</span> <span id="triesInfo" class="muted"></span></span>
+        <button class="btn green" id="defOk"><span id="btn_defOk">Plaqué</span></button>
+        <button class="btn red" id="defFail"><span id="btn_defFail">Loupé</span></button>
+      </div>
+
+      <h3 class="title-sm" id="lbl_playersTitle">Joueurs</h3>
+      <div class="players" id="players"></div>
+
+      <h3 class="title-sm" id="lbl_history">Historique</h3>
+      <div class="list" id="history"></div>
+    </section>
+  </div>
+
+  <script>
+    // ===== i18n =====
+    var I18N = {
+      fr: { title:"Game of SCOOT", subtitle:"Simple & mobile. Choisis les joueurs, ta liste de tricks, et joue.",
+        players:"Joueurs", twoTries:"2 essais sur la dernière lettre", noRepeat:"Sans répétitions",
+        tricks:"Liste des tricks", onePerLine:"1 par ligne", start:"Lancer la partie",
+        lanceur:"Lanceur", rider:"Rider", next:"Prochain", turn:"Tour",
+        draw:"Tirer un trick", lanceurOk:"Plaqué ✅", lanceurFail:"Loupé ❌",
+        forceNext:"Passer au suivant", currentRider:"Rider actuel",
+        defOk:"Plaqué", defFail:"Loupé", playersTitle:"Joueurs", history:"Historique",
+        autoLang:"Auto-langue", ready:"Prêt.", started:"Partie lancée.", sound:"Son 8‑bit" },
+      en: { title:"Game of SCOOT", subtitle:"Simple & mobile. Choose players, your trick list, and play.",
+        players:"Players", twoTries:"Two tries on last letter", noRepeat:"No repetitions",
+        tricks:"Trick list", onePerLine:"1 per line", start:"Start game",
+        lanceur:"Leader", rider:"Rider", next:"Next", turn:"Turn",
+        draw:"Draw a trick", lanceurOk:"Landed ✅", lanceurFail:"Missed ❌",
+        forceNext:"Skip to next", currentRider:"Current rider",
+        defOk:"Landed", defFail:"Missed", playersTitle:"Players", history:"History",
+        autoLang:"Auto language", ready:"Ready.", started:"Game started.", sound:"8‑bit sound" },
+      de: { title:"Game of SCOOT", subtitle:"Einfach & mobil. Spieler wählen, Trickliste anpassen und los!",
+        players:"Spieler", twoTries:"Zwei Versuche beim letzten Buchstaben", noRepeat:"Ohne Wiederholungen",
+        tricks:"Trickliste", onePerLine:"1 pro Zeile", start:"Spiel starten",
+        lanceur:"Leader", rider:"Rider", next:"Nächster", turn:"Zug",
+        draw:"Trick ziehen", lanceurOk:"Gestanden ✅", lanceurFail:"Fehlversuch ❌",
+        forceNext:"Zum nächsten", currentRider:"Aktueller Rider",
+        defOk:"Gestanden", defFail:"Fehlversuch", playersTitle:"Spieler", history:"Verlauf",
+        autoLang:"Auto-Sprache", ready:"Bereit.", started:"Spiel gestartet.", sound:"8‑bit Sound" },
+      it: { title:"Game of SCOOT", subtitle:"Semplice & mobile. Scegli i giocatori, la lista di trick e gioca.",
+        players:"Giocatori", twoTries:"Due tentativi sull’ultima lettera", noRepeat:"Senza ripetizioni",
+        tricks:"Lista trick", onePerLine:"1 per riga", start:"Avvia partita",
+        lanceur:"Leader", rider:"Rider", next:"Prossimo", turn:"Turno",
+        draw:"Estrai un trick", lanceurOk:"Piazzato ✅", lanceurFail:"Mancato ❌",
+        forceNext:"Passa al prossimo", currentRider:"Rider attuale",
+        defOk:"Piazzato", defFail:"Mancato", playersTitle:"Giocatori", history:"Storico",
+        autoLang:"Lingua automatica", ready:"Pronto.", started:"Partita avviata.", sound:"Suono 8‑bit" },
+      es: { title:"Game of SCOOT", subtitle:"Simple y móvil. Elige jugadores, tu lista de trucos y juega.",
+        players:"Jugadores", twoTries:"Dos intentos en la última letra", noRepeat:"Sin repeticiones",
+        tricks:"Lista de trucos", onePerLine:"1 por línea", start:"Iniciar juego",
+        lanceur:"Líder", rider:"Rider", next:"Siguiente", turn:"Turno",
+        draw:"Sacar un truco", lanceurOk:"Clavado ✅", lanceurFail:"Falló ❌",
+        forceNext:"Pasar al siguiente", currentRider:"Rider actual",
+        defOk:"Clavado", defFail:"Falló", playersTitle:"Jugadores", history:"Historial",
+        autoLang:"Idioma automático", ready:"Listo.", started:"Juego iniciado.", sound:"Sonido 8‑bit" }
+    };
+    function applyI18n(lang){
+      var t = I18N[lang] || I18N['en'];
+      document.getElementById('title').textContent = t.title;
+      document.getElementById('subtitle').textContent = t.subtitle;
+      document.getElementById('lbl_players').textContent = t.players;
+      document.getElementById('lbl_twoTries').textContent = t.twoTries;
+      document.getElementById('lbl_noRepeat').textContent = t.noRepeat;
+      document.getElementById('lbl_tricks').textContent = t.tricks;
+      document.getElementById('lbl_onePerLine').textContent = t.onePerLine;
+      document.getElementById('btn_start').textContent = t.start;
+      document.getElementById('lbl_lanceur').textContent = t.lanceur;
+      document.getElementById('lbl_rider').textContent = t.rider;
+      document.getElementById('lbl_next').textContent = t.next;
+      document.getElementById('lbl_turn').textContent = t.turn + " :";
+      document.getElementById('btn_draw').textContent = t.draw;
+      document.getElementById('btn_lanceurOk').textContent = t.lanceurOk;
+      document.getElementById('btn_lanceurFail').textContent = t.lanceurFail;
+      document.getElementById('btn_forceNext').textContent = t.forceNext;
+      document.getElementById('lbl_currentRider').textContent = t.currentRider;
+      document.getElementById('btn_defOk').textContent = t.defOk;
+      document.getElementById('btn_defFail').textContent = t.defFail;
+      document.getElementById('lbl_playersTitle').textContent = t.playersTitle;
+      document.getElementById('lbl_history').textContent = t.history;
+      document.getElementById('i18n_auto_lbl').textContent = t.autoLang;
+      document.getElementById('lbl_sound').textContent = t.sound;
+      document.getElementById('status').textContent = t.ready;
+      window._t = t;
+    }
+    function detectLang(){ var nav=(navigator.language||'en').slice(0,2).toLowerCase(); return I18N[nav]?nav:'en'; }
+
+    // ===== WebAudio (8-bit like) =====
+    var audioCtx=null, soundOn=false;
+    function initAudio(){ if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } }
+    function beep(freq, dur, type, vol){
+      if(!soundOn || !audioCtx) return;
+      var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type = type || 'square';
+      g.gain.value = vol!=null? vol : 0.07;
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    }
+    function jingleStart(){ beep(880,0.08); setTimeout(function(){beep(660,0.08)},90); setTimeout(function(){beep(1320,0.12)},180); }
+    function jingleWin(){ beep(523,0.12,'square',0.08); setTimeout(function(){beep(659,0.12,'square',0.08)},150); setTimeout(function(){beep(784,0.14,'square',0.08)},300); setTimeout(function(){beep(1046,0.22,'square',0.08)},520); }
+    function s_draw(){ beep(740,0.08,'square',0.07); setTimeout(function(){beep(880,0.06)},85); }
+    function s_plaque(){ beep(660,0.08,'square',0.08); setTimeout(function(){beep(990,0.1,'square',0.08)},90); }
+    function s_loupe(){ beep(200,0.12,'sawtooth',0.08); setTimeout(function(){beep(140,0.12,'sawtooth',0.06)},120); }
+
+    // ===== Game data =====
+    var DEFAULT_TRICKS = [
+      'Bunny Hop','Manual','Nose Manual','180','360','540',
+      'Barspin','Double Barspin','Tailwhip','Double Tailwhip',
+      'Triple Whip','Heelwhip','Inward','Bryflip','Buttercup',
+      'Kickless','Fingerwhip','Double Fingerwhip','T-Bog','No Hander',
+      'No Footer','Can-Can','One Foot','One Hand',
+      'Feeble Grind','Smith Grind','50-50 Grind','Boardslide','Lipslide','Hurricane',
+      'Icepick','Crook','Overcrook',
+      'Whip to Bars','Bars to Whip','Bar to Fingerwhip','Whip Rewind','Whip Front',
+      'Full Cab','Half Cab','Truckdriver (360 Barspin)',
+      'Full Whip','Front Scooter Flip (FSF)','Back Scooter Flip (BSF)',
+      'Front Flip','Backflip','Flair','Tuck No Hand','Bar Manual','Whip Manual'
+    ];
+    var TRICKS = DEFAULT_TRICKS.slice();
+    var pool = TRICKS.slice();
+    var players = []; // {name, letters(0..5), alive}
+    var lanceurIdx = 0;
+    var roundActive=false, lanceurLanded=false;
+    var defenseOrder = []; var defensePtr = -1; var defenseTriesLeft = 1;
+
+    // ===== Utils =====
+    function byId(id){ return document.getElementById(id); }
+    function lettersText(n){ return ['','S','SC','SCO','SCOO','SCOOT'][n] || '—'; }
+    function living(){ return players.filter(function(p){return p.alive;}); }
+    function livingCount(){ return living().length; }
+    function nextAlive(from){ var i=from,loops=0; do{ i=(i+1)%players.length; loops++; if(loops>players.length+1) break; }while(!players[i].alive); return i; }
+    function setTricksFromText(){ var arr = byId('tricks').value.split('\n').map(function(t){return t.trim();}).filter(Boolean); TRICKS = arr.length?arr:DEFAULT_TRICKS.slice(); pool = TRICKS.slice(); }
+    function pickTrick(noRepeat){ if(noRepeat){ if(pool.length===0) return null; var idx=Math.floor(Math.random()*pool.length); return pool.splice(idx,1)[0]; } return TRICKS[Math.floor(Math.random()*TRICKS.length)]; }
+    function spinTo(text){ var res=byId('result'); var flashes=Math.floor(6+Math.random()*6), base=60, i=0; function spin(){ res.textContent=TRICKS[Math.floor(Math.random()*TRICKS.length)]; if(i<flashes){ i++; setTimeout(spin, base+i*28);} else { res.textContent=text; res.classList.remove('pulse'); void res.offsetWidth; res.classList.add('pulse'); } } spin(); }
+    function addHistory(line){ var box=byId('history'); var div=document.createElement('div'); div.className='pill'; div.textContent=line; box.insertBefore(div, box.firstChild); }
+    function renderPlayers(){
+      var box=byId('players'); box.innerHTML='';
+      var nextIdx = nextAlive(lanceurIdx);
+      players.forEach(function(p,i){
+        var d=document.createElement('div'); 
+        var cls='p'; 
+        if(!p.alive) cls+=' dead';
+        if(i===lanceurIdx) cls+=' is-current';
+        else if(i===nextIdx) cls+=' is-next';
+        d.className=cls;
+        d.innerHTML='<div class="name">'+p.name+'</div><div class="letters">'+(p.letters?lettersText(p.letters):'—')+'</div>';
+        box.appendChild(d);
+      });
+      byId('lanceurName').textContent = players[lanceurIdx]?players[lanceurIdx].name:'—';
+      byId('lanceurChip').textContent = players[lanceurIdx]?players[lanceurIdx].name:'—';
+      byId('nextName').textContent = players[nextIdx]?players[nextIdx].name:'—';
+      byId('nextChip').textContent = players[nextIdx]?players[nextIdx].name:'—';
+    }
+    function checkEnd(){
+      if(livingCount()<=1){
+        var winner=players.find(function(p){return p.alive;});
+        byId('status').innerHTML='<strong>FIN :</strong> '+(winner?winner.name:'—')+' !';
+        byId('draw').disabled=true; byId('lanceurOk').disabled=true; byId('lanceurFail').disabled=true;
+        byId('defenseControls').style.display='none'; byId('draw').classList.remove('prime');
+        if(soundOn) jingleWin();
+        return true;
+      }
+      return false;
+    }
+
+    // ===== Setup UI =====
+    function renderPlayerInputs(){ var n=parseInt(byId('playerCount').value,10); var wrap=byId('playerInputs'); wrap.innerHTML=''; for(var i=0;i<n;i++){ var row=document.createElement('div'); row.className='p'; row.innerHTML='<span class="pill">J'+(i+1)+'</span><input placeholder="Joueur '+(i+1)+'" value="'+(players[i]?players[i].name:('Joueur '+(i+1)))+'">'; wrap.appendChild(row);} }
+    function applyPlayers(){ var inputs=byId('playerInputs').querySelectorAll('input'); players=[]; inputs.forEach(function(inp,idx){ players.push({name:(inp.value||('Joueur '+(idx+1))).trim(), letters:0, alive:true}); }); lanceurIdx=0; renderPlayers(); }
+
+    // ===== Flow =====
+    function startRound(){
+      var t = pickTrick(byId('noRepeat').checked);
+      if(t===null){ byId('status').textContent = 'Plus de tricks uniques.'; return; }
+      spinTo(t);
+      if(soundOn){ s_draw(); }
+      roundActive=true; lanceurLanded=false;
+      byId('lanceurOk').disabled=false; byId('lanceurFail').disabled=false;
+      byId('draw').disabled=true; byId('draw').classList.remove('prime');
+      byId('status').textContent = (I18N[langSel.value]||I18N.en).lanceur+': '+players[lanceurIdx].name+' — Trick: '+t;
+      addHistory(players[lanceurIdx].name+' → '+t);
+    }
+    function endRound(){
+      roundActive=false; lanceurLanded=false;
+      byId('defenseControls').style.display='none';
+      lanceurIdx = nextAlive(lanceurIdx);
+      byId('lanceurOk').disabled=true; byId('lanceurFail').disabled=true;
+      byId('draw').disabled=false; byId('draw').classList.add('prime');
+      byId('status').textContent = 'OK.';
+      renderPlayers();
+      checkEnd();
+    }
+    function beginDefense(){
+      defenseOrder=[]; var i=nextAlive(lanceurIdx); while(i!==lanceurIdx){ if(players[i].alive) defenseOrder.push(i); i=nextAlive(i); }
+      defensePtr=0; setCurrentRider(); byId('defenseControls').style.display='flex';
+    }
+    function setCurrentRider(){
+      if(defensePtr>=defenseOrder.length){ endRound(); return; }
+      var idx=defenseOrder[defensePtr]; var p=players[idx];
+      var two = document.getElementById('twoTries').checked && p.letters===4; defenseTriesLeft = two?2:1;
+      document.getElementById('riderName').textContent = p.name;
+      document.getElementById('defNow').textContent = p.name; 
+      document.getElementById('triesInfo').textContent = two ? ' (×2)' : '';
+    }
+    function riderOK(){ if(soundOn) s_plaque(); defensePtr++; setCurrentRider(); }
+    function riderFAIL(){ 
+      var idx=defenseOrder[defensePtr]; var p=players[idx]; 
+      if(defenseTriesLeft>1){ defenseTriesLeft--; document.getElementById('triesInfo').textContent=' (1)'; return; } 
+      p.letters++; if(soundOn) s_loupe();
+      if(p.letters>=5){ p.alive=false; addHistory(p.name+' OUT'); } 
+      renderPlayers(); defensePtr++; setCurrentRider(); 
+    }
+
+    // ===== Language & sound wiring =====
+    var langSel = document.getElementById('langSelect');
+    function setLang(l){ langSel.value=l; applyI18n(l); }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      // Auto language
+      var auto = document.getElementById('autoLang'); var lang=detectLang(); setLang(lang);
+      langSel.disabled = auto.checked;
+      auto.addEventListener('change', function(){ langSel.disabled=this.checked; if(this.checked){ setLang(detectLang()); }});
+      langSel.addEventListener('change', function(){ applyI18n(this.value); });
+
+      // Sound toggle
+      var soundToggle = document.getElementById('sound');
+      soundToggle.addEventListener('change', function(){ soundOn = this.checked; if(soundOn){ initAudio(); jingleStart(); } });
+
+      // Setup builders
+      document.getElementById('loadDefault').addEventListener('click', function(){ document.getElementById('tricks').value = DEFAULT_TRICKS.join('\n'); });
+      document.getElementById('fillDefault').addEventListener('click', function(){ var n=parseInt(document.getElementById('playerCount').value,10); var names=[]; for(var i=1;i<=n;i++){ names.push('Joueur '+i);} players = names.map(function(nm){ return {name:nm, letters:0, alive:true}; }); renderPlayerInputs(); });
+      document.getElementById('playerCount').addEventListener('change', renderPlayerInputs);
+      renderPlayerInputs();
+      document.getElementById('applyPlayers').addEventListener('click', applyPlayers);
+      document.getElementById('tricks').value = DEFAULT_TRICKS.join('\n');
+
+      // Game controls
+      document.getElementById('start').addEventListener('click', function(){ setTricksFromText(); applyPlayers(); document.getElementById('status').textContent=(I18N[langSel.value]||I18N.en).started; document.getElementById('draw').classList.add('prime'); if(soundOn){ jingleStart(); } });
+      document.getElementById('draw').addEventListener('click', function(){ if(!checkEnd()) startRound(); });
+      document.getElementById('lanceurOk').addEventListener('click', function(){ if(!roundActive) return; lanceurLanded=true; document.getElementById('status').textContent=(I18N[langSel.value]||I18N.en).rider+'...'; if(soundOn) s_plaque(); beginDefense(); });
+      document.getElementById('lanceurFail').addEventListener('click', function(){ if(!roundActive) return; addHistory('Lanceur '+players[lanceurIdx].name+' ❌'); if(soundOn) s_loupe(); endRound(); });
+      document.getElementById('defOk').addEventListener('click', riderOK);
+      document.getElementById('defFail').addEventListener('click', riderFAIL);
+      document.getElementById('forceNextLanceur').addEventListener('click', endRound);
+    });
+  </script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RIDLY — Riders Map</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --green:#22c55e;
+  --green-dark:#16a34a;
+  --bg:#000;
+  --dim:#9aa5b1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(circle at top left,#022c22 0,#020617 40%,#000 100%);
+  color:#fff;
+  font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  overflow:hidden;
+}
+
+/* ==== INTRO AVEC LOGO ==== */
+#intro{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#000;
+  z-index:1000;
+  animation:fadeOut 1.2s ease 2.7s forwards;
+}
+@keyframes fadeOut{to{opacity:0;visibility:hidden;}}
+
+.logo-intro{
+  width:140px;height:140px;
+  border-radius:36px;
+  background:radial-gradient(circle at 30% 20%,rgba(34,197,94,.9),rgba(5,46,22,1));
+  display:flex;align-items:center;justify-content:center;
+  animation:popIn 2s cubic-bezier(.18,.9,.3,1.1) forwards;
+  box-shadow:0 0 0 rgba(34,197,94,0);
+}
+.logo-intro img{
+  width:90px;height:90px;object-fit:contain;
+}
+@keyframes popIn{
+  0%{transform:scale(0);opacity:0;box-shadow:0 0 0 rgba(34,197,94,0);}
+  40%{transform:scale(1.15);opacity:1;box-shadow:0 0 40px rgba(34,197,94,0.8);}
+  100%{transform:scale(1);opacity:1;box-shadow:0 0 26px rgba(34,197,94,.6);}
+}
+
+/* ==== PAGE PRINCIPALE ==== */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  position:sticky;top:0;z-index:10;
+  opacity:0;animation:fadeIn 1s ease 3s forwards;
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+.brand img{width:40px;height:40px;border-radius:12px}
+.brand span{font-weight:800;font-size:18px}
+.btn-login{
+  padding:7px 14px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.8);
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  text-decoration:none;
+}
+.btn-login:hover{border-color:var(--green);color:var(--green);}
+
+.hero{
+  height:calc(100vh - 70px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  flex-direction:column;
+  padding:20px;
+  opacity:0;
+  animation:fadeIn 1.2s ease 3.1s forwards;
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.hero img{
+  width:110px;height:110px;border-radius:24px;
+  margin-bottom:18px;
+  box-shadow:0 0 22px rgba(34,197,94,.5);
+  border:1px solid rgba(255,255,255,.1);
+  background:#fff;
+}
+h1{
+  font-size:32px;
+  font-weight:800;
+  line-height:1.15;
+  letter-spacing:.02em;
+}
+h1 span{color:var(--green);}
+p{
+  color:var(--dim);
+  font-size:14px;
+  max-width:380px;
+  margin:12px auto 22px;
+}
+.btn-primary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:12px 22px;
+  border-radius:999px;
+  font-size:15px;
+  font-weight:800;
+  text-decoration:none;
+  background:linear-gradient(135deg,var(--green),var(--green-dark));
+  color:#02130b;
+  box-shadow:0 14px 40px rgba(0,0,0,.8);
+}
+.btn-primary:hover{filter:brightness(1.05);}
+footer{
+  text-align:center;
+  font-size:11px;
+  color:#9aa5b1;
+  padding:12px;
+  opacity:0;
+  animation:fadeIn 1.2s ease 3.4s forwards;
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO AVEC LOGO -->
+<div id="intro">
+  <div class="logo-intro">
+    <img src="image/1logo_ridly.png" alt="RIDLY"/>
+  </div>
+</div>
+
+<!-- CONTENU -->
+<header>
+  <a href="index.html" class="brand">
+    <img src="image/1logo_ridly.png" alt="RIDLY">
+    <span>RIDLY</span>
+  </a>
+  <a href="compte.html" class="btn-login">Connexion</a>
+</header>
+
+<section class="hero">
+  <img src="image/1logo_ridly.png" alt="RIDLY">
+  <h1>La carte des spots<br>pour <span>tous les riders</span>.</h1>
+  <p>Trouve les skateparks, street spots, shops partenaires et lieux de cours.
+     Poste tes clips, défie tes potes au Game of Scoot et suis ton profil rider.</p>
+  <a href="compte.html" class="btn-primary">🗺️ Ouvrir RIDLY</a>
+</section>
+
+<footer>
+  © <span id="year"></span> RIDLY — Connecte-toi gratuitement pour accéder à tous les spots, au feed et aux games.
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

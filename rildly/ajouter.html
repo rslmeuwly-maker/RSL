@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ajouter — RIDLY</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#22c55e">
+
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ================== THEME GLOBAL ================== */
+:root{
+  --green:#22c55e;
+  --green-dark:#16a34a;
+
+  --bg:#000000;
+  --text:#ffffff;
+  --panel:#060816;
+  --border:rgba(255,255,255,.15);
+  --dim:#9aa5b1;
+  --nav-bg:rgba(0,0,0,.7);
+  --tab-bg:rgba(0,0,0,.78);
+}
+
+/* Thème clair */
+:root[data-theme="light"]{
+  --bg:#f3f4f6;
+  --text:#020617;
+  --panel:#ffffff;
+  --border:rgba(15,23,42,.12);
+  --dim:#4b5563;
+  --nav-bg:rgba(255,255,255,.96);
+  --tab-bg:rgba(255,255,255,.98);
+}
+
+/* ================== RESET / BASE ================== */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  display:flex;
+  flex-direction:column;
+}
+main{flex:1;position:relative;z-index:1}
+
+/* ================== BG VIDÉO ================== */
+.rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+.rsl-bg-video{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;background:#000;
+  filter:brightness(.48) saturate(1.05);
+}
+.rsl-bg-dim{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6));
+}
+:root[data-theme="light"] .rsl-bg-dim{
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.9));
+}
+
+/* ================== NAV (même que ou_rider) ================== */
+nav.nav{
+  position:sticky;top:0;z-index:1000;
+  background:var(--nav-bg);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+nav .row{
+  max-width:1200px;margin:0 auto;
+  padding:10px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+nav .brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  text-decoration:none;
+  color:var(--text);
+}
+nav .brand img{
+  height:40px;
+  width:40px;
+  border-radius:12px;
+  background:#000;
+  padding:4px;
+  box-shadow:0 0 14px rgba(34,197,94,.6);
+}
+
+/* Boutons theme + chat (ronds à droite) */
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:auto;
+}
+.round-btn{
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.95);
+  color:#fff;
+  cursor:pointer;
+  font-size:17px;
+  box-shadow:0 0 10px rgba(34,197,94,.4);
+}
+:root[data-theme="light"] .round-btn{
+  background:#ffffff;
+  color:#111827;
+  border-color:rgba(15,23,42,.15);
+}
+.round-btn:hover{
+  box-shadow:0 0 14px rgba(34,197,94,.9);
+}
+.chat-btn{
+  position:relative;
+  text-decoration:none;
+}
+.chat-dot{
+  position:absolute;
+  width:8px;height:8px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 8px rgba(34,197,94,1);
+  bottom:5px;right:5px;
+}
+
+/* ================== HERO ================== */
+.page-mini-hero{
+  position:relative;z-index:10;
+  padding:16px 20px 6px;
+}
+.page-mini-hero .container{max-width:1200px;margin:0 auto;}
+.page-mini-hero h1{
+  margin:0 0 6px;
+  font-size:clamp(26px,4vw,38px);
+  font-weight:800;
+}
+.page-mini-hero p{
+  margin:0;
+  color:var(--dim);
+  font-size:14px;
+  max-width:720px;
+}
+
+/* ================== CONTENU ================== */
+main .container{
+  max-width:1100px;
+  margin:0 auto 110px;
+  padding:0 20px 40px;
+  position:relative;
+  z-index:10;
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 30px 80px rgba(0,0,0,.85);
+  margin-top:10px;
+}
+:root[data-theme="light"] .card{
+  box-shadow:0 8px 26px rgba(15,23,42,.18);
+}
+
+h1.main-title{margin:0 0 8px;font-size:22px;font-weight:800}
+.muted{font-size:13px;color:var(--dim)}
+
+.mode-toggle{
+  display:inline-flex;
+  border-radius:999px;
+  padding:3px;
+  background:#020617;
+  border:1px solid rgba(148,163,184,.5);
+  margin:10px 0;
+}
+.mode-btn{
+  border:0;background:transparent;color:#9ca3af;
+  font-size:13px;font-weight:700;
+  padding:7px 14px;border-radius:999px;
+  cursor:pointer;
+}
+.mode-btn.active{
+  background:#0f172a;
+  color:#fff;
+  box-shadow:0 0 0 1px rgba(255,255,255,.15);
+}
+:root[data-theme="light"] .mode-toggle{
+  background:#e5e7eb;
+  border-color:rgba(148,163,184,.7);
+}
+:root[data-theme="light"] .mode-btn.active{
+  background:#ffffff;
+  color:#111827;
+  box-shadow:0 0 0 1px rgba(15,23,42,.12);
+}
+
+/* Form */
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.input,.select{
+  flex:1 1 220px;min-width:220px;
+  padding:10px 12px;border-radius:10px;
+  background:#0b1220;border:1px solid var(--border);
+  color:#fff;font-family:inherit;
+  font-size:14px;font-weight:600;
+}
+textarea.input{min-height:70px;resize:vertical}
+:root[data-theme="light"] .input,
+:root[data-theme="light"] .select{
+  background:#f3f4f6;
+  color:#111827;
+  border:1px solid rgba(148,163,184,.5);
+}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(180deg,var(--green),var(--green-dark));
+  color:#062312;border:0;border-radius:10px;
+  font-weight:800;font-size:14px;
+  padding:11px 14px;cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.5);
+}
+
+/* Upload */
+.upload-shell{flex:1 1 260px;min-width:240px}
+.file-pill{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;border-radius:12px;
+  border:1px dashed rgba(255,255,255,.35);
+  background:rgba(15,23,42,.95);
+  cursor:pointer;font-size:14px;font-weight:700;
+}
+.file-pill:hover{
+  border-style:solid;
+  border-color:var(--green);
+  box-shadow:0 0 0 1px rgba(34,197,94,.35);
+}
+.file-ic{font-size:18px}
+.file-main{display:flex;flex-direction:column}
+.file-title{font-weight:800}
+.file-sub{font-size:11px;color:var(--dim)}
+.file-input{display:none}
+:root[data-theme="light"] .file-pill{
+  background:#f3f4f6;
+  border-color:rgba(148,163,184,.7);
+  color:#111827;
+}
+
+.msg{font-size:13px;font-weight:700;margin-top:6px}
+
+/* ================== TABBAR ================== */
+.tabbar{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:2000;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  padding:14px 18px;
+  border-top:1px solid var(--border);
+  background:var(--tab-bg);
+  backdrop-filter:blur(10px);
+}
+.tab{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  text-decoration:none;
+}
+.tab .ic{font-size:24px}
+.tab span{font-size:13px;color:#e5e7eb;font-weight:700}
+.tab.active span{color:#22c55e}
+:root[data-theme="light"] .tab span{color:#555}
+:root[data-theme="light"] .tab.active span{color:#16a34a}
+@media(min-width:900px){ .tab span{font-size:12px} }
+/* NAV RIDLY FIXE PARTOUT */
+nav.nav{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+body.theme-light nav.nav{
+  background:rgba(243,244,246,.9);
+  border-bottom:1px solid rgba(15,23,42,.1);
+}
+
+nav.nav .row{
+  max-width:1200px;
+  margin:0 auto;
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+nav.nav .brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  color:var(--text);
+  text-decoration:none;
+}
+
+nav.nav .brand img{
+  height:40px !important;
+  width:40px !important;
+  border-radius:12px;
+  background:#000;
+  padding:4px;
+  box-shadow:0 0 10px rgba(34,197,94,.6);
+}
+
+nav.nav .brand span{
+  font-size:18px !important;
+}
+
+nav.nav a{
+  color:var(--text);
+  text-decoration:none;
+  font-weight:700;
+}
+nav.nav a:hover{
+  color:var(--green);
+}
+</style>
+</head>
+<body>
+
+<!-- BG vidéo -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
+</div>
+
+<!-- NAV TOP (même structure que ou_rider) -->
+<nav class="nav">
+  <div class="row">
+    <a class="brand" href="ou_rider.html">
+      <img src="image/1logo_ridly.png" alt="RIDLY"/>
+      <span>RIDLY</span>
+    </a>
+    <div class="nav-actions">
+      <button id="themeToggle" class="round-btn" type="button" title="Mode clair / sombre">🌙</button>
+      <a href="chat.html" class="round-btn chat-btn" title="Chat global">
+        💬
+        <span class="chat-dot"></span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="page-mini-hero">
+  <div class="container">
+    <h1>Ajouter une publication</h1>
+    <p>
+      Publie dans le <b>feed</b> ou en <b>story 48h</b>. Tu peux lier un canton &amp; un spot
+      pour que les autres sachent où tu rides.
+    </p>
+  </div>
+</section>
+
+<!-- état auth (juste texte pour le debug) -->
+<div id="authState" style="display:none"></div>
+
+<main>
+  <div class="container">
+    <section class="card">
+      <h1 class="main-title">Type de publication</h1>
+      <p class="muted">Choisis entre <b>post permanent</b> dans le feed ou une <b>story 48h</b>.</p>
+
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btnModeFeed"  type="button">Post dans le feed</button>
+        <button class="mode-btn"        id="btnModeStory" type="button">Story 48h</button>
+      </div>
+
+      <!-- Form FEED -->
+      <form id="formFeed">
+        <div class="row">
+          <select id="fType" class="select">
+            <option value="park">Skatepark / Pumptrack</option>
+            <option value="street">Street spot</option>
+          </select>
+          <select id="fCanton" class="select">
+            <option value="">Canton (optionnel)</option>
+            <option value="VD">VD — Vaud</option><option value="FR">FR — Fribourg</option>
+            <option value="VS">VS — Valais</option><option value="GE">GE — Genève</option>
+            <option value="NE">NE — Neuchâtel</option><option value="JU">JU — Jura</option>
+            <option value="BE">BE — Berne</option><option value="ZH">ZH — Zurich</option>
+            <option value="TI">TI — Tessin</option><option value="AUTRE">Autre / hors Suisse</option>
+          </select>
+          <select id="fSpot" class="select">
+            <option value="">Pas de spot (optionnel)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="upload-shell">
+            <label for="fFile" class="file-pill">
+              <div class="file-ic">📸</div>
+              <div class="file-main">
+                <span class="file-title" id="fFileLabel">Ajouter une photo / vidéo</span>
+                <span class="file-sub">Clip max ~20s pour les vidéos</span>
+              </div>
+            </label>
+            <input id="fFile" class="file-input" type="file" accept="image/*,video/*">
+          </div>
+          <textarea id="fCaption" class="input" maxlength="140" placeholder="Légende (ex: Double whip à Vidy 🔥)"></textarea>
+        </div>
+
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <button type="submit" class="btn">Publier dans le feed</button>
+          <span class="muted">Les posts sont visibles dans le feed public.</span>
+        </div>
+        <div id="feedMsg" class="msg"></div>
+      </form>
+
+      <!-- Form STORY -->
+      <form id="formStory" style="display:none">
+        <div class="row">
+          <div class="upload-shell">
+            <label for="sFile" class="file-pill">
+              <div class="file-ic">✨</div>
+              <div class="file-main">
+                <span class="file-title" id="sFileLabel">Ajouter une story</span>
+                <span class="file-sub">Photo ou vidéo verticale (48h)</span>
+              </div>
+            </label>
+            <input id="sFile" class="file-input" type="file" accept="image/*,video/*">
+          </div>
+          <textarea id="sCaption" class="input" maxlength="120" placeholder="Texte de la story (optionnel)…"></textarea>
+        </div>
+
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <button type="submit" class="btn">Publier la story</button>
+          <span class="muted">La story apparaît en haut du feed pendant 48h.</span>
+        </div>
+        <div id="storyMsg" class="msg"></div>
+      </form>
+    </section>
+
+    <p class="muted" style="margin-top:10px">
+      Astuce : tu peux poster sans lier un spot, ou alors choisir canton &amp; spot pour que les autres sachent où tu rides.
+    </p>
+  </div>
+</main>
+
+<!-- TABBAR (Ajouter actif) -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab active" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Feed">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="games.html" title="Games">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<!-- ========== JS SUPABASE + THEME ========== -->
+<script src="js/env.js"></script>
+<script>
+const SUPABASE_URL  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+
+/* BG vidéo */
+(function(){
+  const v=document.getElementById('rslBg');
+  if(!v) return;
+  const s=document.createElement('source');
+  s.src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/ridly/ridly.mp4";
+  s.type="video/mp4";
+  v.appendChild(s);
+  const play=()=>{try{v.playbackRate=0.6;const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}};
+  play();
+  document.addEventListener('visibilitychange',()=>{document.hidden?v.pause():play();});
+})();
+
+/* Auth (juste info) */
+let me=null, displayName=null;
+const authState=document.getElementById('authState');
+(async()=>{
+  try{
+    const { data:{ user } } = await supa.auth.getUser();
+    if(user){
+      me=user;
+      displayName=user.user_metadata?.full_name || user.email || "Rider";
+      authState.textContent = `Connecté : ${displayName}`;
+    }else{
+      authState.textContent = `Pas connecté`;
+      document.getElementById('formFeed').style.opacity=".4";
+      document.getElementById('formStory').style.opacity=".4";
+    }
+  }catch(e){
+    authState.textContent="Session inconnue";
+  }
+})();
+
+/* Toggle mode Post / Story */
+const btnModeFeed=document.getElementById('btnModeFeed');
+const btnModeStory=document.getElementById('btnModeStory');
+const formFeed=document.getElementById('formFeed');
+const formStory=document.getElementById('formStory');
+
+btnModeFeed.onclick=()=>{
+  btnModeFeed.classList.add('active');
+  btnModeStory.classList.remove('active');
+  formFeed.style.display='block';
+  formStory.style.display='none';
+};
+btnModeStory.onclick=()=>{
+  btnModeStory.classList.add('active');
+  btnModeFeed.classList.remove('active');
+  formFeed.style.display='none';
+  formStory.style.display='block';
+};
+
+/* Elements feed */
+const fType=document.getElementById('fType');
+const fCanton=document.getElementById('fCanton');
+const fSpot=document.getElementById('fSpot');
+const fFile=document.getElementById('fFile');
+const fFileLabel=document.getElementById('fFileLabel');
+const fCaption=document.getElementById('fCaption');
+const feedMsg=document.getElementById('feedMsg');
+
+/* Elements story */
+const sFile=document.getElementById('sFile');
+const sFileLabel=document.getElementById('sFileLabel');
+const sCaption=document.getElementById('sCaption');
+const storyMsg=document.getElementById('storyMsg');
+
+/* Label fichiers */
+fFile.addEventListener('change',()=>{fFileLabel.textContent=fFile.files?.[0]?.name || "Ajouter une photo / vidéo";});
+sFile.addEventListener('change',()=>{sFileLabel.textContent=sFile.files?.[0]?.name || "Ajouter une story";});
+
+/* Spots par canton */
+async function loadSpotsForCanton(canton){
+  if(!canton || canton==="AUTRE"){
+    fSpot.innerHTML = '<option value="">Pas de spot (optionnel)</option>';
+    return;
+  }
+  let html='<option value="">Pas de spot (optionnel)</option>';
+  try{
+    const { data:parks } = await supa.from('spots').select('id,nom,ville,canton').eq('canton',canton).limit(300);
+    if(parks?.length){
+      html+='<optgroup label="Parks">';
+      parks.forEach(p=>{html+=`<option value="park:${p.id}">${p.nom} — ${p.ville}</option>`;});
+      html+='</optgroup>';
+    }
+  }catch(_){}
+  try{
+    const { data:streets } = await supa.from('bunny').select('id,nom,ville,canton').eq('canton',canton).limit(300);
+    if(streets?.length){
+      html+='<optgroup label="Street spots">';
+      streets.forEach(s=>{html+=`<option value="street:${s.id}">${s.nom} — ${s.ville}</option>`;});
+      html+='</optgroup>';
+    }
+  }catch(_){}
+  if(html=== '<option value="">Pas de spot (optionnel)</option>'){
+    html+='<option disabled>Aucun spot pour ce canton (encore).</option>';
+  }
+  fSpot.innerHTML=html;
+}
+fCanton.addEventListener('change',()=>{loadSpotsForCanton(fCanton.value);});
+
+/* Publier FEED */
+formFeed.addEventListener('submit',async e=>{
+  e.preventDefault();
+  feedMsg.textContent='';
+  if(!me){alert('Connecte-toi pour publier.');return;}
+
+  const file=fFile.files?.[0] || null;
+  if(!file){feedMsg.style.color='#f97373';feedMsg.textContent='Choisis une photo ou vidéo.';return;}
+
+  const pick=fSpot.value;
+  const [spotType,spotIdStr] = (pick||'').split(':');
+  const caption=(fCaption.value||'').trim();
+
+  try{
+    feedMsg.style.color='#e5e7eb';feedMsg.textContent='Upload en cours…';
+    const safeName=file.name.replace(/[^\w.\-]+/g,'_');
+    const path=`${me.id}/feed/${Date.now()}_${safeName}`;
+    let { error:upErr } = await supa.storage.from('feed').upload(path,file,{upsert:false,contentType:file.type||undefined});
+    if(upErr){
+      const res2=await supa.storage.from('feed').upload(path,file,{upsert:true,contentType:file.type||undefined});
+      upErr=res2.error;
+      if(upErr) throw upErr;
+    }
+    const { data:pub } = supa.storage.from('feed').getPublicUrl(path);
+    const mediaUrl=pub?.publicUrl;
+    if(!mediaUrl) throw new Error('URL publique indisponible');
+
+    const row={
+      spot_id: spotIdStr ? Number(spotIdStr) : null,
+      spot_type: spotType || null,
+      user_id: me.id,
+      user_display: displayName||'Rider',
+      media_url: mediaUrl,
+      caption
+    };
+    const { error } = await supa.from('spot_posts').insert([row]);
+    if(error) throw error;
+
+    feedMsg.style.color='#22c55e';feedMsg.textContent='Post publié ✅';
+    fFile.value='';fFileLabel.textContent='Ajouter une photo / vidéo';
+    fCaption.value='';fSpot.value='';
+  }catch(err){
+    feedMsg.style.color='#f97373';feedMsg.textContent='Erreur: '+(err?.message||'');
+  }
+});
+
+/* Publier STORY */
+formStory.addEventListener('submit',async e=>{
+  e.preventDefault();
+  storyMsg.textContent='';
+  if(!me){alert('Connecte-toi pour publier.');return;}
+
+  const file=sFile.files?.[0] || null;
+  if(!file){storyMsg.style.color='#f97373';storyMsg.textContent='Choisis un média pour ta story.';return;}
+
+  const caption=(sCaption.value||'').trim();
+
+  try{
+    storyMsg.style.color='#e5e7eb';storyMsg.textContent='Upload en cours…';
+    const safeName=file.name.replace(/[^\w.\-]+/g,'_');
+    const path=`${me.id}/flashes/${Date.now()}_${safeName}`;
+    let { error:upErr } = await supa.storage.from('flashes').upload(path,file,{upsert:false,contentType:file.type||undefined});
+    if(upErr){
+      const res2=await supa.storage.from('flashes').upload(path,file,{upsert:true,contentType:file.type||undefined});
+      upErr=res2.error;
+      if(upErr) throw upErr;
+    }
+    const { data:pub } = supa.storage.from('flashes').getPublicUrl(path);
+    const mediaUrl=pub?.publicUrl;
+    if(!mediaUrl) throw new Error('URL publique indisponible');
+
+    const expires = new Date(Date.now()+48*60*60*1000).toISOString();
+    const { error } = await supa.from('flashes').insert([{ user_id:me.id, media_url:mediaUrl, caption, expires_at:expires }]);
+    if(error) throw error;
+
+    storyMsg.style.color='#22c55e';storyMsg.textContent='Story publiée ✅';
+    sFile.value='';sFileLabel.textContent='Ajouter une story';
+    sCaption.value='';
+  }catch(err){
+    storyMsg.style.color='#f97373';storyMsg.textContent='Erreur: '+(err?.message||'');
+  }
+});
+
+/* ========== THEME CLAIR / SOMBRE GLOBAL ========== */
+(function(){
+  const root=document.documentElement;
+  const btn=document.getElementById('themeToggle');
+  const saved = localStorage.getItem('ridlyTheme') || 'dark';
+  root.dataset.theme = saved;
+  const syncIcon = ()=>{ btn.textContent = root.dataset.theme === 'light' ? '☀️' : '🌙'; };
+  syncIcon();
+  btn.addEventListener('click',()=>{
+    root.dataset.theme = (root.dataset.theme === 'light') ? 'dark' : 'light';
+    localStorage.setItem('ridlyTheme', root.dataset.theme);
+    syncIcon();
+  });
+})();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>Chat global — RIDLY</title>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#22c55e;
+      --green-dark:#16a34a;
+      --panel:#0b1220;
+      --border:rgba(255,255,255,.15);
+      --dim:#9aa5b1;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:#000;
+      color:#fff;
+      font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+    main{flex:1}
+
+    /* BG vidéo RIDLY */
+    .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+    .rsl-bg-video{
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;background:#000;
+      filter:brightness(.5) saturate(1.05);
+    }
+    .rsl-bg-dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6))}
+
+    /* Header (comme feed) */
+    header{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 16px;border-bottom:1px solid var(--border);
+      background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
+    }
+    header .brand{
+      display:flex;align-items:center;gap:10px;
+      color:#fff;text-decoration:none;
+      font-weight:800;
+    }
+    header .brand img{
+      height:40px;width:40px;
+      border-radius:10px;
+      background:#fff;
+      padding:4px;
+    }
+    header .auth{font-size:13px;color:var(--dim);font-weight:600}
+    header .auth a{color:var(--green);font-weight:800;text-decoration:none}
+
+    .wrap{
+      position:relative;z-index:1;
+      max-width:980px;margin:0 auto;
+      padding:10px 12px 110px;
+    }
+
+    .card{
+      background:rgba(0,0,0,.78);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 30px 80px rgba(0,0,0,.85);
+      margin-top:10px;
+    }
+    h1{margin:0 0 4px;font-size:20px;font-weight:800}
+    .muted{font-size:13px;color:var(--dim);margin:0 0 8px}
+
+    /* Zone chat */
+    .chat-box{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      height:60vh;
+      max-height:520px;
+    }
+    .chat-messages{
+      flex:1;
+      min-height:180px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(15,23,42,.95);
+      padding:8px;
+      overflow-y:auto;
+      font-size:13px;
+    }
+    .msg{
+      padding:6px 8px;
+      border-radius:8px;
+      margin-bottom:4px;
+      background:rgba(15,23,42,1);
+    }
+    .msg-header{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:2px;
+    }
+    .msg-user{font-weight:700;font-size:13px}
+    .msg-time{font-size:11px;color:var(--dim)}
+    .msg-body{font-size:13px;white-space:pre-wrap;word-wrap:break-word}
+
+    .chat-input-row{
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+    }
+    .chat-input{
+      flex:1;
+      min-height:46px;
+      max-height:110px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      color:#fff;
+      font-size:14px;
+      resize:vertical;
+    }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg,var(--green),var(--green-dark));
+      color:#062312;border:0;border-radius:10px;
+      font-weight:800;font-size:14px;
+      padding:10px 14px;cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.5);
+      white-space:nowrap;
+    }
+    .btn:disabled{
+      opacity:.5;cursor:not-allowed;box-shadow:none;
+    }
+    .chat-info{
+      font-size:11px;
+      color:var(--dim);
+      margin-top:4px;
+    }
+    #chatError{font-size:12px;margin-top:4px;font-weight:700;color:#fda4af}
+
+    /* Tabbar (comme les autres pages) */
+    .tabbar{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      z-index:2000;
+      display:flex;
+      align-items:center;
+      justify-content:space-around;
+      padding:14px 18px;
+      border-top:1px solid var(--border);
+      background:rgba(0,0,0,.78);
+      backdrop-filter:blur(10px);
+    }
+    .tab{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:4px;
+      text-decoration:none;
+    }
+    .tab .ic{font-size:24px}
+    .tab span{font-size:13px;color:#e5e7eb;font-weight:700}
+    .tab.active span{color:#22c55e}
+    @media(min-width:900px){ .tab span{font-size:12px} }
+  </style>
+</head>
+<body>
+
+<!-- BG vidéo RIDLY -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="bgVid" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
+</div>
+
+<!-- Header -->
+<header>
+  <a class="brand" href="ou_rider.html">
+    <img src="images/logo_pn360.png" alt="RIDLY"/>
+    <span>RIDLY</span>
+  </a>
+  <div class="auth" id="authState">Vérif session…</div>
+</header>
+
+<div class="wrap">
+  <section class="card">
+    <h1>Chat global RIDLY</h1>
+    <p class="muted">
+      Discute avec les autres riders. Reste respectueux, pas d’insultes ni de contenu sensible.
+    </p>
+
+    <div id="chatLocked" class="muted" style="margin-bottom:6px;display:none">
+      Tu dois être connecté pour utiliser le chat. <a href="compte.html" style="color:#22c55e;font-weight:700">Se connecter</a>
+    </div>
+
+    <div class="chat-box" id="chatBox" style="display:none">
+      <div class="chat-messages" id="chatMessages">
+        <div class="muted">Chargement des messages…</div>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea id="chatInput" class="chat-input" maxlength="400" placeholder="Écris ton message… (max 400 caractères)"></textarea>
+        <button id="chatSend" class="btn">Envoyer</button>
+      </div>
+      <div class="chat-info">
+        Messages récents uniquement. Certains mots sont bloqués automatiquement.
+      </div>
+      <div id="chatError"></div>
+    </div>
+  </section>
+</div>
+
+<!-- Tabbar avec onglet Chat -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Feed">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab active" href="chat.html" title="Chat">
+    <div class="ic">💬</div><span>Chat</span>
+  </a>
+  <a class="tab" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="game.html" title="Game of Scoot">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<script>
+/* Supabase init (comme les autres pages RIDLY) */
+const SUPABASE_URL_FALLBACK  = "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+const supa = supabase.createClient(
+  window.env?.SUPABASE_URL  || SUPABASE_URL_FALLBACK,
+  window.env?.SUPABASE_ANON || SUPABASE_ANON_FALLBACK
+);
+
+/* BG vidéo RIDLY */
+(function(){
+  const v=document.getElementById('bgVid');
+  if(!v) return;
+  const s=document.createElement('source');
+  s.src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/ridly/ridly.mp4";
+  s.type="video/mp4";
+  v.appendChild(s);
+  const play=()=>{try{v.playbackRate=0.6;const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}};
+  play();
+  document.addEventListener('visibilitychange',()=>{document.hidden?v.pause():play();});
+})();
+
+/* DOM */
+const authState   = document.getElementById('authState');
+const chatBox     = document.getElementById('chatBox');
+const chatLocked  = document.getElementById('chatLocked');
+const chatMessages= document.getElementById('chatMessages');
+const chatInput   = document.getElementById('chatInput');
+const chatSend    = document.getElementById('chatSend');
+const chatError   = document.getElementById('chatError');
+
+let me = null;
+let profile = null;
+
+/* Liste de mots interdits (à compléter tranquillement) */
+const BANNED_WORDS = [
+  "con",
+  "connard",
+  "fdp",
+  "merde"
+  // ➜ ajoute ici tous les mots que tu veux bloquer, en minuscules
+];
+
+/* Helpers */
+function escapeHTML(s){
+  return (s||"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[m]));
+}
+function formatTime(iso){
+  if(!iso) return "";
+  const d=new Date(iso);
+  return d.toLocaleTimeString("fr-CH",{hour:"2-digit",minute:"2-digit"});
+}
+
+/* Filtre mots interdits */
+function containsBannedWords(text){
+  const clean = (text||"").toLowerCase();
+  for(const w of BANNED_WORDS){
+    if(!w) continue;
+    // recherche simple, tu pourras raffiner plus tard
+    if(clean.includes(w)) return true;
+  }
+  return false;
+}
+
+/* Chargement utilisateur + profil */
+(async function init(){
+  try{
+    const { data:{ user } } = await supa.auth.getUser();
+    if(!user){
+      authState.innerHTML = `Pas connecté — <a href="compte.html">Se connecter</a>`;
+      chatLocked.style.display = "block";
+      chatBox.style.display    = "none";
+      return;
+    }
+    me = user;
+
+    authState.innerHTML = `Connecté : <b>${user.email || "Rider"}</b>`;
+    chatLocked.style.display = "none";
+    chatBox.style.display    = "flex";
+
+    // on récupère le profil pour afficher le pseudo
+    const { data: prof } = await supa
+      .from('profiles')
+      .select('username, full_name')
+      .eq('id', me.id)
+      .maybeSingle();
+    profile = prof || null;
+
+    await loadMessages();
+    subscribeNewMessages();
+  }catch(e){
+    console.error(e);
+    authState.textContent = "Erreur session";
+    chatLocked.style.display = "block";
+    chatBox.style.display    = "none";
+  }
+})();
+
+/* Charger les 80 derniers messages */
+async function loadMessages(){
+  try{
+    const { data, error } = await supa
+      .from('ridly_chat_messages')
+      .select('id, user_id, content, created_at, profiles(username,full_name)')
+      .order('created_at', { ascending:false })
+      .limit(80);
+    if(error){ console.error(error); chatMessages.innerHTML='<div class="muted">Erreur de chargement du chat.</div>';return;}
+    const list = (data||[]).slice().reverse(); // plus ancien en premier
+
+    chatMessages.innerHTML = "";
+    if(!list.length){
+      chatMessages.innerHTML = '<div class="muted">Pas encore de messages. Lance la discussion 👇</div>';
+      return;
+    }
+    list.forEach(m => appendMessage(m,false));
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }catch(e){
+    console.error(e);
+    chatMessages.innerHTML = '<div class="muted">Erreur de chargement du chat.</div>';
+  }
+}
+
+/* Ajouter un message dans le DOM */
+function appendMessage(m, scroll=true){
+  const who = m.profiles?.username || m.profiles?.full_name || "Rider";
+  const div = document.createElement('div');
+  div.className = "msg";
+  div.innerHTML = `
+    <div class="msg-header">
+      <span class="msg-user">${escapeHTML(who)}</span>
+      <span class="msg-time">${formatTime(m.created_at)}</span>
+    </div>
+    <div class="msg-body">${escapeHTML(m.content)}</div>
+  `;
+  chatMessages.appendChild(div);
+  if(scroll){
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+}
+
+/* Realtime : nouveaux messages */
+function subscribeNewMessages(){
+  supa.channel('ridly_chat')
+    .on('postgres_changes',{
+      event:'INSERT',
+      schema:'public',
+      table:'ridly_chat_messages'
+    }, payload => {
+      const m = payload.new;
+      // on n’a pas le join profiles ici -> on va juste afficher un placeholder simple
+      // (pour les messages récents de toi-même, l’UX reste ok)
+      const fake = {
+        ...m,
+        profiles: (m.user_id === me?.id && profile) ? profile : null
+      };
+      appendMessage(fake,true);
+    })
+    .subscribe();
+}
+
+/* Envoi message */
+async function sendMessage(){
+  chatError.textContent = "";
+  const txt = (chatInput.value || "").trim();
+  if(!txt){ return; }
+  if(txt.length > 400){
+    chatError.textContent = "Message trop long (max 400 caractères).";
+    return;
+  }
+  if(containsBannedWords(txt)){
+    chatError.textContent = "Message bloqué (mot interdit).";
+    return;
+  }
+  if(!me){
+    chatError.textContent = "Tu dois être connecté pour envoyer un message.";
+    return;
+  }
+
+  chatSend.disabled = true;
+  try{
+    const { error } = await supa.from('ridly_chat_messages').insert([{
+      user_id: me.id,
+      content: txt
+    }]);
+    if(error){
+      console.error(error);
+      chatError.textContent = "Erreur lors de l’envoi du message.";
+    }else{
+      chatInput.value = "";
+    }
+  }catch(e){
+    console.error(e);
+    chatError.textContent = "Erreur réseau.";
+  }finally{
+    chatSend.disabled = false;
+  }
+}
+
+/* Events bouton / Enter */
+chatSend.addEventListener('click', sendMessage);
+chatInput.addEventListener('keydown', e=>{
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+</script>
+
+</body>
+</html>

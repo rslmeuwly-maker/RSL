@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Recherche — RIDLY</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#22c55e">
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+  /* ================== THEME GLOBAL (base sombre) ================== */
+  :root{
+    --green:#22c55e;
+    --green-dark:#16a34a;
+
+    --bg:#000000;
+    --text:#ffffff;
+    --panel:#060816;
+    --panel-soft:#020617;
+    --border:rgba(255,255,255,.15);
+    --dim:#9aa5b1;
+    --nav-bg:rgba(0,0,0,.7);
+    --tab-bg:rgba(0,0,0,.78);
+  }
+
+  /* Thème clair via classe sur <body> */
+  body.theme-light{
+    --bg:#f3f4f6;
+    --text:#020617;
+    --panel:#ffffff;
+    --panel-soft:#e5e7eb;
+    --border:rgba(15,23,42,.12);
+    --dim:#4b5563;
+    --nav-bg:rgba(255,255,255,.96);
+    --tab-bg:rgba(255,255,255,.98);
+  }
+
+  /* ================== RESET / BASE ================== */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    display:flex;
+    flex-direction:column;
+  }
+  main{flex:1;position:relative;z-index:1}
+
+  /* ================== BG VIDÉO ================== */
+  .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .rsl-bg-video{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;background:#000;
+    filter:brightness(.48) saturate(1.05);
+  }
+  .rsl-bg-dim{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6));
+  }
+  body.theme-light .rsl-bg-dim{
+    background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.9));
+  }
+
+  /* ================== NAV (copié du doc Ajouter) ================== */
+  nav.nav{
+    position:sticky;top:0;z-index:1000;
+    background:var(--nav-bg);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  nav .row{
+    max-width:1200px;margin:0 auto;
+    padding:10px 16px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  nav .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    text-decoration:none;
+    color:var(--text);
+  }
+  nav .brand img{
+    height:40px;
+    width:40px;
+    border-radius:12px;
+    background:#000;
+    padding:4px;
+    box-shadow:0 0 14px rgba(34,197,94,.6);
+  }
+
+  .nav-actions{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-left:auto;
+  }
+  .round-btn{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(15,23,42,.95);
+    color:#fff;
+    cursor:pointer;
+    font-size:17px;
+    box-shadow:0 0 10px rgba(34,197,94,.4);
+  }
+  body.theme-light .round-btn{
+    background:#ffffff;
+    color:#111827;
+    border-color:rgba(15,23,42,.15);
+  }
+  .round-btn:hover{
+    box-shadow:0 0 14px rgba(34,197,94,.9);
+  }
+  .chat-btn{
+    position:relative;
+    text-decoration:none;
+  }
+  .chat-dot{
+    position:absolute;
+    width:8px;height:8px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 8px rgba(34,197,94,1);
+    bottom:5px;right:5px;
+  }
+
+  /* ================== HERO ================== */
+  .page-mini-hero{
+    position:relative;z-index:10;
+    padding:16px 20px 6px;
+  }
+  .page-mini-hero .container{max-width:1200px;margin:0 auto;}
+  .page-mini-hero h1{
+    margin:0 0 6px;
+    font-size:clamp(26px,4vw,38px);
+    font-weight:800;
+  }
+  .page-mini-hero p{
+    margin:0;
+    color:var(--dim);
+    font-size:14px;
+    max-width:720px;
+  }
+
+  /* ================== CONTENU ================== */
+  main .container{
+    max-width:1100px;
+    margin:0 auto 110px;
+    padding:0 20px 40px;
+    position:relative;
+    z-index:10;
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:0 30px 80px rgba(0,0,0,.85);
+    margin-top:10px;
+  }
+  body.theme-light .card{
+    box-shadow:0 8px 26px rgba(15,23,42,.18);
+  }
+
+  .muted{font-size:13px;color:var(--dim)}
+
+  /* Barre de recherche + filtres */
+  .search{
+    background:var(--panel-soft);
+    border-radius:14px;
+    padding:12px;
+    border:1px solid var(--border);
+    margin-bottom:12px;
+  }
+
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .input,.select{
+    flex:1 1 200px;min-width:160px;
+    padding:10px 12px;border-radius:10px;
+    background:#020617;border:1px solid var(--border);
+    color:#fff;font-family:inherit;
+    font-size:14px;font-weight:600;
+  }
+  body.theme-light .input,
+  body.theme-light .select{
+    background:#f3f4f6;
+    color:#111827;
+    border:1px solid rgba(148,163,184,.5);
+  }
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:linear-gradient(180deg,var(--green),var(--green-dark));
+    color:#062312;border:0;border-radius:10px;
+    font-weight:800;font-size:14px;
+    padding:11px 14px;cursor:pointer;
+    white-space:nowrap;
+    box-shadow:0 10px 24px rgba(0,0,0,.5);
+  }
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:8px 10px;border-radius:10px;cursor:pointer;
+    background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.7);
+    font:800 12px Outfit;
+  }
+  .chip input{width:16px;height:16px}
+  body.theme-light .chip{
+    background:#e5e7eb;
+    border-color:rgba(148,163,184,.9);
+  }
+
+  /* Résultats */
+  .results{margin-top:12px}
+  .count{margin:0 0 8px;font:800 13px Outfit;color:#c9f3d5}
+  body.theme-light .count{color:#16a34a}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+
+  .card-result{
+    background:var(--panel-soft);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.75)
+  }
+  body.theme-light .card-result{
+    background:#ffffff;
+    box-shadow:0 8px 26px rgba(15,23,42,.16);
+  }
+  .title{font:800 15px Outfit;margin:0 0 4px}
+  .meta{font:700 12px Outfit;color:#9aa5b1;margin-bottom:6px}
+  body.theme-light .meta{color:#6b7280}
+  .desc{font:500 13px/1.45 Outfit;color:#e5e7eb}
+  body.theme-light .desc{color:#111827}
+  .badges{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .badge{
+    font:900 11px Outfit;border:1px solid var(--border);
+    padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.04)
+  }
+  body.theme-light .badge{
+    background:#f3f4f6;
+    border-color:rgba(148,163,184,.7);
+  }
+  .go{
+    display:inline-block;margin-top:8px;font:900 12px Outfit;text-decoration:none;
+    background:linear-gradient(180deg,var(--green),var(--green-dark));color:#062312;
+    padding:8px 10px;border-radius:10px;
+  }
+
+  /* ================== TABBAR (même que ajouter) ================== */
+  .tabbar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:2000;
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    padding:14px 18px;
+    border-top:1px solid var(--border);
+    background:var(--tab-bg);
+    backdrop-filter:blur(10px);
+  }
+  .tab{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    text-decoration:none;
+  }
+  .tab .ic{font-size:24px}
+  .tab span{font-size:13px;color:#e5e7eb;font-weight:700}
+  .tab.active span{color:#22c55e}
+  body.theme-light .tab span{color:#555}
+  body.theme-light .tab.active span{color:#16a34a}
+  @media(min-width:900px){ .tab span{font-size:12px} }
+/* NAV RIDLY FIXE PARTOUT */
+nav.nav{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+body.theme-light nav.nav{
+  background:rgba(243,244,246,.9);
+  border-bottom:1px solid rgba(15,23,42,.1);
+}
+
+nav.nav .row{
+  max-width:1200px;
+  margin:0 auto;
+  padding:10px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+nav.nav .brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  color:var(--text);
+  text-decoration:none;
+}
+
+nav.nav .brand img{
+  height:40px !important;
+  width:40px !important;
+  border-radius:12px;
+  background:#000;
+  padding:4px;
+  box-shadow:0 0 10px rgba(34,197,94,.6);
+}
+
+nav.nav .brand span{
+  font-size:18px !important;
+}
+
+nav.nav a{
+  color:var(--text);
+  text-decoration:none;
+  font-weight:700;
+}
+nav.nav a:hover{
+  color:var(--green);
+}
+  </style>
+</head>
+<body class="theme-dark">
+
+<!-- BG vidéo -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
+</div>
+
+<!-- NAV TOP (même structure que Ajouter/Où rider) -->
+<nav class="nav">
+  <div class="row">
+    <a class="brand" href="ou_rider.html">
+      <img src="image/1logo_ridly.png" alt="RIDLY"/>
+      <span>RIDLY</span>
+    </a>
+    <div class="nav-actions">
+      <button id="themeToggle" class="round-btn" type="button" title="Mode clair / sombre">🌙</button>
+      <a href="chat.html" class="round-btn chat-btn" title="Chat global">
+        💬
+        <span class="chat-dot"></span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="page-mini-hero">
+  <div class="container">
+    <h1>Recherche</h1>
+    <p>
+      Trouve rapidement un <b>skatepark</b>, un <b>street spot</b> ou un <b>shop partenaire</b>.
+      Filtre par pays, canton et type, puis ouvre la fiche du spot.
+    </p>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <section class="card">
+      <!-- Barre de recherche -->
+      <section class="search">
+        <div class="row">
+          <input id="q" class="input" placeholder="Rechercher (nom, ville, type : bowl, rail, pumptrack…)" />
+          <select id="country" class="select">
+            <option value="">Pays (tous)</option>
+            <option value="CH">Suisse</option>
+            <option value="FR">France</option>
+            <option value="DE">Allemagne</option>
+            <option value="EU">Autres Europe</option>
+            <option value="WORLD">Monde</option>
+          </select>
+          <select id="canton" class="select">
+            <option value="">Canton (CH)</option>
+          </select>
+          <select id="sort" class="select">
+            <option value="best">Pertinence</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="vc">Ville A → Z</option>
+          </select>
+          <button id="btnClear" class="btn" type="button">Réinitialiser</button>
+        </div>
+
+        <div class="chips" role="group" aria-label="Types">
+          <label class="chip"><input type="checkbox" id="tParks" checked/> Parks</label>
+          <label class="chip"><input type="checkbox" id="tStreet" checked/> Street</label>
+          <label class="chip"><input type="checkbox" id="tShops" checked/> Shops</label>
+        </div>
+      </section>
+
+      <!-- Résultats -->
+      <section class="results">
+        <p class="count" id="count">0 résultat</p>
+        <div id="grid" class="grid"></div>
+      </section>
+    </section>
+  </div>
+</main>
+
+<!-- TABBAR -->
+<nav class="tabbar" aria-label="Navigation">
+  <a class="tab" href="ou_rider.html" title="Carte / Spots">
+    <div class="ic">🏠</div><span>Spots</span>
+  </a>
+  <a class="tab" href="ajouter.html" title="Ajouter">
+    <div class="ic">➕</div><span>Ajouter</span>
+  </a>
+  <a class="tab" href="feed.html" title="Feed">
+    <div class="ic">🎬</div><span>Feed</span>
+  </a>
+  <a class="tab active" href="recherche.html" title="Recherche">
+    <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="games.html" title="Games">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
+  </a>
+  <a class="tab" href="profil_ou_rider.html" title="Profil">
+    <div class="ic">👤</div><span>Profil</span>
+  </a>
+</nav>
+
+<!-- env.js pour tes vraies clés -->
+<script src="js/env.js"></script>
+
+<script>
+/* ====== Supabase init ====== */
+const SUPABASE_URL  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* ====== BG vidéo RIDLY ====== */
+(function(){
+  const v = document.getElementById('rslBg');
+  if(!v) return;
+  const s = document.createElement('source');
+  s.src = SUPABASE_URL + "/storage/v1/object/public/ridly/ridly.mp4";
+  s.type = "video/mp4";
+  v.appendChild(s);
+  const play = ()=>{ try{ v.playbackRate = 0.6; const p=v.play(); if(p&&p.catch) p.catch(()=>{});}catch(e){} };
+  play();
+  document.addEventListener('visibilitychange',()=>{ document.hidden ? v.pause() : play(); });
+})();
+
+/* ====== THEME CLAIR / SOMBRE (clé 'ridlyTheme') ====== */
+(function(){
+  const body=document.body;
+  const btn=document.getElementById('themeToggle');
+  const saved = localStorage.getItem('ridlyTheme') || 'dark';
+  const isLightStart = (saved === 'light');
+
+  body.classList.toggle('theme-light', isLightStart);
+  body.classList.toggle('theme-dark', !isLightStart);
+
+  const syncIcon = ()=>{
+    const isLight = body.classList.contains('theme-light');
+    btn.textContent = isLight ? '☀️' : '🌙';
+  };
+  syncIcon();
+
+  btn.addEventListener('click',()=>{
+    const isLight = body.classList.contains('theme-light');
+    body.classList.toggle('theme-light', !isLight);
+    body.classList.toggle('theme-dark',  isLight);
+    localStorage.setItem('ridlyTheme', !isLight ? 'light' : 'dark');
+    syncIcon();
+  });
+})();
+</script>
+
+<script>
+/* ====== DOM ====== */
+const elQ       = document.getElementById('q');
+const elCountry = document.getElementById('country');
+const elCanton  = document.getElementById('canton');
+const elSort    = document.getElementById('sort');
+const elClear   = document.getElementById('btnClear');
+
+const tParks  = document.getElementById('tParks');
+const tStreet = document.getElementById('tStreet');
+const tShops  = document.getElementById('tShops');
+
+const grid  = document.getElementById('grid');
+const count = document.getElementById('count');
+
+/* ====== Cantons CH ====== */
+const CANTONS_ALL = [
+  "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW",
+  "SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"
+];
+elCanton.innerHTML =
+  '<option value="">Canton (CH)</option>' +
+  CANTONS_ALL.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+/* Afficher/masquer Canton selon Pays */
+function updateCantonVisibility(){
+  const isCH = elCountry.value === 'CH';
+  elCanton.parentElement.style.display = isCH ? '' : 'none';
+  if(!isCH) elCanton.value = '';
+}
+elCountry.addEventListener('change', updateCantonVisibility);
+updateCantonVisibility();
+
+/* ====== State ====== */
+let cache = { parks:[], streets:[], shops:[] };
+
+/* ====== Charger les 3 tables (une fois) ====== */
+async function loadAll(){
+  try{
+    const { data } = await supa.from('spots').select('id,nom,ville,canton,country,description,type');
+    cache.parks = (data||[]).map(r=>({
+      kind:'park',
+      id:r.id,
+      nom:r.nom || 'Spot',
+      ville:r.ville || '',
+      canton:r.canton || '',
+      country:r.country || 'CH',
+      desc:r.description || r.type || ''
+    }));
+  }catch(e){
+    cache.parks = [];
+    console.warn('Erreur load spots', e);
+  }
+
+  try{
+    const { data } = await supa.from('bunny').select('id,nom,ville,canton,country,description,type');
+    cache.streets = (data||[]).map(r=>({
+      kind:'street',
+      id:r.id,
+      nom:r.nom || 'Street spot',
+      ville:r.ville || '',
+      canton:r.canton || '',
+      country:r.country || 'CH',
+      desc:r.description || r.type || ''
+    }));
+  }catch(e){
+    cache.streets = [];
+    console.warn('Erreur load bunny', e);
+  }
+
+  try{
+    const { data } = await supa.from('shops').select('id,nom,ville,canton,country,description,site');
+    cache.shops = (data||[]).map(r=>({
+      kind:'shop',
+      id:r.id,
+      nom:r.nom || 'Shop',
+      ville:r.ville || '',
+      canton:r.canton || '',
+      country:r.country || 'CH',
+      desc:r.description || '',
+      site:r.site || ''
+    }));
+  }catch(e){
+    cache.shops = [];
+    console.warn('Erreur load shops', e);
+  }
+
+  filterAndRender();
+}
+
+/* ====== Filtrer + Trier + Render ====== */
+function normalize(txt){ return (txt||'').toLowerCase(); }
+
+function filterAndRender(){
+  const q = normalize(elQ.value);
+  const want = {
+    park:  tParks.checked,
+    street:tStreet.checked,
+    shop:  tShops.checked
+  };
+  const country = (elCountry.value||'').trim();
+  const canton  = (elCanton.value||'').trim();
+
+  let list = [];
+  if(want.park)   list = list.concat(cache.parks);
+  if(want.street) list = list.concat(cache.streets);
+  if(want.shop)   list = list.concat(cache.shops);
+
+  list = list.filter(it=>{
+    if(country && it.country !== country) return false;
+    if(country === 'CH' && canton && it.canton !== canton) return false;
+    if(q){
+      const blob = `${it.nom} ${it.ville} ${it.canton} ${it.desc}`.toLowerCase();
+      return blob.includes(q);
+    }
+    return true;
+  });
+
+  const mode = elSort.value;
+  if(mode === 'az')  list.sort((a,b)=>a.nom.localeCompare(b.nom));
+  if(mode === 'za')  list.sort((a,b)=>b.nom.localeCompare(a.nom));
+  if(mode === 'vc')  list.sort((a,b)=>a.ville.localeCompare(b.ville));
+  // 'best' = ordre d’origine
+
+  count.textContent = `${list.length} résultat${list.length>1?'s':''}`;
+
+  if(!list.length){
+    grid.innerHTML =
+      `<div class="card-result"><div class="desc">Aucun résultat. Essaie un autre mot-clé ou retire des filtres.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(renderCard).join('');
+}
+
+function renderCard(it){
+  const badge = it.kind==='shop' ? 'Shop' : (it.kind==='street' ? 'Street' : 'Park');
+  const link  = it.kind==='shop'
+    ? (it.site ? `<a class="go" href="${escapeAttr(it.site)}" target="_blank" rel="noopener">Site du shop →</a>` : '')
+    : `<a class="go" href="spot.html?id=${it.id}${it.kind==='street'?'&street=1':''}">Voir la fiche →</a>`;
+  return `
+    <article class="card-result">
+      <h3 class="title">${escapeHTML(it.nom)}</h3>
+      <div class="meta">
+        ${escapeHTML(it.ville)}
+        ${it.canton ? ' ('+escapeHTML(it.canton)+')' : ''}
+        ${it.country ? ' — '+escapeHTML(it.country) : ''}
+      </div>
+      ${it.desc ? `<div class="desc">${escapeHTML(it.desc)}</div>` : ''}
+      <div class="badges"><span class="badge">${badge}</span></div>
+      ${link}
+    </article>
+  `;
+}
+
+/* ====== Utils ====== */
+function escapeHTML(s){
+  return (s||'').replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+function escapeAttr(s){ return escapeHTML(s); }
+
+/* ====== Events ====== */
+['input','change'].forEach(ev=>{
+  [elQ,elCountry,elCanton,elSort,tParks,tStreet,tShops].forEach(el=>{
+    el.addEventListener(ev,filterAndRender);
+  });
+});
+elClear.addEventListener('click', ()=>{
+  elQ.value=''; elCountry.value=''; elCanton.value=''; elSort.value='best';
+  tParks.checked = tStreet.checked = tShops.checked = true;
+  updateCantonVisibility();
+  filterAndRender();
+});
+
+/* ====== Bootstrap ====== */
+loadAll();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  }
+</script>
+
+</body>
+</html>

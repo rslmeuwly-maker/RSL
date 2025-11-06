@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Finger Hero — Groove Split v3.1 (swing) — marge de hit augmentée</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#0f1422; --ink:#e9eef6; --muted:#9fb1cb;
+    --line:#243652; --violet:#9b5cff; --green:#3be28f; --green2:#20b86e;
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,Segoe UI,Roboto,Arial}
+  .wrap{max-width:960px;margin:0 auto;padding:12px}
+  .top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .pill{background:#121a2a;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:13px}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--violet);color:#0b0620;font-weight:800;border-radius:12px;
+       padding:10px 14px;border:0;cursor:pointer}
+  .btn.ghost{background:#121a2a;color:#cfe;border:1px solid var(--line)}
+  .grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px}
+
+  #stage{position:relative;height:580px;border-radius:14px;overflow:hidden;background:linear-gradient(#0d1220,#0b0e14);
+         touch-action:none;-webkit-user-select:none;user-select:none}
+  .lane{position:absolute;top:0;bottom:0;width:25%;border-left:1px solid rgba(255,255,255,.06)}
+  .lane:nth-child(1){left:0%} .lane:nth-child(2){left:25%} .lane:nth-child(3){left:50%} .lane:nth-child(4){left:75%}
+  .lane label{position:absolute;top:8px;left:10px;font-size:12px;color:#9fb1cb;opacity:.8}
+
+  .judgewrap{position:absolute;left:0;right:0;top:50%;height:108px;transform:translateY(-54px);pointer-events:none}
+  .target{position:absolute;top:10px;left:12.5%;transform:translateX(-50%);width:76px;height:76px;border-radius:50%;
+          box-shadow:0 0 0 3px rgba(255,255,255,.08) inset, 0 0 28px rgba(62,224,143,.18);
+          background:radial-gradient(circle at 50% 55%, rgba(62,224,143,.18), rgba(62,224,143,0) 60%)}
+  .target:nth-child(1){left:12.5%} .target:nth-child(2){left:37.5%} .target:nth-child(3){left:62.5%} .target:nth-child(4){left:87.5%}
+  .target.success{box-shadow:0 0 0 3px rgba(59,226,143,.95) inset, 0 0 28px rgba(59,226,143,.85);}
+
+  .judgeline{position:absolute;left:0;right:0;top:44px;height:10px;border-radius:6px;background:rgba(255,255,255,.18);
+             box-shadow:0 0 24px rgba(155,92,255,.25) inset}
+
+  /* Notes plus larges et un peu plus hautes = plus faciles à cliquer */
+  .note{position:absolute;width:88%;left:6%;height:28px;border-radius:10px;
+        background:linear-gradient(180deg,#d7c6ff,#9b7bff);
+        box-shadow:0 6px 18px rgba(155,92,255,.35)}
+  .note.drum{background:linear-gradient(180deg,#cdd8ff,#8ba8ff)}
+  .note.hit{background:linear-gradient(180deg,#b4f6d6,#3be28f); box-shadow:0 6px 18px rgba(59,226,143,.45)}
+  .note.fade{animation:fade .2s linear forwards}
+  @keyframes fade{to{opacity:0;transform:translateY(12px)}}
+
+  .hitpad{position:absolute;bottom:8px;height:92px;left:0;width:25%;display:flex;align-items:center;justify-content:center;
+          border-top:1px solid rgba(255,255,255,.06);transition:background .08s, box-shadow .08s}
+  .hitpad .key{font-weight:900;opacity:.9}
+  .hitpad.active{background:rgba(155,92,255,.22);box-shadow:inset 0 0 0 2px var(--violet)}
+  .hitpad.success{background:rgba(59,226,143,.25); box-shadow:inset 0 0 0 3px var(--green2)}
+/* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/pn360.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap">
+  <div class="top">
+    <div class="pill">🎸 Finger Hero — <b>Groove Split v3.1</b></div>
+    <div class="pill">Niveau: <b id="songName">—</b></div>
+    <div class="pill">Score: <b id="score">0</b></div>
+    <div class="pill">Combo: <b id="combo">0</b></div>
+    <button id="chooseBtn" class="btn">🎵 Choisir un niveau</button>
+  </div>
+
+  <div class="grid">
+    <div class="panel" id="stage">
+      <div class="lane"><label>0 · Kick (tempo)</label></div>
+      <div class="lane"><label>1 · Snare / Hat</label></div>
+      <div class="lane"><label>2 · Basse (notes)</label></div>
+      <div class="lane"><label>3 · Lead (notes)</label></div>
+
+      <div class="judgewrap">
+        <div class="target"></div><div class="target"></div><div class="target"></div><div class="target"></div>
+        <div class="judgeline"></div>
+      </div>
+
+      <div class="hitpad" style="left:0%"><div class="key">F / 1</div></div>
+      <div class="hitpad" style="left:25%"><div class="key">G / 2</div></div>
+      <div class="hitpad" style="left:50%"><div class="key">H / 3</div></div>
+      <div class="hitpad" style="left:75%"><div class="key">J / 4</div></div>
+    </div>
+
+    <div class="panel">
+      <b>Mapping</b>
+      <div class="pill">0–1 = 🥁 auto | 2–3 = 🎹 mélodie (touche = note de l’accord)</div>
+      <div class="pill">F/G/H/J ou tape · P: Pause · R: Restart</div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlays -->
+<div class="overlay" id="startOverlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.65)">
+  <div class="panel" style="text-align:center">
+    <div style="font-size:24px;font-weight:900;margin-bottom:10px">▶️ PLAY pour activer l’audio</div>
+    <button class="btn" id="startBtn">PLAY</button>
+  </div>
+</div>
+
+<div class="overlay" id="songPicker" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.65)">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:22px;font-weight:900">Niveaux (1 = facile → 9 = difficile)</div>
+      <button class="btn ghost" id="closePicker">Fermer</button>
+    </div>
+    <div id="songs"></div>
+  </div>
+</div>
+
+<div class="overlay" id="resultOverlay" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.65)">
+  <div class="panel" style="text-align:center">
+    <div style="font-size:22px;font-weight:900">🏁 Fin</div>
+    <div>Score: <span id="resScore">0</span> — Combo max: <span id="resCombo">0</span></div>
+    <div style="margin-top:8px"><button class="btn" id="againBtn">↻ Rejouer</button></div>
+  </div>
+</div>
+
+<script>
+const HIT_WINDOW_MS = 260;
+const MISS_AFTER_MS  = 220;
+const NOTE_HEIGHT_VIS = 28;
+
+const SONGS=[
+ {title:'1 — Groove Débutant',  bpm:84,  diff:0.45},
+ {title:'2 — Beat Doux',        bpm:92,  diff:0.55},
+ {title:'3 — Lofi Ride',        bpm:100, diff:0.65},
+ {title:'4 — Mid Jam',          bpm:110, diff:0.78},
+ {title:'5 — City Night',       bpm:120, diff:0.90},
+ {title:'6 — Neon Track',       bpm:128, diff:1.05},
+ {title:'7 — Fast Lane',        bpm:138, diff:1.18},
+ {title:'8 — Hard Push',        bpm:148, diff:1.30},
+ {title:'9 — Hyper Rush',       bpm:158, diff:1.42},
+];
+
+const stage = document.getElementById('stage');
+const songNameEl = document.getElementById('songName');
+const songPicker = document.getElementById('songPicker');
+const songsDiv = document.getElementById('songs');
+const startOverlay = document.getElementById('startOverlay');
+const resultOverlay = document.getElementById('resultOverlay');
+const scoreEl = document.getElementById('score');
+const comboEl = document.getElementById('combo');
+let laneEls=[], padEls=[], targets=[...document.querySelectorAll('.target')];
+
+let running=false, paused=false;
+let notes=[], speedPxPerMs=0.30;
+let startTime=0, lastFrame=0;
+let song=null, score=0, combo=0, bestCombo=0;
+
+let AC=null; let loops=[]; let swing=0.56;
+function unlockAudio(){ if(!AC){ AC=new (window.AudioContext||window.webkitAudioContext)(); } AC.resume(); }
+function stopAudio(){ loops.forEach(id=> clearInterval(id)); loops=[]; }
+function startAudio(bpm){
+  stopAudio(); if(!AC) return;
+  const beat=60000/bpm;
+  const chords = [
+    [261.63, 311.13, 392.00], // Cm
+    [220.00, 277.18, 349.23], // Ab
+    [174.61, 207.65, 261.63], // Fm
+    [196.00, 246.94, 311.13], // G
+  ];
+  let chordStep=0;
+  loops.push(setInterval(()=>{ chordStep=(chordStep+1)%4; }, beat*4));
+
+  let beatCount=0;
+  loops.push(setInterval(()=>{
+    const t=AC.currentTime;
+    playKick(0.30, t + (Math.random()-0.5)*0.002);
+    if(beatCount%2===1) playSnare(0.24, t + (Math.random()-0.5)*0.002);
+    playHatClosed(0.06, t + (Math.random()-0.5)*0.001);
+    if(beatCount%2===0 && Math.random()<0.25) playHatOpen(0.08, t + beat/1000*(swing) - 0.01);
+    beatCount=(beatCount+1)%4;
+  }, beat));
+
+  loops.push(setInterval(()=>{
+    const t=AC.currentTime;
+    playHatClosed(0.055, t);
+  }, beat*(1-swing)));
+
+  let bassStep=0;
+  loops.push(setInterval(()=>{
+    const root = chords[chordStep][0]/2;
+    const seq=[root, root, root*0.75, root];
+    playBass(seq[bassStep%seq.length], 0.24);
+    bassStep++;
+  }, beat));
+
+  const leadInt = Math.max(beat*0.75, 200);
+  loops.push(setInterval(()=>{
+    if(Math.random() < 0.25*song.diff){
+      const triad = chords[chordStep];
+      const candidates = [triad[0]*2, triad[1]*2, triad[2]*2, triad[2]*2.5];
+      playLead(candidates[(Math.random()*candidates.length)|0], 0.16, 0.07);
+    }
+  }, leadInt));
+
+  window.__getCurrentChord = ()=> chords[chordStep];
+}
+function playKick(g=0.28, when=null){
+  const t=(when??AC.currentTime);
+  const o=AC.createOscillator(), click=AC.createOscillator(), g1=AC.createGain(), g2=AC.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(130, t);
+  o.frequency.exponentialRampToValueAtTime(45, t+0.12);
+  g1.gain.setValueAtTime(g, t); g1.gain.exponentialRampToValueAtTime(0.0001, t+0.2);
+  click.type='square'; click.frequency.setValueAtTime(2000, t);
+  g2.gain.setValueAtTime(0.05, t); g2.gain.exponentialRampToValueAtTime(0.0001, t+0.03);
+  o.connect(g1).connect(AC.destination); click.connect(g2).connect(AC.destination);
+  o.start(t); o.stop(t+0.21); click.start(t); click.stop(t+0.04);
+}
+function playSnare(g=0.22, when=null){
+  const t=(when??AC.currentTime);
+  const noise=AC.createBuffer(1, AC.sampleRate*0.18, AC.sampleRate);
+  const d=noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const src=AC.createBufferSource(); src.buffer=noise;
+  const bp=AC.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1800; bp.Q.value=0.6;
+  const gn=AC.createGain(); gn.gain.value=g;
+  src.connect(bp).connect(gn).connect(AC.destination);
+  src.start(t);
+}
+function playHatClosed(g=0.05, when=null){
+  const t=(when??AC.currentTime);
+  const noise=AC.createBuffer(1, AC.sampleRate*0.04, AC.sampleRate);
+  const d=noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const src=AC.createBufferSource(); src.buffer=noise;
+  const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7000;
+  const gn=AC.createGain(); gn.gain.value=g;
+  src.connect(hp).connect(gn).connect(AC.destination);
+  src.start(t);
+}
+function playHatOpen(g=0.08, when=null){
+  const t=(when??AC.currentTime);
+  const noise=AC.createBuffer(1, AC.sampleRate*0.18, AC.sampleRate);
+  const d=noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const src=AC.createBufferSource(); src.buffer=noise;
+  const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=5000;
+  const gn=AC.createGain(); gn.gain.value=g; gn.gain.exponentialRampToValueAtTime(0.0001, t+0.16);
+  src.connect(hp).connect(gn).connect(AC.destination);
+  src.start(t);
+}
+function playBass(freq=55,dur=0.24){
+  const o=AC.createOscillator(), sh=AC.createWaveShaper(), gn=AC.createGain();
+  o.type='sawtooth'; o.frequency.value=freq;
+  const curve=new Float32Array(256); for(let i=0;i<256;i++){ const x=i/128-1; curve[i]=Math.tanh(2.5*x); }
+  sh.curve=curve; sh.oversample='4x';
+  gn.gain.value=0.07; o.connect(sh).connect(gn).connect(AC.destination);
+  const t=AC.currentTime; o.start(t); gn.gain.exponentialRampToValueAtTime(0.0001, t+dur); o.stop(t+dur+0.02);
+}
+function playLead(freq=440,dur=0.16, vol=0.08){
+  const o=AC.createOscillator(), bp=AC.createBiquadFilter(), gn=AC.createGain(), del=AC.createDelay();
+  o.type='triangle'; o.frequency.value=freq; bp.type='bandpass'; bp.frequency.value=freq*2; bp.Q.value=1.2;
+  del.delayTime.value=0.12;
+  gn.gain.value=vol; o.connect(bp).connect(del).connect(gn).connect(AC.destination);
+  const t=AC.currentTime; o.start(t); gn.gain.exponentialRampToValueAtTime(0.0001, t+dur); o.stop(t+dur+0.02);
+}
+function playMelodyForLane(l){
+  if(!AC || !window.__getCurrentChord) return;
+  const triad = window.__getCurrentChord();
+  const map = [ triad[0]*2, triad[2]*2, triad[1]*2, triad[0]*2.5 ];
+  playLead(map[l], 0.18, 0.10);
+}
+
+function buildPicker(){
+  songsDiv.innerHTML='';
+  SONGS.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='song';
+    row.innerHTML=`
+      <div><b>${s.title}</b> <small>· BPM ${s.bpm}</small><br>
+        <small class="pill">Difficulté ${(i+1)}/9</small>
+      </div>
+      <div><button class="btn" data-i="${i}">▶️ Jouer</button></div>`;
+    songsDiv.appendChild(row);
+  });
+  songsDiv.querySelectorAll('button.btn[data-i]').forEach(b=> b.onclick=()=> selectSong(+b.dataset.i));
+}
+buildPicker();
+
+function seedRand(seed){ return ()=> (seed = (seed*9301+49297)%233280)/233280; }
+function buildChart(s){
+  const msPerBeat = 60000/s.bpm;
+  const totalBeats = Math.round(64 + 16*s.diff);
+  const chart=[]; let t = msPerBeat*2;
+  const laneOffset = [0, msPerBeat*0.25*0.56, msPerBeat*0.5, msPerBeat*0.75*0.56];
+  for(let i=0;i<totalBeats;i++){
+    pushUnique(chart, {t:Math.round(t + laneOffset[0]), lane:0, drum:true}, 70);
+    if(i%2===1) pushUnique(chart, {t:Math.round(t + laneOffset[1]), lane:1, drum:true}, 70);
+
+    if(Math.random() < 0.60*s.diff) pushUnique(chart, {t:Math.round(t + laneOffset[2]), lane:2}, 100);
+    if(Math.random() < 0.55*s.diff) pushUnique(chart, {t:Math.round(t + laneOffset[3]), lane:3}, 100);
+    if(s.diff>1.05 && Math.random()<0.18) pushUnique(chart, {t:Math.round(t + msPerBeat*0.125), lane:3}, 100);
+    t += msPerBeat;
+  }
+  chart.sort((a,b)=>a.t-b.t);
+  const minGap=110;
+  const filtered=[]; let last=-1e9;
+  for(const n of chart){ if(n.t - last >= minGap){ filtered.push(n); last=n.t; } }
+  return filtered;
+}
+function pushUnique(arr, note, tolMs){
+  for(const n of arr){ if(Math.abs(n.t - note.t) < tolMs) return; }
+  arr.push(note);
+}
+
+function setupLanes(){
+  laneEls=[...stage.querySelectorAll('.lane')];
+  padEls=[...stage.querySelectorAll('.hitpad')];
+  laneEls.forEach(l=> l.querySelectorAll('.note').forEach(n=>n.remove()));
+  padEls.forEach(p=> p.classList.remove('active','success'));
+  const pxTravel = (stage.clientHeight/2 - 54);
+  const timeTravel = 1100;
+  speedPxPerMs = pxTravel / timeTravel;
+}
+function resetStats(){
+  running=true; paused=false; score=0; combo=0; bestCombo=0;
+  scoreEl.textContent=0; comboEl.textContent='';
+}
+function startGame(){
+  startTime=performance.now()+700; lastFrame=startTime;
+  notes.forEach(n=>{ const el=document.createElement('div'); el.className='note'+(n.drum?' drum':''); n.el=el; laneEls[n.lane].appendChild(el); });
+  startAudio(song.bpm);
+  requestAnimationFrame(loop);
+  stage.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function loop(ts){
+  if(!running) return;
+  if(paused){ lastFrame=ts; requestAnimationFrame(loop); return; }
+  const elapsed = ts - startTime;
+  const midY = stage.clientHeight/2 - 54;
+  for(const n of notes){
+    if(!n.el) continue;
+    const y = (n.t - elapsed) * speedPxPerMs + (midY - NOTE_HEIGHT_VIS/2);
+    if(y> -70 && y < stage.clientHeight-40){
+      n.el.style.transform=`translateY(${y}px)`; n.el.style.display='block';
+    }else n.el.style.display='none';
+    if(!n.hit && (elapsed - n.t) > MISS_AFTER_MS){
+      n.hit=true; combo=0; comboEl.textContent='';
+    }
+  }
+  if(elapsed > (notes[notes.length-1]?.t || 0) + 2200){ finish(); return; }
+  lastFrame=ts; requestAnimationFrame(loop);
+}
+function finish(){
+  running=false; stopAudio();
+  document.getElementById('resScore').textContent=score;
+  document.getElementById('resCombo').textContent=bestCombo;
+  resultOverlay.style.display='flex';
+}
+
+function hitLane(l){
+  if(!running || paused) return;
+  const now = performance.now() - startTime;
+
+  padEls[l].classList.add('active');
+  setTimeout(()=> padEls[l].classList.remove('active'), 120);
+
+  let cand=null, best=9999;
+  for(const n of notes){ if(n.lane!==l || n.hit) continue; const dt=Math.abs(n.t-now); if(dt<best){best=dt; cand=n;} }
+  if(!cand || best>HIT_WINDOW_MS){ combo=0; comboEl.textContent=''; return; }
+
+  padEls[l].classList.add('success'); setTimeout(()=> padEls[l].classList.remove('success'), 200);
+  cand.hit=true; if(cand.el){ cand.el.classList.add('hit','fade'); setTimeout(()=> cand.el && cand.el.remove(), 220); }
+  playMelodyForLane(l);
+
+  score+=10; combo++; if(combo>bestCombo) bestCombo=combo;
+  scoreEl.textContent=score; comboEl.textContent= combo>1? combo+'x':'';
+}
+
+const keyMap={ 'f':0,'g':1,'h':2,'j':3,'1':0,'2':1,'3':2,'4':3 };
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(k==='p'){ paused=!paused; if(paused){ stopAudio(); } else { startAudio(song?.bpm||100); startTime += (performance.now()-lastFrame); } }
+  if(k==='r'){ if(running){ const idx=SONGS.indexOf(song); selectSong(idx); } }
+  if(keyMap[k]!=null){ e.preventDefault(); const lane=keyMap[k]; hitLane(lane); }
+});
+stage.addEventListener('pointerdown', (e)=>{
+  if(!running || paused) return;
+  e.preventDefault();
+  const rect = stage.getBoundingClientRect();
+  const laneW = rect.width/4;
+  const lane = Math.min(3, Math.max(0, Math.floor((e.clientX - rect.left) / laneW)));
+  hitLane(lane);
+}, {passive:false});
+
+function buildPicker(){
+  songsDiv.innerHTML='';
+  SONGS.forEach((s,i)=>{
+    const row=document.createElement('div'); row.className='song';
+    row.innerHTML=`
+      <div><b>${s.title}</b> <small>· BPM ${s.bpm}</small><br>
+        <small class="pill">Difficulté ${(i+1)}/9</small>
+      </div>
+      <div><button class="btn" data-i="${i}">▶️ Jouer</button></div>`;
+    songsDiv.appendChild(row);
+  });
+  songsDiv.querySelectorAll('button.btn[data-i]').forEach(b=> b.onclick=()=> selectSong(+b.dataset.i));
+}
+
+document.getElementById('startBtn').onclick=()=>{ unlockAudio(); startOverlay.style.display='none'; songPicker.style.display='flex'; };
+document.getElementById('chooseBtn').onclick=()=> songPicker.style.display='flex';
+document.getElementById('closePicker').onclick=()=> songPicker.style.display='none';
+document.getElementById('againBtn').onclick=()=>{ resultOverlay.style.display='none'; const idx=SONGS.indexOf(song); selectSong(idx); };
+
+function selectSong(i){
+  startOverlay.style.display='none'; songPicker.style.display='none'; resultOverlay.style.display='none';
+  song = {...SONGS[i]};
+  songNameEl.textContent = song.title;
+  notes = buildChart(song);
+  setupLanes();
+  resetStats();
+  startGame();
+}
+</script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>

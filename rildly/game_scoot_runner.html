@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Scoot Runner — Promos avec Pause + Musique “Liquido”</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b0e14;color:#e9eef6;font-family:system-ui,Segoe UI,Roboto,Arial}
+  .wrap{max-width:880px;margin:0 auto;padding:12px;position:relative}
+  .bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+  .pill{background:#121a2a;border:1px solid #243652;border-radius:999px;padding:6px 10px;font-size:13px}
+  #c{width:100%;height:420px;display:block;border:2px solid #3EE08F;border-radius:12px;background:#0b0e14;touch-action:none}
+  .cta{margin-top:8px;text-align:center;font-size:14px;color:#9fb1cb}
+  .btn{display:inline-block;background:#3EE08F;color:#05351e;font-weight:800;border-radius:12px;padding:10px 14px;border:0;cursor:pointer}
+  .btn.ghost{background:#121a2a;color:#cfe; border:1px solid #243652}
+  .good{color:#3EE08F}
+  .banner{position:absolute;left:0;right:0;top:16px;text-align:center;pointer-events:none;z-index:10}
+  .banner .msg{display:inline-block;background:#121a2a;border:1px solid #243652;border-radius:12px;padding:8px 12px;box-shadow:0 10px 22px rgba(0,0,0,.25)}
+  .rewards{margin-top:10px;background:#0f1422;border:1px solid #243652;border-radius:12px;padding:10px}
+  .rewards h4{margin:0 0 6px 0;font-size:14px;color:#cfe}
+  .reward{display:flex;justify-content:space-between;align-items:center;border:1px dashed #2d4366;border-radius:10px;padding:8px 10px;margin:6px 0}
+  .reward b{color:#3EE08F}
+
+  /* Promo modal (pauses the game) */
+  .promo-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:99}
+  .promo-card{width:min(92vw,720px);aspect-ratio:930/910;background:#0b1220;border:1px solid #274067;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative;overflow:hidden}
+  .promo-inner{padding:18px}
+  .promo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .promo-title{font-weight:800;font-size:18px}
+  .promo-shop{font-size:14px;color:#bcd}
+  .promo-body{position:relative;background:linear-gradient(135deg,#0f1a2a 0%,#132542 100%);border:1px solid #21395d;border-radius:12px;padding:14px;overflow:hidden}
+  .shine{position:absolute;inset:-40%;background:conic-gradient(from 0deg,rgba(255,255,255,.06),rgba(255,255,255,0) 20%);animation:spin 6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .promo-code{font-weight:900;font-size:36px;letter-spacing:2px;color:#3EE08F;text-align:center;margin:8px 0 4px}
+  .promo-percent{font-size:28px;text-align:center;margin-bottom:6px}
+  .promo-note{font-size:12px;color:#9fb1cb;text-align:center}
+  .promo-actions{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+  .promo-actions .btn{padding:10px 12px}
+
+  .hidden{display:none}
+/* FOOTER : 3 colonnes + bloc bas à droite */
+  .foot .links-3cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:36px 6vw;align-items:start
+  }
+  .foot .links-3cols h4{margin:0 0 8px;color:#fff;font-weight:700}
+  .foot .links-3cols ul{list-style:none;margin:0;padding:0}
+  .foot .links-3cols li{margin:6px 0}
+  .foot .links-3cols a{color:#cdd6ff;text-decoration:none}
+  .foot .links-3cols a:hover{text-decoration:underline}
+  .foot .bottom.bottom-right{
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:14px;padding:10px 0;display:flex;justify-content:flex-end;gap:14px;align-items:center
+  }
+  .foot .bottom.bottom-right p{margin:0}
+  .foot .bottom.bottom-right a{color:#cdd6ff;text-decoration:none}
+  .foot .bottom.bottom-right a:hover{text-decoration:underline}
+  @media (max-width:900px){.foot .links-3cols{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){
+    .foot .links-3cols{grid-template-columns:1fr}
+    .foot .bottom.bottom-right{justify-content:space-between}
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/common.css"/>
+<link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="images/pn360.png" alt="Logo RSL">
+      <span><b>RSL — Romandie Scooter League</b></span>
+    </a>
+    <ul>
+      <li><a href="formation.html">Formation RSL</a></li>
+      <li><a href="disciplines.html">Disciplines</a></li>
+      <li><a href="ou_rider.html">Où rider ?</a></li>
+      <li><a href="game.html">Games</a></li>
+      <li><a href="evenements.html">Événements</a></li>
+      <li><a href="comite.html">Comité</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    
+      <li><a href="cours.html">Cours</a></li>
+    </ul>
+    <div class="cta">
+      <button class="btn" id="btnIdentity">Se connecter</button>
+      <a class="btn" id="btnAccount" href="#" style="display:none">Mon compte</a>
+      <button class="btn dark" id="btnLogout" style="display:none">Se déconnecter</button>
+    </div>
+    <div class="cta">
+      <a class="btn" id="btnMembre" href="membres.html">Devenir membre</a>
+    </div>
+  </div>
+</nav>
+<div class="wrap">
+  <div class="bar">
+    <div class="pill">Scoot Runner · MINI</div>
+    <div class="pill">Score: <b id="sc">0</b> / <b>9999</b></div>
+    <div class="pill">Niveau: <b id="lvl">1</b></div>
+    <div class="pill">Vitesse: <b id="spd">3.2</b></div>
+    <div class="pill">Musique: <button id="musicBtn" class="btn ghost">🔇 Off</button></div>
+    <div class="pill">SFX: <button id="sfxBtn" class="btn ghost">🔇 Off</button></div>
+  </div>
+  <div class="banner" id="banner" style="display:none"><span class="msg" id="bannerMsg"></span></div>
+  <canvas id="c" width="860" height="420"></canvas>
+  <div class="cta" id="cta">
+    <button class="btn" id="startBtn">▶️ Lancer</button>
+    <div>Tape, clique, ou Espace/↑ pour sauter · P pour pause</div>
+  </div>
+  <div class="cta" id="levelMsg" style="display:none">
+    <div class="good" style="font-weight:800;font-size:18px">🏁 Jeu terminé — 9999 points !</div>
+    <button class="btn" id="againBtn">↻ Rejouer</button>
+  </div>
+
+  <div class="rewards" id="rewards" style="display:none">
+    <h4>🎁 Codes débloqués</h4>
+    <div id="rewardList"></div>
+  </div>
+</div>
+
+<!-- Promo modal (pause) -->
+<div class="promo-backdrop" id="promoModal">
+  <div class="promo-card">
+    <div class="promo-inner">
+      <div class="promo-header">
+        <div>
+          <div class="promo-title">🎉 Code promo débloqué</div>
+          <div class="promo-shop">chez <b>JF‑Rideshop</b></div>
+        </div>
+        <button class="btn ghost" id="promoClose">Fermer</button>
+      </div>
+      <div class="promo-body">
+        <div class="shine"></div>
+        <div class="promo-code" id="promoCode">JF-26</div>
+        <div class="promo-percent" id="promoPercent">10% de réduction</div>
+        <div class="promo-note">Le jeu est en pause. Appuie sur <b>Continuer</b> pour reprendre.</div>
+      </div>
+      <div class="promo-actions">
+        <button class="btn" id="promoCopy">Copier le code</button>
+        <button class="btn" id="promoDL">Télécharger en PNG (1860×1820)</button>
+        <button class="btn" id="promoResume">▶️ Continuer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==== CORE ====
+const cv = document.getElementById('c'); const cx = cv.getContext('2d', {alpha:false});
+let running=false, paused=false, last=0, raf=null, finished=false;
+let score=0, speed=3.2, t=0;
+let level=1, nextMilestone=3000;
+const W=cv.width, H=cv.height;
+const roadY=H-82, groundY=roadY-12;
+const RIDER_Y_OFFSET = 12;
+
+const player={x:140,y:groundY-56,w:96,h:64,vy:0,grav:0.55,jv:-12.8,on:true,coyote:0,ifr:0,shield:1};
+
+const PROMOS = {
+  3000: {code:'JF-26', percent:10, shop:'JF-Rideshop'},
+  6000: {code:'JF-42', percent:15, shop:'JF-Rideshop'},
+  9000: {code:'JF-99', percent:20, shop:'JF-Rideshop'},
+  9999: {code:'JF-20', percent:20, shop:'JF-Rideshop'}
+};
+const unlocked = new Set();
+
+function rnd(a,b){return Math.random()*(b-a)+a}
+function rect(a,b){return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y && a.y+a.h>b.y}
+
+let obs=[], coins=[], spawn=0;
+
+function world(){
+  const g=cx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#89d4ff'); g.addColorStop(1,'#e6f5ff');
+  cx.fillStyle=g; cx.fillRect(0,0,W,H);
+  cx.fillStyle='rgba(12,22,36,.15)';
+  for(let i=0;i<10;i++){ const x=(i*140-(t*18)% (W+160))-80; const w=80+((i*37)%50), h=60+((i*23)%80);
+    cx.fillRect(x,140-h,w,h);
+  }
+  cx.fillStyle='#cfe6d9'; cx.fillRect(0,roadY-24,W,24);
+  cx.fillStyle='#dfe8f1'; cx.fillRect(0,roadY-12,W,12);
+  cx.strokeStyle='#b8c8da'; cx.lineWidth=2; cx.beginPath(); cx.moveTo(0,roadY); cx.lineTo(W,roadY); cx.stroke();
+  const asp=cx.createLinearGradient(0,roadY,0,H); asp.addColorStop(0,'#2b2f3a'); asp.addColorStop(1,'#1e222a');
+  cx.fillStyle=asp; cx.fillRect(0,roadY,W,H-roadY);
+  cx.setLineDash([26,18]); cx.strokeStyle='#f7f7f7'; cx.lineWidth=3; cx.beginPath(); cx.moveTo(0,roadY+22); cx.lineTo(W,roadY+22); cx.stroke(); cx.setLineDash([]);
+  cx.strokeStyle='#f1cc57'; cx.lineWidth=3; cx.beginPath(); cx.moveTo(0,roadY+10); cx.lineTo(W,roadY+10); cx.stroke();
+}
+function rider(){
+  const x=player.x, y=player.y + RIDER_Y_OFFSET + (player.on?0:-4);
+  cx.fillStyle='rgba(0,0,0,.18)'; cx.beginPath(); cx.ellipse(x+30,H-10,34,8,0,0,Math.PI*2); cx.fill();
+  function wh(wx,wy){cx.fillStyle='#10151d'; cx.beginPath(); cx.arc(wx,wy,12,0,Math.PI*2); cx.fill();
+                     cx.fillStyle='#8a95a5'; cx.beginPath(); cx.arc(wx,wy,9,0,Math.PI*2); cx.fill();}
+  wh(x+10,y+12); wh(x+46,y+12);
+  cx.fillStyle='#0f1a24'; cx.fillRect(x+3,y+6,52,9);
+  cx.fillStyle='#1e293b'; cx.fillRect(x+5,y+7,36,3);
+  cx.fillStyle='#3EE08F'; cx.fillRect(x+5,y+10,34,2);
+  cx.fillStyle='#0f1a24'; cx.fillRect(x+55,y+6,4,9);
+  cx.strokeStyle='#0f1a24'; cx.lineWidth=3; cx.lineCap='round';
+  cx.beginPath(); cx.moveTo(x+28,y); cx.lineTo(x+28,y-20); cx.stroke();
+  cx.beginPath(); cx.moveTo(x+14,y-20); cx.lineTo(x+42,y-20); cx.stroke();
+  cx.strokeStyle='#3EE08F'; cx.beginPath(); cx.moveTo(x+12,y-20); cx.lineTo(x+16,y-20); cx.stroke();
+  cx.beginPath(); cx.moveTo(x+40,y-20); cx.lineTo(x+44,y-20); cx.stroke();
+  cx.fillStyle='#2a7adf'; rr(x+18,y-24,20,22,5);
+  cx.fillStyle='#1e63c7'; rr(x+18,y-34,18,12,5);
+  cx.fillStyle='#0f1a24'; cx.beginPath(); cx.arc(x+28,y-32,8,0,Math.PI*2); cx.fill();
+  cx.fillStyle='#fff'; cx.fillRect(x+24,y-34,7,2);
+  cx.strokeStyle='#0f1a24'; cx.lineWidth=3;
+  cx.beginPath(); cx.moveTo(x+24,y-12); cx.lineTo(x+28,y-20); cx.stroke();
+  cx.beginPath(); cx.moveTo(x+32,y-12); cx.lineTo(x+28,y-20); cx.stroke();
+  cx.beginPath(); cx.moveTo(x+22,y+4); cx.lineTo(x+16,y+12); cx.lineTo(x+12,y+12); cx.stroke();
+  cx.beginPath(); cx.moveTo(x+26,y+4); cx.lineTo(x+32,y+10); cx.lineTo(x+38,y+14); cx.stroke();
+}
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.fill();}
+
+function drawObs(o){
+  if(o.type==='rail'){ cx.fillStyle='#0f1a24'; cx.fillRect(o.x,o.y,o.w,o.h); cx.fillStyle='#3EE08F'; cx.fillRect(o.x+4,o.y+2,o.w-8,o.h-4);
+                       cx.fillStyle='#0f1a24'; cx.fillRect(o.x+10,o.y+o.h,6,10); cx.fillRect(o.x+o.w-16,o.y+o.h,6,10); }
+  else if(o.type==='box'){ cx.fillStyle='#0f1a24'; cx.fillRect(o.x,o.y,o.w,o.h); cx.fillStyle='#3EE08F'; cx.fillRect(o.x+5,o.y+5,o.w-10,o.h-10); }
+  else { cx.fillStyle='#0f1a24'; cx.beginPath(); cx.moveTo(o.x,o.y+o.h); cx.lineTo(o.x+o.w/2,o.y); cx.lineTo(o.x+o.w,o.y+o.h); cx.closePath(); cx.fill();
+         cx.fillStyle='#3EE08F'; cx.fillRect(o.x+6,o.y+o.h-8,o.w-12,6); }
+}
+function coin(c){ cx.fillStyle='#ffd54d'; cx.beginPath(); cx.arc(c.x,c.y,8,0,Math.PI*2); cx.fill();
+                  cx.strokeStyle='#e6b800'; cx.lineWidth=2; cx.beginPath(); cx.arc(c.x,c.y,6,0,Math.PI*2); cx.stroke(); }
+
+function reset(){
+  score=0; speed=3.2; t=0; obs.length=0; coins.length=0; spawn=0; finished=false;
+  level=1; nextMilestone=3000; unlocked.clear();
+  player.y=groundY-56; player.vy=0; player.on=true; player.coyote=0; player.ifr=0; player.shield=1;
+  document.getElementById('sc').textContent=0;
+  document.getElementById('lvl').textContent=level;
+  document.getElementById('spd').textContent=speed.toFixed(1);
+  document.getElementById('levelMsg').style.display='none';
+  hideBanner();
+  document.getElementById('rewards').style.display='none';
+  document.getElementById('rewardList').innerHTML='';
+}
+function start(){ if(running) return; reset(); running=true; paused=false; last=performance.now(); raf=requestAnimationFrame(loop);
+  document.getElementById('cta').style.display='none'; audioInit(); if(musicOn) startMusic(); }
+function stop(){ running=false; cancelAnimationFrame(raf); document.getElementById('cta').style.display='block'; stopMusic(); }
+function finishGame(){ running=false; finished=true; cancelAnimationFrame(raf); stopMusic(); document.getElementById('levelMsg').style.display='block';
+  const finalPromo = PROMOS[9999]; if(finalPromo && !unlocked.has(finalPromo.code)){ unlocked.add(finalPromo.code); addReward(finalPromo, 9999); showPromo(finalPromo,true); }
+}
+function pause(){ if(!running)return; paused=!paused; if(!paused){ last=performance.now(); raf=requestAnimationFrame(loop);} }
+
+function loop(ts){
+  const dt=Math.min(32, ts-last)/16.67; last=ts;
+  if(!paused && running) update(dt);
+  render();
+  if(running) raf=requestAnimationFrame(loop);
+}
+
+function update(s){
+  if(finished) return;
+  t += s; speed += 0.0006*s;
+  player.vy += player.grav*s; player.y += player.vy*s*3;
+  if(player.y+player.h>=groundY){ player.y=groundY-player.h; player.vy=0; if(!player.on){player.on=true;} player.coyote=6; }
+  else { player.on=false; if(player.coyote>0) player.coyote--; }
+  if(player.ifr>0) player.ifr -= s*60;
+
+  spawn -= s;
+  if(spawn<=0){
+    spawnObs();
+    if(Math.random()<0.35) coins.push({x:W+120,y:groundY-40-Math.random()*20,r:8});
+    spawn = (60 + Math.random()*40)/(speed/3.2);
+  }
+
+  const vx=speed*s*3;
+  obs.forEach(o=>o.x-=vx); coins.forEach(c=>c.x-=vx);
+  obs=obs.filter(o=>o.x>-160); coins=coins.filter(c=>c.x>-60);
+
+  score += s*(1 + speed*0.05);
+  const sc=Math.floor(score);
+  document.getElementById('sc').textContent = sc;
+  document.getElementById('spd').textContent = speed.toFixed(1);
+
+  // Paliers: pause + promo modal + vitesse +0.2
+  if(sc>=nextMilestone && sc<9999){
+    level++; nextMilestone += 3000;
+    speed += 0.2;
+    document.getElementById('lvl').textContent = level;
+    const promo = PROMOS[sc>=9000?9000:(sc>=6000?6000:3000)];
+    if(promo && !unlocked.has(promo.code)){
+      unlocked.add(promo.code);
+      paused=true; // PAUSE
+      showPromo(promo,true);
+      addReward(promo, sc);
+    }else{
+      showBanner(`⚡ Niveau ${level} — Vitesse +0.2`);
+    }
+  }
+
+  if(sc>=9999){ finishGame(); return; }
+
+  const hb={x:player.x+24,y:player.y+14,w:68,h:42};
+  if(player.ifr<=0){
+    for(const o of obs){
+      if(rect(hb,o)){
+        if(player.shield>0){ player.shield--; player.ifr=24; player.vy=-8; o.x=player.x-o.w-16; sfxHit(); }
+        else { stop(); }
+        break;
+      }
+    }
+  }
+  coins.forEach(c=>{ if(rect({x:c.x-8,y:c.y-8,w:16,h:16}, hb)){ score+=10; c.x=-999; sfxCoin(); } });
+}
+
+function render(){ world(); rider(); obs.forEach(drawObs); coins.forEach(coin); }
+
+// Banner
+let bannerTO=null;
+function showBanner(text){ const b=document.getElementById('banner'); const m=document.getElementById('bannerMsg');
+  m.textContent=text; b.style.display='block'; clearTimeout(bannerTO); bannerTO=setTimeout(()=>{ b.style.display='none'; }, 1800); }
+function hideBanner(){ const b=document.getElementById('banner'); b.style.display='none'; clearTimeout(bannerTO); }
+
+// Rewards
+function addReward(promo, sc){
+  const wrap = document.getElementById('rewards');
+  const list = document.getElementById('rewardList');
+  wrap.style.display = 'block';
+  const row = document.createElement('div');
+  row.className = 'reward';
+  row.innerHTML = `<span>🎁 <b>${promo.code}</b> — ${promo.percent}% chez <b>${promo.shop}</b> (palier ${sc})</span>
+                   <button class="btn ghost" onclick="navigator.clipboard && navigator.clipboard.writeText('${promo.code}')">Copier</button>`;
+  list.appendChild(row);
+}
+
+// Spawn
+function spawnObs(){
+  const t = ['rail','box','cone'][Math.floor(Math.random()*3)];
+  let w=96,h=8,y=groundY-16;
+  if(t==='box'){ w=36; h=26; y=groundY-26; }
+  if(t==='cone'){ w=28; h=28; y=groundY-28; }
+  obs.push({x:W+40,y,w,h,type:t});
+}
+
+// Input
+function jump(){
+  if(finished){ return; }
+  if(!running){ start(); return; }
+  if(paused){ return; } // bloqué pendant le modal
+  if(player.on || player.coyote>0){ player.vy=player.jv; player.on=false; player.coyote=0; sfxJump(); }
+}
+document.getElementById('startBtn').addEventListener('click', start, {passive:true});
+document.getElementById('againBtn').addEventListener('click', ()=>{ if(!running){ start(); } }, {passive:true});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'||e.code==='ArrowUp'){ e.preventDefault(); jump(); }
+  if(e.key==='p'||e.key==='P'){ pause(); }
+},{passive:false});
+cv.addEventListener('pointerdown', ()=> jump(), {passive:true});
+setTimeout(()=>{ if(!running) start(); }, 1500);
+
+// === AUDIO “LIQUIDO” (pad + hat léger) ===
+let AC=null, musicOn=false, sfxOn=false, padInterval=null, hatNode=null;
+const musicBtn = document.getElementById('musicBtn');
+const sfxBtn   = document.getElementById('sfxBtn');
+musicBtn.onclick = ()=>{ musicOn=!musicOn; musicBtn.textContent = musicOn?'🔊 On':'🔇 Off'; if(musicOn && running) startMusic(); else stopMusic(); };
+sfxBtn.onclick   = ()=>{ sfxOn=!sfxOn; sfxBtn.textContent = sfxOn?'🔊 On':'🔇 Off'; };
+
+function audioInit(){ if(AC) return; try{ AC = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){ console.warn('AudioContext non dispo'); } }
+
+function startMusic(){
+  if(!AC) return;
+  stopMusic();
+  const bpm = 174, beat = 60/bpm;
+  const chords = [[196,246,294],[220,262,330],[185,233,294],[196,247,311]];
+  let ci=0;
+  padInterval = setInterval(()=>{
+    const now = AC.currentTime;
+    const g=AC.createGain(); g.gain.value=0.0001; g.connect(AC.destination);
+    chords[ci].forEach(f=>{
+      const o=AC.createOscillator(); const ftr=AC.createBiquadFilter();
+      o.type='sine'; o.frequency.value=f;
+      ftr.type='lowpass'; ftr.frequency.value=1200;
+      o.connect(ftr).connect(g);
+      o.start(now);
+      g.gain.exponentialRampToValueAtTime(0.05, now+beat*0.25);
+      g.gain.exponentialRampToValueAtTime(0.01, now+beat*4);
+      o.stop(now+beat*4.2);
+    });
+    ci=(ci+1)%chords.length;
+  }, beat*1000*4);
+
+  hatNode = setInterval(()=>{
+    const now = AC.currentTime;
+    const n=AC.createBuffer(1, AC.sampleRate*0.05, AC.sampleRate);
+    const d=n.getChannelData(0);
+    for(let i=0;i<d.length;i++){ d[i]= (Math.random()*2-1) * Math.pow(1-i/d.length,2); }
+    const src=AC.createBufferSource(); src.buffer=n;
+    const hp=AC.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=5000;
+    const g=AC.createGain(); g.gain.value=0.03;
+    src.connect(hp).connect(g).connect(AC.destination);
+    src.start(now);
+  }, beat*500);
+}
+
+function stopMusic(){
+  if(padInterval){ clearInterval(padInterval); padInterval=null; }
+  if(hatNode){ clearInterval(hatNode); hatNode=null; }
+}
+
+// SFX
+function beep(freq, dur, type='sine', gain=0.08){
+  if(!AC) return; const o=AC.createOscillator(); const g=AC.createGain();
+  o.type=type; o.frequency.value=freq; g.gain.value=gain; o.connect(g).connect(AC.destination);
+  o.start(); g.gain.setTargetAtTime(0, AC.currentTime+dur*0.7, 0.03); o.stop(AC.currentTime+dur);
+}
+function sfxJump(){ if(!sfxOn||!AC) return; beep(660,0.10,'square',0.06); }
+function sfxCoin(){ if(!sfxOn||!AC) return; beep(880,0.08,'triangle',0.06); }
+function sfxHit(){  if(!sfxOn||!AC) return; beep(240,0.14,'sawtooth',0.06); }
+
+// ===== PROMO modal + PNG 1860×1820 =====
+const promoModal = document.getElementById('promoModal');
+const promoCodeEl = document.getElementById('promoCode');
+const promoPercentEl = document.getElementById('promoPercent');
+document.getElementById('promoClose').onclick = ()=> closePromo();
+document.getElementById('promoResume').onclick = ()=> closePromo(true);
+document.getElementById('promoCopy').onclick = ()=> navigator.clipboard && navigator.clipboard.writeText(promoCodeEl.textContent);
+document.getElementById('promoDL').onclick = ()=> downloadPromoPNG(promoCodeEl.textContent, promoPercentEl.textContent);
+
+function showPromo(promo, pauseGame){
+  promoCodeEl.textContent = promo.code;
+  promoPercentEl.textContent = `${promo.percent}% de réduction`;
+  promoModal.style.display='flex';
+  if(pauseGame){ paused = true; }
+}
+function closePromo(resume=false){
+  promoModal.style.display='none';
+  if(resume){
+    paused = false;
+    last = performance.now();
+    if(running){ raf=requestAnimationFrame(loop); }
+  }
+}
+
+// draw promo into an offscreen canvas and download as PNG 1860×1820
+function downloadPromoPNG(code, percentText){
+  const w=1860, h=1820;
+  const cnv=document.createElement('canvas'); cnv.width=w; cnv.height=h;
+  const c=cnv.getContext('2d');
+  const g=c.createLinearGradient(0,0,w,h); g.addColorStop(0,'#0b1220'); g.addColorStop(1,'#0e1b33'); c.fillStyle=g; c.fillRect(0,0,w,h);
+  c.fillStyle='rgba(62,224,143,0.10)'; c.beginPath(); c.arc(w/2, h*0.35, 520, 0, Math.PI*2); c.fill();
+  const rx=54; roundRect(c, 140, 180, w-280, h-360, rx, '#101a2b'); c.strokeStyle='#28456b'; c.lineWidth=6; c.stroke();
+  c.fillStyle='#bcd'; c.font='48px system-ui,Segoe UI,Roboto,Arial'; c.fillText('chez JF-Rideshop', 200, 300);
+  c.fillStyle='#e9eef6'; c.font='bold 80px system-ui,Segoe UI,Roboto,Arial'; c.fillText('🎉 CODE PROMO DÉBLOQUÉ', 200, 420);
+  c.fillStyle='#3EE08F'; c.font='900 180px system-ui,Segoe UI,Roboto,Arial'; c.fillText(code, 200, 640);
+  c.fillStyle='#e9eef6'; c.font='bold 120px system-ui,Segoe UI,Roboto,Arial'; c.fillText(percentText, 200, 820);
+  c.fillStyle='#8fa5bf'; c.font='42px system-ui,Segoe UI,Roboto,Arial'; c.fillText('Utilisable en boutique partenaire · Capture/partage OK', 200, 940);
+  c.setLineDash([24,18]); c.strokeStyle='#3EE08F'; c.lineWidth=6; roundRectStroke(c, 160, 200, w-320, h-400, rx);
+  c.setLineDash([]); c.fillStyle='#3EE08F'; c.font='bold 48px system-ui,Segoe UI,Roboto,Arial'; c.fillText('Romandie Scooter League', 200, h-220);
+  const a=document.createElement('a'); a.download=`RSL_${code}.png`; a.href=cnv.toDataURL('image/png'); a.click();
+}
+function roundRect(c,x,y,w,h,r,fill){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); if(fill){ c.fillStyle=fill; c.fill(); } }
+function roundRectStroke(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); c.stroke(); }
+
+// first paint
+world(); rider();
+</script>
+<footer class="foot">
+  <div class="container">
+    <div class="links links-3cols">
+      <div class="col">
+        <h4>RSL</h4>
+        <ul>
+          <li><a href="formation.html">Formation</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="reglement.html">Règlement</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="membres.html">Adhésion</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="ou_rider.html">Où rider</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contest</h4>
+        <ul>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="inscriptions.html">Inscriptions</a></li>
+          <li><a href="resultats.html">Résultats</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom bottom-right">
+      <p class="tiny">© 2025 — Romandie Scooter League</p>
+      <p class="tiny"><a href="reglement.html">Conditions générales</a></p>
+    </div>
+  </div>
+</footer>
+<script>
+(function(){
+  function init(){
+    var idBtn = document.getElementById('btnIdentity');
+    var btnLogout = document.getElementById('btnLogout');
+    var btnAccount = document.getElementById('btnAccount');
+    function refresh(user){
+      var logged = !!user;
+      if(idBtn) idBtn.style.display = logged ? 'none' : '';
+      if(btnLogout) btnLogout.style.display = logged ? '' : 'none';
+      if(btnAccount) btnAccount.style.display = logged ? '' : 'none';
+    }
+    if(window.netlifyIdentity){
+      window.netlifyIdentity.on('init', function(user){ refresh(user); });
+      window.netlifyIdentity.on('login', function(user){ refresh(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', function(){ refresh(null); });
+      window.netlifyIdentity.init();
+    }
+    if(idBtn) idBtn.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.open(); });
+    if(btnLogout) btnLogout.addEventListener('click', function(){ if(window.netlifyIdentity) window.netlifyIdentity.logout(); });
+    if(btnAccount) btnAccount.addEventListener('click', function(e){ e.preventDefault(); if(window.netlifyIdentity) window.netlifyIdentity.open('settings'); });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+</script>
+<script defer src="js/site.js"></script>
+<script defer src="/.netlify/identity-widget.js"></script>
+<script defer src="js/auth.js"></script>
+</body>
+</html>
