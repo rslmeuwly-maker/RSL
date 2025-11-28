@@ -2,460 +2,360 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RSL — Accès</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RIDLY — Riders Map</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-  :root{
-    --bg:#000;
-    --panel:#0f172aee;
-    --border:rgba(255,255,255,.18);
-    --text:#fff;
-    --green:#22c55e;
-    --green-dark:#16a34a;
-    --danger:#ff4d4f;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{
-    height:100%;
-    background:#000;
-    font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    color:var(--text);
-  }
+:root{
+  --green:#22c55e;
+  --green-dark:#16a34a;
+  --bg:#000;
+  --text:#f9fafb;
+  --dim:#9aa5b1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:radial-gradient(circle at top left,#022c22 0,#020617 40%,#000 100%);
+  color:var(--text);
+  font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  overflow:hidden;
+}
 
-  /* ===== vidéo fond ===== */
-  .bg-video-wrap{
-    position:fixed;
-    inset:0;
-    z-index:0;
-    overflow:hidden;
-    background:#000;
-  }
-  .bg-video-wrap video{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    filter:brightness(.35) saturate(1.1);
-  }
-  .bg-dim{
-    position:absolute;
-    inset:0;
-    background:radial-gradient(circle at 50% 30%, rgba(34,197,94,.18) 0%, rgba(0,0,0,.8) 60%);
-    pointer-events:none;
-  }
+/* ================= INTRO ================= */
 
-  /* ===== layout ===== */
-  .page-wrap{
-    position:relative;
-    z-index:10;
-    min-height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-  }
-  .gate-card{
-    width:100%;
-    max-width:980px;
-    background:rgba(0,0,0,.55);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:16px;
-    box-shadow:0 30px 80px rgba(0,0,0,.8);
-    padding:20px;
-    color:#fff;
-    backdrop-filter:blur(6px) saturate(140%);
-  }
+#intro{
+  position:fixed;
+  inset:0;
+  background:#020617;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  overflow:hidden;
+  transition:opacity .6s ease-out;
+}
 
-  .gate-header{text-align:center;margin-bottom:20px;}
-  .badge-top{
-    display:inline-block;
-    background:linear-gradient(180deg,var(--green),var(--green-dark));
-    color:#062312;
-    font-size:13px;
-    font-weight:800;
-    padding:6px 10px;
-    line-height:1.2;
-    border-radius:8px;
-    box-shadow:0 20px 60px rgba(0,0,0,.8),0 0 20px rgba(34,197,94,.4);
-  }
-  .gate-small{
-    color:#cdd6ff;
-    font-size:13px;
-    font-weight:500;
-    margin-top:8px;
-  }
-  .gate-small b{color:#fff;font-weight:700;}
+/* Radar */
+.intro-card{
+  position:relative;
+  width:100%;
+  max-width:520px;
+  min-height:230px;
+  padding:1.6rem 2rem;
+  background:transparent;
+}
+.intro-step{
+  position:absolute;
+  inset:1.2rem 1.6rem;
+  display:flex;
+  align-items:center;
+  gap:1.5rem;
+  opacity:0;
+  transform:translateY(10px) scale(.97);
+  transition:.45s;
+}
+.intro-step.active{
+  opacity:1;
+  transform:translateY(0);
+}
+.intro-radar{
+  width:140px;
+  height:140px;
+  border-radius:999px;
+  background:radial-gradient(circle,#022c22,#020617 60%);
+  box-shadow:0 0 40px rgba(34,197,94,.35);
+  position:relative;
+  overflow:hidden;
+}
+.radar-grid{
+  position:absolute;
+  inset:-20px;
+  background-image:
+    linear-gradient(to right,rgba(15,23,42,.7)1px,transparent 1px),
+    linear-gradient(to bottom,rgba(15,23,42,.7)1px,transparent 1px);
+  background-size:18px 18px;
+  mix-blend-mode:soft-light;
+}
+.radar-circle{
+  position:absolute;
+  border-radius:999px;
+  border:1px solid rgba(34,197,94,.35);
+}
+.radar-circle.c1{inset:18%;}
+.radar-circle.c2{inset:32%;opacity:.7;}
+.radar-circle.c3{inset:46%;opacity:.5;}
+.radar-sweep{
+  position:absolute;
+  inset:-10%;
+  background:conic-gradient(from 210deg,rgba(34,197,94,0)0,rgba(34,197,94,.8)60deg,rgba(34,197,94,0)120deg);
+  animation:radarSweep 2.2s linear infinite;
+  opacity:.9;
+}
+.radar-dot{
+  width:12px;
+  height:12px;
+  border-radius:999px;
+  background:var(--green);
+  box-shadow:0 0 12px rgba(34,197,94,.9);
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+.radar-dot::before{
+  content:"";
+  position:absolute;
+  inset:-4px;
+  border-radius:inherit;
+  border:2px solid rgba(34,197,94,.7);
+  opacity:0;
+  animation:radarPulse 1.6s ease-out infinite;
+}
 
-  .cols{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-  }
-  @media(max-width:720px){
-    .cols{grid-template-columns:1fr}
-  }
+.intro-text-block{flex:1;}
+.intro-title{font-size:1.1rem;font-weight:700;}
+.intro-sub{font-size:.82rem;color:var(--dim);}
 
-  /* ===== panels ===== */
-  .panel{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:18px;
-    box-shadow:0 20px 60px rgba(0,0,0,.6);
-  }
-  .panel h2{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    color:#fff;
-    font-size:15px;
-    font-weight:700;
-    margin:0 0 12px;
-  }
-  .panel-desc{
-    font-size:13px;
-    line-height:1.4;
-    color:#cdd6ff;
-    font-weight:500;
-    margin-bottom:14px;
-  }
+/* MAP STEP */
+.intro-map-mini{
+  width:150px;height:150px;
+  border-radius:1.3rem;
+  background:#020617;
+  border:1px solid rgba(56,189,248,.6);
+  box-shadow:0 0 0 1px rgba(15,23,42,1),0 0 35px rgba(56,189,248,.35);
+  position:relative;
+  overflow:hidden;
+}
+.map-bg{
+  position:absolute;
+  inset:-30px;
+  background:
+    radial-gradient(circle at 20% 10%,rgba(34,197,94,.2),transparent 55%),
+    radial-gradient(circle at 80% 80%,rgba(56,189,248,.24),transparent 55%);
+}
+.map-grid{
+  position:absolute;
+  inset:-30px;
+  background-image:
+    linear-gradient(to right,rgba(15,23,42,.7)1px,transparent1px),
+    linear-gradient(to bottom,rgba(15,23,42,.7)1px,transparent1px);
+  background-size:18px 18px;
+  mix-blend-mode:soft-light;
+  animation:introGridMove 6s linear infinite;
+}
+.map-spot{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:999px;
+  background:var(--green);
+  box-shadow:0 0 12px rgba(34,197,94,.9);
+}
 
-  .field{margin-bottom:12px;}
-  .field label{
-    display:block;
-    font-size:13px;
-    font-weight:600;
-    color:#fff;
-    margin-bottom:6px;
-  }
-  .input{
-    width:100%;
-    background:rgba(0,0,0,.6);
-    border:1px solid rgba(255,255,255,.25);
-    border-radius:10px;
-    color:#fff;
-    font-size:14px;
-    font-weight:600;
-    padding:10px 12px;
-    outline:none;
-  }
-  .input:focus{
-    border-color:var(--green);
-    box-shadow:0 0 0 3px rgba(34,197,94,.25);
-  }
+/* LOGO */
+.intro-logo-center{
+  text-align:center;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.intro-logo-circle{
+  width:90px;height:90px;
+  background:#000;
+  border-radius:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(148,163,184,.6);
+  box-shadow:0 0 24px rgba(34,197,94,.7);
+}
+.intro-logo-circle img{
+  width:70px;height:70px;
+}
 
-  .btn-main{
-    background:linear-gradient(180deg,var(--green),var(--green-dark));
-    border:0;
-    border-radius:10px;
-    color:#062312;
-    font-weight:800;
-    font-size:14px;
-    line-height:1.2;
-    padding:11px 14px;
-    cursor:pointer;
-    box-shadow:0 10px 24px rgba(0,0,0,.5);
-  }
-  .btn-main:disabled{
-    filter:grayscale(1) brightness(.6);
-    cursor:default;
-  }
+#intro.fade-out{opacity:0;pointer-events:none}
 
-  .msg-err,
-  .msg-ok{
-    display:none;
-    margin-top:10px;
-    border-radius:10px;
-    font-size:13px;
-    font-weight:600;
-    line-height:1.4;
-    padding:10px 12px;
-  }
-  .msg-err{
-    background:rgba(255,80,80,.12);
-    border:1px solid rgba(255,80,80,.4);
-    color:#ff9f9f;
-  }
-  .msg-ok{
-    background:rgba(34,197,94,.12);
-    border:1px solid rgba(34,197,94,.4);
-    color:#7cffb0;
-  }
+/* ================= PAGE ================= */
 
-  .rsl-logo-box{text-align:left;margin-top:16px;}
-  .rsl-logo-box img{
-    max-width:120px;
-    background:#fff;
-    border-radius:10px;
-    padding:8px;
-  }
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  background:#0008;
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid #fff2;
+  position:sticky;
+  top:0;
+  z-index:10;
+  opacity:0;
+  animation:fadeIn 1s ease 4.3s forwards;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#fff;
+}
+.brand img{
+  width:40px;height:40px;
+  border-radius:12px;
+}
+.btn-login{
+  padding:7px 14px;
+  border-radius:999px;
+  border:1px solid #fff3;
+  background:#000c;
+  color:#fff;
+  font-weight:700;
+}
 
-  .muted-note{
-    font-size:11px;
-    color:#9aa5b1;
-    margin-top:10px;
-    text-align:left;
-  }
+.hero{
+  height:calc(100vh - 70px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  opacity:0;
+  animation:fadeIn 1.2s ease 4.5s forwards;
+}
+.hero img{
+  width:110px;height:110px;
+  border-radius:24px;
+  background:#fff;
+  margin-bottom:18px;
+  box-shadow:0 0 22px rgba(34,197,94,.5);
+}
+h1{font-size:32px;font-weight:800;}
+h1 span{color:var(--green);}
+p{
+  color:#9aa5b1;
+  font-size:14px;
+  max-width:380px;
+  margin:10px auto;
+}
 
-  .footcopy{
-    text-align:center;
-    font-size:12px;
-    color:#9aa5b1;
-    margin-top:24px;
-  }
+.btn-primary{
+  background:linear-gradient(135deg,var(--green),var(--green-dark));
+  padding:12px 22px;
+  border-radius:999px;
+  color:#02130b;
+  font-weight:800;
+  text-decoration:none;
+  box-shadow:0 14px 40px #000c;
+}
+footer{
+  text-align:center;
+  color:#9aa5b1;
+  font-size:11px;
+  padding:12px;
+  animation:fadeIn 1.2s ease 4.7s forwards;
+  opacity:0;
+}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes radarSweep{to{transform:rotate(360deg);}}
+@keyframes radarPulse{60%{opacity:0;transform:scale(2.2);}100%{opacity:0;transform:scale(2.5);}}
+@keyframes introGridMove{100%{transform:translate(-30px,20px);}}
 </style>
 </head>
 <body>
 
-<!-- ====== VIDÉO FOND ====== -->
-<div class="bg-video-wrap">
-  <video id="bgVideo" autoplay muted playsinline loop></video>
-  <div class="bg-dim"></div>
+<!-- INTRO -->
+<div id="intro">
+  <div class="intro-card">
+    <div class="intro-step step-geo active">
+      <div class="intro-radar">
+        <div class="radar-grid"></div>
+        <div class="radar-circle c1"></div>
+        <div class="radar-circle c2"></div>
+        <div class="radar-circle c3"></div>
+        <div class="radar-sweep"></div>
+        <div class="radar-dot"></div>
+      </div>
+      <div class="intro-text-block">
+        <div class="intro-title">On te trouve…</div>
+        <div class="intro-sub" id="geo-label">Autorise la localisation</div>
+      </div>
+    </div>
+
+    <div class="intro-step step-spots">
+      <div class="intro-map-mini">
+        <div class="map-bg"></div>
+        <div class="map-grid"></div>
+        <div class="map-spot" style="left:30%;top:32%"></div>
+        <div class="map-spot" style="left:64%;top:46%"></div>
+        <div class="map-spot" style="left:42%;top:68%"></div>
+      </div>
+      <div class="intro-text-block">
+        <div class="intro-title">On charge les spots…</div>
+      </div>
+    </div>
+
+    <div class="intro-step step-logo">
+      <div class="intro-logo-center">
+        <div class="intro-logo-circle">
+          <img src="image/1logo_ridly.png" alt="RIDLY">
+        </div>
+        <b style="font-size:1.4rem">RIDLY</b>
+      </div>
+    </div>
+  </div>
 </div>
 
-<main class="page-wrap">
-  <section class="gate-card">
-    <div class="gate-header">
-      <div class="badge-top">Bienvenue sur le site officiel de la RSL</div>
-      <div class="gate-small">Ouverture prévue <b>2026</b> • Pré-inscription ci-dessous.</div>
-    </div>
+<header>
+  <a class="brand" href="#">
+    <img src="image/1logo_ridly.png" alt=""><span>RIDLY</span>
+  </a>
+  <a class="btn-login" href="compte.html">Connexion</a>
+</header>
 
-    <div class="cols">
-      <!-- STAFF / COMITÉ -->
-      <form class="panel" id="staffForm">
-        <h2>
-          <span>Staff / Comité RSL</span>
-          <span style="color:#22c55e;font-size:12px;">Accès interne</span>
-        </h2>
+<section class="hero">
+  <img src="image/1logo_ridly.png" alt="RIDLY">
+  <h1>La carte des spots<br><span>pour tous les riders</span></h1>
+  <p>Spots, parks, shops, cours, game of scoot, profil rider complet.</p>
+  <a href="compte.html" class="btn-primary">🗺 Ouvrir RIDLY</a>
+</section>
 
-        <div class="panel-desc">Entre le mot de passe pour accéder au site interne.</div>
-
-        <div class="field">
-          <label for="staffPass">Mot de passe</label>
-          <input id="staffPass" class="input" type="password" placeholder="••••••••" required/>
-        </div>
-
-        <button class="btn-main" type="submit">Entrer</button>
-
-        <div id="staffMsgErr" class="msg-err"></div>
-
-        <div class="rsl-logo-box">
-          <img src="images/logo_rsl.png" alt="RSL">
-        </div>
-
-        <p class="muted-note">
-          Le code est le même pour tout le staff : <b>rsl2015#</b>
-        </p>
-      </form>
-
-      <!-- RIDER / PRÉ-INSCRIPTION -->
-      <form class="panel" id="riderForm">
-        <h2>
-          <span>Pré-inscription rider</span>
-          <span style="font-size:12px;background:rgba(255,255,255,.1);border-radius:6px;padding:3px 6px;">Gratuit</span>
-        </h2>
-
-        <div class="panel-desc">
-          Laisse tes infos. On te contactera quand la ligue ouvre officiellement.
-        </div>
-
-        <div class="field">
-          <label for="riderNom">Nom</label>
-          <input id="riderNom" class="input" type="text" required/>
-        </div>
-
-        <div class="field">
-          <label for="riderPrenom">Prénom</label>
-          <input id="riderPrenom" class="input" type="text" required/>
-        </div>
-
-        <div class="field">
-          <label for="riderEmail">Email</label>
-          <input id="riderEmail" class="input" type="email" placeholder="ton@email.ch" required/>
-        </div>
-
-        <div class="field">
-          <label for="riderCode">Ton code perso (mot de passe futur)</label>
-          <input id="riderCode" class="input" type="password" placeholder="Choisis ton code" required minlength="4"/>
-        </div>
-
-        <button class="btn-main" id="riderSubmitBtn" type="submit">Envoyer</button>
-
-        <div id="riderMsgErr" class="msg-err"></div>
-        <div id="riderMsgOk" class="msg-ok"></div>
-
-        <p class="muted-note">
-          Tu ne peux pas encore te connecter au site.<br/>
-          On t’enverra ton accès à l’ouverture officielle.
-        </p>
-      </form>
-    </div>
-
-    <p class="footcopy">© 2026 — Romandie Scooter League</p>
-  </section>
-</main>
-
-<!-- Supabase (pour créer l'utilisateur et donc stocker l'email dans auth.users) -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="js/env.js"></script>
+<footer>
+  © <span id="year"></span> RIDLY — Riders & Spots.
+</footer>
 
 <script>
-// ==== VIDÉO SUPABASE ALÉATOIRE ====
+// Année
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* 🔥 REDIRECTION AUTO SI ARRIVÉE DE L’EMAIL SUPABASE */
 (function(){
-  const vids=[
-    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
-    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
-  ];
-  const pick=vids[Math.floor(Math.random()*vids.length)];
-  const vEl=document.getElementById("bgVideo");
-  if(vEl){
-    const s=document.createElement("source");
-    s.src=pick;
-    s.type="video/mp4";
-    vEl.appendChild(s);
+  const params = new URLSearchParams(window.location.search);
+  const fromEmail =
+    params.has("access_token") ||
+    params.get("type") === "signup";
 
-    const slowPlay=()=>{
-      try{
-        vEl.playbackRate=0.6;
-        const p=vEl.play();
-        if(p && p.catch){ p.catch(()=>{}); }
-      }catch(e){}
-    };
-    slowPlay();
-
-    document.addEventListener("visibilitychange",()=>{
-      if(document.hidden){
-        vEl.pause();
-      }else{
-        slowPlay();
-      }
-    });
+  if(fromEmail){
+    window.location.href = "https://rsl-swiss.ch/redirect-choice.html";
+    return;
   }
 })();
 
-// ==== ACCÈS STAFF ====
-(function(){
-  const PASS="rsl2015#";
-  const form=document.getElementById("staffForm");
-  const input=document.getElementById("staffPass");
-  const err=document.getElementById("staffMsgErr");
-
-  form.addEventListener("submit",e=>{
-    e.preventDefault();
-    if(input.value.trim()===PASS){
-      // staff a le droit d'entrer tout de suite
-      window.location.href="index1.html";
-    }else{
-      err.textContent="Mot de passe incorrect.";
-      err.style.display="block";
-      input.style.borderColor="var(--danger)";
-      setTimeout(()=>{input.style.borderColor="rgba(255,255,255,.25)";},1000);
-    }
-  });
-})();
-
-// ==== PRÉ-INSCRIPTION RIDER -> ENREGISTRE DANS SUPABASE AUTH ====
-(function(){
-  // init supabase client avec tes variables d'env
-  let supa=null;
-  try{
-    supa = supabase.createClient(
-      window.env?.SUPABASE_URL || '',
-      window.env?.SUPABASE_ANON || ''
-    );
-  }catch(e){
-    console.warn("Init Supabase raté:",e);
-  }
-
-  const form           = document.getElementById("riderForm");
-  const btn            = document.getElementById("riderSubmitBtn");
-  const nom            = document.getElementById("riderNom");
-  const prenom         = document.getElementById("riderPrenom");
-  const email          = document.getElementById("riderEmail");
-  const code           = document.getElementById("riderCode");
-  const ok             = document.getElementById("riderMsgOk");
-  const err            = document.getElementById("riderMsgErr");
-
-  form.addEventListener("submit", async e=>{
-    e.preventDefault();
-
-    ok.style.display="none";
-    err.style.display="none";
-
-    // validation côté front
-    if(
-      !nom.value.trim() ||
-      !prenom.value.trim() ||
-      !email.value.trim() ||
-      !code.value.trim()
-    ){
-      err.textContent="Merci de remplir tous les champs.";
-      err.style.display="block";
-      return;
-    }
-    if(code.value.trim().length < 4){
-      err.textContent="Code perso trop court (min 4).";
-      err.style.display="block";
-      return;
-    }
-
-    // désactive le bouton le temps d'envoyer
-    btn.disabled = true;
-
-    // on crée un compte Supabase pour qu'il apparaisse dans auth.users
-    // email = riderEmail
-    // password = riderCode
-    // metadata = nom / prénom / préinscription
-    try{
-      if(!supa){
-        throw new Error("Supabase pas prêt");
-      }
-
-      const { error: signErr } = await supa.auth.signUp({
-        email: email.value.trim(),
-        password: code.value.trim(),
-        options:{
-          data:{
-            nom: nom.value.trim(),
-            prenom: prenom.value.trim(),
-            preinscription_rsl: true,
-            statut: "waiting_open_2026"
-          }
-        }
-      });
-
-      if(signErr){
-        console.warn(signErr);
-        err.textContent="Impossible d'enregistrer. (Email déjà utilisé ?)";
-        err.style.display="block";
-        btn.disabled=false;
-        return;
-      }
-
-      // succès visuel
-      ok.textContent="Merci ! On te contactera à l’ouverture officielle.";
-      ok.style.display="block";
-
-      // reset du form
-      nom.value="";
-      prenom.value="";
-      email.value="";
-      code.value="";
-
-    }catch(ex){
-      console.warn(ex);
-      err.textContent="Erreur technique, réessaie.";
-      err.style.display="block";
-    }
-
-    btn.disabled = false;
-  });
-})();
+/* INTRO SEQUENCE */
+const steps = document.querySelectorAll(".intro-step");
+function show(i){
+  steps.forEach((s,x)=>s.classList.toggle("active",x===i));
+}
+setTimeout(()=>show(1),1400);
+setTimeout(()=>show(2),2800);
+setTimeout(()=>{
+  const intro = document.getElementById("intro");
+  if(intro){ intro.classList.add("fade-out"); }
+},4500);
 </script>
+
 </body>
 </html>
