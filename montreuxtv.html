@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Montreux Scooter Contest — TV + PUB RSL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body{
+      background:#000;
+      margin:0;
+      font-family:Arial, sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      color:#0f0;
+      text-align:center;
+    }
+    h1{margin-bottom:12px;font-size:22px}
+    .area{
+      width:90vw;
+      max-width:1000px;
+      aspect-ratio:16/9;
+      border:3px solid #0f0;
+      border-radius:12px;
+      overflow:hidden;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    #screen{
+      /* zone lecteur */
+    }
+    #adScreen{
+      display:none;              /* caché par défaut */
+      gap:8px;
+      padding:8px;
+    }
+    .flyer{
+      width:50%;
+      height:100%;
+      object-fit:contain;
+    }
+    button{
+      margin-top:12px;
+      padding:10px 24px;
+      font-size:18px;
+      font-weight:bold;
+      background:#0f0;
+      color:#000;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      transition:.2s;
+    }
+    button:hover{opacity:0.75;}
+  </style>
+</head>
+<body>
+
+  <h1>🎥 Montreux Scooter Contest — TV + PUB RSL</h1>
+
+  <!-- zone vidéo -->
+  <div id="screen" class="area">
+    <div id="player"></div>
+  </div>
+
+  <!-- zone PUB : 2 flyers côte à côte -->
+  <div id="adScreen" class="area">
+    <img
+      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png"
+      alt="Flyer Montreux Scooter Contest 1"
+      class="flyer">
+    <img
+      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png"
+      alt="Flyer Montreux Scooter Contest 2"
+      class="flyer">
+  </div>
+
+  <button id="startBtn">▶ Lancer / Reprendre</button>
+
+<script>
+/* 🔥 Playlist (boucle infinie) */
+const VIDEO_IDS = [
+  "w5j7cIC7IVk",
+  "ByhXJUUjV1U",
+  "BWRR-rKD46c",
+  "v0D2qziOqjQ",
+  "H48vxTdkrNc",
+  "V_IrrBfwUR0"
+];
+
+let index = 0;
+let player;
+const adDurationMs = 10000; // durée pub entre 2 vidéos (ms) → ici 10 secondes
+
+const screenEl  = document.getElementById("screen");
+const adScreenEl = document.getElementById("adScreen");
+
+/* ▶ Lance/relance la TV */
+document.getElementById("startBtn").onclick = ()=>{
+
+  if(!player){
+    player = new YT.Player("player", {
+      videoId: VIDEO_IDS[index],
+      playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
+      events:{
+        onReady: enablePermissions,
+        onStateChange: handleChange
+      }
+    });
+  } else {
+    // si on est sur l'écran pub et que tu appuies sur ▶ → force retour vidéo
+    if(adScreenEl.style.display === "flex"){
+      adScreenEl.style.display = "none";
+      screenEl.style.display   = "flex";
+    }
+    player.playVideo();
+  }
+};
+
+/* 🔥 Ajout des permissions sur l'iframe générée par YouTube */
+function enablePermissions(){
+  const iframe = document.querySelector("iframe");
+  if(iframe){
+    iframe.setAttribute("allow",
+      "autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; clipboard-write; gyroscope; web-share"
+    );
+  }
+}
+
+/* Gestion des changements d'état du player */
+function handleChange(e){
+  if(e.data === YT.PlayerState.ENDED){
+    // à la fin de la vidéo → afficher PUB puis passer à la suivante
+    showAdThenNext();
+  }
+}
+
+/* 🔁 Affiche PUB, puis après X secondes, passe à la vidéo suivante */
+function showAdThenNext(){
+  // cacher lecteur vidéo, montrer pub
+  screenEl.style.display   = "none";
+  adScreenEl.style.display = "flex";
+
+  setTimeout(()=>{
+    // après X secondes → cacher pub, montrer vidéo suivante
+    adScreenEl.style.display = "none";
+    screenEl.style.display   = "flex";
+
+    index = (index+1) % VIDEO_IDS.length;
+    player.loadVideoById(VIDEO_IDS[index]);
+  }, adDurationMs);
+}
+</script>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+</body>
+</html>
