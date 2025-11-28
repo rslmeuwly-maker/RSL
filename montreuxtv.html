@@ -15,24 +15,15 @@
   opacity:.55;
   filter:blur(2px) brightness(.60) contrast(1.10);
 }
-
 body::before{
   content:"";position:fixed;inset:0;
   background:#00000090;z-index:-1;
 }
-
 body{
   margin:0;height:100vh;
   display:flex;flex-direction:column;
   justify-content:center;align-items:center;
   color:#00ff93;font-family:Arial;text-align:center;
-  animation:glowPulse 2.5s infinite ease-in-out;
-}
-
-@keyframes glowPulse{
-  0%  {text-shadow:0 0 10px #00ffaf80;}
-  50% {text-shadow:0 0 38px #00ffafff;}
-  100%{text-shadow:0 0 15px #00ffaf90;}
 }
 
 /* ===== TITRE ===== */
@@ -44,24 +35,45 @@ h1{
 #subtext{
   font-size:17px;opacity:.88;margin-bottom:14px;
   text-shadow:0 0 12px #00ffaf99;
-  animation:popIn 1s ease forwards;
-}
-@keyframes popIn{
-  0%{transform:scale(.7);opacity:0;}
-  100%{transform:scale(1);opacity:1;}
 }
 
-/* ===== CADRE VIDÉO ===== */
+/* ===== LIGNE : BLOC GAUCHE + CADRE VERT ===== */
+.frame-row{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+/* ===== PETIT BLOC À GAUCHE, À L’EXTÉRIEUR DU CADRE VERT ===== */
+#sideInfo{
+  width:230px;
+  background:#000000dd;
+  border:2px solid #00ffaf;
+  border-radius:12px;
+  padding:10px 10px 12px;
+  font-size:.8rem;
+  line-height:1.25;
+  text-align:left;
+  box-shadow:0 0 18px #00ffaf77;
+  display:none;           /* affiché toutes les 10 min */
+}
+#sideInfo img{
+  width:100%;
+  border-radius:8px;
+  margin-bottom:6px;
+  box-shadow:0 0 10px #00ffaf55;
+}
+
+/* ===== CADRE VIDÉO (VERT) ===== */
 .area{
   width:95vw;max-width:1350px;aspect-ratio:16/9;
   border-radius:18px;border:4px solid #00ffaf;background:#000;
   overflow:hidden;
-  box-shadow:0 0 45px #00ffea,inset 0 0 28px #00ffc3;
-  position:relative;display:flex;
-  align-items:center;justify-content:center;
+  box-shadow:0 0 45px #00ffea, inset 0 0 28px #00ffc3;
+  position:relative;
 }
 
-/* ✅ PLAYER ADAPTÉ À LA VIDÉO (SANS ZOOM) */
+/* ===== PLAYER PLEIN CADRE ===== */
 #player{
   position:absolute;
   inset:0;
@@ -71,34 +83,36 @@ h1{
 #player iframe{
   width:100%;
   height:100%;
-  object-fit:contain;   /* s’adapte au cadre sans couper la vidéo */
+  object-fit:contain;   /* on respecte la vidéo, pas de zoom dégueu */
   object-position:center;
-  background:#000;      /* pour les éventuelles bandes */
+  background:#000;
 }
 
-/* ===== INTRO ===== */
+/* ===== INTRO (UNE SEULE FOIS AU DÉBUT, PAR-DESSUS LA VIDÉO) ===== */
 #introLayer{
   position:absolute;inset:0;padding:24px;
-  background:radial-gradient(circle,#000000dd,#000000b5,#00000090);
+  background:radial-gradient(circle,#000000dd,#000000b0,#00000080);
   display:flex;align-items:center;justify-content:space-between;
   color:#00ff93;z-index:3;
 }
 #introText{
   width:55%;font-size:1rem;line-height:1.4;text-align:left;
-  opacity:0;transform:translateY(20px);
   text-shadow:0 0 15px #00ffaf;
-  animation:introReveal 1.6s ease forwards;
-}
-@keyframes introReveal{
-  0%{opacity:0;transform:translateY(20px);}
-  100%{opacity:1;transform:translateY(0);}
 }
 #introFlyer{
   width:35%;object-fit:contain;max-height:80%;
   border-radius:10px;box-shadow:0 0 25px #00ffafaa;
 }
 
-/* ===== QR (x2) ===== */
+/* ===== SECTION PUB ENTRE LES VIDÉOS ===== */
+#adScreen{
+  display:none;gap:14px;padding:14px;
+}
+.flyer{
+  width:50%;object-fit:contain;height:100%;
+}
+
+/* ===== QR (on ne touche plus) ===== */
 #qrFixed{
   position:fixed;right:14px;bottom:14px;
   width:180px;z-index:10;
@@ -110,15 +124,7 @@ h1{
   text-shadow:0 0 8px #00ffaf;z-index:10;
 }
 
-/* ===== PUB ===== */
-#adScreen{
-  display:none;gap:14px;padding:14px;
-}
-.flyer{
-  width:50%;object-fit:contain;height:100%;
-}
-
-/* ===== BTN ===== */
+/* ===== BOUTON START ===== */
 #startBtn{
   margin-top:18px;padding:14px 34px;font-size:21px;font-weight:bold;
   background:#00ffaf;color:#000;border:none;border-radius:8px;
@@ -131,46 +137,64 @@ h1{
 </head>
 <body>
 
-<!-- 🔥 BACKGROUND -->
+<!-- FOND VIDÉO -->
 <video id="bgVideo" autoplay loop muted playsinline>
   <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4">
 </video>
 
 <h1>Montreux Scooter Time Machine</h1>
-<div id="subtext">📼 archives 2005 → 2025 • 20 ans de trottinette freestyle 🔥</div>
+<div id="subtext">📼 2005 → 2025 • 20 ans de trottinette freestyle 🔥</div>
 
-<!-- 🎥 ÉCRAN PRINCIPAL -->
-<div id="screen" class="area">
-  <!-- INTRO -->
-  <div id="introLayer">
-    <div id="introText">
-      🛴 Montreux — là où tout a commencé.<br><br>
-      Avant YouTube, avant les decks en aluminium forgé, avant les tricks de folie qu’on voit aujourd’hui…<br>
-      il y a eu Montreux, avril 2005.<br><br>
+<!-- LIGNE : BLOC GAUCHE + CADRE VERT -->
+<div class="frame-row">
 
-      Le tout premier Scooter Contest connu, en Suisse, au bord du lac, dans un skatepark qui allait marquer l’histoire.<br>
-      Pas de caméras 4K, pas de réseaux sociaux pour immortaliser le moment.<br>
-      Juste des passionnés, du rap, des riders motivés, des figures improvisées<br>
-      et une seule certitude :<br><br>
-
-      C’était le début. Le point de départ d’une culture mondiale.<br><br>
-
-      Aujourd’hui, le scooter freestyle remplit des skateparks partout dans le monde,
-      les tricks volent plus haut, les riders vont plus loin,
-      mais l’ADN reste le même : liberté, créativité, famille.<br><br>
-
-      Et tout ça… est né ici.<br><br>
-
-      Montreux – 2005 → 2025<br>
-      20 ans de ride. 20 ans d’histoire.
-    </div>
-    <img id="introFlyer" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png">
+  <!-- 🟩 PETIT BLOC À GAUCHE, À L’EXTÉRIEUR DU CADRE -->
+  <div id="sideInfo">
+    <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png" alt="Montreux 2005">
+    🛴 Montreux — là où tout a commencé.<br><br>
+    Avant YouTube, avant les decks forgés, avant les gros tricks…<br>
+    Avril 2005 : le premier Scooter Contest connu en Suisse, au bord du lac.<br><br>
+    Montreux – 2005 → 2025.<br>
+    20 ans de ride. 20 ans d’histoire.
   </div>
 
-  <div id="player"></div>
+  <!-- 🎥 CADRE VERT AVEC PLAYER -->
+  <div id="screen" class="area">
+
+    <!-- INTRO (UNE SEULE FOIS AU DÉBUT, PAR-DESSUS LA VIDÉO) -->
+    <div id="introLayer">
+      <div id="introText">
+        🛴 Montreux — là où tout a commencé.<br><br>
+        Avant YouTube, avant les decks en aluminium forgé, avant les tricks de folie qu’on voit aujourd’hui…<br>
+        il y a eu Montreux, avril 2005.<br><br>
+
+        Le tout premier Scooter Contest connu, en Suisse, au bord du lac, dans un skatepark qui allait marquer l’histoire.<br>
+        Pas de caméras 4K, pas de réseaux sociaux pour immortaliser le moment.<br>
+        Juste des passionnés, du rap, des riders motivés, des figures improvisées
+        et une seule certitude :<br><br>
+
+        C’était le début. Le point de départ d’une culture mondiale.<br><br>
+
+        Aujourd’hui, le scooter freestyle remplit des skateparks partout dans le monde,
+        les tricks volent plus haut, les riders vont plus loin,
+        mais l’ADN reste le même : liberté, créativité, famille.<br><br>
+
+        Et tout ça… est né ici.<br><br>
+
+        Montreux – 2005 → 2025.<br>
+        20 ans de ride. 20 ans d’histoire.
+      </div>
+
+      <img id="introFlyer"
+           src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png"
+           alt="Flyer Montreux 2005">
+    </div>
+
+    <div id="player"></div>
+  </div>
 </div>
 
-<!-- 🟩 PUB : FLYERS INVERSES -->
+<!-- PUB ENTRE LES VIDÉOS -->
 <div id="adScreen" class="area">
   <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
   <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
@@ -178,11 +202,11 @@ h1{
 
 <button id="startBtn">▶ Lancer</button>
 
-<!-- 📸 QR -->
-<img id="qrFixed" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/contest_photos_2025/qr_access_photos.png">
+<!-- QR FIXE -->
+<img id="qrFixed" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/contest_photos_2025/qr_access_photos.png" alt="QR photos event">
 <div id="qrFixedLabel">📸 Photos ici →</div>
 
-<!-- 🔥 SCRIPTS -->
+<!-- SCRIPTS -->
 <script>
 const V = [
   "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
@@ -192,26 +216,24 @@ const V = [
 
 let index = 0;
 let player = null;
-let videosSinceIntro = 0;
+let ytReady = false;
 let introShownOnce = false;
 
 const INTRO_DURATION = 10000;  // 10 s
 const AD_DURATION    = 20000;  // 20 s
+const sideInfo       = document.getElementById("sideInfo");
+const introLayer     = document.getElementById("introLayer");
+const screen         = document.getElementById("screen");
+const ads            = document.getElementById("adScreen");
 
-const introLayer = document.getElementById("introLayer");
-const screen     = document.getElementById("screen");
-const ads        = document.getElementById("adScreen");
-
-let ytReady = false;
-
-/* Appelé automatiquement par l'API YouTube quand elle est prête */
+/* Appelé par l'API YouTube quand elle est prête */
 function onYouTubeIframeAPIReady(){
   ytReady = true;
 }
 
 /* Bouton LANCER */
 document.getElementById("startBtn").onclick = () => {
-  if (!introShownOnce) {
+  if (!introShownOnce){
     introShownOnce = true;
     introLayer.style.display = "flex";
     setTimeout(() => {
@@ -224,12 +246,11 @@ document.getElementById("startBtn").onclick = () => {
 };
 
 function startVideo(){
-  if (!ytReady) {
+  if (!ytReady){
     setTimeout(startVideo, 200);
     return;
   }
-
-  if (!player) {
+  if (!player){
     player = new YT.Player("player",{
       videoId: V[index],
       playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
@@ -238,28 +259,17 @@ function startVideo(){
   } else {
     player.loadVideoById(V[index]);
   }
-  videosSinceIntro++;
 }
 
 function onPlayerStateChange(e){
-  if (e.data === YT.PlayerState.ENDED) {
+  if (e.data === YT.PlayerState.ENDED){
+    // pub entre les vidéos
     screen.style.display = "none";
     ads.style.display    = "flex";
-
     setTimeout(() => {
       ads.style.display    = "none";
-      screen.style.display = "flex";
-
-      if (videosSinceIntro >= 3) {
-        videosSinceIntro = 0;
-        introLayer.style.display = "flex";
-        setTimeout(() => {
-          introLayer.style.display = "none";
-          nextVideo();
-        }, INTRO_DURATION);
-      } else {
-        nextVideo();
-      }
+      screen.style.display = "block";
+      nextVideo();
     }, AD_DURATION);
   }
 }
@@ -268,6 +278,14 @@ function nextVideo(){
   index = (index + 1) % V.length;
   startVideo();
 }
+
+/* ⏱ BLOC GAUCHE TOUTES LES 10 MINUTES (10s) */
+setInterval(() => {
+  sideInfo.style.display = "block";
+  setTimeout(() => {
+    sideInfo.style.display = "none";
+  }, 10000);
+}, 600000); // 600 000 ms = 10 minutes
 </script>
 
 <script src="https://www.youtube.com/iframe_api"></script>
