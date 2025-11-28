@@ -2,360 +2,571 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>RIDLY — Riders Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RSL — Romandie Scooter League</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --green:#22c55e;
-  --green-dark:#16a34a;
-  --bg:#000;
-  --text:#f9fafb;
-  --dim:#9aa5b1;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{
-  background:radial-gradient(circle at top left,#022c22 0,#020617 40%,#000 100%);
-  color:var(--text);
-  font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  overflow:hidden;
-}
+  :root{
+    --bg:#040404;
+    --green:#22c55e;
+    --neon:#7cffb0;
+    --danger:#ff4d4f;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    height:100%;
+    margin:0;
+    background:var(--bg);
+    font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    color:#e8ffe8;
+    overflow:hidden;
+  }
 
-/* ================= INTRO ================= */
+  /* full screen canvas code rain */
+  #codeRain{position:fixed;inset:0;z-index:1}
 
-#intro{
-  position:fixed;
-  inset:0;
-  background:#020617;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  overflow:hidden;
-  transition:opacity .6s ease-out;
-}
+  /* splash card (download / intro) */
+  .splash{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;
+    pointer-events:none;
+  }
+  .card{
+    width:min(980px,94vw);max-width:980px;padding:28px;border-radius:16px;
+    background:linear-gradient(180deg, rgba(2,6,4,.72), rgba(3,8,6,.6));
+    border:1px solid rgba(255,255,255,.06);backdrop-filter: blur(6px) saturate(120%);
+    box-shadow:0 30px 80px rgba(0,0,0,.8);
+    pointer-events:auto; text-align:center; color:var(--neon);
+    overflow:hidden; position:relative;
+  }
 
-/* Radar */
-.intro-card{
-  position:relative;
-  width:100%;
-  max-width:520px;
-  min-height:230px;
-  padding:1.6rem 2rem;
-  background:transparent;
-}
-.intro-step{
-  position:absolute;
-  inset:1.2rem 1.6rem;
-  display:flex;
-  align-items:center;
-  gap:1.5rem;
-  opacity:0;
-  transform:translateY(10px) scale(.97);
-  transition:.45s;
-}
-.intro-step.active{
-  opacity:1;
-  transform:translateY(0);
-}
-.intro-radar{
-  width:140px;
-  height:140px;
-  border-radius:999px;
-  background:radial-gradient(circle,#022c22,#020617 60%);
-  box-shadow:0 0 40px rgba(34,197,94,.35);
-  position:relative;
-  overflow:hidden;
-}
-.radar-grid{
-  position:absolute;
-  inset:-20px;
-  background-image:
-    linear-gradient(to right,rgba(15,23,42,.7)1px,transparent 1px),
-    linear-gradient(to bottom,rgba(15,23,42,.7)1px,transparent 1px);
-  background-size:18px 18px;
-  mix-blend-mode:soft-light;
-}
-.radar-circle{
-  position:absolute;
-  border-radius:999px;
-  border:1px solid rgba(34,197,94,.35);
-}
-.radar-circle.c1{inset:18%;}
-.radar-circle.c2{inset:32%;opacity:.7;}
-.radar-circle.c3{inset:46%;opacity:.5;}
-.radar-sweep{
-  position:absolute;
-  inset:-10%;
-  background:conic-gradient(from 210deg,rgba(34,197,94,0)0,rgba(34,197,94,.8)60deg,rgba(34,197,94,0)120deg);
-  animation:radarSweep 2.2s linear infinite;
-  opacity:.9;
-}
-.radar-dot{
-  width:12px;
-  height:12px;
-  border-radius:999px;
-  background:var(--green);
-  box-shadow:0 0 12px rgba(34,197,94,.9);
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-}
-.radar-dot::before{
-  content:"";
-  position:absolute;
-  inset:-4px;
-  border-radius:inherit;
-  border:2px solid rgba(34,197,94,.7);
-  opacity:0;
-  animation:radarPulse 1.6s ease-out infinite;
-}
+  .brand{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px}
+  .brand img{height:44px;border-radius:10px}
+  .title{
+    font-size:clamp(20px,3.6vw,38px);
+    font-weight:800;
+    color:#fff;
+    text-shadow:0 6px 28px rgba(34,197,94,.06)
+  }
+  .subtitle{
+    color:rgba(200,255,210,.9);
+    opacity:.9;
+    margin-bottom:12px;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:.3px;
+  }
 
-.intro-text-block{flex:1;}
-.intro-title{font-size:1.1rem;font-weight:700;}
-.intro-sub{font-size:.82rem;color:var(--dim);}
+  /* terminal fake */
+  .term{
+    background:rgba(0,0,0,.42);
+    border-radius:10px;
+    padding:12px 14px;
+    margin:12px auto 18px;
+    max-width:900px;
+    border:1px solid rgba(34,197,94,.06);
+    text-align:left;
+    font-family:ui-monospace,monospace;
+    color:var(--neon);
+    height:120px;
+    overflow:hidden;
+    position:relative;
+  }
+  .line{font-size:13px;line-height:1.25;white-space:nowrap;opacity:.95}
 
-/* MAP STEP */
-.intro-map-mini{
-  width:150px;height:150px;
-  border-radius:1.3rem;
-  background:#020617;
-  border:1px solid rgba(56,189,248,.6);
-  box-shadow:0 0 0 1px rgba(15,23,42,1),0 0 35px rgba(56,189,248,.35);
-  position:relative;
-  overflow:hidden;
-}
-.map-bg{
-  position:absolute;
-  inset:-30px;
-  background:
-    radial-gradient(circle at 20% 10%,rgba(34,197,94,.2),transparent 55%),
-    radial-gradient(circle at 80% 80%,rgba(56,189,248,.24),transparent 55%);
-}
-.map-grid{
-  position:absolute;
-  inset:-30px;
-  background-image:
-    linear-gradient(to right,rgba(15,23,42,.7)1px,transparent1px),
-    linear-gradient(to bottom,rgba(15,23,42,.7)1px,transparent1px);
-  background-size:18px 18px;
-  mix-blend-mode:soft-light;
-  animation:introGridMove 6s linear infinite;
-}
-.map-spot{
-  position:absolute;
-  width:10px;height:10px;
-  border-radius:999px;
-  background:var(--green);
-  box-shadow:0 0 12px rgba(34,197,94,.9);
-}
+  /* download area */
+  .download{
+    display:flex;align-items:center;gap:14px;justify-content:center;margin-top:4px;flex-wrap:wrap;
+    color:#d6ffdc;font-size:13px;font-weight:600;text-align:center;
+  }
+  .progress{
+    width:220px;
+    height:14px;
+    background:rgba(255,255,255,.06);
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.04)
+  }
+  .bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--green),#8ef9b6);
+    box-shadow:0 6px 24px rgba(34,197,94,.08);
+    transition:width .2s linear
+  }
+  .pct{font-weight:800;color:#d6ffdc;min-width:48px;text-align:right;font-size:14px}
 
-/* LOGO */
-.intro-logo-center{
-  text-align:center;
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-.intro-logo-circle{
-  width:90px;height:90px;
-  background:#000;
-  border-radius:24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:1px solid rgba(148,163,184,.6);
-  box-shadow:0 0 24px rgba(34,197,94,.7);
-}
-.intro-logo-circle img{
-  width:70px;height:70px;
-}
+  /* glitch overlay when we "explode" */
+  .glitch-overlay{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(255,20,20,.02), rgba(255,20,20,.06));
+    mix-blend-mode:screen;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .25s;
+  }
+  .glitch{
+    position:absolute;inset:0;pointer-events:none;opacity:0;z-index:10;
+    background-image:
+      linear-gradient(0deg, rgba(0,0,0,0) 30%, rgba(255,255,255,.02) 31%, rgba(255,255,255,.02) 32%, rgba(0,0,0,0) 33%);
+    background-size:100% 6px;
+    animation:glitchScan .12s steps(1) infinite;
+  }
+  @keyframes glitchScan{
+    0%{transform:translateY(0)}
+    50%{transform:translateY(2px)}
+    100%{transform:translateY(0)}
+  }
 
-#intro.fade-out{opacity:0;pointer-events:none}
+  /* welcome state (après l'onde de choc) */
+  .welcome{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:12;
+    opacity:0;pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .welcome.open{opacity:1;pointer-events:auto}
+  .welcome-card{
+    width:min(780px,94vw);
+    padding:28px;
+    border-radius:14px;
+    background:linear-gradient(180deg,#021007,#06220f);
+    border:1px solid rgba(255,255,255,.06);
+    text-align:center;
+    color:#e9ffe9;
+    box-shadow:0 30px 120px rgba(0,0,0,.7);
+  }
+  .welcome-card h1{
+    font-size:32px;
+    margin:0 0 8px;
+    font-weight:800;
+    color:#fff;
+  }
+  .welcome-card p{
+    margin:0 0 16px;
+    color:#cfeed6;
+    font-size:15px;
+    line-height:1.4;
+  }
 
-/* ================= PAGE ================= */
+  /* form zone */
+  .join-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    text-align:left;
+    max-width:340px;
+    margin:0 auto 20px;
+    color:#eaffef;
+    font-size:14px;
+    font-weight:500;
+  }
+  .join-wrap label{font-size:13px;font-weight:600;color:#cfeed6;display:block;margin-bottom:4px}
+  .join-wrap input[type="email"],
+  .join-wrap input[type="password"],
+  .join-wrap input[type="text"]{
+    width:100%;
+    background:rgba(0,0,0,.6);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;
+    padding:10px 12px;
+    color:#fff;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:600;
+    outline:none;
+  }
+  .human-check{
+    display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#cfeed6;font-weight:600;line-height:1.3;
+  }
+  .human-check input{margin-top:2px;width:16px;height:16px}
 
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:14px 18px;
-  background:#0008;
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid #fff2;
-  position:sticky;
-  top:0;
-  z-index:10;
-  opacity:0;
-  animation:fadeIn 1s ease 4.3s forwards;
-}
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  text-decoration:none;
-  color:#fff;
-}
-.brand img{
-  width:40px;height:40px;
-  border-radius:12px;
-}
-.btn-login{
-  padding:7px 14px;
-  border-radius:999px;
-  border:1px solid #fff3;
-  background:#000c;
-  color:#fff;
-  font-weight:700;
-}
+  .msg-ok{
+    background:rgba(34,197,94,.12);
+    border:1px solid rgba(34,197,94,.4);
+    color:#7cffb0;
+    font-weight:600;
+    font-size:13px;
+    border-radius:8px;
+    padding:10px 12px;
+    line-height:1.4;
+    display:none;
+  }
 
-.hero{
-  height:calc(100vh - 70px);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  opacity:0;
-  animation:fadeIn 1.2s ease 4.5s forwards;
-}
-.hero img{
-  width:110px;height:110px;
-  border-radius:24px;
-  background:#fff;
-  margin-bottom:18px;
-  box-shadow:0 0 22px rgba(34,197,94,.5);
-}
-h1{font-size:32px;font-weight:800;}
-h1 span{color:var(--green);}
-p{
-  color:#9aa5b1;
-  font-size:14px;
-  max-width:380px;
-  margin:10px auto;
-}
+  .cta-row{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .btn{
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:800;
+    border:1px solid rgba(255,255,255,.06);
+    cursor:pointer;
+    background:rgba(255,255,255,.03);
+    color:var(--neon);
+    font-size:14px;
+    line-height:1.2;
+  }
+  .btn.green{
+    background:linear-gradient(180deg,var(--green),#8ef9b6);
+    color:#062312;
+    border:0;
+  }
+  .btn.alt{
+    background:transparent;
+    border:1px solid rgba(255,255,255,.08);
+    color:#fff;
+  }
 
-.btn-primary{
-  background:linear-gradient(135deg,var(--green),var(--green-dark));
-  padding:12px 22px;
-  border-radius:999px;
-  color:#02130b;
-  font-weight:800;
-  text-decoration:none;
-  box-shadow:0 14px 40px #000c;
-}
-footer{
-  text-align:center;
-  color:#9aa5b1;
-  font-size:11px;
-  padding:12px;
-  animation:fadeIn 1.2s ease 4.7s forwards;
-  opacity:0;
-}
+  /* skip link */
+  .skip{
+    position:absolute;top:18px;right:18px;z-index:20;
+    font-weight:800;
+    color:rgba(255,255,255,.85);
+    cursor:pointer;
+    padding:8px 10px;
+    border-radius:8px;
+    background:rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.04);
+    font-size:13px;
+    line-height:1.2;
+    user-select:none;
+  }
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-@keyframes radarSweep{to{transform:rotate(360deg);}}
-@keyframes radarPulse{60%{opacity:0;transform:scale(2.2);}100%{opacity:0;transform:scale(2.5);}}
-@keyframes introGridMove{100%{transform:translate(-30px,20px);}}
+  /* tiny footer */
+  .footcopy{
+    position:fixed;left:0;right:0;bottom:10px;
+    text-align:center;
+    color:rgba(180,210,190,.7);
+    font-size:13px;
+    z-index:20
+  }
+
+  /* code/pass bloc in welcome */
+  .access-block{
+    background:rgba(0,0,0,.5);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    padding:16px;
+    text-align:left;
+    margin:0 auto 20px;
+    max-width:340px;
+  }
+  .access-block h2{
+    margin:0 0 8px;
+    font-size:14px;
+    font-weight:700;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .access-block small{
+    font-size:11px;
+    font-weight:600;
+    color:#9affc0;
+    line-height:1.4;
+    display:block;
+    margin-bottom:10px;
+  }
+  .hint-pass{
+    font-size:11px;
+    font-weight:600;
+    color:#9affc0;
+    text-align:right;
+  }
 </style>
 </head>
 <body>
 
-<!-- INTRO -->
-<div id="intro">
-  <div class="intro-card">
-    <div class="intro-step step-geo active">
-      <div class="intro-radar">
-        <div class="radar-grid"></div>
-        <div class="radar-circle c1"></div>
-        <div class="radar-circle c2"></div>
-        <div class="radar-circle c3"></div>
-        <div class="radar-sweep"></div>
-        <div class="radar-dot"></div>
-      </div>
-      <div class="intro-text-block">
-        <div class="intro-title">On te trouve…</div>
-        <div class="intro-sub" id="geo-label">Autorise la localisation</div>
+<!-- background matrix -->
+<canvas id="codeRain"></canvas>
+
+<!-- splash intro -->
+<div class="splash" role="dialog" aria-modal="true" aria-label="RSL Intro">
+  <div class="card" id="card">
+    <div class="skip" id="skipBtn">Passer →</div>
+
+    <div class="brand">
+      <img src="images/logo_rsl.png" alt="RSL logo" onerror="this.style.display='none'">
+      <div>
+        <div class="title">Romandie Scooter League</div>
+        <div class="subtitle">Initialisation du core RSL...</div>
       </div>
     </div>
 
-    <div class="intro-step step-spots">
-      <div class="intro-map-mini">
-        <div class="map-bg"></div>
-        <div class="map-grid"></div>
-        <div class="map-spot" style="left:30%;top:32%"></div>
-        <div class="map-spot" style="left:64%;top:46%"></div>
-        <div class="map-spot" style="left:42%;top:68%"></div>
-      </div>
-      <div class="intro-text-block">
-        <div class="intro-title">On charge les spots…</div>
+    <div class="term" id="term">
+      <div class="line" id="t1">[init] handshake with rsl-core... OK</div>
+      <div class="line" id="t2">[proc] loading modules: visuals, events, auth</div>
+      <div class="line" id="t3">[sys] preparing environment</div>
+      <div class="line" id="t4">[net] connecting to hub.rsl — 192.0.2.2</div>
+    </div>
+
+    <div class="download">
+      <div style="font-weight:900;color:#bfffcf;font-size:13px;letter-spacing:.3px">CHARGEMENT RSL</div>
+      <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+      <div class="pct" id="pct">0%</div>
+    </div>
+
+    <div style="margin-top:12px;font-size:12px;color:rgba(200,255,210,.75);font-weight:500;line-height:1.4;text-align:center;">
+      Attends le chargement,<br/>ou clique
+      <button class="btn alt" id="openNow" style="font-size:12px;padding:6px 8px;line-height:1.2">Devenir membre</button>
+    </div>
+
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+    <div class="glitch" id="glitch"></div>
+  </div>
+</div>
+
+<!-- welcome / accès -->
+<div class="welcome" id="welcome">
+  <div class="welcome-card">
+    <h1>Bienvenue sur RSL</h1>
+    <p>Tu fais partie des premiers. Ouverture officielle 2026.<br/>
+    Ton compte membre est créé, mais l'accès complet n'est pas encore actif.</p>
+
+    <!-- bloc d'accès par code -->
+    <div class="access-block">
+      <h2>
+        Accès direct
+        <span class="hint-pass">Ctrl+8</span>
+      </h2>
+      <small>Entre le code d'accès pour passer directement au site complet.</small>
+
+      <label for="passcode">Code d'accès</label>
+      <input id="passcode" type="password" placeholder="********" autocomplete="off"/>
+
+      <div class="cta-row" style="margin-top:12px;justify-content:flex-end">
+        <button class="btn green" id="unlockBtn" style="font-size:13px;padding:8px 10px;">Entrer</button>
       </div>
     </div>
 
-    <div class="intro-step step-logo">
-      <div class="intro-logo-center">
-        <div class="intro-logo-circle">
-          <img src="image/1logo_ridly.png" alt="RIDLY">
-        </div>
-        <b style="font-size:1.4rem">RIDLY</b>
+    <!-- préinscription / devenir membre -->
+    <form class="join-wrap" id="joinForm" autocomplete="off" novalidate>
+      <div>
+        <label for="emailJoin">Email</label>
+        <input id="emailJoin" type="email" placeholder="ton.email@example.com" required/>
       </div>
+
+      <div class="human-check">
+        <input id="humanCheck" type="checkbox" required/>
+        <label for="humanCheck">Je confirme que je suis un humain et que je veux rejoindre RSL.</label>
+      </div>
+
+      <button class="btn green" id="btnJoinNow" type="submit" style="width:100%;text-align:center;justify-content:center">
+        Valider l'inscription
+      </button>
+
+      <div class="msg-ok" id="joinMsg">
+        Merci de vous être inscrit.<br/>
+        Ouverture officielle 2026.<br/>
+        Ton compte membre est créé mais pas encore activé.
+      </div>
+    </form>
+
+    <div class="cta-row">
+      <button class="btn alt" id="enterBtn">Entrer sur le site</button>
     </div>
   </div>
 </div>
 
-<header>
-  <a class="brand" href="#">
-    <img src="image/1logo_ridly.png" alt=""><span>RIDLY</span>
-  </a>
-  <a class="btn-login" href="compte.html">Connexion</a>
-</header>
-
-<section class="hero">
-  <img src="image/1logo_ridly.png" alt="RIDLY">
-  <h1>La carte des spots<br><span>pour tous les riders</span></h1>
-  <p>Spots, parks, shops, cours, game of scoot, profil rider complet.</p>
-  <a href="compte.html" class="btn-primary">🗺 Ouvrir RIDLY</a>
-</section>
-
-<footer>
-  © <span id="year"></span> RIDLY — Riders & Spots.
-</footer>
+<p class="footcopy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
 
 <script>
-// Année
-document.getElementById("year").textContent = new Date().getFullYear();
-
-/* 🔥 REDIRECTION AUTO SI ARRIVÉE DE L’EMAIL SUPABASE */
+/* ===================== MATRIX / CODE RAIN ===================== */
 (function(){
-  const params = new URLSearchParams(window.location.search);
-  const fromEmail =
-    params.has("access_token") ||
-    params.get("type") === "signup";
+  const canvas = document.getElementById('codeRain');
+  const ctx = canvas.getContext('2d');
+  let W, H, cols, size=16, drops;
 
-  if(fromEmail){
-    window.location.href = "https://rsl-swiss.ch/redirect-choice.html";
-    return;
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    cols = Math.floor(W/size);
+    drops = new Array(cols).fill(1).map(()=>Math.floor(Math.random()*H/size));
   }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const letters = "01[]{}()<>=/*\\|-_@#$%^&*!;:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  function draw(){
+    ctx.fillStyle = "rgba(0,0,0,0.12)";
+    ctx.fillRect(0,0,W,H);
+    ctx.font = size + "px monospace";
+    for(let i=0;i<cols;i++){
+      const text = letters.charAt(Math.floor(Math.random()*letters.length));
+      const x = i*size, y = drops[i]*size;
+      ctx.fillStyle = (Math.random()<0.07) ? "rgba(255,255,255,.9)" : "rgba(34,197,94,0.95)";
+      ctx.fillText(text, x, y);
+      if(y > H && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
 })();
 
-/* INTRO SEQUENCE */
-const steps = document.querySelectorAll(".intro-step");
-function show(i){
-  steps.forEach((s,x)=>s.classList.toggle("active",x===i));
-}
-setTimeout(()=>show(1),1400);
-setTimeout(()=>show(2),2800);
-setTimeout(()=>{
-  const intro = document.getElementById("intro");
-  if(intro){ intro.classList.add("fade-out"); }
-},4500);
-</script>
+/* ===================== INTRO / PROGRESS / GLITCH ===================== */
+(function(){
+  const bar = document.getElementById('bar');
+  const pct = document.getElementById('pct');
+  const glitchOverlay = document.getElementById('glitchOverlay');
+  const glitch = document.getElementById('glitch');
+  const welcome = document.getElementById('welcome');
+  const skipBtn = document.getElementById('skipBtn');
+  const openNow = document.getElementById('openNow');
 
+  let progress = 0;
+  let running = true;
+
+  function step(){
+    if(!running) return;
+
+    progress += (Math.random()*2.8 + 0.6);
+    if(progress>100) progress = 100;
+    bar.style.width = progress + '%';
+    pct.textContent = Math.round(progress) + '%';
+
+    const tlines = [
+      '[init] handshake with rsl-core... OK',
+      '[proc] loading modules: visuals, events, auth',
+      '[sys] preparing environment',
+      '[net] connecting to hub.rsl — 192.0.2.2',
+      '[fs] writing /usr/local/share/rsl/flags',
+      '[dbg] launching renderers...',
+      '[ok] modules ready'
+    ];
+    const term = document.getElementById('term');
+    term.querySelectorAll('.line').forEach((el,i)=> {
+      el.textContent = tlines[(i + Math.floor(progress/12)) % tlines.length];
+    });
+
+    if(progress < 100){
+      setTimeout(step, 280 + Math.random()*220);
+    } else {
+      openWelcome();
+    }
+  }
+
+  function openWelcome(){
+    // glitch flash
+    glitchOverlay.style.transition = 'opacity .12s';
+    glitchOverlay.style.opacity = 0.65;
+    glitch.style.opacity = 1;
+
+    // shake card
+    const card = document.getElementById('card');
+    card.animate([
+      { transform: 'translateX(0) rotate(0)' },
+      { transform: 'translateX(-8px) rotate(-0.8deg)' },
+      { transform: 'translateX(10px) rotate(0.8deg)' },
+      { transform: 'translateX(-6px) rotate(-0.6deg)' },
+      { transform: 'translateX(0) rotate(0)' }
+    ], { duration: 650, iterations: 1, easing: 'ease-in-out' });
+
+    setTimeout(()=>{
+      glitchOverlay.style.opacity = 0;
+      glitch.style.opacity = 0;
+      welcome.classList.add('open');
+      setTimeout(()=>{ document.querySelector('.splash').style.display='none'; }, 400);
+    }, 900);
+  }
+
+  // démarrage pseudo-download
+  setTimeout(step, 700);
+
+  // skip direct
+  skipBtn.addEventListener('click', ()=>{
+    running=false;
+    bar.style.width='100%';
+    pct.textContent='100%';
+    openWelcome();
+  });
+
+  // "devenir membre" pendant le chargement -> on ouvre déjà l'écran welcome (préinscription)
+  openNow.addEventListener('click', ()=>{
+    running=false;
+    openWelcome();
+  });
+
+  // raccourci clavier Ctrl+8 : accès direct au site
+  document.addEventListener('keydown', (e)=>{
+    if(e.ctrlKey && (e.key === '8' || e.key === 'Digit8')){
+      window.location.href='index.html';
+    }
+  });
+})();
+
+/* ===================== WELCOME LOGIC (form + code) ===================== */
+(function(){
+  const unlockBtn = document.getElementById('unlockBtn');
+  const passcodeInput = document.getElementById('passcode');
+
+  const enterBtn = document.getElementById('enterBtn');
+
+  const joinForm = document.getElementById('joinForm');
+  const emailJoin = document.getElementById('emailJoin');
+  const humanCheck = document.getElementById('humanCheck');
+  const joinMsg = document.getElementById('joinMsg');
+
+  // bouton "Entrer sur le site" sans rien -> index direct
+  enterBtn.addEventListener('click', ()=>{
+    window.location.href='index.html';
+  });
+
+  // bouton "Entrer" avec le code d'accès
+  unlockBtn.addEventListener('click', ()=>{
+    const val = passcodeInput.value.trim();
+    if(val === 'RSL2026#'){
+      window.location.href='index.html';
+    } else {
+      passcodeInput.style.borderColor='var(--danger)';
+      passcodeInput.style.outline='2px solid var(--danger)';
+      setTimeout(()=>{
+        passcodeInput.style.borderColor='rgba(255,255,255,.12)';
+        passcodeInput.style.outline='none';
+      },1000);
+    }
+  });
+
+  // préinscription membre
+  joinForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+
+    const emailVal = emailJoin.value.trim();
+    const okHuman = humanCheck.checked;
+
+    if(!emailVal || !okHuman){
+      // feedback rouge basique
+      if(!emailVal){
+        emailJoin.style.borderColor='var(--danger)';
+        emailJoin.style.outline='2px solid var(--danger)';
+        setTimeout(()=>{
+          emailJoin.style.borderColor='rgba(255,255,255,.12)';
+          emailJoin.style.outline='none';
+        },1000);
+      }
+      if(!okHuman){
+        humanCheck.style.outline='2px solid var(--danger)';
+        setTimeout(()=>{ humanCheck.style.outline='none'; },1000);
+      }
+      return;
+    }
+
+    // ICI tu pourras brancher Supabase ou envoi email, etc.
+    // pour l'instant on simule: compte créé mais pas encore accès
+    joinMsg.style.display='block';
+
+    // reset form visuel
+    emailJoin.value='';
+    humanCheck.checked=false;
+  });
+})();
+</script>
 </body>
 </html>
