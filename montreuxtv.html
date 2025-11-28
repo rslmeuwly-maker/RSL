@@ -6,80 +6,78 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
-/* ===== FOND VIDÉO (ÉCLAIRCI) ===== */
+/* ===== FOND VIDÉO (moins sombre + visible) ===== */
 #bgVideo{
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   width:100vw;height:100vh;
   object-fit:cover;
   z-index:-2;
-  opacity:.55; 
+  opacity:.55;
   filter:blur(2px) brightness(.60) contrast(1.10);
 }
 
-/* ===== OVERLAY NOIR PLUS LÉGER ===== */
+/* ===== OVERLAY LÉGER ===== */
 body::before{
-  content:"";
-  position:fixed; inset:0;
-  background:#00000090;
+  content:""; position:fixed; inset:0;
+  background:#00000090;       /* réduit pour + de lumière */
   z-index:-1;
 }
 
 body{
-  margin:0;
-  height:100vh;
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
-  color:#00ff93;
-  font-family:Arial, sans-serif;
-  text-align:center;
+  margin:0;height:100vh;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  color:#00ff93;font-family:Arial;text-align:center;
   animation:glowPulse 2.5s infinite ease-in-out;
 }
 
+/* Glow en pulsation */
 @keyframes glowPulse{
-  0%{text-shadow:0 0 10px #00ffaf80;}
-  50%{text-shadow:0 0 38px #00ffafff;}
- 100%{text-shadow:0 0 15px #00ffaf90;}
+ 0%{text-shadow:0 0 10px #00ffaf80;}
+ 50%{text-shadow:0 0 38px #00ffafff;}
+100%{text-shadow:0 0 15px #00ffaf90;}
 }
 
 h1{
-  margin-bottom:18px;
-  font-size:29px;
-  letter-spacing:1.5px;
-  text-shadow:0 0 35px #00ffaf,0 0 15px #00ffaf;
+  margin-bottom:18px;font-size:29px;
+  letter-spacing:1.5px;text-shadow:0 0 35px #00ffaf,0 0 15px #00ffaf;
 }
 
-/* ===== PLAYER AGRANDI ===== */
+/* ===== CADRE TV LARGE ===== */
 .area{
-  width:95vw; max-width:1300px;
+  width:95vw; max-width:1350px;
   aspect-ratio:16/9;
-  border-radius:18px;
-  border:4px solid #00ffaf;
-  overflow:hidden;
-  background:#000;
-  box-shadow:0 0 45px #00ffea,inset 0 0 28px #00ffc3;
-  display:flex;align-items:center;justify-content:center;
+  border-radius:18px; border:4px solid #00ffaf;
+  overflow:hidden;background:#000;
+  box-shadow:0 0 45px #00ffea, inset 0 0 28px #00ffc3;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
 }
 
-/* ===== FLYERS ===== */
+/* ===== PLAYER YouTube FULL SIZE ===== */
+#player iframe{
+  width:100% !important;
+  height:100% !important;
+  position:absolute; top:0; left:0;
+  object-fit:cover; /* plein cadre comme demandé */
+}
+
+/* ===== FLYERS ENTRE LES VIDÉOS ===== */
 #adScreen{
   display:none;
-  gap:14px;padding:14px;
+  gap:14px; padding:14px;
 }
-.flyer{ width:50%;height:100%;object-fit:contain; }
+.flyer{
+  width:50%; height:100%; object-fit:contain;
+}
 
-/* BOUTON */
+/* ===== BOUTON ===== */
 #startBtn{
-  margin-top:18px;padding:14px 34px;
-  font-size:21px;font-weight:bold;
-  background:#00ffaf;color:#000;border:none;
-  border-radius:8px;cursor:pointer;
-  box-shadow:0 0 28px #00ffaf;
-  transition:.2s;
+  margin-top:18px;padding:14px 34px;font-size:21px;font-weight:bold;
+  background:#00ffaf;color:#000;border:none;border-radius:8px;
+  cursor:pointer;box-shadow:0 0 28px #00ffaf;transition:.2s;
 }
 #startBtn:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 50px #00ffe1;
+  transform:scale(1.08); box-shadow:0 0 50px #00ffe1;
 }
 </style>
 </head>
@@ -92,8 +90,10 @@ h1{
 
 <h1>Montreux Scooter Time Machine</h1>
 
+<!-- 🎥 LECTEUR PRINCIPAL -->
 <div id="screen" class="area"><div id="player"></div></div>
 
+<!-- 🟩 FLYERS ENTRE VIDEOS (20 sec) -->
 <div id="adScreen" class="area">
   <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
   <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
@@ -101,11 +101,12 @@ h1{
 
 <button id="startBtn">▶ LANCER</button>
 
+<!-- 🔥 PLAYLIST (ordre donné) -->
 <script>
 const VIDEO_IDS=[
-  "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
-  "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
-  "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
+ "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
+ "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
+ "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
 ];
 
 let i=0,player;
@@ -113,41 +114,30 @@ const pub=20000;
 const screen=document.getElementById("screen");
 const ads=document.getElementById("adScreen");
 
-startBtn.onclick=()=>{
-  if(!player){
-    player=new YT.Player("player",{
-      videoId:VIDEO_IDS[i],
-      playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
-      events:{onReady:allow,onStateChange:end}
-    });
-  } else {
-    // si tu appuies pendant les flyers → retour vidéo
-    if(ads.style.display==="flex"){
-      ads.style.display="none";
-      screen.style.display="flex";
-    }
-    player.playVideo();
-  }
+document.getElementById("startBtn").onclick=()=>{
+ if(!player){
+   player=new YT.Player("player",{
+     videoId:VIDEO_IDS[i],
+     playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
+     events:{onReady:allow,onStateChange:end}
+   });
+ }else player.playVideo();
 };
 
 function allow(){
-  const iframe=document.querySelector("iframe");
-  if(iframe){
-    iframe.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
-  }
+ const iframe=document.querySelector("iframe");
+ if(iframe) iframe.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
 }
 
 function end(e){
-  if(e.data===YT.PlayerState.ENDED){
-    screen.style.display="none";
-    ads.style.display="flex";
-    setTimeout(()=>{
-      ads.style.display="none";
-      screen.style.display="flex";
-      i=(i+1)%VIDEO_IDS.length;
-      player.loadVideoById(VIDEO_IDS[i]);
-    },pub);
-  }
+ if(e.data===YT.PlayerState.ENDED){
+   screen.style.display="none";ads.style.display="flex";
+   setTimeout(()=>{
+     ads.style.display="none";screen.style.display="flex";
+     i=(i+1)%VIDEO_IDS.length;
+     player.loadVideoById(VIDEO_IDS[i]);
+   },pub);
+ }
 }
 </script>
 
