@@ -1,163 +1,156 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>Montreux Scooter Contest — TV + PUB RSL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Montreux Scooter Time Machine</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <style>
-    body{
-      background:#000;
-      margin:0;
-      font-family:Arial, sans-serif;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      height:100vh;
-      color:#0f0;
-      text-align:center;
-    }
-    h1{margin-bottom:12px;font-size:22px}
-    .area{
-      width:90vw;
-      max-width:1000px;
-      aspect-ratio:16/9;
-      border:3px solid #0f0;
-      border-radius:12px;
-      overflow:hidden;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    #screen{
-      /* zone lecteur */
-    }
-    #adScreen{
-      display:none;              /* caché par défaut */
-      gap:8px;
-      padding:8px;
-    }
-    .flyer{
-      width:50%;
-      height:100%;
-      object-fit:contain;
-    }
-    button{
-      margin-top:12px;
-      padding:10px 24px;
-      font-size:18px;
-      font-weight:bold;
-      background:#0f0;
-      color:#000;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      transition:.2s;
-    }
-    button:hover{opacity:0.75;}
-  </style>
+<style>
+/* ===== FOND VIDÉO (ÉCLAIRCI) ===== */
+#bgVideo{
+  position:fixed;
+  inset:0;
+  width:100vw;height:100vh;
+  object-fit:cover;
+  z-index:-2;
+  opacity:.55; 
+  filter:blur(2px) brightness(.60) contrast(1.10);
+}
+
+/* ===== OVERLAY NOIR PLUS LÉGER ===== */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background:#00000090;
+  z-index:-1;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  color:#00ff93;
+  font-family:Arial, sans-serif;
+  text-align:center;
+  animation:glowPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes glowPulse{
+  0%{text-shadow:0 0 10px #00ffaf80;}
+  50%{text-shadow:0 0 38px #00ffafff;}
+ 100%{text-shadow:0 0 15px #00ffaf90;}
+}
+
+h1{
+  margin-bottom:18px;
+  font-size:29px;
+  letter-spacing:1.5px;
+  text-shadow:0 0 35px #00ffaf,0 0 15px #00ffaf;
+}
+
+/* ===== PLAYER AGRANDI ===== */
+.area{
+  width:95vw; max-width:1300px;
+  aspect-ratio:16/9;
+  border-radius:18px;
+  border:4px solid #00ffaf;
+  overflow:hidden;
+  background:#000;
+  box-shadow:0 0 45px #00ffea,inset 0 0 28px #00ffc3;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ===== FLYERS ===== */
+#adScreen{
+  display:none;
+  gap:14px;padding:14px;
+}
+.flyer{ width:50%;height:100%;object-fit:contain; }
+
+/* BOUTON */
+#startBtn{
+  margin-top:18px;padding:14px 34px;
+  font-size:21px;font-weight:bold;
+  background:#00ffaf;color:#000;border:none;
+  border-radius:8px;cursor:pointer;
+  box-shadow:0 0 28px #00ffaf;
+  transition:.2s;
+}
+#startBtn:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 50px #00ffe1;
+}
+</style>
 </head>
 <body>
 
-  <h1>🎥 Montreux Scooter Contest — TV + PUB RSL</h1>
+<!-- 🔥 Background vidéo -->
+<video id="bgVideo" autoplay loop muted playsinline>
+  <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4" type="video/mp4">
+</video>
 
-  <!-- zone vidéo -->
-  <div id="screen" class="area">
-    <div id="player"></div>
-  </div>
+<h1>Montreux Scooter Time Machine</h1>
 
-  <!-- zone PUB : 2 flyers côte à côte -->
-  <div id="adScreen" class="area">
-    <img
-      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png"
-      alt="Flyer Montreux Scooter Contest 1"
-      class="flyer">
-    <img
-      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png"
-      alt="Flyer Montreux Scooter Contest 2"
-      class="flyer">
-  </div>
+<div id="screen" class="area"><div id="player"></div></div>
 
-  <button id="startBtn">▶ Lancer / Reprendre</button>
+<div id="adScreen" class="area">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+</div>
+
+<button id="startBtn">▶ LANCER</button>
 
 <script>
-/* 🔥 Playlist (boucle infinie) */
-const VIDEO_IDS = [
-  "w5j7cIC7IVk",
-  "ByhXJUUjV1U",
-  "BWRR-rKD46c",
-  "v0D2qziOqjQ",
-  "H48vxTdkrNc",
-  "V_IrrBfwUR0"
+const VIDEO_IDS=[
+  "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
+  "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
+  "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
 ];
 
-let index = 0;
-let player;
-const adDurationMs = 10000; // durée pub entre 2 vidéos (ms) → ici 10 secondes
+let i=0,player;
+const pub=20000;
+const screen=document.getElementById("screen");
+const ads=document.getElementById("adScreen");
 
-const screenEl  = document.getElementById("screen");
-const adScreenEl = document.getElementById("adScreen");
-
-/* ▶ Lance/relance la TV */
-document.getElementById("startBtn").onclick = ()=>{
-
+startBtn.onclick=()=>{
   if(!player){
-    player = new YT.Player("player", {
-      videoId: VIDEO_IDS[index],
+    player=new YT.Player("player",{
+      videoId:VIDEO_IDS[i],
       playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
-      events:{
-        onReady: enablePermissions,
-        onStateChange: handleChange
-      }
+      events:{onReady:allow,onStateChange:end}
     });
   } else {
-    // si on est sur l'écran pub et que tu appuies sur ▶ → force retour vidéo
-    if(adScreenEl.style.display === "flex"){
-      adScreenEl.style.display = "none";
-      screenEl.style.display   = "flex";
+    // si tu appuies pendant les flyers → retour vidéo
+    if(ads.style.display==="flex"){
+      ads.style.display="none";
+      screen.style.display="flex";
     }
     player.playVideo();
   }
 };
 
-/* 🔥 Ajout des permissions sur l'iframe générée par YouTube */
-function enablePermissions(){
-  const iframe = document.querySelector("iframe");
+function allow(){
+  const iframe=document.querySelector("iframe");
   if(iframe){
-    iframe.setAttribute("allow",
-      "autoplay; encrypted-media; picture-in-picture; fullscreen; accelerometer; clipboard-write; gyroscope; web-share"
-    );
+    iframe.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
   }
 }
 
-/* Gestion des changements d'état du player */
-function handleChange(e){
-  if(e.data === YT.PlayerState.ENDED){
-    // à la fin de la vidéo → afficher PUB puis passer à la suivante
-    showAdThenNext();
+function end(e){
+  if(e.data===YT.PlayerState.ENDED){
+    screen.style.display="none";
+    ads.style.display="flex";
+    setTimeout(()=>{
+      ads.style.display="none";
+      screen.style.display="flex";
+      i=(i+1)%VIDEO_IDS.length;
+      player.loadVideoById(VIDEO_IDS[i]);
+    },pub);
   }
-}
-
-/* 🔁 Affiche PUB, puis après X secondes, passe à la vidéo suivante */
-function showAdThenNext(){
-  // cacher lecteur vidéo, montrer pub
-  screenEl.style.display   = "none";
-  adScreenEl.style.display = "flex";
-
-  setTimeout(()=>{
-    // après X secondes → cacher pub, montrer vidéo suivante
-    adScreenEl.style.display = "none";
-    screenEl.style.display   = "flex";
-
-    index = (index+1) % VIDEO_IDS.length;
-    player.loadVideoById(VIDEO_IDS[index]);
-  }, adDurationMs);
 }
 </script>
 
 <script src="https://www.youtube.com/iframe_api"></script>
-
 </body>
 </html>
