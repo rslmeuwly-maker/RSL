@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
-/* ===== FOND VIDÉO (moins sombre + visible) ===== */
+/* ===== FOND VIDÉO ===== */
 #bgVideo{
   position:fixed; inset:0;
   width:100vw;height:100vh;
@@ -16,10 +16,9 @@
   filter:blur(2px) brightness(.60) contrast(1.10);
 }
 
-/* ===== OVERLAY LÉGER ===== */
 body::before{
   content:""; position:fixed; inset:0;
-  background:#00000090;       /* réduit pour + de lumière */
+  background:#00000090;
   z-index:-1;
 }
 
@@ -30,19 +29,32 @@ body{
   animation:glowPulse 2.5s infinite ease-in-out;
 }
 
-/* Glow en pulsation */
 @keyframes glowPulse{
  0%{text-shadow:0 0 10px #00ffaf80;}
  50%{text-shadow:0 0 38px #00ffafff;}
 100%{text-shadow:0 0 15px #00ffaf90;}
 }
 
+/* ===== TITRE + SOUS TEXTE ===== */
 h1{
-  margin-bottom:18px;font-size:29px;
+  margin-bottom:6px;font-size:32px;
   letter-spacing:1.5px;text-shadow:0 0 35px #00ffaf,0 0 15px #00ffaf;
 }
 
-/* ===== CADRE TV LARGE ===== */
+#subtext{
+  font-size:17px;
+  opacity:0.88;
+  margin-bottom:14px;
+  text-shadow:0 0 12px #00ffaf99;
+  animation:popIn 1s ease forwards;
+}
+
+@keyframes popIn{
+  0%{transform:scale(.7);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+
+/* ===== CADRE VIDÉO TV ===== */
 .area{
   width:95vw; max-width:1350px;
   aspect-ratio:16/9;
@@ -53,47 +65,112 @@ h1{
   position:relative;
 }
 
-/* ===== PLAYER YouTube FULL SIZE ===== */
+/* ===== PLAYER ===== */
 #player iframe{
-  width:100% !important;
-  height:100% !important;
-  position:absolute; top:0; left:0;
-  object-fit:cover; /* plein cadre comme demandé */
+  width:100% !important;height:100% !important;
+  position:absolute;top:0;left:0;object-fit:cover;
 }
 
-/* ===== FLYERS ENTRE LES VIDÉOS ===== */
-#adScreen{
-  display:none;
-  gap:14px; padding:14px;
-}
-.flyer{
-  width:50%; height:100%; object-fit:contain;
+/* ===== INTRO (TEXTE + FLYER) ===== */
+/* + animation du texte */
+#introLayer{
+  position:absolute; inset:0;
+  display:flex;
+  padding:24px;box-sizing:border-box;
+  align-items:center;justify-content:space-between;
+  color:#00ff93;font-family:Arial;
+  z-index:2;
+  background:radial-gradient(circle at center,#000000dd 0%,#000000cc 60%,#000000aa 100%);
 }
 
-/* ===== BOUTON ===== */
+#introText{
+  width:55%;
+  font-size:1rem;line-height:1.4;text-align:left;
+  text-shadow:0 0 15px #00ffaf;
+  opacity:0; transform:translateY(15px);
+  animation:introReveal 1.6s ease forwards;
+}
+
+@keyframes introReveal{
+  0%{opacity:0;transform:translateY(25px);}
+  70%{opacity:1;transform:translateY(-4px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
+#introFlyer{
+  width:35%;max-height:80%;object-fit:contain;
+  border-radius:10px;box-shadow:0 0 25px #00ffafaa;
+}
+
+/* ===== QR BAS DROITE (x2) ===== */
+#qrFixed{
+  position:fixed;right:14px;bottom:14px;
+  width:180px;z-index:10;
+}
+#qrFixedLabel{
+  position:fixed;right:210px;bottom:60px;
+  font-size:1rem;color:#00ff93;
+  padding:6px 12px;background:#000000dd;
+  border-radius:6px;text-shadow:0 0 8px #00ffaf;
+  z-index:10;
+}
+
+/* ===== PUB ===== */
+#adScreen{display:none;gap:14px;padding:14px;}
+.flyer{width:50%;height:100%;object-fit:contain;}
+
+/* ===== BTN ===== */
 #startBtn{
   margin-top:18px;padding:14px 34px;font-size:21px;font-weight:bold;
   background:#00ffaf;color:#000;border:none;border-radius:8px;
   cursor:pointer;box-shadow:0 0 28px #00ffaf;transition:.2s;
 }
-#startBtn:hover{
-  transform:scale(1.08); box-shadow:0 0 50px #00ffe1;
-}
+#startBtn:hover{transform:scale(1.08);box-shadow:0 0 50px #00ffe1;}
 </style>
 </head>
 <body>
 
-<!-- 🔥 Background vidéo -->
+<!-- 🔥 ARRIÈRE PLAN -->
 <video id="bgVideo" autoplay loop muted playsinline>
-  <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4" type="video/mp4">
+  <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4">
 </video>
 
 <h1>Montreux Scooter Time Machine</h1>
+<div id="subtext">📼 archives 2005 → 2025 • 20 ans de trottinette freestyle en une machine temporelle 🔥</div>
 
-<!-- 🎥 LECTEUR PRINCIPAL -->
-<div id="screen" class="area"><div id="player"></div></div>
+<!-- 🎥 ÉCRAN VIDÉO -->
+<div id="screen" class="area">
+  <!-- INTRO (10s start + toutes 3 vidéos) -->
+  <div id="introLayer">
+    <div id="introText">
+      🛴 Montreux — là où tout a commencé.<br><br>
+      Avant YouTube, avant les decks en aluminium forgé, avant les tricks de folie qu’on voit aujourd’hui…<br>
+      il y a eu Montreux, avril 2005.<br><br>
 
-<!-- 🟩 FLYERS ENTRE VIDEOS (20 sec) -->
+      Le tout premier Scooter Contest connu, en Suisse, au bord du lac, dans un skatepark qui allait marquer l’histoire.<br>
+      Pas de caméras 4K, pas de réseaux sociaux pour immortaliser le moment.<br>
+      Juste des passionnés, du rap, des riders motivés, des figures improvisées<br>
+      et une seule certitude :<br><br>
+
+      C’était le début. Le point de départ d’une culture mondiale.<br><br>
+
+      Aujourd’hui, le scooter freestyle remplit des skateparks partout dans le monde,<br>
+      les tricks volent plus haut, les riders vont plus loin,<br>
+      mais l’ADN reste le même : liberté, créativité, famille.<br><br>
+
+      Et tout ça…<br>
+      est né ici.<br><br>
+
+      Montreux – 2005 → 2025.<br>
+      20 ans de ride. 20 ans d’histoire.
+    </div>
+    <img id="introFlyer" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png">
+  </div>
+
+  <div id="player"></div>
+</div>
+
+<!-- PUB -->
 <div id="adScreen" class="area">
   <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
   <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
@@ -101,43 +178,71 @@ h1{
 
 <button id="startBtn">▶ LANCER</button>
 
-<!-- 🔥 PLAYLIST (ordre donné) -->
+<!-- 📸 QR -->
+<img id="qrFixed" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/contest_photos_2025/qr_access_photos.png">
+<div id="qrFixedLabel">📸 PHOTOS ICI →</div>
+
+<!-- SCRIPT -->
 <script>
 const VIDEO_IDS=[
- "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
- "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
- "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
+  "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
+  "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
+  "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
 ];
+let i=0,player,videosSinceIntro=0,introOnce=false;
+const intro=document.getElementById("introLayer"),screen=document.getElementById("screen"),ads=document.getElementById("adScreen");
+const introTime=10000,pub=20000;
 
-let i=0,player;
-const pub=20000;
-const screen=document.getElementById("screen");
-const ads=document.getElementById("adScreen");
-
+/* lancement */
 document.getElementById("startBtn").onclick=()=>{
- if(!player){
-   player=new YT.Player("player",{
-     videoId:VIDEO_IDS[i],
-     playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
-     events:{onReady:allow,onStateChange:end}
-   });
- }else player.playVideo();
+  if(!introOnce){
+    introOnce=true;
+    intro.style.display="flex";
+    setTimeout(()=>{intro.style.display="none";startVid();},introTime);
+  } else {
+    startVid();
+  }
 };
 
-function allow(){
- const iframe=document.querySelector("iframe");
- if(iframe) iframe.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
+function startVid(){
+  if(!player){
+    player=new YT.Player("player",{
+      videoId:VIDEO_IDS[i],
+      playerVars:{autoplay:1,controls:1,rel:0,modestbranding:1},
+      events:{onReady:allow,onStateChange:ended}
+    });
+  }else{
+    player.loadVideoById(VIDEO_IDS[i]);
+  }
+  videosSinceIntro++;
 }
 
-function end(e){
- if(e.data===YT.PlayerState.ENDED){
-   screen.style.display="none";ads.style.display="flex";
-   setTimeout(()=>{
-     ads.style.display="none";screen.style.display="flex";
-     i=(i+1)%VIDEO_IDS.length;
-     player.loadVideoById(VIDEO_IDS[i]);
-   },pub);
- }
+function allow(){
+  const iframe=document.querySelector("#player iframe");
+  if(iframe) iframe.setAttribute("allow","autoplay; encrypted-media; picture-in-picture; fullscreen");
+}
+
+function ended(e){
+  if(e.data===0){
+    screen.style.display="none";
+    ads.style.display="flex";
+    setTimeout(()=>{
+      ads.style.display="none";
+      screen.style.display="flex";
+      if(videosSinceIntro>=3){
+        videosSinceIntro=0;
+        intro.style.display="flex";
+        setTimeout(()=>{intro.style.display="none";nextVid();},introTime);
+      }else{
+        nextVid();
+      }
+    },pub);
+  }
+}
+
+function nextVid(){
+  i=(i+1)%VIDEO_IDS.length;
+  startVid();
 }
 </script>
 
