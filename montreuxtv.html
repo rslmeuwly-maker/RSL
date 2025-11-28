@@ -61,17 +61,19 @@ h1{
   align-items:center;justify-content:center;
 }
 
-/* ===== VIDÉO FULLSCREEN (zoom léger) ===== */
+/* ✅ PLAYER ADAPTÉ À LA VIDÉO (SANS ZOOM) */
 #player{
   position:absolute;
-  inset:-10%;    /* zoom pour supprimer bandes */
-  width:120%;
-  height:120%;
+  inset:0;
+  width:100%;
+  height:100%;
 }
 #player iframe{
-  width:100%;height:100%;
-  object-fit:cover;
+  width:100%;
+  height:100%;
+  object-fit:contain;   /* s’adapte au cadre sans couper la vidéo */
   object-position:center;
+  background:#000;      /* pour les éventuelles bandes */
 }
 
 /* ===== INTRO ===== */
@@ -223,7 +225,6 @@ document.getElementById("startBtn").onclick = () => {
 
 function startVideo(){
   if (!ytReady) {
-    // attend que l'API soit prête si besoin
     setTimeout(startVideo, 200);
     return;
   }
@@ -242,7 +243,6 @@ function startVideo(){
 
 function onPlayerStateChange(e){
   if (e.data === YT.PlayerState.ENDED) {
-    // afficher pub
     screen.style.display = "none";
     ads.style.display    = "flex";
 
@@ -252,7 +252,6 @@ function onPlayerStateChange(e){
 
       if (videosSinceIntro >= 3) {
         videosSinceIntro = 0;
-        // ré-affiche l'intro
         introLayer.style.display = "flex";
         setTimeout(() => {
           introLayer.style.display = "none";
