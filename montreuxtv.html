@@ -24,10 +24,9 @@ body{
   color:#00ff93;font-family:Arial;text-align:center;
   animation:glowPulse 2.5s infinite ease-in-out;
 }
-
 @keyframes glowPulse{
- 0%{text-shadow:0 0 10px #00ffaf80;}
- 50%{text-shadow:0 0 38px #00ffafff;}
+0%{text-shadow:0 0 10px #00ffaf80;}
+50%{text-shadow:0 0 38px #00ffafff;}
 100%{text-shadow:0 0 15px #00ffaf90;}
 }
 
@@ -44,19 +43,20 @@ h1{margin-bottom:6px;font-size:32px;letter-spacing:1.5px;text-shadow:0 0 35px #0
   position:relative;display:flex;align-items:center;justify-content:center;
 }
 
-/* ===== *** FIX PLEIN ÉCRAN *** ===== */
+/* ===== VIDÉO FULL-SCREEN ===== */
 #player{
   position:absolute;
-  inset:0;       /* FORCE PLEIN CADRE */
-  width:100%;
-  height:100%;
+  inset:-10%;       /* plein cadre réel */
+  width:120%;
+  height:120%;
 }
 #player iframe{
   width:100%;height:100%;
-  object-fit:cover; /* PLEIN ÉCRAN RÉEL */
+  object-fit:cover;
+  object-position:center;
 }
 
-/* ===== INTRO (texte + flyer) ===== */
+/* ===== INTRO ===== */
 #introLayer{
   position:absolute;inset:0;padding:24px;
   background:radial-gradient(circle,#000000dd,#000000b5,#00000090);
@@ -70,7 +70,7 @@ h1{margin-bottom:6px;font-size:32px;letter-spacing:1.5px;text-shadow:0 0 35px #0
 @keyframes introReveal{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
 #introFlyer{width:35%;object-fit:contain;max-height:80%;border-radius:10px;box-shadow:0 0 25px #00ffafaa;}
 
-/* ===== QR BAS DROITE (x2) ===== */
+/* ===== QR (x2) ===== */
 #qrFixed{position:fixed;right:14px;bottom:14px;width:180px;z-index:10;}
 #qrFixedLabel{
   position:fixed;right:210px;bottom:60px;
@@ -82,7 +82,7 @@ h1{margin-bottom:6px;font-size:32px;letter-spacing:1.5px;text-shadow:0 0 35px #0
 #adScreen{display:none;gap:14px;padding:14px;}
 .flyer{width:50%;object-fit:contain;height:100%;}
 
-/* ===== BOUTON START ===== */
+/* ===== BTN ===== */
 #startBtn{
   margin-top:18px;padding:14px 34px;font-size:21px;font-weight:bold;
   background:#00ffaf;color:#000;border:none;border-radius:8px;cursor:pointer;
@@ -106,22 +106,33 @@ h1{margin-bottom:6px;font-size:32px;letter-spacing:1.5px;text-shadow:0 0 35px #0
 🛴 Montreux — là où tout a commencé.<br><br>
 Avant YouTube, avant les decks en aluminium forgé, avant les tricks de folie qu’on voit aujourd’hui…<br>
 il y a eu Montreux, avril 2005.<br><br>
-Le tout premier Scooter Contest connu en Suisse.<br>
-Pas de 4K, pas d’Insta, juste du rap, des riders et des figures improvisées.<br><br>
-C’était le début d’une culture mondiale.<br><br>
-Aujourd’hui les tricks volent plus haut, les riders vont plus loin — mais l’essence reste liberté, créativité, famille.<br><br>
+
+Le tout premier Scooter Contest connu, en Suisse, au bord du lac, dans un skatepark qui allait marquer l’histoire.<br>
+Pas de caméras 4K, pas de réseaux sociaux pour immortaliser le moment.<br>
+Juste des passionnés, du rap, des riders motivés, des figures improvisées<br>
+et une seule certitude :<br><br>
+
+C’était le début. Le point de départ d’une culture mondiale.<br><br>
+
+Aujourd’hui, le scooter freestyle remplit des skateparks partout dans le monde,
+les tricks volent plus haut, les riders vont plus loin,
+mais l’ADN reste le même : liberté, créativité, famille.<br><br>
+
 Et tout ça… est né ici.<br><br>
+
 Montreux – 2005 → 2025<br>
-20 ans de ride, 20 ans d’histoire.
+20 ans de ride. 20 ans d’histoire.
 </div>
 <img id="introFlyer" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png">
 </div>
+
 <div id="player"></div>
 </div>
 
+<!-- 🟩 PUB — FLYERS INVERSES UNIQUEMENT -->
 <div id="adScreen" class="area">
-<img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
-<img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
 </div>
 
 <button id="startBtn">▶ Lancer</button>
