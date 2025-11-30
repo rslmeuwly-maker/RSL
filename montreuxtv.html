@@ -1,314 +1,137 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>Montreux Scooter Time Machine</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<title>Montreux Scooter Time Machine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    html,body{
-      margin:0;
-      padding:0;
-      height:100%;
-      overflow:hidden;            /* 🔥 pas de scroll pour Fully Kiosk */
-    }
+<style>
+/* ====== FOND VIDÉO VISIBLE & PLEIN ÉCRAN ====== */
+#bgVideo{
+  position:fixed; inset:0;
+  width:100vw;height:100vh;
+  object-fit:cover;
+  z-index:-2;
+  opacity:.75; /* + visible */
+  filter:brightness(.85) contrast(1.2) saturate(1.1);
+}
 
-    /* ===== FOND VIDÉO ===== */
-    #bgVideo{
-      position:fixed; inset:0;
-      width:100vw;height:100vh;
-      object-fit:cover;
-      z-index:-2;
-      opacity:.5;
-      filter:blur(2px) brightness(.6) contrast(1.1);
-    }
-    body::before{
-      content:"";
-      position:fixed; inset:0;
-      background:#000000b0;
-      z-index:-1;
-    }
+/* ====== LUMIÈRE AMBIENTE ====== */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background:linear-gradient(to bottom,#000000a0,#000000d5 60%,#000000f0);
+  z-index:-1;
+}
 
-    body{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      color:#e5fff6;
-      font-family:Arial,sans-serif;
-      text-align:center;
-    }
+/* ====== PAGE CENTRÉE SUR GRAND ÉCRAN ====== */
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  color:#00ffbf;
+  font-family:Arial, sans-serif;
+  text-align:center;
+  padding:2vh 0;
+}
 
-    h1{
-      margin:0 0 14px;
-      font-size:28px;
-      letter-spacing:1px;
-      color:#bfffe0;
-      text-shadow:0 0 18px #00ffaf;
-    }
+/* ===== TITRE PLUS PROPRE ET VISIBLE ===== */
+h1{
+  font-size:3vw; /* responsive TV */
+  margin:1vh 0 0.5vh;
+  text-shadow:0 0 25px #00ffd5,0 0 60px #00ffe2;
+}
 
-    /* ===== CADRE VIDÉO ===== */
-    .frame-wrapper{
-      width:95vw;
-      max-width:1350px;
-      aspect-ratio:16/9;
-      position:relative;
-      margin:0 auto 10px;
-      flex-shrink:0;
-    }
+/* ===== Phrase histoire ==== */
+.subtitle{
+  color:#cafff5;
+  font-size:1.2vw;
+  max-width:60vw;
+  margin-bottom:1vh;
+  opacity:.9;
+}
 
-    .area{
-      position:absolute;
-      inset:0;
-      border-radius:18px;
-      border:4px solid #00ffaf;
-      background:#000;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 0 38px #00ffaf60, inset 0 0 20px #00ffaf50;
-      z-index:1;
-    }
+/* ====== Cadre vidéo PLUS GRAND ====== */
+.area{
+  width:70vw;
+  max-width:1400px;
+  aspect-ratio:16/9;
+  border:4px solid #00ffd0;
+  border-radius:14px;
+  box-shadow:0 0 45px #00ffea, inset 0 0 35px #00ffe5;
+  overflow:hidden;
+  position:relative;
+}
 
-    #player iframe{
-      width:100% !important;
-      height:100% !important;
-      position:absolute;
-      top:0;left:0;
-      object-fit:cover;
-    }
+/* ===== YOUTUBE PLAYER COVER ===== */
+#player iframe{
+  width:100% !important;
+  height:100% !important;
+  position:absolute;
+  inset:0;
+  object-fit:cover;
+}
 
-    :fullscreen .frame-wrapper{
-      width:95vw !important;
-      max-width:1350px !important;
-      aspect-ratio:16/9 !important;
-      margin:auto !important;
-    }
+/* FLYERS */
+#adScreen{
+  display:none;
+  gap:1vw;
+  padding:1vw;
+}
+.flyer{width:50%;height:100%;object-fit:contain;}
 
-    /* ===== INTRO DANS LE CADRE ===== */
-    #introScreen{
-      position:absolute;
-      inset:0;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      padding:18px 26px;
-      background:#050505;
-      color:#f7fff9;
-      box-sizing:border-box;
-      overflow-y:hidden;
-      z-index:2; /* au-dessus du player et de la pub */
-    }
+#startBtn{
+  margin-bottom:2vh;
+  padding:1vw 2.5vw;
+  font-size:1.4vw;
+  background:#00ffd5;
+  color:#000;
+  font-weight:bold;
+  border:none;border-radius:10px;
+  cursor:pointer;
+  box-shadow:0 0 25px #00ffe8;
+}
 
-    .intro-top{
-      display:flex;
-      gap:20px;
-      align-items:center;
-      justify-content:center;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-
-    .intro-top img{
-      width:240px;
-      max-width:38%;
-      height:auto;
-      object-fit:contain;
-      filter:drop-shadow(0 0 20px #00ffaf80);
-    }
-
-    .intro-title-block{
-      max-width:420px;
-      text-align:left;
-    }
-
-    .intro-title{
-      font-size:20px;
-      font-weight:bold;
-      margin-bottom:8px;
-    }
-
-    .intro-sub{
-      font-size:13px;
-      color:#d4ffe9;
-    }
-
-    .intro-text{
-      max-width:900px;
-      text-align:left;
-      font-size:12px;
-      line-height:1.35;
-      margin-top:8px;
-    }
-
-    .intro-text p{
-      margin:0 0 4px;
-    }
-
-    .intro-text b{
-      font-weight:bold;
-    }
-
-    /* ===== PUB ENTRE LES VIDÉOS ===== */
-    #adScreen{
-      display:none;
-      gap:14px;
-      padding:14px;
-      box-sizing:border-box;
-    }
-
-    .flyer{
-      width:50%;
-      height:100%;
-      object-fit:contain;
-    }
-
-    /* ===== SPONSORS SOUS LE CADRE ===== */
-    .sponsor-row{
-      width:95vw;
-      max-width:1350px;
-      margin:0 auto;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-      flex-shrink:0;
-    }
-
-    .sponsor-logo{
-      height:50px;          /* 🔥 même taille pour tous */
-      width:auto;
-      object-fit:contain;
-      filter:drop-shadow(0 0 8px #000000cc);
-      background:transparent;
-      flex:0 0 auto;
-    }
-  </style>
+/* FULLSCREEN = même taille, pas d'agrandissement */
+:fullscreen .area{
+  width:70vw !important;
+}
+</style>
 </head>
 <body>
 
-<!-- Fond vidéo -->
+<!-- 🔥 FOND VIDÉO -->
 <video id="bgVideo" autoplay loop muted playsinline>
   <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4" type="video/mp4">
 </video>
 
 <h1>Montreux Scooter Time Machine</h1>
+<p class="subtitle">On repart de 2005 et plus on avance, plus le contest devient moderne.</p>
 
-<div class="frame-wrapper">
+<!-- TV ZONE -->
+<div id="screen" class="area"><div id="player"></div></div>
 
-  <!-- 🔥 INTRO DANS LE CADRE VERT (image + texte) -->
-  <div id="introScreen">
-    <div class="intro-top">
-      <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png" alt="Montreux 2005">
-      <div class="intro-title-block">
-        <div class="intro-title">🛴 Montreux — là où tout a commencé.</div>
-        <div class="intro-sub">
-          20 ans de ride, d'histoires et de contests.  
-          Cette Time Machine remonte de 2005 jusqu’à aujourd’hui.
-        </div>
-      </div>
-    </div>
-
-    <div class="intro-text">
-      <p>Avant YouTube, avant les decks en aluminium forgé, avant les tricks de folie qu’on voit aujourd’hui… il y a eu Montreux, avril 2005.</p>
-      <p>Le tout premier Scooter Contest connu, en Suisse, au bord du lac, dans un skatepark qui allait marquer l’histoire.</p>
-      <p>Pas de caméras 4K, pas de réseaux sociaux pour immortaliser le moment. Juste des passionnés, du rap, des riders motivés, des figures improvisées et une seule certitude :</p>
-      <p><b>C’était le début. Le point de départ d’une culture mondiale.</b></p>
-      <p>Aujourd’hui, le scooter freestyle remplit des skateparks partout dans le monde, les tricks volent plus haut, les riders vont plus loin, mais l’ADN reste le même : liberté, créativité, famille.</p>
-      <p>Et tout ça… est né ici.</p>
-      <p><b>Montreux – 2005 → 2025. 20 ans de ride. 20 ans d’histoire.</b></p>
-    </div>
-  </div>
-
-  <!-- LECTEUR PRINCIPAL -->
-  <div id="screen" class="area">
-    <div id="player"></div>
-  </div>
-
-  <!-- PUB ENTRE LES VIDÉOS -->
-  <div id="adScreen" class="area">
-    <img class="flyer" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png">
-    <img class="flyer" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png">
-  </div>
-
+<!-- FLYERS entre vidéos -->
+<div id="adScreen" class="area">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
 </div>
 
-<!-- LIGNE DE SPONSORS SOUS LE CADRE -->
-<div class="sponsor-row">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(2).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(3).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(4).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(5).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(6).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(7).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(8).png">
-  <img class="sponsor-logo" src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(9).png">
-</div>
+<button id="startBtn">▶ Lancer le voyage</button>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-const VIDEO_IDS = [
-  "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
-  "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
-  "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
-];
+const VIDEO_IDS=[ "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
+"jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
+"PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"];
 
-let i = 0;
-let player;
-const PUB_DURATION = 20000; // 20s
-const screen   = document.getElementById("screen");
-const ads      = document.getElementById("adScreen");
-const intro    = document.getElementById("introScreen");
-
-/* 🔥 Sur Fully Kiosk : on démarre tout seul après 10s d'intro */
-function startFlow(){
-  setTimeout(startVideos, 10000);
-}
-
-function startVideos(){
-  intro.style.display = "none";
-  player = new YT.Player("player", {
-    videoId: VIDEO_IDS[i],
-    playerVars: {autoplay:1,controls:1,rel:0,modestbranding:1,playsinline:1},
-    events: {
-      onStateChange: onPlayerStateChange,
-      onError: onPlayerError
-    }
-  });
-}
-
-function onPlayerStateChange(e){
-  if(e.data === YT.PlayerState.ENDED){
-    showAdsThenNext();
-  }
-}
-
-function onPlayerError(e){
-  console.log("Erreur vidéo, on passe à la suivante :", e.data);
-  showAdsThenNext();
-}
-
-function showAdsThenNext(){
-  screen.style.display = "none";
-  ads.style.display    = "flex";
-
-  setTimeout(() => {
-    ads.style.display    = "none";
-    screen.style.display = "flex";
-    i = (i + 1) % VIDEO_IDS.length; // boucle infinie
-    if(player){
-      player.loadVideoById(VIDEO_IDS[i]);
-    }
-  }, PUB_DURATION);
-}
-
-/* API YouTube prête → on lance le flow intro + vidéos */
-function onYouTubeIframeAPIReady(){
-  startFlow();
-}
+let i=0,player,pub=20000;
+const S=document.getElementById("screen"),A=document.getElementById("adScreen"),btn=document.getElementById("startBtn");
+btn.onclick=()=>{player=new YT.Player("player",{videoId:VIDEO_IDS[i],playerVars:{autoplay:1,controls:1},events:{onStateChange:e=>e.data===0&&next(),onError:next}});btn.style.display="none";}
+function next(){S.style.display="none";A.style.display="flex";setTimeout(()=>{A.style.display="none";S.style.display="flex";i=(i+1)%VIDEO_IDS.length;player.loadVideoById(VIDEO_IDS[i])},pub);}
 </script>
 </body>
 </html>
