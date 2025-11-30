@@ -1,137 +1,261 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<title>Montreux Scooter Time Machine</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Montreux Scooter Time Machine</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<style>
-/* ====== FOND VIDÉO VISIBLE & PLEIN ÉCRAN ====== */
-#bgVideo{
-  position:fixed; inset:0;
-  width:100vw;height:100vh;
-  object-fit:cover;
-  z-index:-2;
-  opacity:.75; /* + visible */
-  filter:brightness(.85) contrast(1.2) saturate(1.1);
-}
+  <style>
+    /* ===== FOND VIDÉO (visible + flou léger) ===== */
+    #bgVideo{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
+      object-fit:cover;
+      z-index:-2;
+      opacity:.6;
+      filter:blur(2px) brightness(.7) contrast(1.1);
+    }
 
-/* ====== LUMIÈRE AMBIENTE ====== */
-body::before{
-  content:"";
-  position:fixed; inset:0;
-  background:linear-gradient(to bottom,#000000a0,#000000d5 60%,#000000f0);
-  z-index:-1;
-}
+    /* Voile sombre léger par-dessus le fond */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:#00000080;
+      z-index:-1;
+    }
 
-/* ====== PAGE CENTRÉE SUR GRAND ÉCRAN ====== */
-body{
-  margin:0;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  color:#00ffbf;
-  font-family:Arial, sans-serif;
-  text-align:center;
-  padding:2vh 0;
-}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      color:#00ff93;
+      font-family:Arial,sans-serif;
+      text-align:center;
+    }
 
-/* ===== TITRE PLUS PROPRE ET VISIBLE ===== */
-h1{
-  font-size:3vw; /* responsive TV */
-  margin:1vh 0 0.5vh;
-  text-shadow:0 0 25px #00ffd5,0 0 60px #00ffe2;
-}
+    .main{
+      flex:1;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;   /* ➜ centre VERTICALEMENT */
+      padding:20px 0 10px;
+    }
 
-/* ===== Phrase histoire ==== */
-.subtitle{
-  color:#cafff5;
-  font-size:1.2vw;
-  max-width:60vw;
-  margin-bottom:1vh;
-  opacity:.9;
-}
+    /* Titre + glow */
+    h1{
+      margin:0 0 6px;
+      font-size:28px;
+      letter-spacing:1.5px;
+      text-shadow:0 0 25px #00ffaf,0 0 10px #00ffaf;
+    }
 
-/* ====== Cadre vidéo PLUS GRAND ====== */
-.area{
-  width:70vw;
-  max-width:1400px;
-  aspect-ratio:16/9;
-  border:4px solid #00ffd0;
-  border-radius:14px;
-  box-shadow:0 0 45px #00ffea, inset 0 0 35px #00ffe5;
-  overflow:hidden;
-  position:relative;
-}
+    .subtitle{
+      max-width:900px;
+      font-size:14px;
+      line-height:1.4;
+      color:#c4ffe8;
+      margin:0 16px 8px;
+      opacity:0.9;
+    }
 
-/* ===== YOUTUBE PLAYER COVER ===== */
-#player iframe{
-  width:100% !important;
-  height:100% !important;
-  position:absolute;
-  inset:0;
-  object-fit:cover;
-}
+    /* Bandeau 2005–2025 animé */
+    .years-banner{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-size:14px;
+      color:#e5fff6;
+      margin-bottom:16px;
+      opacity:0;
+      animation:yearsFade 1.8s ease-out .3s forwards;
+    }
+    .years-line{
+      height:1px;
+      width:80px;
+      background:#00ffaf;
+      box-shadow:0 0 10px #00ffaf;
+      transform:scaleX(0);
+      transform-origin:left;
+      animation:lineGrow 1.5s ease-out .3s forwards;
+    }
+    .years-text{
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight:bold;
+      text-shadow:0 0 10px #00ffaf;
+    }
+    @keyframes lineGrow{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+    @keyframes yearsFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-/* FLYERS */
-#adScreen{
-  display:none;
-  gap:1vw;
-  padding:1vw;
-}
-.flyer{width:50%;height:100%;object-fit:contain;}
+    /* Cadre vidéo centré & fixe */
+    .area{
+      width:90vw;
+      max-width:1200px;
+      aspect-ratio:16/9;
+      border-radius:18px;
+      border:4px solid #00ffaf;
+      background:#000;
+      overflow:hidden;
+      box-shadow:0 0 35px #00ffea,inset 0 0 25px #00ffc3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
 
-#startBtn{
-  margin-bottom:2vh;
-  padding:1vw 2.5vw;
-  font-size:1.4vw;
-  background:#00ffd5;
-  color:#000;
-  font-weight:bold;
-  border:none;border-radius:10px;
-  cursor:pointer;
-  box-shadow:0 0 25px #00ffe8;
-}
+    /* Player YouTube remplit bien le cadre */
+    #player iframe{
+      position:absolute;
+      inset:0;
+      width:100% !important;
+      height:100% !important;
+      object-fit:cover;
+    }
 
-/* FULLSCREEN = même taille, pas d'agrandissement */
-:fullscreen .area{
-  width:70vw !important;
-}
-</style>
+    /* En fullscreen, on garde la même taille de cadre */
+    :fullscreen .area,
+    :-webkit-full-screen .area{
+      width:90vw !important;
+      max-width:1200px !important;
+      aspect-ratio:16/9 !important;
+      height:auto !important;
+      border-radius:18px !important;
+      border:4px solid #00ffaf !important;
+      box-shadow:0 0 35px #00ffea,inset 0 0 25px #00ffc3 !important;
+      margin:auto !important;
+    }
+
+    /* Ecran pubs */
+    #adScreen{
+      display:none;
+      gap:14px;
+      padding:14px;
+    }
+    .flyer{
+      width:50%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    /* Bouton lancer (disparaît après le 1er clic) */
+    #startBtn{
+      margin:10px 0 18px;
+      padding:12px 30px;
+      font-size:18px;
+      font-weight:bold;
+      background:#00ffaf;
+      color:#000;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      box-shadow:0 0 24px #00ffaf;
+      transition:.2s;
+    }
+    #startBtn:hover{
+      transform:scale(1.05);
+      box-shadow:0 0 40px #00ffe1;
+    }
+  </style>
 </head>
 <body>
 
-<!-- 🔥 FOND VIDÉO -->
+<!-- Fond vidéo sponsors / trott -->
 <video id="bgVideo" autoplay loop muted playsinline>
   <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4" type="video/mp4">
 </video>
 
-<h1>Montreux Scooter Time Machine</h1>
-<p class="subtitle">On repart de 2005 et plus on avance, plus le contest devient moderne.</p>
+<div class="main">
+  <h1>Montreux Scooter Time Machine</h1>
 
-<!-- TV ZONE -->
-<div id="screen" class="area"><div id="player"></div></div>
+  <p class="subtitle">
+    On remonte le temps, édition après édition&nbsp;: des premières années plus brutes jusqu’aux contests
+    les plus modernes. Laisse tourner et regarde l’histoire du Montreux Scooter Contest défiler sous tes yeux.
+  </p>
 
-<!-- FLYERS entre vidéos -->
-<div id="adScreen" class="area">
-  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
-  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+  <div class="years-banner">
+    <div class="years-line"></div>
+    <div class="years-text">2005&nbsp;–&nbsp;2025 · 20 ans de trottinette</div>
+    <div class="years-line"></div>
+  </div>
+
+  <!-- Cadre vidéo principal -->
+  <div id="screen" class="area">
+    <div id="player"></div>
+  </div>
+
+  <!-- Ecran PUB avec flyers -->
+  <div id="adScreen" class="area">
+    <!-- gauche = flyer original -->
+    <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+    <!-- droite = copie -->
+    <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer">
+  </div>
+
+  <button id="startBtn">▶ Lancer la Time Machine</button>
 </div>
-
-<button id="startBtn">▶ Lancer le voyage</button>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-const VIDEO_IDS=[ "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
-"jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
-"PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"];
+const VIDEO_IDS=[
+  "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
+  "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
+  "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
+];
 
-let i=0,player,pub=20000;
-const S=document.getElementById("screen"),A=document.getElementById("adScreen"),btn=document.getElementById("startBtn");
-btn.onclick=()=>{player=new YT.Player("player",{videoId:VIDEO_IDS[i],playerVars:{autoplay:1,controls:1},events:{onStateChange:e=>e.data===0&&next(),onError:next}});btn.style.display="none";}
-function next(){S.style.display="none";A.style.display="flex";setTimeout(()=>{A.style.display="none";S.style.display="flex";i=(i+1)%VIDEO_IDS.length;player.loadVideoById(VIDEO_IDS[i])},pub);}
+let i=0;
+let player;
+const PUB_DURATION = 20000; // 20s
+const screenEl = document.getElementById("screen");
+const adEl     = document.getElementById("adScreen");
+const startBtn = document.getElementById("startBtn");
+
+startBtn.onclick = () => {
+  if (!player) {
+    player = new YT.Player("player", {
+      videoId: VIDEO_IDS[i],
+      playerVars: { autoplay: 1, controls: 1, rel: 0, modestbranding: 1 },
+      events: {
+        onStateChange: onPlayerStateChange,
+        onError: onPlayerError
+      }
+    });
+  } else {
+    player.playVideo();
+  }
+  startBtn.style.display = "none"; // tu cliques une fois le matin, après le bouton disparaît
+};
+
+function onPlayerStateChange(e){
+  if (e.data === YT.PlayerState.ENDED) {
+    showAdsThenNext();
+  }
+}
+
+function onPlayerError(e){
+  console.log("Erreur vidéo, on skip:", e.data);
+  showAdsThenNext();
+}
+
+function showAdsThenNext(){
+  screenEl.style.display = "none";
+  adEl.style.display     = "flex";
+
+  setTimeout(() => {
+    adEl.style.display   = "none";
+    screenEl.style.display = "flex";
+
+    i = (i + 1) % VIDEO_IDS.length; // boucle infinie
+    if (player) player.loadVideoById(VIDEO_IDS[i]);
+  }, PUB_DURATION);
+}
 </script>
 </body>
 </html>
