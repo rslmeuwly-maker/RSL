@@ -18,122 +18,207 @@
   <script defer src="js/site.js"></script>
 
   <style>
-    /* ======= STRUCTURE GLOBALE ======= */
-    html,body { height:100%; margin:0; font-family:"Outfit",system-ui; color:#fff; background:#000; overflow-x:hidden; }
-    body { display:flex; flex-direction:column; position:relative; z-index:1; }
+    html, body { height:100%; }
+    body{
+      background: transparent !important;
+      margin:0;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+    main{ flex:1; }
 
-    /* ======= VIDÉO DE FOND ======= */
-    .video-bg {
-      position:fixed; inset:0;
-      width:100%; height:100%;
+    /* ======= VIDÉO DE FOND (même style que les autres pages) ======= */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
       object-fit:cover;
       z-index:-2;
+      background:#000;
     }
-    .video-overlay {
-      position:fixed; inset:0;
-      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
       z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
     }
 
     /* ======= NAVBAR ======= */
     nav.nav {
-      background: rgba(0,0,0,.55);
+      background: rgba(0,0,0,.65);
       backdrop-filter: blur(8px);
-      position: sticky; top: 0; z-index:10;
+      position: sticky; top: 0; z-index:100;
     }
     nav.nav .container { max-width:1320px; margin:0 auto; padding:12px 28px; }
     nav.nav .row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
     .brand { display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
     .brand img { height:48px; border-radius:10px; display:block; }
-    .brand span { font-weight:800; font-size:17px; }
+    .brand span { font-weight:800; font-size:17px; letter-spacing:.2px; }
 
     nav.nav ul { display:flex; align-items:center; gap:26px; }
-    nav.nav ul li a { font-weight:600; color:#e8f0ea; font-size:17px; text-decoration:none; }
+    nav.nav ul li a {
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      text-decoration:none;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      transition:.2s ease;
+    }
     nav.nav ul li a:hover { color:#22c55e; }
 
     .cta { display:flex; align-items:center; gap:12px; }
     #menuBtn{
       display:none; align-items:center; justify-content:center; gap:8px;
-      padding:10px 12px; font-size:18px;
+      padding:10px 12px; font-size:18px; line-height:1;
       border-radius:10px; border:1px solid rgba(255,255,255,.12);
       background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
+      transition:.2s ease;
     }
-    #menuBtn:hover { background:rgba(34,197,94,.25); }
+    #menuBtn:hover { background:rgba(34,197,94,.22); }
 
-    /* ======= CARTES COMPACTES ======= */
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      padding: 60px 20px 40px;
-      z-index: 2;
-      position: relative;
+    /* ======= CONTAINER PAGE ======= */
+    .container-page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 24px 40px;
     }
 
-    .cards {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      max-width: 1100px;
-      width: 100%;
+    /* ======= INTRO ======= */
+    .page-intro{
+      color:#fff;
+      padding:32px 0 10px;
+      text-align:left;
+    }
+    .page-intro h1{
+      font-size:clamp(32px,4.5vw,46px);
+      font-weight:800;
+      margin:6px 0 8px;
+    }
+    .page-intro p{
+      margin:0;
+      opacity:.95;
+      font-size:clamp(15px,2.1vw,19px);
+      max-width:720px;
     }
 
-    .card {
-      background: rgba(15, 23, 42, .82);
-      border: 1px solid rgba(255, 255, 255, .08);
-      border-radius: 16px;
-      padding: 18px 16px 20px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
-      backdrop-filter: blur(5px);
+    /* ======= MONTREUX SCOOTER CONTEST (ENGLISH BLOCK) ======= */
+    .msc-highlight{
+      margin:10px 0 18px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.5);
+      background:rgba(15,23,42,.9);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      box-shadow:0 10px 30px rgba(0,0,0,.6);
+    }
+    .msc-text{
+      font-size:13px;
+      color:#e5e7eb;
+      max-width:720px;
+    }
+    .msc-text b{
+      color:#fff;
+    }
+    .msc-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(34,197,94,.12);
+      color:#bbf7d0;
+      font-size:13px;
+      font-weight:700;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .msc-btn span{
+      margin-left:6px;
+      font-size:12px;
+    }
+    .msc-btn:hover{
+      background:rgba(34,197,94,.22);
+      border-color:#22c55e;
     }
 
-    .card h3 {
-      color: #22c55e;
-      font-weight: 800;
-      margin: 0 0 4px;
-      font-size: 17px;
-      line-height: 1.2;
+    /* ======= CARTES ÉVÉNEMENTS ======= */
+    .cards{
+      display:grid;
+      gap:18px;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      margin-top:10px;
     }
 
-    .meta {
-      font-size: 14px;
-      opacity: .9;
-      margin-bottom: 6px;
+    .card{
+      background:rgba(15,23,42,.88);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:18px 16px 20px;
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
+      backdrop-filter:blur(6px);
     }
 
-    .card p {
-      font-size: 15px;
-      margin: 0 0 12px;
+    .card h3{
+      color:#22c55e;
+      font-weight:800;
+      margin:0 0 4px;
+      font-size:17px;
+      line-height:1.25;
     }
 
-    .card .btn {
-      font-size: 14px;
-      padding: 6px 12px;
-      border-radius: 8px;
+    .meta{
+      font-size:14px;
+      opacity:.9;
+      margin-bottom:6px;
+    }
+
+    .card p{
+      font-size:15px;
+      margin:0 0 10px;
+      color:#e5e7eb;
+    }
+
+    .card .btn{
+      font-size:14px;
+      padding:6px 12px;
+      border-radius:8px;
     }
 
     /* ======= FOOTER ======= */
-    footer.footer-mini {
+    .footer-mini .copy{
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:20px 0 24px; margin:0;
       border-top:1px solid rgba(255,255,255,.1);
-      background:rgba(0,0,0,.3);
-      text-align:center; padding:24px 0;
-      color:#9aa5b1; font-size:14px;
-      z-index:3;
+      background:transparent;
     }
 
-    /* ======= FAB ======= */
+    /* ======= FAB COACH ======= */
     .coach-fab{
-      position:fixed; right:16px; bottom:16px; z-index:20;
+      position: fixed; right:16px; bottom:16px; z-index:80;
       display:inline-flex; align-items:center; gap:8px;
       padding:12px 14px; border-radius:12px;
       background:linear-gradient(180deg,#22c55e,#16a34a);
       color:#062312; font-weight:800; text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35);
+      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      border:0;
     }
-    .coach-fab:hover{ filter:brightness(1.1); transform:translateY(-1px); transition:.15s ease; }
+    .coach-fab:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
+      transition:.15s ease;
+    }
 
     /* ======= MENU MOBILE ======= */
-    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:50; }
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
     .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
     .mobile-panel{
@@ -145,6 +230,12 @@
     }
     .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
     .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+    .mobile-panel .coach-link{
+      border-top:1px solid rgba(255,255,255,.12);
+      margin-top:8px;
+      padding-top:12px;
+      font-weight:700;
+    }
 
     @media(max-width:990px){
       nav.nav ul{display:none!important;}
@@ -157,52 +248,53 @@
 <body>
 
   <!-- VIDÉO DE FOND -->
-  <video class="video-bg" autoplay muted loop playsinline id="rslHeroVideo">
-    <source src="images/trottvideo.mp4" type="video/mp4">
-  </video>
-  <div class="video-overlay"></div>
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAVBAR -->
+   <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class="brand" href="index.html" aria-current="page">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
+
         <ul>
           <li><a href="cours.html">Cours</a></li>
           <li><a href="formation.html">Formation RSL</a></li>
           <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html" aria-current="page">Événements</a></li>
+          <li><a href="evenements.html">Événements</a></li>
           <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
           <li><a href="comite.html">Comité</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
+
         <div class="cta">
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
           <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn" aria-label="Menu">☰</button>
+          <button id="menuBtn">☰</button>
         </div>
       </div>
     </div>
   </nav>
-
-  <!-- MENU MOBILE -->
-  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+   <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
+      <a href="index.html" aria-current="page">Accueil</a>
       <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html" aria-current="page">Événements</a>
       <a href="disciplines.html">Disciplines</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
-      <hr/>
-      <a href="membres.html">Devenir membre</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
@@ -211,27 +303,58 @@
 
   <!-- CONTENU -->
   <main>
-    <div class="cards">
-      <article class="card">
-        <h3>Montreux Scooter Contest — 20e édition</h3>
-        <div class="meta">📍 Montreux — 6 décembre 2025</div>
-        <p>Le plus grand contest de Suisse romande fête ses 20 ans !</p>
-        <a class="btn green" href="#">Infos</a>
-      </article>
+    <div class="container-page">
+      <header class="page-intro">
+        <h1>Événements RSL</h1>
+        <p>
+          Contests officiels, jams, journées street encadrées et événements partenaires
+          organisés ou soutenus par la Romandie Scooter League.
+        </p>
 
-      <article class="card">
-        <h3>Jam RSL — Lausanne Vidy</h3>
-        <div class="meta">📍 Vidy — Mars 2026</div>
-        <p>Session chill, best tricks & cadeaux. Ouvert à tous.</p>
-        <a class="btn dark" href="#">Pré-inscription</a>
-      </article>
+        <!-- MONTREUX SCOOTER CONTEST — ENGLISH + BUTTON -->
+        <div class="msc-highlight">
+          <div class="msc-text">
+            <b>Montreux Scooter Contest</b> is one of the pioneer freestyle scooter contests in Switzerland,
+            hosted in Montreux by the local community since 2005.  
+            Watch the video history and archives on <b>MontreuxTV</b>.
+          </div>
+          <a class="msc-btn" href="https://rsl-swiss.ch/montreuxtv" target="_blank" rel="noopener">
+            Video history <span>▶</span>
+          </a>
+        </div>
+      </header>
 
-      <article class="card">
-        <h3>RSL Street Day — Genève</h3>
-        <div class="meta">📍 Plainpalais — Printemps 2026</div>
-        <p>Tour street RSL sur plusieurs spots, sécurité assurée.</p>
-        <a class="btn dark" href="#">Participer</a>
-      </article>
+      <section class="section">
+        <div class="cards">
+          <article class="card">
+            <h3>Montreux Scooter Contest — 20e édition</h3>
+            <div class="meta">📍 Montreux — 6 décembre 2025</div>
+            <p>Le plus grand contest de Suisse romande fête ses 20 ans ! Park, street, kids & pros.</p>
+            <a class="btn green" href="#">Infos & programme</a>
+          </article>
+
+          <article class="card">
+            <h3>Jam RSL — Lausanne Vidy</h3>
+            <div class="meta">📍 Lausanne Vidy — Mars 2026</div>
+            <p>Session chill, best tricks & cadeaux. Format jam ouvert à tous les niveaux.</p>
+            <a class="btn dark" href="#">Pré-inscription</a>
+          </article>
+
+          <article class="card">
+            <h3>RSL Street Day — Genève</h3>
+            <div class="meta">📍 Genève — Printemps 2026</div>
+            <p>Tour street RSL sur plusieurs spots, encadré et sécurisé, avec juges officiels.</p>
+            <a class="btn dark" href="#">Participer</a>
+          </article>
+
+          <article class="card">
+            <h3>Stages & Kids Days</h3>
+            <div class="meta">📍 Divers parks — Toute l’année</div>
+            <p>Journées découvertes et stages encadrés avec les coachs RSL pour les plus jeunes.</p>
+            <a class="btn dark" href="cours.html">Voir les cours</a>
+          </article>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -243,32 +366,64 @@
   <!-- FAB COACH -->
   <a href="coach.html" class="coach-fab">👨‍🏫 Devenir coach</a>
 
-  <!-- SCRIPT -->
+  <!-- SCRIPTS -->
   <script>
-    // MENU BURGER
-    const menuBtn=document.getElementById('menuBtn');
-    const mobile=document.getElementById('mobileMenu');
-    menuBtn?.addEventListener('click',e=>{
-      e.stopPropagation();
-      mobile.classList.add('open');
-      mobile.setAttribute('aria-hidden','false');
-    });
-    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
-      mobile.classList.remove('open');
-      mobile.setAttribute('aria-hidden','true');
-    });
-    document.addEventListener('keydown',e=>{
-      if(e.key==='Escape'){mobile.classList.remove('open');mobile.setAttribute('aria-hidden','true');}
-    });
+    // Vidéo de fond
+    (function(){
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
 
-    // VIDEO LENTE
-    window.addEventListener('DOMContentLoaded',()=>{
-      const v=document.getElementById('rslHeroVideo');
-      if(!v)return;
-      const start=()=>{try{v.playbackRate=0.6;v.play().catch(()=>{});}catch(e){}};
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
+
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
       start();
-      document.addEventListener('visibilitychange',()=>{if(document.hidden)v.pause();else start();});
-    });
+
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden){
+          v.pause();
+        }else{
+          start();
+        }
+      });
+    })();
+
+    // MENU BURGER
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
   </script>
 </body>
 </html>
