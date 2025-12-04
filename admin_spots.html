@@ -11,21 +11,6 @@
   :root{ --green:#22c55e; --red:#ef4444; --amber:#f59e0b; }
   body{margin:0;background:#0b0e14;color:#fff;font-family:Outfit,system-ui}
   header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
-  header .brand{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:#fff;
-    text-decoration:none;
-  }
-  header .brand img{
-    height:30px;
-    width:30px;
-    border-radius:8px;
-    background:#fff;
-    padding:4px;
-  }
-
   header b{font-weight:800}
   .wrap{max-width:1100px;margin:20px auto;padding:0 18px}
   .tabs{display:flex;gap:8px;margin-bottom:12px}
@@ -47,10 +32,7 @@
 </head>
 <body>
 <header>
-  <a class="brand" href="ou_rider.html">
-    <img src="images/logo_rsl.png" alt="RSL"/>
-    <b>RSL — Admin Spots</b>
-  </a>
+  <b>RSL — Admin Spots</b>
   <div id="adminWho" style="opacity:.8"></div>
 </header>
 
@@ -100,7 +82,7 @@ async function mustBeAdmin(){
   const { data: { user } } = await supa.auth.getUser();
   if(!user){ alert("Connecte-toi (admin requis)."); window.location.href = "compte.html"; return; }
   const { data: prof } = await supa.from('profiles').select('full_name,is_admin,email').eq('id', user.id).maybeSingle();
-  if(!prof || !prof.is_admin){ alert("Accès refusé (admin)."); window.location.href = "ou_rider.html"; return; }
+  if(!prof || !prof.is_admin){ alert("Accès refusé (admin)."); window.location.href = "index.html"; return; }
   adminWho.textContent = (prof.full_name || prof.email) + " (admin)";
 }
 mustBeAdmin();

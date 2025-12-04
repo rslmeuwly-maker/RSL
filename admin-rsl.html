@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin RSL — Coachs & Inscriptions</title>
+
+  <!-- Fonts + style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    body{
+      margin:0;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:#020617;
+      color:#e5e7eb;
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+    }
+    h1{
+      font-size:26px;
+      margin:0 0 4px;
+    }
+    h2{
+      font-size:20px;
+      margin:18px 0 6px;
+    }
+    .subtitle{
+      font-size:14px;
+      color:#9ca3af;
+      margin-bottom:18px;
+    }
+    .status{
+      margin-bottom:14px;
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:14px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(148,163,184,.5);
+    }
+    .status.error{
+      border-color:rgba(248,113,113,.8);
+      color:#fecaca;
+      background:rgba(127,29,29,.85);
+    }
+
+    /* Onglets */
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+      margin-bottom:8px;
+      border-bottom:1px solid rgba(30,41,59,.8);
+    }
+    .tab-btn{
+      border:0;
+      background:transparent;
+      padding:8px 14px;
+      border-radius:999px 999px 0 0;
+      font-size:14px;
+      font-weight:600;
+      color:#9ca3af;
+      cursor:pointer;
+      border:1px solid transparent;
+      border-bottom:0;
+    }
+    .tab-btn.active{
+      background:rgba(15,23,42,.95);
+      color:#e5e7eb;
+      border-color:rgba(148,163,184,.7);
+    }
+
+    section.block{
+      margin-top:0;
+      padding:16px 14px 18px;
+      border-radius:0 16px 16px 16px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.85);
+      margin-bottom:22px;
+    }
+    section.block.hidden{
+      display:none;
+    }
+
+    .block-header{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .block-header h2{
+      margin:0;
+      flex:1;
+    }
+    .block-header .block-stat{
+      font-size:12px;
+      color:#9ca3af;
+      white-space:nowrap;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:14px;
+    }
+    th,td{
+      padding:8px 10px;
+      border-bottom:1px solid rgba(51,65,85,.8);
+    }
+    th{
+      text-align:left;
+      font-weight:700;
+      color:#cbd5e1;
+      background:rgba(15,23,42,.9);
+    }
+    tr:nth-child(even){
+      background:rgba(15,23,42,.6);
+    }
+    .tag{
+      display:inline-block;
+      padding:2px 7px;
+      border-radius:999px;
+      font-size:11px;
+      border:1px solid rgba(148,163,184,.7);
+      color:#e5e7eb;
+    }
+    .tag.coach{
+      border-color:rgba(34,197,94,.9);
+      color:#bbf7d0;
+      background:rgba(22,163,74,.2);
+    }
+    .tag.no{
+      border-color:rgba(148,163,184,.6);
+      background:rgba(15,23,42,.8);
+    }
+    .tag.admin{
+      border-color:rgba(59,130,246,.9);
+      color:#bfdbfe;
+      background:rgba(37,99,235,.2);
+      margin-left:4px;
+    }
+    .center{
+      text-align:center;
+    }
+    input[type="checkbox"]{
+      transform:scale(1.1);
+      cursor:pointer;
+    }
+
+    .course-header-row{
+      cursor:pointer;
+    }
+    .course-header-row:hover{
+      background:rgba(30,64,175,.45);
+    }
+    .course-enrollments-row{
+      display:none;
+      background:rgba(15,23,42,.9);
+    }
+    .course-enrollments-row.open{
+      display:table-row;
+    }
+    .pill{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(148,163,184,.7);
+      font-size:11px;
+      margin-right:4px;
+    }
+
+    .filters-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin-bottom:8px;
+      font-size:13px;
+      color:#cbd5e1;
+    }
+    .filters-row select{
+      padding:6px 10px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      font-size:13px;
+      min-width:140px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Admin RSL</h1>
+    <p class="subtitle">
+      Gestion des coachs, admins et vue sur les inscriptions aux cours.
+    </p>
+    <div id="adminStatus" class="status" style="display:none;"></div>
+
+    <!-- ONGLES -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="coachs">Utilisateurs / Coachs</button>
+      <button class="tab-btn" data-tab="courses">Cours & inscriptions</button>
+    </div>
+
+    <!-- ONGLET 1 : COACHS / UTILISATEURS -->
+    <section class="block" id="tab-coachs">
+      <div class="block-header">
+        <h2>Utilisateurs / Coachs</h2>
+        <span id="coachStats" class="block-stat"></span>
+      </div>
+
+      <p style="font-size:13px;color:#9ca3af;margin-bottom:8px;">
+        Coche les utilisateurs qui ont le droit d’accéder à la page <code>coach.html</code> et ceux qui sont <b>admins RSL</b>.<br>
+        Tu peux filtrer par statut coach et par localité.
+      </p>
+
+      <div class="filters-row">
+        <span>Filtrer :</span>
+        <select id="coachStatusFilter">
+          <option value="all">Tous</option>
+          <option value="coach">Coachs</option>
+          <option value="noncoach">Non coachs</option>
+        </select>
+
+        <select id="coachCityFilter">
+          <option value="">Toutes les villes</option>
+        </select>
+      </div>
+
+      <div id="adminContent">
+        <p>Chargement des utilisateurs…</p>
+      </div>
+    </section>
+
+    <!-- ONGLET 2 : COURS / INSCRIPTIONS -->
+    <section class="block hidden" id="tab-courses">
+      <div class="block-header">
+        <h2>Cours & inscriptions</h2>
+        <!-- compteur des cours sélectionnés EN HAUT À DROITE -->
+        <span id="courseStats" class="block-stat"></span>
+      </div>
+
+      <p style="font-size:13px;color:#9ca3af;margin-bottom:8px;">
+        Vue des cours et du nombre de jeunes inscrits.  
+        Clique sur un cours pour afficher le détail des inscriptions.
+      </p>
+
+      <div class="filters-row">
+        <span>Filtrer par ville :</span>
+        <select id="courseCityFilter">
+          <option value="">Toutes les villes</option>
+        </select>
+      </div>
+
+      <div id="coursesContent">
+        <p>Chargement des cours…</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const SUPABASE_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+    const supa = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    // UUID admin "root" (toi)
+    const ADMIN_ID = "36a00c9e-9321-41bf-b043-298ad5089593";
+
+    const statusEl        = document.getElementById('adminStatus');
+    const contentEl       = document.getElementById('adminContent');
+    const coursesContent  = document.getElementById('coursesContent');
+
+    const coachStatusFilterEl = document.getElementById('coachStatusFilter');
+    const coachCityFilterEl   = document.getElementById('coachCityFilter');
+    const coachStatsEl        = document.getElementById('coachStats');
+
+    const courseCityFilterEl  = document.getElementById('courseCityFilter');
+    const courseStatsEl       = document.getElementById('courseStats');
+
+    let profilesData = [];
+    let coursesData  = [];
+
+    function showStatus(msg, isError = false){
+      statusEl.textContent = msg;
+      statusEl.style.display = 'block';
+      statusEl.classList.toggle('error', !!isError);
+    }
+
+    async function checkIsAdmin(){
+      const { data:{ user }, error } = await supa.auth.getUser();
+      if(error || !user){
+        showStatus("Tu dois être connecté pour accéder à cette page admin.", true);
+        setTimeout(()=>{ window.location.href = "compte.html"; }, 1500);
+        throw new Error("not logged");
+      }
+
+      // Toi = super admin
+      if(user.id === ADMIN_ID){
+        showStatus("Connecté en tant qu’admin principal : " + (user.email || user.id));
+        return user;
+      }
+
+      // Autres admins : via profiles.is_admin
+      const { data: profile, error: errP } = await supa
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if(errP || !profile || !profile.is_admin){
+        showStatus("Accès réservé aux admins RSL.", true);
+        setTimeout(()=>{ window.location.href = "index.html"; }, 1500);
+        throw new Error("not admin");
+      }
+
+      showStatus("Connecté en tant qu’admin RSL : " + (user.email || user.id));
+      return user;
+    }
+
+    /* ========== ONGLET COACHS / UTILISATEURS ========== */
+
+    async function loadUsers(){
+      contentEl.innerHTML = "<p>Chargement des profils…</p>";
+
+      const { data, error } = await supa
+        .from('profiles')
+        .select('id, full_name, username, is_coach, is_admin, city')
+        .order('full_name', { ascending:true });
+
+      if(error){
+        console.error(error);
+        contentEl.innerHTML = "<p>Erreur lors du chargement des profils.</p>";
+        showStatus("Erreur chargement profils : " + (error.message || error.code), true);
+        return;
+      }
+
+      profilesData = data || [];
+
+      buildCoachCityOptions();
+      renderUsers();
+    }
+
+    function buildCoachCityOptions(){
+      if(!coachCityFilterEl) return;
+
+      const cities = Array.from(new Set(
+        profilesData
+          .map(p => p.city)
+          .filter(c => c && c.trim() !== "")
+      )).sort((a,b)=>a.localeCompare(b,'fr'));
+
+      coachCityFilterEl.innerHTML = '<option value="">Toutes les villes</option>' +
+        cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function renderUsers(){
+      if(!profilesData.length){
+        contentEl.innerHTML = "<p>Aucun profil trouvé.</p>";
+        coachStatsEl.textContent = "";
+        return;
+      }
+
+      const statusFilter = coachStatusFilterEl ? coachStatusFilterEl.value : "all";
+      const cityFilter   = coachCityFilterEl ? (coachCityFilterEl.value || "") : "";
+
+      let filtered = profilesData.slice();
+
+      if(statusFilter === "coach"){
+        filtered = filtered.filter(p => !!p.is_coach);
+      }else if(statusFilter === "noncoach"){
+        filtered = filtered.filter(p => !p.is_coach);
+      }
+
+      if(cityFilter){
+        filtered = filtered.filter(p => (p.city || "") === cityFilter);
+      }
+
+      const totalCoach    = profilesData.filter(p => p.is_coach).length;
+      const totalNonCoach = profilesData.length - totalCoach;
+      const totalAdmin    = profilesData.filter(p => p.is_admin).length;
+      const shown         = filtered.length;
+
+      if(coachStatsEl){
+        coachStatsEl.textContent =
+          `${shown} profil(s) affiché(s) — ${totalCoach} coach(s), ${totalNonCoach} non coach(s), ${totalAdmin} admin(s)`;
+      }
+
+      if(!filtered.length){
+        contentEl.innerHTML = "<p>Aucun profil ne correspond à ce filtre.</p>";
+        return;
+      }
+
+      const rows = filtered.map(p=>{
+        const label = p.full_name || p.username || p.id;
+        const checkedCoach = p.is_coach ? "checked" : "";
+        const checkedAdmin = p.is_admin ? "checked" : "";
+        const tagClass = p.is_coach ? "tag coach" : "tag no";
+        const tagText  = p.is_coach ? "Coach" : "Non coach";
+        const cityText = p.city ? p.city : "—";
+        const adminTag = p.is_admin ? '<span class="tag admin">Admin</span>' : '';
+
+        return `
+          <tr data-user-id="${p.id}">
+            <td>${label}<br>
+              <span style="font-size:11px;color:#9ca3af;">ID: ${p.id}</span>
+            </td>
+            <td>${cityText}</td>
+            <td class="center">
+              <span class="${tagClass}" data-role="tag">${tagText}</span>
+              ${adminTag}
+            </td>
+            <td class="center">
+              <input type="checkbox" data-role="coach-toggle" ${checkedCoach}>
+            </td>
+            <td class="center">
+              <input type="checkbox" data-role="admin-toggle" ${checkedAdmin}>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      contentEl.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Ville</th>
+              <th>Statuts</th>
+              <th class="center">Coach</th>
+              <th class="center">Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function toggleCoach(userId, isCoach){
+      const { error } = await supa
+        .from('profiles')
+        .update({ is_coach: isCoach })
+        .eq('id', userId);
+
+      if(error){
+        console.error(error);
+        showStatus("Erreur mise à jour coach : " + (error.message || error.code), true);
+        return;
+      }
+
+      profilesData = profilesData.map(p =>
+        p.id === userId ? { ...p, is_coach: isCoach } : p
+      );
+
+      showStatus("Statut coach mis à jour.", false);
+      renderUsers();
+    }
+
+    async function toggleAdmin(userId, isAdmin){
+      const { error } = await supa
+        .from('profiles')
+        .update({ is_admin: isAdmin })
+        .eq('id', userId);
+
+      if(error){
+        console.error(error);
+        showStatus("Erreur mise à jour admin : " + (error.message || error.code), true);
+        return;
+      }
+
+      profilesData = profilesData.map(p =>
+        p.id === userId ? { ...p, is_admin: isAdmin } : p
+      );
+
+      showStatus("Statut admin mis à jour.", false);
+      renderUsers();
+    }
+
+    /* ========== ONGLET COURS / INSCRIPTIONS ========== */
+
+    function formatDateFR(d){
+      if(!(d instanceof Date) || isNaN(d.getTime())) return "";
+      return d.toLocaleDateString('fr-CH', {
+        weekday:'short', day:'2-digit', month:'2-digit'
+      });
+    }
+
+    function formatTimeFR(d){
+      if(!(d instanceof Date) || isNaN(d.getTime())) return "";
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      return hh + "h" + mm;
+    }
+
+    async function loadCoursesWithEnrollments(){
+      coursesContent.innerHTML = "<p>Chargement des cours…</p>";
+
+      const { data, error } = await supa
+        .from('courses')
+        .select('id, location, starts_at, capacity, enrollments(*)')
+        .order('starts_at', { ascending:true });
+
+      if(error){
+        console.error(error);
+        coursesContent.innerHTML = "<p>Erreur lors du chargement des cours.</p>";
+        showStatus("Erreur chargement cours/inscriptions : " + (error.message || error.code), true);
+        return;
+      }
+
+      coursesData = data || [];
+
+      buildCourseCityOptions();
+      renderCoursesAdmin();
+    }
+
+    function buildCourseCityOptions(){
+      if(!courseCityFilterEl) return;
+
+      const cities = Array.from(new Set(
+        coursesData
+          .map(c => c.location)
+          .filter(c => c && c.trim() !== "")
+      )).sort((a,b)=>a.localeCompare(b,'fr'));
+
+      courseCityFilterEl.innerHTML = '<option value="">Toutes les villes</option>' +
+        cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function renderCoursesAdmin(){
+      if(!coursesData.length){
+        coursesContent.innerHTML = "<p>Aucun cours trouvé.</p>";
+        if(courseStatsEl) courseStatsEl.textContent = "0 cours sélectionné(s)";
+        return;
+      }
+
+      const cityFilter = courseCityFilterEl ? (courseCityFilterEl.value || "") : "";
+
+      const coursesToDisplay = cityFilter
+        ? coursesData.filter(c => (c.location || "") === cityFilter)
+        : coursesData.slice();
+
+      const selectedCount = coursesToDisplay.length;
+      if(courseStatsEl){
+        courseStatsEl.textContent = `${selectedCount} cours sélectionné(s)`;
+      }
+
+      if(!coursesToDisplay.length){
+        coursesContent.innerHTML = "<p>Aucun cours ne correspond à ce filtre.</p>";
+        return;
+      }
+
+      const rows = coursesToDisplay.map(c=>{
+        const d = new Date(c.starts_at);
+        const dateTxt = formatDateFR(d);
+        const timeTxt = formatTimeFR(d);
+        const cap   = c.capacity || 0;
+        const inscr = (c.enrollments || []).length;
+        const rest  = cap ? (cap - inscr) : null;
+
+        const details = (c.enrollments || []).map(e=>{
+          const label =
+            e.child_name ||
+            e.rider_name ||
+            e.full_name ||
+            e.name ||
+            e.email ||
+            ("Inscription #" + e.id);
+
+          const extra = [];
+          if(e.birth_year) extra.push("né " + e.birth_year);
+          if(e.level)      extra.push("niveau: " + e.level);
+
+          return `<li>${label}${extra.length ? " — " + extra.join(", ") : ""}</li>`;
+        }).join("");
+
+        const detailBlock = details
+          ? `<ul style="margin:6px 0 0 18px;padding-left:0;list-style:disc;">${details}</ul>`
+          : `<em>Aucune inscription pour ce cours.</em>`;
+
+        return `
+          <tr class="course-header-row" data-course-id="${c.id}">
+            <td>${c.location || "Lieu ?"}<br>
+              <span style="font-size:11px;color:#9ca3af;">ID: ${c.id}</span>
+            </td>
+            <td>${dateTxt}<br><span style="font-size:12px;color:#9ca3af;">${timeTxt}</span></td>
+            <td class="center">${cap || "-"}</td>
+            <td class="center">
+              <span class="pill">${inscr} inscrit(s)</span>
+              ${rest !== null ? `<span class="pill">${rest} place(s) libre(s)</span>` : ""}
+            </td>
+          </tr>
+          <tr class="course-enrollments-row" data-course-id="${c.id}">
+            <td colspan="4">
+              ${detailBlock}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      coursesContent.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Cours / Lieu</th>
+              <th>Date & heure</th>
+              <th class="center">Capacité</th>
+              <th class="center">Inscriptions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // Click global : coach toggle + admin toggle + détails cours
+    document.addEventListener('click', (e)=>{
+      // Toggle coach
+      const coachCheckbox = e.target.closest('[data-role="coach-toggle"]');
+      if(coachCheckbox){
+        const row = coachCheckbox.closest('tr');
+        const userId = row?.dataset?.userId;
+        if(userId){
+          toggleCoach(userId, coachCheckbox.checked);
+        }
+        return;
+      }
+
+      // Toggle admin
+      const adminCheckbox = e.target.closest('[data-role="admin-toggle"]');
+      if(adminCheckbox){
+        const row = adminCheckbox.closest('tr');
+        const userId = row?.dataset?.userId;
+        if(userId){
+          toggleAdmin(userId, adminCheckbox.checked);
+        }
+        return;
+      }
+
+      // Toggle ligne d’inscriptions
+      const headerRow = e.target.closest('.course-header-row');
+      if(headerRow && headerRow.parentElement.closest('#coursesContent')){
+        const courseId = headerRow.dataset.courseId;
+        if(!courseId) return;
+        const detailRow = document.querySelector(
+          `.course-enrollments-row[data-course-id="${courseId}"]`
+        );
+        if(!detailRow) return;
+        detailRow.classList.toggle('open');
+      }
+    });
+
+    // Changement filtres
+    coachStatusFilterEl?.addEventListener('change', renderUsers);
+    coachCityFilterEl?.addEventListener('change', renderUsers);
+    courseCityFilterEl?.addEventListener('change', renderCoursesAdmin);
+
+    // Changement onglets
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.tab-btn');
+      if(!btn) return;
+
+      const tab = btn.dataset.tab;
+      if(!tab) return;
+
+      document.querySelectorAll('.tab-btn').forEach(b=>{
+        b.classList.toggle('active', b === btn);
+      });
+
+      const coachSection   = document.getElementById('tab-coachs');
+      const coursesSection = document.getElementById('tab-courses');
+
+      if(tab === 'coachs'){
+        coachSection?.classList.remove('hidden');
+        coursesSection?.classList.add('hidden');
+      }else if(tab === 'courses'){
+        coursesSection?.classList.remove('hidden');
+        coachSection?.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      try{
+        await checkIsAdmin();
+        await loadUsers();
+        await loadCoursesWithEnrollments();
+      }catch(e){
+        console.warn(e);
+      }
+    });
+  </script>
+</body>
+</html>

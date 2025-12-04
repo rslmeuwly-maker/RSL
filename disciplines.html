@@ -11,126 +11,356 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
+  <!-- Supabase + scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
+
   <style>
-    /* ======= NAVBAR (identique à index) ======= */
-    nav.nav {
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      position: sticky; top: 0; z-index: 100;
+    html, body{
+      height:100%;
+      margin:0;
+      background:transparent !important;
+      display:flex;
+      flex-direction:column;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
     }
-    nav.nav .container { max-width: 1320px; margin: 0 auto; padding: 12px 28px; }
-    nav.nav .row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand { display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img { height:48px; border-radius:10px; display:block; }
-    .brand span { font-weight:800; letter-spacing:.2px; font-size:17px; }
-    nav.nav ul { display:flex; align-items:center; gap:26px; }
-    nav.nav ul li a { font-weight:600; color:#e8f0ea; transition:.2s ease; font-size:17px; letter-spacing:.2px; white-space:nowrap; }
-    nav.nav ul li a:hover { color:#22c55e; }
-    .cta { display:flex; align-items:center; gap:12px; }
+    main{ flex:1; }
+
+    /* ===== VIDÉO DE FOND ===== */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+    }
+
+    /* ===== NAVBAR ===== */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+    nav.nav .container{
+      max-width:1320px;
+      margin:0 auto;
+      padding:12px 28px;
+    }
+    nav.nav .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      text-decoration:none;
+    }
+    .brand img{
+      height:48px;
+      border-radius:10px;
+      display:block;
+    }
+    .brand span{
+      font-weight:800;
+      font-size:17px;
+      letter-spacing:.2px;
+    }
+
+    nav.nav ul{
+      display:flex;
+      align-items:center;
+      gap:26px;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      text-decoration:none;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{
+      color:#22c55e;
+    }
+
+    .cta{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
     #menuBtn{
-      display:none; align-items:center; justify-content:center; gap:8px;
-      padding:10px 12px; font-size:18px; line-height:1;
-      border-radius:10px; border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12); color:#22c55e;
-      cursor:pointer; transition:.2s ease;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12);
+      color:#22c55e;
+      cursor:pointer;
+      transition:.2s ease;
     }
-    #menuBtn:hover { background:rgba(34,197,94,.22); }
+    #menuBtn:hover{
+      background:rgba(34,197,94,.22);
+    }
 
-    /* ======= HERO VIDÉO ======= */
-    .hero-video {
-      position:relative; color:#fff; min-height:65vh;
-      display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden;
-      margin-top:-4px;
+    /* Avatar nav */
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
     }
-    .hero-video::before {
-      content:""; position:absolute; inset:0;
-      background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.85)); z-index:1;
-    }
-    .hero-video .bg-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-    .hero-video .hero-inner { position:relative; z-index:2; max-width:900px; padding:20px; margin-top:-40px; }
-    .hero-video h1 { font-size:clamp(36px,5vw,54px); font-weight:800; margin-bottom:8px; }
-    .hero-video p { font-size:clamp(16px,2vw,22px); opacity:.95; margin-bottom:0; }
 
-    /* ======= SECTIONS ======= */
-    section.section { max-width:1200px; margin:40px auto; padding:0 24px; color:#e5f2ea; }
-    .section h2 { font-size:28px; font-weight:700; margin-bottom:14px; color:#22c55e; }
-    .card {
-      background: linear-gradient(180deg,#111827,#0f172a);
+    /* ===== CONTAINER PAGE ===== */
+    .container-page{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 24px 40px;
+    }
+
+    /* ===== INTRO / HERO TEXTE ===== */
+    .page-intro{
+      color:#fff;
+      padding:32px 0 18px;
+      text-align:left;
+    }
+    .page-intro h1{
+      font-size:clamp(32px,4.5vw,46px);
+      font-weight:800;
+      margin:6px 0 8px;
+    }
+    .page-intro p{
+      margin:0;
+      opacity:.95;
+      font-size:clamp(15px,2.1vw,19px);
+      max-width:720px;
+    }
+
+    /* ===== SECTIONS DISCIPLINES ===== */
+    section.section{
+      margin:10px 0 30px;
+      color:#e5f2ea;
+    }
+    .section h2{
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:14px;
+      color:#22c55e;
+    }
+    .card{
+      background:linear-gradient(180deg,#111827,#0f172a);
       border:1px solid rgba(255,255,255,.08);
       border-radius:18px;
       padding:24px 20px;
       box-shadow:0 8px 24px rgba(0,0,0,.25);
       text-align:left;
     }
-    .grid-2 { display:grid; gap:24px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
-    .badge { background:#22c55e; color:#062312; font-weight:700; border-radius:6px; padding:3px 8px; font-size:14px; margin-right:6px; }
-    ul.list { list-style:disc; margin-left:20px; line-height:1.6; font-size:16px; color:#d1d5db; }
+    .grid-2{
+      display:grid;
+      gap:24px;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    }
+    .badge{
+      background:#22c55e;
+      color:#062312;
+      font-weight:700;
+      border-radius:6px;
+      padding:3px 8px;
+      font-size:13px;
+      margin:0 6px 6px 0;
+      display:inline-block;
+    }
+    ul.list{
+      list-style:disc;
+      margin-left:20px;
+      line-height:1.6;
+      font-size:15px;
+      color:#d1d5db;
+    }
 
-    /* ======= RÈGLEMENT ======= */
-    .reglement { background:#0b1220; padding:50px 24px; text-align:center; margin-top:30px; }
-    .reglement h2 { color:#22c55e; margin-bottom:12px; font-size:28px; }
-    .reglement ul { text-align:left; max-width:700px; margin:25px auto; color:#d1d5db; font-size:17px; line-height:1.7; }
+    /* ===== RÈGLEMENT ===== */
+    .reglement{
+      margin-top:20px;
+      background:rgba(15,23,42,.95);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      padding:26px 20px 26px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,.4);
+    }
+    .reglement h2{
+      color:#22c55e;
+      margin-bottom:12px;
+      font-size:24px;
+    }
+    .reglement ul{
+      text-align:left;
+      max-width:720px;
+      margin:20px auto 0;
+      color:#d1d5db;
+      font-size:15px;
+      line-height:1.7;
+      padding-left:18px;
+    }
 
-    /* ======= FOOTER ======= */
-    .footer-mini .copy {
-      text-align:center; color:#9aa5b1; font-size:14px;
-      padding:20px 0 24px; margin:0;
+    /* ===== FOOTER ===== */
+    .footer-mini .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:14px;
+      padding:20px 0 24px;
+      margin:0;
       border-top:1px solid rgba(255,255,255,.1);
-      background:rgba(0,0,0,.2);
+      background:transparent;
     }
 
-    /* ======= MENU MOBILE ======= */
-    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
-    .mobile-sheet.open{ display:block; }
-    .mobile-sheet .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
-    .mobile-sheet .mobile-panel{
-      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
-      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    /* ===== MENU MOBILE ===== */
+    .mobile-sheet{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:120;
     }
-    .mobile-sheet .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
-    .mobile-sheet .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
-    .mobile-panel .coach-link { border-top:1px solid rgba(255,255,255,.12); margin-top:8px; padding-top:12px; font-weight:700; }
+    .mobile-sheet.open{display:block;}
+    .mobile-dim{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.5);
+    }
+    .mobile-panel{
+      position:absolute;
+      top:0;
+      right:0;
+      height:100%;
+      width:82vw;
+      max-width:360px;
+      background:#0b1220;
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{
+      color:#eaf5ee;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 0;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(255,255,255,.1);
+      margin:10px 0;
+    }
+    .mobile-panel .coach-link{
+      border-top:1px solid rgba(255,255,255,.12);
+      margin-top:8px;
+      padding-top:12px;
+      font-weight:700;
+    }
 
-    @media (max-width:990px){
-      nav.nav ul{display:none!important;}#menuBtn{display:inline-flex;}
+    /* ===== BOUTON COACH FLOTTANT ===== */
+    .coach-fab{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:80;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      font-weight:800;
+      text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      border:0;
+    }
+
+    @media(max-width:990px){
+      nav.nav ul{display:none !important;}
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{display:inline-flex;}
+      .coach-fab{display:none;}
     }
   </style>
 </head>
 <body>
 
-  <!-- ======= NAV ======= -->
+  <!-- VIDÉO DE FOND -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
+
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html" aria-label="Accueil RSL">
+        <a class="brand" href="index.html">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
-        <!-- Menu PC identique à index -->
         <ul>
           <li><a href="cours.html">Cours</a></li>
           <li><a href="formation.html">Formation RSL</a></li>
           <li><a href="ou_rider.html">Où rider ?</a></li>
           <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html" style="color:#22c55e">Disciplines</a></li>
+          <li><a href="disciplines.html" aria-current="page">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
           <li><a href="comite.html">Comité</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
 
         <div class="cta">
+          <button class="btn dark" id="btnLogin">Login</button>
           <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-          <button class="btn dark" id="btnMon compte">Mon compte</button>
-          <a class="btn green" href="cours.html">Cours RSL</a>
+
+          <!-- AVATAR -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn" aria-label="Menu">☰</button>
+          <button id="menuBtn">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- ======= MENU MOBILE ======= -->
+  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
@@ -138,7 +368,8 @@
       <a href="formation.html">Formation RSL</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
-      <a href="disciplines.html">Disciplines</a>
+      <a href="disciplines.html" aria-current="page">Disciplines</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <hr/>
@@ -149,93 +380,165 @@
     </nav>
   </div>
 
-  <!-- ======= HERO VIDÉO ======= -->
-  <section class="hero-video">
-    <video class="bg-video" autoplay muted loop playsinline poster="images/hero-poster.jpg">
-      <source src="images/trottvideo.mp4" type="video/mp4">
-    </video>
-    <div class="hero-inner">
-      <h1>Disciplines & Règlement</h1>
-      <p>Les deux styles majeurs de la trottinette freestyle : <strong>Park</strong> & <strong>Street</strong></p>
-    </div>
-  </section>
+  <!-- CONTENU -->
+  <main>
+    <div class="container-page">
+      <!-- Intro -->
+      <header class="page-intro">
+        <h1>Disciplines & Règlement</h1>
+        <p>
+          Les deux styles majeurs de la trottinette freestyle : <strong>Park</strong> &amp; <strong>Street</strong>.<br/>
+          La RSL encadre les contests officiels avec un règlement clair et adapté à tous les niveaux.
+        </p>
+      </header>
 
-  <!-- ======= DISCIPLINES ======= -->
-  <section class="section">
-    <div class="grid-2">
-      <article class="card">
-        <h2>Trottinette Freestyle — Park</h2>
-        <p>Skateparks avec bowls, spines et quarters. Amplitude, flow et gros airs.</p>
-        <div style="margin:10px 0;">
-          <span class="badge">Bowls</span>
-          <span class="badge">Spines</span>
-          <span class="badge">Funbox</span>
-          <span class="badge">Quarters</span>
+      <!-- DISCIPLINES -->
+      <section class="section">
+        <div class="grid-2">
+          <article class="card">
+            <h2>Trottinette Freestyle — Park</h2>
+            <p>Skateparks avec bowls, spines et quarters. Amplitude, flow et gros airs.</p>
+            <div style="margin:10px 0;">
+              <span class="badge">Bowls</span>
+              <span class="badge">Spines</span>
+              <span class="badge">Funbox</span>
+              <span class="badge">Quarters</span>
+            </div>
+            <ul class="list">
+              <li>Figures : backflips, tailwhips, bri flips, combos aériens</li>
+              <li>Critères : amplitude, style, propreté</li>
+              <li>Format : runs chronométrés, meilleure note retenue</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h2>Trottinette Freestyle — Street</h2>
+            <p>Rails, ledges, marches. Technique, précision et créativité urbaine.</p>
+            <div style="margin:10px 0;">
+              <span class="badge">Rails</span>
+              <span class="badge">Ledges</span>
+              <span class="badge">Gaps</span>
+              <span class="badge">Curbs</span>
+            </div>
+            <ul class="list">
+              <li>Figures : grinds, slides, manuals, lignes techniques</li>
+              <li>Critères : difficulté, contrôle, originalité</li>
+              <li>Format : best line ou best trick</li>
+            </ul>
+          </article>
         </div>
-        <ul class="list">
-          <li>Figures : backflips, tailwhips, bri flips, combos aériens</li>
-          <li>Critères : amplitude, style, propreté</li>
-          <li>Format : runs chronométrés, meilleure note retenue</li>
-        </ul>
-      </article>
+      </section>
 
-      <article class="card">
-        <h2>Trottinette Freestyle — Street</h2>
-        <p>Rails, ledges, marches. Technique, précision et créativité urbaine.</p>
-        <div style="margin:10px 0;">
-          <span class="badge">Rails</span>
-          <span class="badge">Ledges</span>
-          <span class="badge">Gaps</span>
-          <span class="badge">Curbs</span>
-        </div>
-        <ul class="list">
-          <li>Figures : grinds, slides, manuals, lignes techniques</li>
-          <li>Critères : difficulté, contrôle, originalité</li>
-          <li>Format : best line ou best trick</li>
+      <!-- RÈGLEMENT -->
+      <section class="reglement">
+        <h2>Règlement Officiel RSL</h2>
+        <ul>
+          <li>⚠️ <b>Casque obligatoire</b> pour tous les riders.</li>
+          <li>Qualifications : 2 runs (45–60s) — le meilleur compte.</li>
+          <li>Finale : 2 runs — le meilleur compte.</li>
+          <li>Grille de 100 points : difficulté (40), exécution (30), style (20), créativité (10).</li>
+          <li>Classement général du tour : 2 meilleurs résultats sur 3 manches.</li>
+          <li>Protections supplémentaires (genouillères, coudières, dorsales) fortement recommandées.</li>
+          <li>Les juges sont choisis pour leur expérience, leur neutralité et leur connaissance de la scène.</li>
         </ul>
-      </article>
+      </section>
     </div>
-  </section>
+  </main>
 
-  <!-- ======= RÈGLEMENT ======= -->
-  <section class="reglement">
-    <h2>Règlement Officiel RSL</h2>
-    <ul>
-      <li>⚠️ <b>Casque obligatoire</b> pour tous les riders.</li>
-      <li>Qualifications : 2 runs (45–60s) — le meilleur compte.</li>
-      <li>Finale : 2 runs — le meilleur compte.</li>
-      <li>Grille de 100 points : difficulté (40), exécution (30), style (20), créativité (10).</li>
-      <li>Classement du tour : 2 meilleurs résultats sur 3 manches.</li>
-      <li>Protections supplémentaires recommandées.</li>
-      <li>Juges choisis pour expérience et neutralité.</li>
-    </ul>
-  </section>
-
-  <!-- ======= FOOTER ======= -->
+  <!-- FOOTER -->
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- ======= SCRIPTS ======= -->
+  <!-- Bouton coach flottant -->
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+
+  <!-- SCRIPTS LOCAUX -->
   <script>
-    // Burger mobile
-    const menuBtn=document.getElementById('menuBtn');
-    const mobile=document.getElementById('mobileMenu');
-    menuBtn?.addEventListener('click',e=>{
-      e.stopPropagation();
-      mobile.classList.add('open');
-      mobile.setAttribute('aria-hidden','false');
-    });
-    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
-      mobile.classList.remove('open');
-      mobile.setAttribute('aria-hidden','true');
-    });
-    document.addEventListener('keydown',e=>{
-      if(e.key==='Escape'){
+    // Vidéo de fond Supabase aléatoire
+    (function(){
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
+
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
+
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
+      start();
+
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden){
+          v.pause();
+        }else{
+          start();
+        }
+      });
+    })();
+
+    // Menu burger
+    (function(){
+      const menuBtn = document.getElementById('menuBtn');
+      const mobile  = document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click', e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
         mobile.classList.remove('open');
         mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown', e=>{
+        if(e.key === 'Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // Login ↔ Compte
+    (async function(){
+      if(typeof supabase === 'undefined') return;
+      try{
+        const { data:{ user } } = await supabase.auth.getUser();
+        const btnLogin   = document.getElementById('btnLogin');
+        const btnAccount = document.getElementById('btnAccount');
+
+        function ui(u){
+          if(!btnLogin || !btnAccount) return;
+          if(u){
+            btnAccount.style.display = 'inline-flex';
+            btnLogin.style.display   = 'none';
+          }else{
+            btnAccount.style.display = 'none';
+            btnLogin.style.display   = 'inline-flex';
+            btnLogin.textContent     = 'Login';
+          }
+        }
+
+        ui(user);
+        btnLogin?.addEventListener('click', ()=>location.href='compte.html');
+        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
+      }catch(e){
+        console.error(e);
       }
-    });
+    })();
   </script>
 </body>
 </html>

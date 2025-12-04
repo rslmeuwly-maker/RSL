@@ -5,276 +5,258 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Comité — Romandie Scooter League</title>
 
-  <!-- Fonts + style global -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
+  <!-- Supabase + scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
+
   <style>
-    :root{--g:#22c55e}
+    html, body { height:100%; margin:0; background:transparent!important; color:#fff;
+    font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial; display:flex; flex-direction:column; }
+    main{ flex:1; }
 
-    html,body{height:100%;margin:0}
-    body{
-      font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:#000;color:#fff;
-      display:flex;flex-direction:column;
+    /* Fond vidéo */
+    .site-bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; background:#000; }
+    .site-bg-dim{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8)); }
+
+    /* NAV – IDENTIQUE INDEX */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      position:sticky; top:0; z-index:100;
     }
-    main{flex:1;z-index:10;position:relative}
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:48px; border-radius:10px; display:block; }
+    .brand span{ font-weight:800; font-size:17px; letter-spacing:.2px; }
+    nav.nav ul{ display:flex; align-items:center; gap:26px; }
+    nav.nav ul li a{ font-weight:600; color:#e8f0ea; font-size:17px; letter-spacing:.2px; text-decoration:none; }
+    nav.nav ul li a:hover{ color:#22c55e; }
 
-    /* ===== Vidéo de fond ===== */
-    .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
-    .rsl-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
-    .rsl-bg-dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.7))}
-
-    /* ===== NAV identique ===== */
-    nav.nav{position:sticky;top:0;z-index:1000;background:rgba(0,0,0,.65);backdrop-filter:blur(8px)}
-    nav.nav .container{max-width:1320px;margin:0 auto;padding:12px 28px}
-    nav.nav .row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
-    .brand img{height:48px;border-radius:10px}
-    .brand span{font-weight:800;font-size:17px}
-    nav.nav ul{display:flex;align-items:center;gap:26px}
-    nav.nav ul li a{font-weight:600;color:#e8f0ea;font-size:17px;letter-spacing:.2px;white-space:nowrap}
-    nav.nav ul li a:hover{color:var(--g)}
-    .cta{display:flex;align-items:center;gap:12px}
-    #menuBtn{display:none;align-items:center;justify-content:center;padding:10px 12px;font-size:18px;line-height:1;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(34,197,94,.12);color:var(--g);cursor:pointer}
-    #menuBtn:hover{background:rgba(34,197,94,.22)}
-    @media (max-width:990px){nav.nav ul{display:none !important}.cta a{display:none !important}#menuBtn{display:inline-flex}}
-
-    /* ===== MENU MOBILE ===== */
-    .mobile-sheet{position:fixed;inset:0;display:none;z-index:3000}
-    .mobile-sheet.open{display:block}
-    .mobile-sheet .mobile-dim{position:absolute;inset:0;background:rgba(0,0,0,.5)}
-    .mobile-sheet .mobile-panel{
-      position:absolute;top:0;right:0;height:100%;width:82vw;max-width:360px;
-      background:#0b1220;padding:22px 18px;display:flex;flex-direction:column;gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);box-shadow:-12px 0 30px rgba(0,0,0,.35)
+    .cta{ display:flex; align-items:center; gap:12px; }
+    #menuBtn{
+      display:none; padding:10px 12px; border-radius:10px; font-size:18px;
+      background:rgba(34,197,94,.12); border:1px solid rgba(255,255,255,.12); color:#22c55e;
     }
-    .mobile-sheet .mobile-panel a{color:#eaf5ee;text-decoration:none;font-weight:700;padding:8px 0}
-    .mobile-sheet .mobile-panel hr{border:0;height:1px;background:rgba(255,255,255,.1);margin:10px 0}
-
-    /* ===== Bandeau titre ===== */
-    .page-mini-hero{color:#fff;padding:28px 0 10px;text-align:center;z-index:10;position:relative}
-    .page-mini-hero h1{margin:0;font-size:clamp(30px,5vw,44px);font-weight:800}
-    .page-mini-hero p{opacity:.9;margin:4px 0 0}
-
-    /* ===== Comité ===== */
-    .committee-wrap{max-width:1200px;margin:40px auto;padding:0 20px}
-    .committee{
-      display:grid;gap:18px;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+    #menuBtn:hover{ background:rgba(34,197,94,.22); }
+    .nav-avatar{
+      width:38px; height:38px; border-radius:999px; object-fit:cover;
+      border:2px solid #22c55e; box-shadow:0 0 10px rgba(34,197,94,.5);
     }
-    @media (max-width:1100px){.committee{grid-template-columns:repeat(3,1fr)}}
-    @media (max-width:800px){.committee{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:520px){.committee{grid-template-columns:1fr}}
 
+    @media(max-width:990px){
+      nav.nav ul{ display:none!important; }
+      #btnCart, #btnLogin, #btnAccount, .btn.green{ display:none!important; }
+      #menuBtn{ display:inline-flex; }
+      .coach-fab{ display:none; }
+    }
+
+    /* MENU MOBILE */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-panel{
+      position:absolute; right:0; top:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+    }
+    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+
+    /* CONTENU */
+    .container-page{ max-width:1200px; margin:0 auto; padding:0 24px 40px; }
+    .page-intro h1{ font-size:clamp(32px,4.5vw,46px); font-weight:800; margin:10px 0; }
+    .committee{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
     .member{
-      background:linear-gradient(180deg,#111827,#0f172a);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px; padding:18px; text-align:center;
-      box-shadow:0 8px 24px rgba(0,0,0,.25);
+      background:rgba(15,23,42,.9); padding:18px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.08); text-align:center; backdrop-filter:blur(6px);
     }
-    .member img{
-      width:120px;height:120px;border-radius:999px;object-fit:cover;
-      display:block;margin:0 auto 10px;border:2px solid rgba(255,255,255,.18)
-    }
-    .member h3{margin:6px 0 4px}
-    .member p{margin:0;opacity:.9}
+    .member img{ width:120px; height:120px; border-radius:999px; object-fit:cover;
+      border:2px solid rgba(255,255,255,.18); margin-bottom:10px; }
 
-    /* ===== Vision bloc ===== */
     .vision{
-      max-width:1100px;margin:46px auto 60px;padding:0 20px;
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;padding:26px
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:22px; margin-top:40px; backdrop-filter:blur(6px);
     }
-    .vision h2{margin:0 0 4px;color:var(--g)}
-    .vision .muted{opacity:.9}
-    .vision p{line-height:1.8;font-size:17px;margin:14px 0 0}
+    .vision h2{ margin:0 0 6px; color:#22c55e; font-size:22px; }
+    .vision p{ font-size:15px; line-height:1.7; color:#e5e7eb; margin:14px 0; }
 
-    /* ===== Footer mini ===== */
+    /* FOOTER */
     .footer-mini .copy{
-      color:#9aa5b1;text-align:center;border-top:1px solid rgba(255,255,255,.1);
-      background:rgba(0,0,0,.25);margin:0;padding:24px 0 28px;font-size:14px
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:24px 0; border-top:1px solid rgba(255,255,255,.12);
     }
 
-    /* Coach FAB (PC) */
-    .coach-fab{display:none;position:fixed;right:16px;bottom:16px;z-index:80;
-      padding:12px 14px;border-radius:12px;background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312;font-weight:800;text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15)
+    /* FAB COACH */
+    .coach-fab{
+      position:fixed; right:16px; bottom:16px; padding:12px 14px; border-radius:12px;
+      background:linear-gradient(180deg,#22c55e,#16a34a); color:#062312; font-weight:800;
+      text-decoration:none; box-shadow:0 10px 24px rgba(0,0,0,.35);
     }
-    @media (min-width:991px){.coach-fab{display:inline-flex}}
   </style>
 </head>
 <body>
 
-  <!-- Vidéo de fond -->
-  <div class="rsl-bg-wrap" aria-hidden="true">
-    <video class="rsl-bg-video" autoplay muted loop playsinline preload="auto" poster="images/hero-poster.jpg">
-      <source src="images/trottvideo2.mp4" type="video/mp4">
-    </video>
-    <div class="rsl-bg-dim"></div>
-  </div>
+<!-- Fond vidéo -->
+<video class="site-bg-video" autoplay muted loop playsinline id="rslBg"></video>
+<div class="site-bg-dim"></div>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="container">
-      <div class="row">
-        <a class="brand" href="index.html">
-          <img src="images/logo_rsl.png" alt="Logo RSL"/>
-          <span>RSL — Romandie Scooter League</span>
+<!-- NAV -->
+<nav class="nav">
+  <div class="container">
+    <div class="row">
+      <a class="brand" href="index.html">
+        <img src="images/logo_rsl.png" alt="Logo RSL"/>
+        <span>RSL — Romandie Scooter League</span>
+      </a>
+
+      <ul>
+        <li><a href="cours.html">Cours</a></li>
+        <li><a href="formation.html">Formation RSL</a></li>
+        <li><a href="ou_rider.html">Où rider ?</a></li>
+        <li><a href="evenements.html">Événements</a></li>
+        <li><a href="disciplines.html">Disciplines</a></li>
+        <li><a href="shop-rsl.html">Shop</a></li>
+        <li><a href="comite.html">Comité</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+
+      <div class="cta">
+        <button class="btn dark" id="btnLogin">Login</button>
+        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+        <a href="compte.html">
+          <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="" style="display:none;">
         </a>
-        <ul>
-          <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-        <div class="cta">
-          <a class="btn dark" href="compte.html">Mon compte</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn">☰</button>
-        </div>
+
+        <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+        <a class="btn green" href="membres.html">Devenir membre</a>
+        <button id="menuBtn">☰</button>
       </div>
     </div>
-  </nav>
-
-  <!-- Menu mobile -->
-  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
-    <div class="mobile-dim"></div>
-    <nav class="mobile-panel">
-      <a href="cours.html">Cours</a>
-      <a href="formation.html">Formation RSL</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html">Événements</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <hr/>
-      <a href="membres.html">Devenir membre</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
-    </nav>
   </div>
+</nav>
 
-  <!-- Bandeau -->
-  <section class="page-mini-hero">
+<!-- MENU MOBILE -->
+<div class="mobile-sheet" id="mobileMenu">
+  <div class="mobile-dim"></div>
+  <nav class="mobile-panel">
+    <a href="index.html">Accueil</a>
+    <a href="cours.html">Cours</a>
+    <a href="membres.html">Devenir membre</a>
+    <a href="formation.html">Formation RSL</a>
+    <a href="disciplines.html">Disciplines</a>
+    <a href="ou_rider.html">Où rider ?</a>
+    <a href="evenements.html">Événements</a>
+    <a href="game.html">Games</a>
+    <a href="shop-rsl.html">Shop</a>
+    <a href="comite.html">Comité</a>
+    <a href="contact.html">Contact</a>
+    <a href="conditions.html">Conditions générales</a>
+    <a href="compte.html">Mon compte</a>
+    <a href="coach.html">👨‍🏫 Je suis coach</a>
+  </nav>
+</div>
+
+<!-- CONTENU -->
+<main class="container-page">
+  <div class="page-intro">
     <h1>Comité</h1>
     <p>L’équipe qui fait tourner la Romandie Scooter League.</p>
-  </section>
-
-  <!-- Comité -->
-  <main>
-    <div class="committee-wrap">
-      <div class="committee">
-        <article class="member">
-          <img src="images/comite_joel.png" alt="Joël Meuwly" loading="lazy">
-          <h3>Joël Meuwly</h3>
-          <p class="muted">Président · Coordination · Résultats · Sponsors</p>
-        </article>
-
-        <article class="member">
-          <img src="images/comite_william.png" alt="William Maurer" loading="lazy">
-          <h3>William Maurer</h3>
-          <p class="muted">Comptable · Trésorier · Prof RSL</p>
-        </article>
-
-        <article class="member">
-          <img src="images/comite_florian.png" alt="Florian Barbezat" loading="lazy">
-          <h3>Florian Barbezat</h3>
-          <p class="muted">Responsable médias · Prof RSL</p>
-        </article>
-
-        <article class="member">
-          <img src="images/comite_louis.png" alt="Louis Zanolli" loading="lazy">
-          <h3>Louis Zanolli</h3>
-          <p class="muted">Co-responsable médias · Prof RSL</p>
-        </article>
-      </div>
-    </div>
-
-    <!-- Vision -->
-    <div class="vision">
-      <h2>Notre vision</h2>
-      <span class="muted">Pourquoi la RSL existe</span>
-      <p>
-        La <b>Romandie Scooter League (RSL)</b> est née d’une conviction simple :
-        la trottinette freestyle mérite un cadre structuré, humain et passionné, à l’image des riders qui la font vivre.
-      </p>
-      <p>
-        Nous réunissons des générations de riders autour d’une mission : créer une structure claire et accessible pour apprendre,
-        progresser, former les moniteurs de demain et unir les clubs et skateparks de Suisse romande autour d’une même passion.
-      </p>
-      <p>
-        La RSL n’est pas une fédération froide : c’est une famille de passionnés qui croit en la transmission,
-        la progression et le respect. Chaque cours, chaque jam, chaque sourire sur un skatepark fait grandir cette culture.
-      </p>
-      <p>
-        Notre but : offrir un cadre solide, humain et durable à la trottinette freestyle romande, pour tous les âges et niveaux.
-      </p>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer-mini">
-    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
-  </footer>
-
-  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
-
-  <!-- HelpBot (RSL) -->
-  <link rel="stylesheet" href="css/helpbot.css">
-  <div id="hb-root">
-    <button class="hb-launcher" id="hbOpen" aria-label="Ouvrir l’aide">💬</button>
-    <div class="hb-panel" id="hbPanel" role="dialog" aria-modal="true" aria-labelledby="hbTitle">
-      <div class="hb-head">
-        <div class="title" id="hbTitle">Aide — RSL</div>
-        <div class="actions">
-          <button class="hb-icon-btn" id="hbMin" title="Réduire">▁</button>
-          <button class="hb-icon-btn" id="hbClose" title="Fermer">✕</button>
-        </div>
-      </div>
-      <div class="hb-body" id="hbBody"></div>
-      <div class="hb-foot">
-        <input id="hbInput" class="hb-input" type="text" placeholder="Pose ta question… (ex: prix des cours, remboursement)">
-        <button id="hbSend" class="hb-send">Envoyer</button>
-      </div>
-    </div>
   </div>
 
-  <!-- Scripts -->
-  <script defer src="js/helpbot.js"></script>
+  <div class="committee">
+    <article class="member">
+      <img src="images/comite_joel.png" alt="">
+      <h3>Joël Meuwly</h3>
+      <p>Président — Coordination — Résultats — Sponsors</p>
+    </article>
 
-  <script>
-  // Vidéo de fond (lecture douce)
-  window.addEventListener('DOMContentLoaded',()=>{
-    const v=document.querySelector('.rsl-bg-video');
-    try{ v.playbackRate=0.6; v.play().catch(()=>{});}catch(e){}
-  });
+    <article class="member">
+      <img src="images/comite_william.png" alt="">
+      <h3>William Maurer</h3>
+      <p>Comptable — Trésorier — Prof RSL</p>
+    </article>
 
-  // Menu burger mobile (comme Contact)
-  const menuBtn=document.getElementById('menuBtn');
-  const mobile=document.getElementById('mobileMenu');
-  menuBtn?.addEventListener('click',e=>{
-    e.stopPropagation();
-    mobile.classList.add('open');
-    mobile.setAttribute('aria-hidden','false');
-  });
-  mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
-    mobile.classList.remove('open');
-    mobile.setAttribute('aria-hidden','true');
-  });
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){
-      mobile.classList.remove('open');
-      mobile.setAttribute('aria-hidden','true');
+    <article class="member">
+      <img src="images/comite_florian.png" alt="">
+      <h3>Florian Barbezat</h3>
+      <p>Responsable médias — Prof RSL</p>
+    </article>
+
+    <article class="member">
+      <img src="images/comite_louis.png" alt="">
+      <h3>Louis Zanolli</h3>
+      <p>Co-responsable médias — Prof RSL</p>
+    </article>
+  </div>
+
+  <div class="vision">
+    <h2>Notre vision</h2>
+
+    <p>L’histoire de la RSL commence avec Ride4Style, construite depuis 2018 pour donner une vraie structure à la trottinette freestyle en Suisse romande.</p>
+
+    <p>Des cours, des stages, des contests, une communauté grandissante : coachs, parents, riders. La RSL est la continuité naturelle.</p>
+
+    <p>Objectif : offrir une progression claire, du premier drop aux contests officiels, dans un cadre cohérent et passionné.</p>
+
+    <p>Notre but : que les riders puissent dire un jour « j’ai grandi avec la RSL ».</p>
+  </div>
+</main>
+
+<footer class="footer-mini">
+  <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+</footer>
+
+<a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+
+<!-- SCRIPTS -->
+<script>
+  (function(){
+    const vids=[
+      "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+      "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+    ];
+    const pick=vids[Math.floor(Math.random()*vids.length)];
+    const v=document.getElementById('rslBg');
+    if(!v) return;
+    const s=document.createElement('source');
+    s.src=pick; s.type='video/mp4';
+    v.appendChild(s);
+    v.playbackRate=0.6;
+  })();
+</script>
+
+<script>
+  (function(){
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click',()=> mobile.classList.add('open'));
+    document.querySelector('.mobile-dim').addEventListener('click',()=> mobile.classList.remove('open'));
+  })();
+</script>
+
+<script>
+  (async function(){
+    if(typeof supabase==='undefined') return;
+    const {data:{user}}=await supabase.auth.getUser();
+    const login=document.getElementById('btnLogin');
+    const acc=document.getElementById('btnAccount');
+    function ui(u){
+      if(u){ acc.style.display='inline-flex'; login.style.display='none'; }
+      else{ acc.style.display='none'; login.style.display='inline-flex'; }
     }
-  });
-  </script>
+    ui(user);
+    supabase.auth.onAuthStateChange((_e,s)=> ui(s?.user ?? null));
+  })();
+</script>
+
 </body>
 </html>

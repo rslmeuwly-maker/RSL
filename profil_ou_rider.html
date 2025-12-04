@@ -24,18 +24,6 @@
     position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
     padding:12px 16px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)
   }
-  header .brand{
-    display:flex;
-    align-items:center;
-  }
-  header .brand img{
-    height:34px;
-    width:34px;
-    border-radius:8px;
-    background:#fff;
-    padding:4px;
-  }
-
   header a{color:#fff;text-decoration:none;font-weight:800}
   header a:hover{color:var(--green)}
   header .ttl{font-weight:800;letter-spacing:.2px}
@@ -76,25 +64,8 @@
   .empty{color:#9aa5b1;text-align:center;margin:18px 0 8px}
 
   /* Tabbar (même que feed) */
-  .tabbar{
-    position:fixed;
-    left:0;right:0;bottom:0;
-    z-index:2000;
-    display:flex;
-    align-items:center;
-    justify-content:space-around;
-    padding:10px 12px;
-    border-top:1px solid var(--border);
-    background:rgba(0,0,0,.78);
-    backdrop-filter:blur(10px);
-  }
-  .tab{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
-    text-decoration:none;
-  }
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-around;gap:6px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.6);backdrop-filter:blur(8px)}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none}
   .tab .ic{font-size:20px}
   .tab span{font-size:11px;color:#e5e7eb;font-weight:700}
   .tab.active span{color:#22c55e}
@@ -109,11 +80,9 @@
 </div>
 
 <header>
-  <a class="brand" href="ou_rider.html">
-    <img src="images/logo_rsl.png" alt="RSL"/>
-  </a>
+  <a href="ou_rider.html">← Carte</a>
   <div class="ttl">Profil rider</div>
-  <a class="link" href="feed.html">Feed →</a>
+  <a href="feed.html">Feed →</a>
 </header>
 
 <main class="wrap">
@@ -166,21 +135,11 @@
 
 <!-- Tabbar unifiée -->
 <nav class="tabbar" aria-label="Navigation">
-  <a class="tab" href="ou_rider.html" title="Carte / Spots">
-    <div class="ic">🏠</div><span>Spots</span>
-  </a>
-  <a class="tab" href="ajouter.html" title="Ajouter">
-    <div class="ic">➕</div><span>Ajouter</span>
-  </a>
-  <a class="tab" href="feed.html" title="Vidéos">
-    <div class="ic">🎬</div><span>Feed</span>
-  </a>
-  <a class="tab" href="recherche.html" title="Recherche">
-    <div class="ic">🔎</div><span>Recherche</span>
-  </a>
-  <a class="tab active" href="profil_ou_rider.html" title="Profil">
-    <div class="ic">👤</div><span>Profil</span>
-  </a>
+  <a class="tab" data-page="spots"   href="ou_rider.html"            title="Carte"><div class="ic">🏠</div><span>Carte</span></a>
+  <a class="tab" data-page="add"     href="feed.html#composer"       title="Ajouter vidéo ou photos"><div class="ic">➕</div><span>Ajouter</span></a>
+  <a class="tab" data-page="feed"    href="feed.html"                 title="Feed"><div class="ic">🎬</div><span>Feed</span></a>
+  <a class="tab" data-page="search"  href="recherche.html"            title="Recherche par spot"><div class="ic">🔎</div><span>Recherche</span></a>
+  <a class="tab active" data-page="profile" href="profil_ou_rider.html" title="Profil"><div class="ic">👤</div><span>Profil</span></a>
 </nav>
 
 <script>

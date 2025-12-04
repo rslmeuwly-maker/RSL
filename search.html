@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Recherche — RSL</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{ --green:#22c55e; --green-dark:#16a34a; }
+  body{margin:0;background:#000;color:#fff;font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+  /* vidéo fond (juste assombrie) */
+  .bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;filter:brightness(.5) saturate(1.05)}
+  .bg-dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.7))}
+
+  header{position:relative;z-index:10;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.12);padding:14px 18px;display:flex;gap:10px;align-items:center}
+  header .t{font-weight:800}
+
+  .wrap{position:relative;z-index:10;max-width:980px;margin:14px auto 110px;padding:0 16px}
+  .search{display:flex;gap:8px;align-items:center;margin:6px 0 14px}
+  .search input{
+    flex:1;background:#0b1220;border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;
+    padding:12px 14px;font:600 15px Outfit;outline:none
+  }
+  .search input:focus{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.25)}
+  .tip{margin:-6px 0 12px;color:#9aa5b1;font:500 12px/1.4 Outfit}
+
+  .group{margin:14px 0}
+  .group h2{margin:0 0 8px;font:800 14px Outfit;color:#cdd6ff;letter-spacing:.3px}
+  .item{
+    display:flex;justify-content:space-between;gap:10px;align-items:center;
+    padding:12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.6);
+    margin:8px 0; text-decoration:none; color:#fff;
+  }
+  .item:hover{border-color:rgba(34,197,94,.6)}
+  .item .left{min-width:0}
+  .item .name{font:800 15px/1.25 Outfit;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item .meta{font:600 12px/1.35 Outfit;color:#9aa5b1}
+  .badge{
+    font:800 11px Outfit;padding:6px 8px;border-radius:8px;white-space:nowrap
+  }
+  .badge.park{background:linear-gradient(180deg,#7c3aed,#4c1d95);color:#fff}
+  .badge.street{background:linear-gradient(180deg,#f97316,#b45309);color:#1f1308}
+
+  /* bottom bar */
+  .rsl-tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5000;display:flex;justify-content:space-around;align-items:center;padding:10px 12px calc(env(safe-area-inset-bottom,0) + 10px);background:rgba(0,0,0,.78);border-top:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+  .rsl-tab{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#cbd5e1;font:600 11px/1 Outfit;min-width:58px}
+  .rsl-tab svg{width:24px;height:24px;stroke:#cbd5e1;fill:none}
+  .rsl-tab.active{color:#22c55e}.rsl-tab.active svg{stroke:#22c55e}
+  .rsl-tab.plus{background:linear-gradient(180deg,#22c55e,#16a34a);color:#062312;border-radius:14px;padding:8px 12px;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+  .rsl-tab.plus svg{stroke:#062312}
+  @media(min-width:900px){.rsl-tabbar{display:none}}
+</style>
+</head>
+<body>
+
+<div class="bg-wrap" aria-hidden="true">
+  <video class="bg-video" id="bgVid" autoplay muted loop playsinline preload="auto"></video>
+  <div class="bg-dim"></div>
+</div>
+
+<header>
+  <div class="t">RSL • Recherche</div>
+</header>
+
+<main class="wrap">
+  <div class="search">
+    <input id="q" type="search" placeholder="Recherche : Lausanne, Vidy, bowl, GE, rail…"/>
+  </div>
+  <div class="tip">Tape pour chercher dans les <b>skateparks</b> et les <b>street spots</b> (nom, ville, canton, type, description).</div>
+
+  <div id="results">
+    <div class="group"><h2>Suggestions</h2>
+      <a class="item" href="spot.html?id=1"><div class="left"><div class="name">Exemple — Vidy</div><div class="meta">Lausanne (VD)</div></div><div class="badge park">Skatepark</div></a>
+    </div>
+  </div>
+</main>
+
+<!-- bottom nav -->
+<nav class="rsl-tabbar" role="navigation" aria-label="Navigation principale">
+  <a class="rsl-tab" data-path="ou_rider.html" href="ou_rider.html" aria-label="Carte">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Carte</span>
+  </a>
+  <a class="rsl-tab active" data-path="search.html" href="search.html" aria-label="Recherche">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Recherche</span>
+  </a>
+  <button class="rsl-tab plus" id="rslAddBtn" type="button" aria-label="Ajouter">
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Ajouter</span>
+  </button>
+  <a class="rsl-tab" data-path="feed.html" href="feed.html" aria-label="Vidéos">
+    <svg viewBox="0 0 24 24"><path d="M4 5h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M20 7l-3 2v6l3 2z"/></svg><span>Vidéos</span>
+  </a>
+  <a class="rsl-tab" data-path="compte.html" href="compte.html" aria-label="Profil">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profil</span>
+  </a>
+</nav>
+
+<script src="js/env.js"></script>
+<script>
+const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// vidéo de fond
+(function(){
+  const vids=[`${SUPABASE_URL}/storage/v1/object/public/videos_rsl/trottvideo1.mp4`,`${SUPABASE_URL}/storage/v1/object/public/videos_rsl/trottvideo2.mp4`];
+  const v=document.getElementById('bgVid'); const s=document.createElement('source'); s.src=vids[Math.floor(Math.random()*vids.length)]; s.type='video/mp4'; v.appendChild(s);
+  const start=()=>{try{v.playbackRate=.6;const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}; start(); document.addEventListener('visibilitychange',()=>{document.hidden?v.pause():start();});
+})();
+document.getElementById('rslAddBtn')?.addEventListener('click',()=>{ location.href='feed.html#post'; });
+
+// util
+const qEl = document.getElementById('q');
+const resEl = document.getElementById('results');
+const debounce = (fn,ms=250)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); } };
+
+function renderResults(parks=[],streets=[]){
+  if((!parks||!parks.length)&&(!streets||!streets.length)){
+    resEl.innerHTML = '<div class="tip">Aucun résultat. Essaie un autre mot-clé (ex: "Vidy", "GE", "bowl").</div>';
+    return;
+  }
+  let html='';
+  if(parks?.length){
+    html += '<div class="group"><h2>Skateparks / Pumptracks</h2>';
+    for(const p of parks){
+      html += `
+        <a class="item" href="spot.html?id=${p.id}">
+          <div class="left">
+            <div class="name">${p.nom||'Spot'}</div>
+            <div class="meta">${p.ville||''} (${p.canton||''})</div>
+          </div>
+          <div class="badge park">Skatepark</div>
+        </a>`;
+    }
+    html += '</div>';
+  }
+  if(streets?.length){
+    html += '<div class="group"><h2>Street spots</h2>';
+    for(const s of streets){
+      html += `
+        <a class="item" href="spot.html?id=${s.id}&street=1">
+          <div class="left">
+            <div class="name">${s.nom||'Street spot'}</div>
+            <div class="meta">${s.ville||''} (${s.canton||''})</div>
+          </div>
+          <div class="badge street">Street</div>
+        </a>`;
+    }
+    html += '</div>';
+  }
+  resEl.innerHTML = html;
+}
+
+async function searchNow(term){
+  const t = (term||'').trim();
+  if(!t){ resEl.innerHTML='<div class="tip">Tape un mot-clé pour lancer la recherche.</div>'; return; }
+
+  // recherche ILIKE sur plusieurs colonnes
+  const like = `%${t}%`;
+
+  // parks
+  let parks=[];
+  try{
+    const { data } = await supa
+      .from('spots')
+      .select('id,nom,ville,canton,description,type')
+      .or(`nom.ilike.${like},ville.ilike.${like},canton.ilike.${like},description.ilike.${like},type.ilike.${like}`)
+      .limit(50);
+    parks = data||[];
+  }catch(_){}
+
+  // street
+  let streets=[];
+  try{
+    const { data } = await supa
+      .from('bunny')
+      .select('id,nom,ville,canton,description,type')
+      .or(`nom.ilike.${like},ville.ilike.${like},canton.ilike.${like},description.ilike.${like},type.ilike.${like}`)
+      .limit(50);
+    streets = data||[];
+  }catch(_){}
+
+  renderResults(parks,streets);
+}
+
+qEl.addEventListener('input', debounce(e=>searchNow(e.target.value), 250));
+
+// état initial
+resEl.innerHTML = '<div class="tip">Tape pour chercher. Exemples : <b>Vidy</b>, <b>GE</b>, <b>rail</b>, <b>pumptrack</b>.</div>';
+</script>
+</body>
+</html>

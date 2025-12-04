@@ -18,268 +18,872 @@
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body { height:100%; }
-    body { background: transparent !important; display:flex; flex-direction:column; }
-    main { flex:1; }
+    html, body{
+      height:100%;
+      margin:0;
+      background:transparent !important;
+      display:flex;
+      flex-direction:column;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
+    }
+    main{flex:1;}
 
-    /* ======= Vidéo de fond ======= */
+    /* ===== Vidéo de fond ===== */
     .site-bg-video{
-      position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2;
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
       background:#000;
     }
     .site-bg-dim{
-      position:fixed; inset:0; z-index:-1;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.85));
     }
 
-    /* ======= NAV ======= */
+    /* ===== NAV (comme index) ===== */
     nav.nav{
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      position: sticky; top:0; z-index:100;
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      position:sticky;
+      top:0;
+      z-index:100;
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; display:block; }
-    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
-    nav.nav ul{ display:flex; align-items:center; gap:26px; }
-    nav.nav ul li a{ font-weight:600; color:#e8f0ea; font-size:17px; letter-spacing:.2px; white-space:nowrap; }
-    nav.nav ul li a:hover{ color:#22c55e; }
-    .cta{ display:flex; align-items:center; gap:12px; }
-    #menuBtn{
-      display:none; align-items:center; justify-content:center; gap:8px;
-      padding:10px 12px; font-size:18px; line-height:1; border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
+    nav.nav .container{
+      max-width:1320px;
+      margin:0 auto;
+      padding:12px 28px;
     }
-
-    /* ======= Intro page ======= */
-    .container{ max-width:1200px; margin:0 auto; padding:0 24px; }
-    .page-intro{ color:#fff; padding:28px 0 18px; }
-    .page-intro h1{ font-size:clamp(28px,4.2vw,42px); font-weight:800; margin:8px 0 6px; }
-    .badges{ display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 18px; }
-
-    .badge{
-      display:inline-flex; align-items:center; gap:8px; padding:10px 14px;
-      border-radius:999px; font-weight:800; border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg,#0e1526,#0b1220); color:#eaf2ed;
+    nav.nav .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
-    .badge.green{ background:linear-gradient(180deg,#22c55e,#16a34a); color:#062312; }
-    .badge.red{ background:transparent; color:#ef4444; border:2px solid #ef4444; }
-
-    /* ======= Grille programme / inscription ======= */
-    .formation-grid{
-      display:grid; grid-template-columns:1.1fr .9fr; gap:18px; margin-bottom:30px;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      text-decoration:none;
     }
-    .card{
-      background: linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:18px; padding:18px; color:#e7f2eb;
-      box-shadow:0 8px 24px rgba(0,0,0,.25);
+    .brand img{
+      height:48px;
+      border-radius:10px;
+      display:block;
     }
-    .card h3{ margin:0 0 12px; font-size:20px; font-weight:800; }
-    .slot{ display:flex; gap:14px; padding:10px 0; border-top:1px dashed rgba(255,255,255,.09); }
-    .slot:first-child{ border-top:0; }
-    .time{ width:120px; color:#bfe6c9; font-weight:800; }
-    .desc{ flex:1; }
-
-    /* ======= Formulaire ======= */
-    .form-row{ display:flex; flex-direction:column; gap:8px; margin:10px 0; }
-    .label{ font-weight:700; color:#eaf2ed; }
-    .input, .select{
-      width:100%; padding:12px 14px; border-radius:12px; font-weight:600;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.06); color:#fff;
+    .brand span{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:17px;
+    }
+    nav.nav ul{
+      display:flex;
+      align-items:center;
+      gap:26px;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      text-decoration:none;
       transition:.2s ease;
     }
-    .input:focus, .select:focus{ outline:none; border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.25); }
+    nav.nav ul li a:hover{
+      color:#22c55e;
+    }
+
+    .cta{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12);
+      color:#22c55e;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover{
+      background:rgba(34,197,94,.22);
+    }
+
+    .container{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 24px;
+    }
+
+    /* Avatar nav */
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+    }
+
+    @media(max-width:990px){
+      nav.nav ul{display:none !important;}
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{display:inline-flex;}
+      .coach-fab{display:none;}
+    }
+
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:120;
+    }
+    .mobile-sheet.open{display:block;}
+    .mobile-dim{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.5);
+    }
+    .mobile-panel{
+      position:absolute;
+      top:0;
+      right:0;
+      height:100%;
+      width:82vw;
+      max-width:360px;
+      background:#0b1220;
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{
+      color:#eaf5ee;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 0;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(255,255,255,.1);
+      margin:10px 0;
+    }
+    .mobile-panel .coach-link{
+      border-top:1px solid rgba(255,255,255,.12);
+      margin-top:8px;
+      padding-top:12px;
+    }
+
+    /* ===== HERO / INTRO FORMATION ===== */
+    .formation-hero-wrap{
+      max-width:1200px;
+      margin:40px auto 24px;
+      padding:0 16px;
+    }
+    .formation-hero{
+      background:rgba(0,0,0,.65);
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.45);
+      box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 60px rgba(34,197,94,.18);
+      padding:20px 20px 22px;
+      position:relative;
+      overflow:hidden;
+    }
+    .formation-hero-inner{
+      position:relative;
+      z-index:1;
+    }
+
+    .formation-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .formation-title-block{
+      max-width:640px;
+    }
+
+    .formation-badges-top{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 11px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#9ca3af;
+    }
+    .pill span{
+      width:7px;
+      height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.9);
+    }
+
+    .price-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:6px;
+    }
+    .price-pill{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+    }
+    .price-pill.main{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+    }
+    .price-pill.old{
+      border:1px solid #ef4444;
+      color:#fecaca;
+      background:rgba(127,29,29,.4);
+      text-decoration:line-through;
+    }
+    .price-pill.info{
+      border:1px solid rgba(148,163,184,.6);
+      color:#cbd5f5;
+      background:rgba(15,23,42,.9);
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .formation-hero-title{
+      margin:6px 0 4px;
+      font-size:clamp(26px,4vw,32px);
+      font-weight:800;
+    }
+    .formation-hero-sub{
+      margin:0;
+      font-size:14px;
+      color:#cdd6ff;
+      max-width:620px;
+    }
+
+    .formation-hero-side{
+      min-width:220px;
+      max-width:260px;
+    }
+    .formation-hero-side .mini-card{
+      background:rgba(15,23,42,.96);
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.55);
+      padding:14px 14px 16px;
+      font-size:13px;
+      color:#e5e7eb;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);
+    }
+    .mini-card h2{
+      font-size:14px;
+      margin:0 0 4px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#9ca3af;
+    }
+    .mini-card p{
+      margin:0 0 6px;
+      color:#cdd6ff;
+    }
+    .mini-card ul{
+      margin:6px 0 0;
+      padding-left:18px;
+      font-size:12px;
+      color:#e5e7eb;
+    }
+    .mini-card li{
+      margin-bottom:3px;
+    }
+
+    .formation-hero-bottom{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      font-size:12px;
+      color:#9ca3af;
+    }
+    .formation-hero-bottom .links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .badge-link{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.55);
+      font-size:12px;
+      text-decoration:none;
+      color:#e5e7eb;
+      background:rgba(15,23,42,.9);
+    }
+
+    @media(max-width:900px){
+      .formation-hero{
+        padding:18px 14px 20px;
+      }
+      .formation-hero-side{
+        max-width:100%;
+      }
+    }
+
+    /* ===== CONTENU : programme + inscription ===== */
+    .formation-main{
+      max-width:1200px;
+      margin:0 auto 40px;
+      padding:0 16px;
+    }
+    .formation-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr);
+      gap:18px;
+    }
+    @media(max-width:900px){
+      .formation-grid{grid-template-columns:1fr;}
+      .formation-inscription{order:-1;}
+    }
+
+    .card{
+      background:linear-gradient(180deg,rgba(9,13,23,.9),rgba(7,10,18,.9));
+      border:1px solid rgba(148,163,184,.4);
+      border-radius:18px;
+      padding:18px 16px;
+      color:#e7f2eb;
+      box-shadow:0 16px 40px rgba(0,0,0,.5);
+    }
+    .card h3{
+      margin:0 0 6px;
+      font-size:15px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#9ca3af;
+    }
+    .card-title-big{
+      font-size:18px;
+      font-weight:800;
+      margin:0 0 8px;
+    }
+    .card p{
+      font-size:14px;
+      margin:4px 0 8px;
+      color:#dbeafe;
+    }
+
+    /* Programme en "timeline" */
+    .slots-list{
+      margin-top:10px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.85);
+      overflow:hidden;
+    }
+    .slot{
+      display:flex;
+      gap:12px;
+      padding:10px 12px;
+      border-top:1px solid rgba(30,64,175,.45);
+      font-size:13px;
+    }
+    .slot:first-child{
+      border-top:0;
+    }
+    .time{
+      width:110px;
+      color:#a5b4fc;
+      font-weight:700;
+      flex-shrink:0;
+    }
+    .desc b{
+      color:#e5e7eb;
+    }
+    .desc small{
+      display:block;
+      margin-top:2px;
+      color:#9ca3af;
+      font-size:12px;
+    }
+
+    /* Colonne droite inscription */
+    .formation-inscription .card-title-big{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+    .capacity-tag{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#9ca3af;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+    }
+
+    .form-row{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin:8px 0;
+    }
+    .label{
+      font-weight:700;
+      color:#eaf2ed;
+      font-size:13px;
+    }
+    .input,
+    .select{
+      width:100%;
+      padding:14px 16px;
+      border-radius:12px;
+      font-weight:600;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.9);
+      color:#fff;
+      transition:.2s ease;
+      font-size:15px;
+    }
+    .input:focus,
+    .select:focus{
+      outline:none;
+      border-color:#22c55e;
+      box-shadow:0 0 0 3px rgba(34,197,94,.25);
+    }
 
     .select{
-      appearance:none; padding-right:42px;
+      appearance:none;
+      padding-right:42px;
       background-image:
-        linear-gradient(45deg, transparent 50%, #22c55e 50%),
-        linear-gradient(135deg, #22c55e 50%, transparent 50%);
-      background-position: calc(100% - 24px) center, calc(100% - 18px) center;
-      background-size: 7px 7px, 7px 7px; background-repeat:no-repeat;
+        linear-gradient(45deg,transparent 50%,#22c55e 50%),
+        linear-gradient(135deg,#22c55e 50%,transparent 50%);
+      background-position:calc(100% - 24px) center,calc(100% - 18px) center;
+      background-size:7px 7px,7px 7px;
+      background-repeat:no-repeat;
     }
-    select option{ background:#0b1220; color:#fff; }
+    select option{
+      background:#020617;
+      color:#fff;
+      font-size:15px;
+      padding:6px 8px;
+    }
+
+    /* Cartes de dates à la place du select natif */
+    .date-options{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .date-option{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.9);
+      cursor:pointer;
+      transition:.18s ease;
+      font-size:14px;
+    }
+    .date-option:hover{
+      border-color:#22c55e;
+      box-shadow:0 0 0 2px rgba(34,197,94,.18);
+    }
+    .date-option input{
+      display:none;
+    }
+    .date-option.selected{
+      border-color:#22c55e;
+      background:linear-gradient(180deg,#022c22,#020617);
+      box-shadow:0 0 0 2px rgba(34,197,94,.3);
+    }
+    .date-main{
+      font-weight:700;
+      color:#e5e7eb;
+    }
+    .date-sub{
+      font-size:12px;
+      color:#9ca3af;
+    }
 
     .btn.primary{
-      display:inline-flex; align-items:center; justify-content:center;
-      width:100%; padding:12px 14px; border-radius:14px; font-weight:800;
-      background:linear-gradient(180deg,#22c55e,#16a34a); color:#062312; border:0;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:800;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      border:0;
+      box-shadow:0 10px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15);
       cursor:pointer;
+      font-size:15px;
     }
-    .hint{ color:#d6e6db; opacity:.9; font-size:14px; margin-top:8px; }
-
-    @media (max-width:990px){
-      nav.nav ul{ display:none !important; }
-      .cta a, .cta #btnAccount, .cta #btnLogin{ display:none !important; }
-      #menuBtn{ display:inline-flex; }
-      .formation-grid{ grid-template-columns:1fr; }
-      .formation-inscription{ order:-1; }
+    .btn.primary:hover{
+      filter:brightness(1.05);
     }
 
-    /* ======= Menu mobile ======= */
-    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
-    .mobile-sheet.open{ display:block; }
-    .mobile-sheet .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
-    .mobile-sheet .mobile-panel{
-      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
-      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    .hint{
+      color:#d6e6db;
+      opacity:.9;
+      font-size:13px;
+      margin-top:6px;
     }
-    .mobile-sheet .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
-    .mobile-sheet .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
-    .mobile-panel .coach-link{ border-top:1px solid rgba(255,255,255,.12); margin-top:8px; padding-top:12px; font-weight:700; }
+    .sub-hint{
+      font-size:12px;
+      color:#9ca3af;
+      margin-top:4px;
+    }
 
-    /* ======= Footer ======= */
+    /* Footer */
     .footer-mini .copy{
-      text-align:center; color:#9aa5b1; font-size:14px;
-      padding:24px 0 28px; margin:0;
+      text-align:center;
+      color:#9aa5b1;
+      font-size:14px;
+      padding:24px 0 28px;
+      margin:0;
       border-top:1px solid rgba(255,255,255,.1);
       background:transparent;
     }
 
-    /* ======= Bouton coach ======= */
+    /* FAB coach */
     .coach-fab{
-      position: fixed; right:16px; bottom:16px; z-index:80;
-      display:inline-flex; align-items:center; gap:8px;
-      padding:12px 14px; border-radius:12px;
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:80;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:12px 14px;
+      border-radius:12px;
       background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312; font-weight:800; text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      color:#062312;
+      font-weight:800;
+      text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15);
       border:0;
     }
-    @media (max-width:990px){ .coach-fab{ display:none; } }
+    .coach-fab:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
+      transition:.15s ease;
+    }
+
+    @media(max-width:480px){
+      .formation-hero-wrap{padding:0 10px;}
+      .formation-hero{border-radius:14px;}
+    }
   </style>
 </head>
 <body>
 
   <!-- Fond vidéo -->
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg">
-    <source src="images/trottvideo.mp4" type="video/mp4">
-  </video>
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
   <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html" aria-label="Accueil RSL">
+        <a class="brand" href="index.html">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
         <ul>
           <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="formation.html" aria-current="page">Formation RSL</a></li>
           <li><a href="ou_rider.html">Où rider ?</a></li>
           <li><a href="evenements.html">Événements</a></li>
           <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
           <li><a href="comite.html">Comité</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
 
         <div class="cta">
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
           <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <!-- AVATAR -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn" aria-label="Menu">☰</button>
+          <button id="menuBtn">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Menu mobile -->
+  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
-      <a href="formation.html">Formation RSL</a>
+      <a href="membres.html">Devenir membre</a>
+      <a href="formation.html" aria-current="page">Formation RSL</a>
+      <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
-      <a href="disciplines.html">Disciplines</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
-      <hr/>
-      <a href="membres.html">Devenir membre</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <!-- CONTENU -->
-  <main class="container">
-    <div class="page-intro">
-      <div class="badges">
-        <span class="badge green">30.–</span>
-        <span class="badge red">90.–</span>
-        <span class="badge">prix de lancement</span>
-      </div>
-      <h1>Formation Moniteur RSL</h1>
-      <p>Journée complète (6–7h) avec éducatrice spécialisée + module Samaritains : pédagogie, sécurité, pratique, examen & certificats.</p>
-      <div class="badges">
-        <a class="badge" href="#">Certificat RSL</a>
-        <span class="badge">1re session 2026</span>
-        <a class="badge" href="docs/horaire-formation.pdf" target="_blank" rel="noopener">Télécharger l’horaire (.pdf)</a>
-      </div>
+  <!-- HERO FORMATION -->
+  <main>
+    <div class="formation-hero-wrap">
+      <section class="formation-hero">
+        <div class="formation-hero-inner">
+          <div class="formation-top">
+            <div class="formation-title-block">
+              <div class="formation-badges-top">
+                <div class="pill">
+                  <span></span> Formation Moniteur RSL
+                </div>
+              </div>
+
+              <div class="price-tags">
+                <div class="price-pill main">30.– par personne</div>
+                <div class="price-pill old">90.– prix plein</div>
+                <div class="price-pill info">Prix de lancement 2026</div>
+              </div>
+
+              <h1 class="formation-hero-title">Deviens moniteur RSL</h1>
+              <p class="formation-hero-sub">
+                Une journée complète (6–7h) avec une <b>éducatrice spécialisée</b> + module
+                <b>Samaritains</b> : pédagogie, sécurité, pratique en skatepark, examen final
+                et <b>certificats officiels RSL</b>.
+              </p>
+            </div>
+
+            <aside class="formation-hero-side">
+              <div class="mini-card">
+                <h2>À qui ça s’adresse ?</h2>
+                <p>Pour les riders et adultes qui veulent encadrer des jeunes proprement.</p>
+                <ul>
+                  <li>Riders RSL qui aident déjà sur les cours</li>
+                  <li>Coach en devenir / moniteurs de camps</li>
+                  <li>Parents ou bénévoles impliqués</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+
+          <div class="formation-hero-bottom">
+            <div class="links">
+              <a class="badge-link" href="#">Certificat RSL moniteur</a>
+              <a class="badge-link" href="docs/horaire-formation.pdf" target="_blank" rel="noopener">
+                Télécharger l’horaire (.pdf)
+              </a>
+            </div>
+            <div>
+              1re session : <b>2026</b> • Places limitées • Formation officielle de la Romandie Scooter League.
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <section class="formation-grid">
-      <!-- Programme -->
-      <article class="card formation-programme">
-        <h3>Programme (exemple 6–7h)</h3>
-        <div class="slot"><div class="time">09:00 – 09:15</div><div class="desc"><b>Accueil & présentation RSL</b></div></div>
-        <div class="slot"><div class="time">09:15 – 10:00</div><div class="desc"><b>Rôle du moniteur :</b> attitude, responsabilité</div></div>
-        <div class="slot"><div class="time">10:00 – 10:45</div><div class="desc"><b>Pédagogie & progression :</b> structurer un cours</div></div>
-        <div class="slot"><div class="time">11:00 – 12:30</div><div class="desc"><b>Module Samaritains :</b> sécuriser la zone, 144, plaies/entorses/trauma</div></div>
-        <div class="slot"><div class="time">12:30 – 13:15</div><div class="desc"><b>Pause</b></div></div>
-        <div class="slot"><div class="time">13:15 – 14:15</div><div class="desc"><b>Sécurité & gestion des risques</b> au skatepark</div></div>
-        <div class="slot"><div class="time">14:15 – 15:15</div><div class="desc"><b>Communication positive</b> avec les jeunes</div></div>
-        <div class="slot"><div class="time">15:30 – 16:30</div><div class="desc"><b>Mise en pratique :</b> chacun anime un mini-cours</div></div>
-        <div class="slot"><div class="time">16:30 – 17:00</div><div class="desc"><b>Examen & certificats</b></div></div>
-      </article>
+    <!-- CONTENU : Programme + Inscription -->
+    <section class="formation-main">
+      <div class="formation-grid">
+        <!-- Programme -->
+        <article class="card formation-programme">
+          <h3>Programme de la journée</h3>
+          <p class="card-title-big">Exemple de déroulement sur 6–7h</p>
+          <p>
+            Le but : que tu ressortes avec des <b>bases solides</b> en pédagogie,
+            sécurité et gestion d’un groupe de jeunes en skatepark.
+          </p>
 
-      <!-- Inscription -->
-      <aside class="card formation-inscription">
-        <h3>Choisis ta date (1er samedi du mois — 2026)</h3>
-        <p style="margin-top:-6px">Capacité : 20 inscrits par date.</p>
+          <div class="slots-list">
+            <div class="slot">
+              <div class="time">09:00 – 09:15</div>
+              <div class="desc">
+                <b>Accueil & présentation RSL</b>
+                <small>Qui fait quoi, objectifs de la formation, attentes.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">09:15 – 10:00</div>
+              <div class="desc">
+                <b>Rôle du moniteur</b>
+                <small>Attitude, responsabilité, posture avec les jeunes et les parents.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">10:00 – 10:45</div>
+              <div class="desc">
+                <b>Pédagogie & progression</b>
+                <small>Comment structurer un cours, gérer différents niveaux, garder la motivation.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">11:00 – 12:30</div>
+              <div class="desc">
+                <b>Module Samaritains</b>
+                <small>Sécuriser la zone, 144, gestion des plaies, entorses, petits traumas.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">12:30 – 13:15</div>
+              <div class="desc">
+                <b>Pause midi</b>
+                <small>Échanges informels avec l’équipe, questions libres.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">13:15 – 14:15</div>
+              <div class="desc">
+                <b>Sécurité & gestion des risques</b>
+                <small>Lecture du skatepark, zones de danger, gestion des groupes, météo, matériel.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">14:15 – 15:15</div>
+              <div class="desc">
+                <b>Communication avec les jeunes</b>
+                <small>Motiver, cadrer sans casser l’envie, communiquer avec les parents.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">15:30 – 16:30</div>
+              <div class="desc">
+                <b>Mise en pratique en park</b>
+                <small>Chaque participant anime un mini-cours, feedback direct.</small>
+              </div>
+            </div>
+            <div class="slot">
+              <div class="time">16:30 – 17:00</div>
+              <div class="desc">
+                <b>Examen & certificats</b>
+                <small>Validation des acquis, retour individuel, remise des certificats RSL.</small>
+              </div>
+            </div>
+          </div>
+        </article>
 
-        <div class="form-row">
-          <label class="label" for="dateSelect">Date</label>
-          <select id="dateSelect" class="select">
-            <option value="">— Sélectionne —</option>
-            <option value="2026-01-03">sam. 03.01.2026</option>
-            <option value="2026-02-07">sam. 07.02.2026</option>
-            <option value="2026-03-07">sam. 07.03.2026</option>
-          </select>
-        </div>
+        <!-- Inscription -->
+        <aside class="card formation-inscription">
+          <h3>Inscription</h3>
+          <p class="card-title-big">
+            Choisis ta date 2026
+            <span class="capacity-tag">20 places / session</span>
+          </p>
+          <p>
+            Les formations ont lieu <b>le 1er samedi du mois</b>.
+            Une fois inscrit·e, tu reçois un mail avec les infos pratiques (lieu, horaire définitif, matériel à prendre).
+          </p>
 
-        <div class="form-row">
-          <label class="label" for="nom">Nom et prénom</label>
-          <input id="nom" class="input" type="text" placeholder="Nom et prénom"/>
-        </div>
+          <div class="form-row">
+            <span class="label">Date souhaitée</span>
+            <div class="date-options" id="dateOptions">
+              <label class="date-option">
+                <input type="radio" name="formation_date" value="2026-01-03">
+                <span class="date-main">Samedi 3 janvier 2026</span>
+                <span class="date-sub">1er samedi du mois</span>
+              </label>
+              <label class="date-option">
+                <input type="radio" name="formation_date" value="2026-02-07">
+                <span class="date-main">Samedi 7 février 2026</span>
+                <span class="date-sub">1er samedi du mois</span>
+              </label>
+              <label class="date-option">
+                <input type="radio" name="formation_date" value="2026-03-07">
+                <span class="date-main">Samedi 7 mars 2026</span>
+                <span class="date-sub">1er samedi du mois</span>
+              </label>
+            </div>
+          </div>
 
-        <div class="form-row">
-          <label class="label" for="email">Email</label>
-          <input id="email" class="input" type="email" placeholder="ton@email.ch"/>
-        </div>
+          <div class="form-row">
+            <label class="label" for="nom">Nom et prénom</label>
+            <input id="nom" class="input" type="text" placeholder="Nom et prénom complet">
+          </div>
 
-        <div class="form-row">
-          <label class="label" for="dob">Date de naissance</label>
-          <input id="dob" class="input" type="text" inputmode="numeric" placeholder="jj.mm.aaaa"/>
-        </div>
+          <div class="form-row">
+            <label class="label" for="email">Email</label>
+            <input id="email" class="input" type="email" placeholder="ton@email.ch">
+          </div>
 
-        <div class="form-row">
-          <button class="btn primary" id="btnFormInscrire">Je m’inscris</button>
-          <p class="hint">Astuce : ajoute l’événement dans ton agenda après confirmation.</p>
-        </div>
-      </aside>
+          <div class="form-row">
+            <label class="label" for="dob">Date de naissance</label>
+            <input id="dob" class="input" type="text" inputmode="numeric" placeholder="jj.mm.aaaa">
+          </div>
+
+          <div class="form-row">
+            <button class="btn primary" id="btnFormInscrire">Je m’inscris à la formation</button>
+            <p class="hint">
+              Après validation, tu recevras un mail avec les détails + le lien de paiement (30.– prix de lancement).
+            </p>
+            <p class="sub-hint">
+              Si tu ne reçois rien dans les 48h, pense à vérifier ton dossier spam ou contacte la RSL.
+            </p>
+          </div>
+        </aside>
+      </div>
     </section>
   </main>
 
@@ -287,4 +891,126 @@
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <a href="coach.html" class="coach-f
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+
+  <!-- SCRIPTS LOCAUX -->
+  <script>
+    // Vidéo de fond Supabase aléatoire
+    (function(){
+      const vids=[
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick=vids[Math.floor(Math.random()*vids.length)];
+      const v=document.getElementById('rslBg');
+      if(!v) return;
+
+      const s=document.createElement('source');
+      s.src=pick;
+      s.type='video/mp4';
+      v.appendChild(s);
+
+      const start=()=>{
+        try{
+          v.playbackRate=0.6;
+          const p=v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
+      start();
+
+      document.addEventListener('visibilitychange',()=>{
+        if(document.hidden){
+          v.pause();
+        }else{
+          start();
+        }
+      });
+    })();
+
+    // Burger mobile
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // Login ↔ Compte
+    (async function(){
+      if(typeof supabase==='undefined') return;
+      try{
+        const {data:{user}}=await supabase.auth.getUser();
+        const btnLogin=document.getElementById('btnLogin');
+        const btnAccount=document.getElementById('btnAccount');
+        function ui(u){
+          if(!btnLogin || !btnAccount) return;
+          if(u){
+            btnAccount.style.display='inline-flex';
+            btnLogin.style.display='none';
+          }else{
+            btnAccount.style.display='none';
+            btnLogin.style.display='inline-flex';
+            btnLogin.textContent='Login';
+          }
+        }
+        ui(user);
+        btnLogin?.addEventListener('click',()=>location.href='compte.html');
+        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
+      }catch(e){}
+    })();
+
+    // Visuel sélection des dates
+    (function(){
+      const options=document.querySelectorAll('.date-option');
+      options.forEach(opt=>{
+        opt.addEventListener('click',()=>{
+          options.forEach(o=>o.classList.remove('selected'));
+          opt.classList.add('selected');
+          const input=opt.querySelector('input[type="radio"]');
+          if(input) input.checked=true;
+        });
+      });
+    })();
+
+    // Bouton inscription (à connecter plus tard à Supabase / mail)
+    document.getElementById('btnFormInscrire')?.addEventListener('click',e=>{
+      e.preventDefault();
+      const dateInput=document.querySelector('input[name="formation_date"]:checked');
+      const nom=document.getElementById('nom')?.value || '';
+      const email=document.getElementById('email')?.value || '';
+      const dob=document.getElementById('dob')?.value || '';
+
+      if(!dateInput){
+        alert("Merci de choisir une date de formation.");
+        return;
+      }
+
+      alert(
+        "Merci !\\n\\n" +
+        "Date choisie : " + dateInput.value +
+        "\\nNom : " + nom +
+        "\\nEmail : " + email +
+        "\\nDate de naissance : " + dob +
+        "\\n\\nOn confirmera ta date de formation par email."
+      );
+    });
+  </script>
+</body>
+</html>

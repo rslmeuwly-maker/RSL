@@ -3,101 +3,1038 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Adhésion — Romandie Scooter League</title>
+  <title>Membres — Romandie Scooter League</title>
+
+  <!-- Fonts + style global -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase / scripts site -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
+
+  <style>
+    html,body{
+      height:100%;
+      margin:0;
+      background:transparent!important;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden; /* comme index : rien ne dépasse */
+    }
+    main{flex:1;}
+
+    /* VIDÉO FOND */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.88));
+    }
+
+    /* NAV */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      position:sticky;
+      top:0;
+      z-index:999;
+    }
+    nav.nav .container{
+      max-width:1320px;
+      margin:0 auto;
+      padding:12px 28px;
+    }
+    nav.nav .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      text-decoration:none;
+    }
+    .brand img{
+      height:48px;
+      border-radius:10px;
+      display:block;
+    }
+    .brand span{
+      font-weight:800;
+      font-size:17px;
+      letter-spacing:.2px;
+    }
+    nav.nav ul{
+      display:flex;
+      align-items:center;
+      gap:26px;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      white-space:nowrap;
+      transition:.2s;
+    }
+    nav.nav ul li a:hover{color:#22c55e;}
+    nav.nav ul li a.active{color:#22c55e;}
+
+    .cta{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    #menuBtn{
+      display:none;
+      font-size:18px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12);
+      color:#22c55e;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover{ background:rgba(34,197,94,.22); }
+
+    .container{max-width:1200px;margin:0 auto;padding:0 24px;}
+
+    /* Avatar rond nav (même que index) */
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+    }
+
+    @media(max-width:990px){
+      nav.nav ul{display:none!important;}
+      /* on cache seulement les boutons, pas l'avatar */
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{display:inline-flex;}
+      .coach-fab{display:none;}
+    }
+
+    /* MENU MOBILE */
+    .mobile-sheet{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:1400;
+    }
+    .mobile-sheet.open{display:block;}
+    .mobile-dim{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.55);
+    }
+    .mobile-panel{
+      position:absolute;
+      right:0;
+      top:0;
+      height:100%;
+      width:82vw;
+      max-width:360px;
+      background:#0b1220;
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{
+      color:#eaf5ee;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 0;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(255,255,255,.12);
+      margin:10px 0;
+    }
+
+    /* CONTENU MEMBRES */
+    .shop-wrap{
+      max-width:1200px;
+      margin:40px auto 40px;
+      padding:0 20px 50px;
+    }
+    .shop-intro h1{
+      font-size:clamp(30px,4vw,40px);
+      margin:0 0 10px;
+      font-weight:800;
+    }
+    .shop-intro p{
+      margin:0 0 10px;
+      font-size:15px;
+      color:#cdd6ff;
+      max-width:780px;
+    }
+    .shop-note{
+      margin-top:6px;
+      font-size:14px;
+      color:#9ca3af;
+      max-width:820px;
+    }
+
+    .badge-partner{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:rgba(15,23,42,.95);
+      border:1px solid rgba(148,163,184,.65);
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:#9ca3af;
+      margin-bottom:12px;
+    }
+    .badge-partner span{
+      width:7px;height:7px;border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.9);
+    }
+
+    .why-block{
+      display:flex;
+      flex-wrap:wrap;
+      gap:20px;
+      margin-top:18px;
+    }
+    .why-card{
+      flex:1 1 260px;
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.5);
+      background:rgba(15,23,42,.85);
+      padding:14px 16px;
+      font-size:14px;
+      color:#e5e7eb;
+    }
+    .why-card h3{
+      margin:0 0 6px;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#9ca3af;
+    }
+    .why-card ul{
+      margin:0;
+      padding-left:18px;
+    }
+    .why-card li{
+      margin:2px 0;
+    }
+
+    .plans-title{
+      margin-top:28px;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:#9ca3af;
+    }
+
+    .products-grid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:18px;
+    }
+    .product-card{
+      background:rgba(15,23,42,.9);
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.5);
+      box-shadow:0 20px 50px rgba(0,0,0,.7);
+      padding:14px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .product-card.highlight{
+      border-color:#22c55e;
+      box-shadow:0 24px 70px rgba(34,197,94,.28);
+    }
+    .product-ribbon{
+      position:absolute;
+      top:10px;
+      right:-30px;
+      transform:rotate(35deg);
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#062312;
+      font-size:10px;
+      font-weight:800;
+      padding:4px 32px;
+      text-transform:uppercase;
+      letter-spacing:.15em;
+    }
+    .product-img{
+      width:100%;
+      border-radius:12px;
+      overflow:hidden;
+      background:radial-gradient(circle at 15% 0%,rgba(34,197,94,.3),transparent 55%), #020617;
+      aspect-ratio:16/7;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      color:#9ca3af;
+    }
+    .product-title{
+      font-size:16px;
+      font-weight:800;
+      margin-top:4px;
+    }
+    .product-meta{
+      font-size:13px;
+      color:#cbd5f5;
+    }
+    .product-meta ul{
+      margin:4px 0 0;
+      padding-left:18px;
+    }
+    .product-meta li{
+      margin:1px 0;
+    }
+    .product-price{
+      font-size:18px;
+      font-weight:800;
+      margin-top:4px;
+    }
+    .product-price span{
+      font-size:12px;
+      font-weight:600;
+      color:#a5b4fc;
+      margin-left:6px;
+    }
+    .product-btn{
+      margin-top:10px;
+      display:inline-block;
+      text-align:center;
+      padding:9px 10px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:800;
+      text-decoration:none;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      box-shadow:0 10px 24px rgba(0,0,0,.6);
+      cursor:pointer;
+    }
+    .product-btn:hover{
+      filter:brightness(1.05);
+    }
+    .badge-small{
+      display:inline-block;
+      margin-top:4px;
+      padding:3px 7px;
+      font-size:11px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      color:#e5e7eb;
+    }
+
+    .footer-mini .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:14px;
+      padding:24px 0 28px;
+      margin:0;
+      border-top:1px solid rgba(255,255,255,.1);
+      background:transparent;
+    }
+
+    /* MODAL FORMULE */
+    .product-modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:1500;
+    }
+    .product-modal.open{
+      display:flex;
+    }
+    .product-modal-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.7);
+    }
+    .product-modal-panel{
+      position:relative;
+      max-width:520px;
+      width:90vw;
+      max-height:80vh;
+      background:#020617;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.6);
+      box-shadow:0 25px 80px rgba(0,0,0,.9);
+      padding:18px 18px 20px;
+      overflow-y:auto;
+      z-index:1;
+    }
+    .product-modal-close{
+      position:absolute;
+      top:10px;
+      right:12px;
+      border:none;
+      background:transparent;
+      color:#9ca3af;
+      font-size:20px;
+      cursor:pointer;
+    }
+    .product-modal-content h2{
+      margin:0 0 6px;
+      font-size:18px;
+      font-weight:800;
+    }
+    .product-modal-content h3{
+      margin:10px 0 4px;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#9ca3af;
+    }
+    .product-modal-content p{
+      font-size:14px;
+      line-height:1.5;
+      color:#e5e7eb;
+      margin:4px 0 8px;
+    }
+    .product-modal-content ul{
+      padding-left:18px;
+      margin:4px 0 8px;
+      font-size:14px;
+      color:#e5e7eb;
+    }
+    .product-modal-content table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin:4px 0 10px;
+    }
+    .product-modal-content th,
+    .product-modal-content td{
+      text-align:left;
+      padding:4px 0;
+    }
+    .product-modal-content th{
+      border-bottom:1px solid rgba(148,163,184,.6);
+      color:#9ca3af;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- VIDÉO FOND -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim"></div>
+
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL"/>
-        <span><b>RSL — Romandie Scooter League</b></span>
-      </a>
-      <ul>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="game.html">Games</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="cours.html">Cours</a></li>
-      </ul>
-      <button id="menuBtn" aria-label="Menu">☰</button>
-      <div class="cta">
-        <button class="btn dark" id="btnLogin">Se connecter</button>
-        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-        <a class="btn green" href="membres.html">Devenir membre</a>
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <!-- 🟩 AVATAR ICI (comme index) -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" 
+                 alt="Avatar" style="display:none;">
+          </a>
+          <!-- 🟩 FIN AVATAR -->
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn">☰</button>
+        </div>
       </div>
     </div>
   </nav>
 
-  <div class="mobile-sheet" id="mobileMenu">
+  <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
       <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
+      <a href="membres.html" aria-current="page">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
-      <a href="game.html">Games</a>
       <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <main class='container'><div class='card'><h3>Adhésion</h3><p class='muted'>Devenir membre de l’association.</p></div></main>
+  <!-- CONTENU MEMBRES -->
+  <main>
+    <div class="shop-wrap" id="plans">
+      <div class="shop-intro">
+        <div class="badge-partner">
+          <span></span> Devenir membre • Romandie Scooter League
+        </div>
+        <h1>Choisis ta formule RSL et rejoins la ligue</h1>
+        <p>
+          À la RSL, on a simplifié tous les tarifs pour arriver à <b>5 formules claires</b>.
+          Tu peux commencer petit, progresser avec le temps ou soutenir la scène comme un boss.
+        </p>
+        <p class="shop-note">
+          Que tu sois <b>rider</b>, <b>parent</b>, <b>coach</b> ou juste fan de trottinette freestyle,
+          il y a une formule pour toi. Le but : te donner un cadre, des cours, des events, et faire
+          grandir la scène ensemble.
+        </p>
 
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>RSL</h4>
-        <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
-        </ul>
+        <div class="why-block">
+          <div class="why-card">
+            <h3>Pourquoi devenir membre ?</h3>
+            <ul>
+              <li>Accès prioritaire aux cours & events RSL</li>
+              <li>Infos et préinscriptions avant le public</li>
+              <li>Encadrement sécurisé & pédagogique</li>
+              <li>Tu soutiens une ligue créée par des riders</li>
+            </ul>
+          </div>
+          <div class="why-card">
+            <h3>Concrètement, tu gagnes</h3>
+            <ul>
+              <li>Une vraie structure pour progresser</li>
+              <li>Un lien direct avec les coachs & l’asso</li>
+              <li>Des réductions / avantages selon la formule</li>
+              <li>Une communauté motivée, pas juste un club</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="plans-title">Les 5 formules membres RSL (ordre croissant)</div>
       </div>
-      <div>
-        <h4>Ressources</h4>
-        <ul>
-          <li><a href="membres.html">Adhésion</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contest</h4>
-        <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Infos légales</h4>
-        <ul>
-          <li><a href="conditions.html">Conditions générales</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
+
+      <div class="products-grid">
+        <!-- 1) STARTER — 50/an -->
+        <article class="product-card">
+          <div class="product-img">
+            Starter — entrer dans la ligue
+          </div>
+          <div class="product-title">Starter — 50 CHF/an</div>
+          <div class="product-meta">
+            Le pack idéal pour <b>rejoindre officiellement la RSL</b>, soutenir la scène
+            et profiter d’avantages concrets.
+            <ul>
+              <li>Statut <b>membre officiel RSL</b></li>
+              <li><b>Cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+              <li><b>–10% sur le livret de tricks</b></li>
+              <li><b>–10% dans les boutiques partenaires</b></li>
+              <li>Sticker / support visuel RSL inclus</li>
+            </ul>
+          </div>
+          <div class="product-price">50 CHF/an <span>Pack d’entrée</span></div>
+          <a class="product-btn js-open-plan">Choisir la formule Starter</a>
+          <div class="badge-small">Pour commencer & soutenir</div>
+
+          <div class="product-popup-content" style="display:none">
+            <div class="product-modal-content">
+              <h2>Formule STARTER — 50 CHF/an</h2>
+              <p>
+                La formule <b>Starter</b>, c’est le pack d’entrée pour faire partie de la RSL,
+                soutenir la ligue et déjà bénéficier de vrais avantages.
+              </p>
+              <h3>Idéale pour</h3>
+              <ul>
+                <li>Parents / proches qui veulent soutenir la scène</li>
+                <li>Riders qui débutent et veulent déjà être membres</li>
+                <li>Ceux qui veulent aider sans encore s’engager sur un gros pack</li>
+              </ul>
+              <h3>Ce que tu reçois</h3>
+              <ul>
+                <li>Statut de <b>membre officiel RSL</b></li>
+                <li><b>Cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+                <li><b>–10% sur le livret de tricks</b></li>
+                <li><b>–10% dans les boutiques partenaires</b></li>
+                <li>Sticker / support visuel RSL inclus</li>
+              </ul>
+              <p>
+                C’est la formule parfaite pour rejoindre la famille RSL et déjà profiter
+                d’un prix réduit sur les cours.
+              </p>
+              <p style="margin-top:10px;">
+                <a href="https://buy.stripe.com/6oU6oA6Wt0gi8MK6RGeUU00"
+                   class="product-btn"
+                   target="_blank"
+                   rel="noopener">
+                  Payer & devenir membre Starter — 50 CHF/an
+                </a>
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2) RIDER — 80/an -->
+        <article class="product-card highlight">
+          <div class="product-ribbon">Populaire</div>
+          <div class="product-img">
+            Rider — progresser toute l’année
+          </div>
+          <div class="product-title">Rider — 80 CHF/an</div>
+          <div class="product-meta">
+            Pour <b>rider régulièrement</b> avec la RSL, profiter de sessions organisées
+            et bénéficier d’avantages renforcés.
+            <ul>
+              <li>Accès prioritaire à certaines sessions & événements</li>
+              <li><b>Cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+              <li><b>–15% sur le livret de tricks</b></li>
+              <li><b>–15% dans les boutiques partenaires RSL</b></li>
+              <li>Parfait pour une <b>progression régulière</b></li>
+              <li>Sticker / support visuel RSL inclus</li>
+            </ul>
+          </div>
+          <div class="product-price">80 CHF/an <span>Progression régulière</span></div>
+          <a class="product-btn js-open-plan">Choisir la formule Rider</a>
+          <div class="badge-small">Riders actifs & motivés</div>
+
+          <div class="product-popup-content" style="display:none">
+            <div class="product-modal-content">
+              <h2>Formule RIDER — 80 CHF/an</h2>
+              <p>
+                La formule <b>Rider</b>, c’est pour ceux qui veulent participer régulièrement
+                à la vie de la ligue et profiter d’un cadre pour progresser toute l’année.
+              </p>
+              <h3>Idéale pour</h3>
+              <ul>
+                <li>Jeunes riders qui roulent souvent en skatepark</li>
+                <li>Riders déjà un peu à l’aise, qui veulent structurer leur progression</li>
+                <li>Parents qui veulent un suivi “light” mais régulier</li>
+              </ul>
+              <h3>Concrètement, tu obtiens</h3>
+              <ul>
+                <li>Accès prioritaire à certaines sessions & événements RSL</li>
+                <li><b>Cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+                <li><b>–15% sur le livret de tricks</b></li>
+                <li><b>–15% dans les boutiques partenaires RSL</b></li>
+                <li>Sticker / support visuel RSL inclus</li>
+              </ul>
+              <p>
+                C’est la formule “logique” pour un rider qui veut autre chose
+                qu’une simple entrée au skatepark, avec des vrais avantages prix.
+              </p>
+              <p style="margin-top:10px;">
+                <a href="https://buy.stripe.com/5kQaEQ5Sp3sufb8dg4eUU01"
+                   class="product-btn"
+                   target="_blank"
+                   rel="noopener">
+                  Payer & devenir membre Rider — 80 CHF/an
+                </a>
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3) PRO / SOUTIEN — 15/mois ou 149/an -->
+        <article class="product-card">
+          <div class="product-img">
+            Pro / Soutien — financer la ligue
+          </div>
+          <div class="product-title">Pro / Soutien — 15 CHF/mois ou 149 CHF/an</div>
+          <div class="product-meta">
+            Pour les <b>marques, commerces, parents, riders adultes</b> qui veulent soutenir
+            financièrement la ligue et la scène, tout en profitant d’avantages RSL.
+            <ul>
+              <li>Formule don / soutien (mensuel ou annuel)</li>
+              <li>Visibilité & remerciements (selon niveau de soutien)</li>
+              <li>Tu aides à financer cours, events, matériel…</li>
+              <li><b>Livret de tricks offert</b></li>
+              <li><b>Cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+              <li><b>–15% dans les boutiques partenaires RSL</b></li>
+              <li>Sticker / support visuel RSL inclus</li>
+            </ul>
+          </div>
+          <div class="product-price">
+            15 CHF/mois ou 149 CHF/an
+            <span>Pro / Soutien officiel</span>
+          </div>
+          <a class="product-btn js-open-plan">Choisir la formule Pro / Soutien</a>
+          <div class="badge-small">Parents, commerces, partenaires</div>
+
+          <div class="product-popup-content" style="display:none">
+            <div class="product-modal-content">
+              <h2>Formule PRO / SOUTIEN — 15 CHF/mois ou 149 CHF/an</h2>
+              <p>
+                Cette formule est pensée pour ceux qui veulent <b>financer la RSL</b> :
+                parents, riders adultes, commerces, marques, organisations.
+              </p>
+              <h3>Pourquoi c’est important</h3>
+              <ul>
+                <li>Tu aides à payer les cours pour certains jeunes</li>
+                <li>Tu permets d’organiser des événements de qualité</li>
+                <li>Tu participes à structurer la scène romande</li>
+              </ul>
+              <h3>Forme du soutien</h3>
+              <ul>
+                <li>15 CHF / mois (soutien régulier)</li>
+                <li>ou 149 CHF / an (soutien annuel)</li>
+                <li>Visibilité / remerciements publics selon ton envie</li>
+              </ul>
+              <h3>Avantages concrets</h3>
+              <ul>
+                <li><b>Livret de tricks offert</b></li>
+                <li><b>Cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+                <li><b>–15% dans les boutiques partenaires RSL</b></li>
+                <li>Sticker / support visuel RSL inclus</li>
+              </ul>
+              <p>
+                C’est la formule parfaite si tu veux que la RSL existe longtemps,
+                pour cette génération et les prochaines, tout en profitant toi aussi d’avantages.
+              </p>
+              <p style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                <!-- Lien mensuel Pro/Soutien -->
+                <a href="https://buy.stripe.com/dRm6oA5Spd34gfcfoceUU06"
+                   class="product-btn"
+                   target="_blank"
+                   rel="noopener">
+                  Soutenir la RSL — 15 CHF/mois
+                </a>
+                <!-- Lien annuel Pro/Soutien -->
+                <a href="https://buy.stripe.com/cNicMY3Kh8MO0gea3SeUU03"
+                   class="product-btn"
+                   target="_blank"
+                   rel="noopener">
+                  Soutenir la RSL — 149 CHF/an
+                </a>
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 4) PROGRESSION — 289/an ou 25/mois -->
+        <article class="product-card">
+          <div class="product-img">
+            Progression — gros développement
+          </div>
+          <div class="product-title">Progression — 289 CHF/an ou 25 CHF/mois</div>
+          <div class="product-meta">
+            Pour un <b>gros boost de progression</b> : cours, programme, suivi… la formule pour
+            ceux qui veulent vraiment évoluer avec un vrai plan.
+            <ul>
+              <li><b>15 cours inclus</b> dans l’abonnement</li>
+              <li>Après les 15 cours : <b>cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+              <li>Suivi progression / objectifs tricks</li>
+              <li>Accès privilégié aux events liés à l’entraînement</li>
+              <li><b>–15% dans les boutiques partenaires RSL</b></li>
+              <li><b>–15% sur tout le matériel RSL</b></li>
+              <li><b>T-shirt officiel RSL offert</b></li>
+              <li>Sticker / support visuel RSL inclus</li>
+            </ul>
+          </div>
+          <div class="product-price">289 CHF/an ou 25 CHF/mois <span>Gros développement</span></div>
+          <a class="product-btn js-open-plan">Choisir la formule Progression</a>
+          <div class="badge-small">Riders en plein développement</div>
+
+          <div class="product-popup-content" style="display:none">
+            <div class="product-modal-content">
+              <h2>Formule PROGRESSION — 289 CHF/an ou 25 CHF/mois</h2>
+              <p>
+                La formule <b>Progression</b>, c’est pour les riders qui veulent un vrai
+                <b>plan de développement</b>, pas juste rouler au hasard.
+              </p>
+              <h3>Pour quel profil ?</h3>
+              <ul>
+                <li>Riders motivés qui veulent voir une vraie évolution</li>
+                <li>Ceux qui commencent à envoyer des runs / combos</li>
+                <li>Parents qui veulent investir dans un suivi structuré</li>
+              </ul>
+              <h3>Dans l’idée, ça inclut</h3>
+              <ul>
+                <li><b>15 cours inclus</b> dans la formule</li>
+                <li>Après les 15 cours : <b>cours RSL à 20 CHF</b> au lieu de 30 CHF</li>
+                <li>Suivi progression, objectifs, points à travailler</li>
+                <li>Accès privilégié aux events liés à l’entraînement</li>
+              </ul>
+              <h3>Avantages supplémentaires</h3>
+              <ul>
+                <li><b>–15% dans les boutiques partenaires RSL</b></li>
+                <li><b>–15% sur tout le matériel RSL</b></li>
+                <li><b>T-shirt officiel RSL offert</b></li>
+                <li>Sticker / support visuel RSL inclus</li>
+              </ul>
+              <p>
+                Tu peux choisir de payer en une fois ou en mensuel, selon ce qui est le plus simple.
+              </p>
+              <p style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                <a href="https://buy.stripe.com/8x26oAa8F1kmbYWgsgeUU08"
+                   class="product-btn" target="_blank" rel="noopener">
+                   🔁 Payer la formule Progression — 289 CHF/an
+                </a>
+
+                <a href="https://buy.stripe.com/00wfZa94Bfbc4wugsgeUU05"
+                   class="product-btn" target="_blank" rel="noopener">
+                   🔥 Payer Progression — 25 CHF/mois
+                </a>
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5) PREMIUM — 490/an ou 43/mois -->
+        <article class="product-card">
+          <div class="product-img">
+            Premium — élite & encadrement maximal
+          </div>
+          <div class="product-title">Premium — 490 CHF/an ou 43 CHF/mois</div>
+          <div class="product-meta">
+            Pour ceux qui veulent un <b>développement maximum</b> : accès complet aux cours,
+            suivi avancé, focus contest & élite.
+            <ul>
+              <li><b>Tous les cours RSL gratuits</b> inclus dans l’abonnement</li>
+              <li><b>–50% sur tous les événements</b> organisés par la RSL</li>
+              <li>Accès complet aux structures RSL (selon offre)</li>
+              <li><b>Suivi avancé</b> avec les coachs & préparation contest / élite</li>
+              <li><b>–15% dans les boutiques partenaires RSL</b></li>
+              <li><b>T-shirt officiel RSL offert</b></li>
+              <li><b>Sweat officiel RSL offert</b></li>
+              <li>Sticker / support visuel RSL inclus</li>
+            </ul>
+          </div>
+          <div class="product-price">490 CHF/an ou 43 CHF/mois <span>Élite / encadrement</span></div>
+          <a class="product-btn js-open-plan">Choisir la formule Premium</a>
+          <div class="badge-small">Riders très engagés</div>
+
+          <div class="product-popup-content" style="display:none">
+            <div class="product-modal-content">
+              <h2>Formule PREMIUM — 490 CHF/an ou 43 CHF/mois</h2>
+              <p>
+                La formule <b>Premium</b>, c’est le niveau le plus élevé pour les riders
+                qui prennent leur progression très au sérieux.
+              </p>
+              <h3>Pour quel type de rider ?</h3>
+              <ul>
+                <li>Riders très engagés, souvent présents en park</li>
+                <li>Objectifs contest, élite, gros niveau technique</li>
+                <li>Familles prêtes à investir dans un suivi haut de gamme</li>
+              </ul>
+              <h3>Concrètement, tu as</h3>
+              <ul>
+                <li><b>Tous les cours RSL gratuits</b> inclus dans l’abonnement</li>
+                <li><b>–50% sur tous les événements</b> organisés par la RSL</li>
+                <li>Accès complet aux structures & installations RSL (selon offre)</li>
+                <li><b>Suivi avancé</b> avec les coachs & préparation contest / élite</li>
+              </ul>
+              <h3>Avantages supplémentaires</h3>
+              <ul>
+                <li><b>–15% dans les boutiques partenaires RSL</b></li>
+                <li><b>T-shirt officiel RSL offert</b></li>
+                <li><b>Sweat officiel RSL offert</b></li>
+                <li>Sticker / support visuel RSL inclus</li>
+              </ul>
+              <p>
+                Tu peux payer à l’année ou en mensuel, selon ce qui est le plus simple.
+              </p>
+              <p style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                <a href="https://buy.stripe.com/5kQ7sE2Gd4wygfc1xmeUU07"
+                   class="product-btn" target="_blank" rel="noopener">
+                   🔁 Payer Premium — 490 CHF/an
+                </a>
+
+                <a href="https://buy.stripe.com/3cIaEQ5Sp4wy5Ay5NCeUU04"
+                   class="product-btn" target="_blank" rel="noopener">
+                   🔥 Payer Premium — 43 CHF/mois
+                </a>
+              </p>
+            </div>
+          </div>
+        </article>
+
       </div>
     </div>
-    <p class="copy">© <span id="rsl-year"></span> — Romandie Scooter League</p>
+  </main>
+
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — Romandie Scooter League / Association Ride4Style Montreux. Tous droits réservés.</p>
   </footer>
 
+  <!-- MODAL GLOBALE FORMULE -->
+  <div class="product-modal" id="productModal">
+    <div class="product-modal-backdrop"></div>
+    <div class="product-modal-panel">
+      <button class="product-modal-close" aria-label="Fermer">✕</button>
+      <div id="productModalInner"></div>
+    </div>
+  </div>
+
   <script>
-    (function(){ var y=document.getElementById('rsl-year'); if(y) y.textContent=(new Date()).getFullYear(); })();
+    // Vidéo de fond (même logique que le shop / index)
+    (function(){
+      const vids=[
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const v=document.getElementById('rslBg');
+      if(!v) return;
+      const s=document.createElement('source');
+      s.src=vids[Math.floor(Math.random()*vids.length)];
+      s.type="video/mp4";
+      v.appendChild(s);
+
+      const start=()=>{
+        try{
+          v.playbackRate=0.6;
+          const p=v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+      start();
+
+      document.addEventListener('visibilitychange',()=>{
+        if(document.hidden){ v.pause(); } else { start(); }
+      });
+    })();
+
+    // Menu mobile (version alignée sur index)
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // Popup formule
+    (function(){
+      const modal=document.getElementById('productModal');
+      const modalInner=document.getElementById('productModalInner');
+      if(!modal || !modalInner) return;
+
+      function openModal(contentHtml){
+        modalInner.innerHTML=contentHtml;
+        modal.classList.add('open');
+      }
+      function closeModal(){
+        modal.classList.remove('open');
+        modalInner.innerHTML="";
+      }
+
+      document.addEventListener('click',function(e){
+        const btn=e.target.closest('.js-open-plan');
+        if(btn){
+          e.preventDefault();
+          const card=btn.closest('.product-card');
+          const popup=card?.querySelector('.product-popup-content');
+          if(popup){
+            openModal(popup.innerHTML);
+          }
+        }
+
+        if(e.target.closest('.product-modal-close') || e.target.classList.contains('product-modal-backdrop')){
+          closeModal();
+        }
+      });
+
+      document.addEventListener('keydown',function(e){
+        if(e.key==="Escape"){
+          if(modal.classList.contains('open')) closeModal();
+        }
+      });
+    })();
+
+    // Login ↔ Compte (Supabase)
+    (async function(){
+      if(typeof supabase==='undefined') return;
+      try{
+        const {data:{user}} = await supabase.auth.getUser();
+        const btnLogin   = document.getElementById('btnLogin');
+        const btnAccount = document.getElementById('btnAccount');
+
+        function ui(u){
+          if(!btnLogin || !btnAccount) return;
+          if(u){
+            btnAccount.style.display = 'inline-flex';
+            btnLogin.style.display   = 'none';
+          } else {
+            btnAccount.style.display = 'none';
+            btnLogin.style.display   = 'inline-flex';
+            btnLogin.textContent     = 'Login';
+          }
+        }
+
+        ui(user);
+        btnLogin?.addEventListener('click',()=>location.href='compte.html');
+        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
+      }catch(e){
+        console.error(e);
+      }
+    })();
   </script>
 </body>
 </html>

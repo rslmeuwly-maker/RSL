@@ -11,77 +11,96 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase + scripts du site -->
+  <!-- Supabase + scripts globaux -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body { height:100%; }
-    body {
-      background: transparent !important;
+    html, body{
+      height:100%;
+      margin:0;
+      background:transparent !important;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      overflow-x:hidden;
+    }
+    main{ position:relative; z-index:10; }
+
+    /* ======= VIDÉO DE FOND ======= */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.82));
     }
 
-    /* ======= NAVBAR ======= */
-    nav.nav {
+    /* ======= NAVBAR (comme index) ======= */
+    nav.nav{
       background: rgba(0,0,0,.65);
       backdrop-filter: blur(8px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top:0; z-index:100;
     }
-    nav.nav .container {
-      max-width:1320px;
-      margin:0 auto;
-      padding:12px 28px;
-    }
-    nav.nav .row {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:#fff;
-      text-decoration:none;
-    }
-    .brand img {
-      height:48px;
-      border-radius:10px;
-      display:block;
-    }
-    .brand span {
-      font-weight:800;
-      letter-spacing:.2px;
-      font-size:17px;
-    }
-
-    nav.nav ul {
-      display:flex;
-      align-items:center;
-      gap:26px;
-    }
-    nav.nav ul li a {
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:48px; border-radius:10px; display:block; }
+    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
+    nav.nav ul{ display:flex; align-items:center; gap:26px; list-style:none; margin:0; padding:0; }
+    nav.nav ul li a{
       font-weight:600;
       color:#e8f0ea;
-      transition:.2s ease;
       font-size:17px;
       letter-spacing:.2px;
       white-space:nowrap;
+      text-decoration:none;
+      transition:.2s ease;
     }
-    nav.nav ul li a:hover {
-      color:#22c55e;
+    nav.nav ul li a:hover{ color:#22c55e; }
+
+    .cta{ display:flex; align-items:center; gap:12px; }
+
+    .btn.dark{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:600;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .btn.green{
+      border-radius:999px;
+      border:0;
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#022c16;
+      padding:8px 16px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+      box-shadow:0 12px 26px rgba(0,0,0,.6);
     }
 
-    .cta {
-      display:flex;
-      align-items:center;
-      gap:12px;
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
     }
 
     #menuBtn{
@@ -99,42 +118,56 @@
       cursor:pointer;
       transition:.2s ease;
     }
-    #menuBtn:hover{
-      background:rgba(34,197,94,.22);
-    }
+    #menuBtn:hover{ background:rgba(34,197,94,.22); }
+
     @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
       #menuBtn{ display:inline-flex; }
-      nav.nav ul{ display:none; }
+      .coach-fab{ display:none; }
     }
 
-    /* ======= VIDÉO DE FOND ======= */
-    .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      z-index:-2;
-      background:#000;
-    }
-    .site-bg-dim{
-      position:fixed;
-      inset:0;
-      z-index:-1;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
-    }
-
-    /* ======= CONTENU PRINCIPAL ======= */
-    .container {
+    .container{
       max-width:1200px;
       margin:0 auto;
       padding:0 24px;
     }
 
+    /* ======= MENU MOBILE ======= */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{
+      color:#eaf5ee;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 0;
+    }
+    .mobile-panel hr{
+      border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0;
+    }
+    .mobile-panel .coach-link{
+      border-top:1px solid rgba(255,255,255,.12);
+      margin-top:8px;
+      padding-top:12px;
+      font-weight:700;
+    }
+
+    /* ======= INTRO PAGE ======= */
     .page-intro{
       color:#fff;
       text-align:left;
-      padding:28px 0 8px;
+      padding:28px 0 10px;
     }
     .page-intro h1{
       margin:10px 0 6px;
@@ -147,207 +180,257 @@
       font-size:clamp(15px,2.2vw,18px);
     }
 
-    /* ======= FILTRES ======= */
-    .filters {
+    /* ======= FILTRES + CUSTOM SELECT ======= */
+    .filters{
       display:flex;
-      gap:10px;
-      align-items:center;
       flex-wrap:wrap;
-      margin:18px 0 8px;
-    }
-    .filters label {
-      color:#fff;
-      display:flex;
-      align-items:center;
-      gap:8px;
+      gap:12px;
+      align-items:flex-end;
+      margin:8px 0 16px;
     }
 
-    .select {
-      appearance: none;
-      background-color: rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: #fff;
-      padding: 10px 36px 10px 14px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
+    .filter-field{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:160px;
+      flex:1 1 180px;
+      position:relative;
+    }
+    .filter-label{
+      font-size:13px;
+      font-weight:600;
+      color:#e5e7eb;
+      opacity:.9;
+    }
+
+    .select-shell{
+      position:relative;
+    }
+
+    .select-display{
+      width:100%;
+      background:rgba(15,23,42,.95);
+      border:1px solid rgba(148,163,184,.7);
+      border-radius:12px;
+      padding:11px 40px 11px 14px;
+      font-size:15px;
+      font-weight:600;
+      color:#f9fafb;
+      text-align:left;
+      box-shadow:0 10px 30px rgba(0,0,0,.7);
+      cursor:pointer;
       background-image:
         linear-gradient(45deg, transparent 50%, #22c55e 50%),
         linear-gradient(135deg, #22c55e 50%, transparent 50%);
       background-position:
         calc(100% - 22px) center,
-        calc(100% - 17px) center;
+        calc(100% - 16px) center;
       background-size: 6px 6px, 6px 6px;
-      background-repeat: no-repeat;
-      transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+      background-repeat:no-repeat;
+      transition:.18s ease;
     }
-    .select:hover {
-      background-color: rgba(34,197,94,0.12);
-      border-color: rgba(34,197,94,0.35);
+    .select-shell.open .select-display{
+      border-color:#22c55e;
+      box-shadow:0 0 0 2px rgba(34,197,94,.35),0 18px 40px rgba(0,0,0,.85);
     }
-    .select:focus {
-      outline: none;
-      border-color: #22c55e;
-      box-shadow: 0 0 0 3px rgba(34,197,94,0.25);
+
+    .select-panel{
+      position:absolute;
+      left:0; right:0;
+      top:calc(100% + 4px);
+      background:#020617;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.6);
+      box-shadow:0 18px 50px rgba(0,0,0,.9);
+      padding:6px 0;
+      max-height:260px;
+      overflow:auto;
+      display:none;
+      z-index:200;
     }
-    select option {
-      background-color:#0b1220;
-      color:#fff;
+    .select-shell.open .select-panel{ display:block; }
+
+    .select-option{
+      padding:8px 14px;
+      font-size:14px;
+      color:#e5e7eb;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+    }
+    .select-option:hover{
+      background:rgba(34,197,94,.12);
+    }
+    .select-option.is-selected{
+      background:rgba(34,197,94,.18);
+      font-weight:700;
+      color:#bbf7d0;
+    }
+
+    /* vrai select caché */
+    .select-native{
+      position:absolute;
+      left:-9999px;
+      width:1px;
+      height:1px;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .filters label.check-label{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      margin-left:4px;
+    }
+    .filters label.check-label input{
+      width:16px;
+      height:16px;
+      accent-color:#22c55e;
+    }
+
+    @media(max-width:640px){
+      .filters{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .filter-field{ flex:1 1 auto; }
     }
 
     /* ======= LISTE COURS ======= */
-    .list {
-      margin:14px 0 160px; /* espace pour la barre panier */
+    .list{
+      margin:10px 0 120px;
     }
-
-    .item {
-      background: linear-gradient(180deg, rgba(9,13,23,.78), rgba(7,10,18,.78));
-      border:1px solid rgba(255,255,255,.08);
+    .item{
+      background:linear-gradient(180deg,rgba(9,13,23,.88),rgba(7,10,18,.95));
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.45);
+      padding:12px 12px 10px;
+      margin-bottom:10px;
+      box-shadow:0 14px 40px rgba(0,0,0,.8);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      color:#e5e7eb;
+    }
+    .item-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .item-main{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+    .course-title{
+      font-weight:700;
+      font-size:15px;
+    }
+    .course-meta{
+      font-size:13px;
+      color:#cbd5f5;
+    }
+    .course-meta span{ margin-right:6px; white-space:nowrap; }
+    .course-price{
+      font-size:14px;
+      font-weight:700;
+      color:#bbf7d0;
+    }
+    .item-actions{
+      width:100%;
+      margin-top:4px;
+    }
+    .inscrire-btn{
+      width:100%;
       border-radius:12px;
-      padding:12px;
-      color:#e7f2eb;
-      box-shadow:0 8px 24px rgba(0,0,0,.25);
-      margin-bottom:12px;
+      border:0;
+      padding:10px 12px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      box-shadow:0 10px 26px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.16);
     }
-    .badge{
-      display:inline-block;
-      border-radius:8px;
-      border:1px solid rgba(255,255,255,.12);
-      padding:4px 8px;
-      font-size:12px;
-      line-height:1.2;
-      font-weight:600;
-      white-space:nowrap;
-    }
-    .btn.green.inscrire-btn.selected{
-      filter:brightness(1.07);
+    .inscrire-btn.selected{
+      filter:brightness(1.06);
+      background:#16a34a;
     }
 
     /* ======= BAR PANIER BAS ======= */
     .basket-bar{
       position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
-      background:rgba(0,0,0,.9);
+      left:0; right:0; bottom:0;
+      background:rgba(0,0,0,.93);
       backdrop-filter:blur(10px) saturate(140%);
       border-top:1px solid rgba(255,255,255,.15);
       box-shadow:0 -20px 40px rgba(0,0,0,.8);
-      padding:16px 20px;
-      display:none; /* affiché quand panier > 0 */
+      padding:12px 16px;
+      display:none;
       justify-content:space-between;
       align-items:center;
       flex-wrap:wrap;
       z-index:300;
-      color:#fff;
-      font-family:"Outfit",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      gap:10px;
     }
     .basket-left{
-      font-size:15px;
+      font-size:14px;
       font-weight:600;
     }
     .basket-actions{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
       flex-wrap:wrap;
     }
     .basket-clear-btn{
       background:rgba(0,0,0,.6);
       color:#fff;
       font-weight:600;
-      font-size:14px;
-      border-radius:10px;
-      padding:10px 12px;
+      font-size:13px;
+      border-radius:999px;
+      padding:8px 12px;
       line-height:1.2;
       border:1px solid rgba(255,255,255,.25);
       box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
       cursor:pointer;
-      min-width:140px;
+      min-width:130px;
       text-align:center;
     }
-    .basket-clear-btn:hover{
-      filter:brightness(1.07);
-    }
+    .basket-clear-btn:hover{ filter:brightness(1.07); }
     .basket-btn{
       background:#22c55e;
       color:#062312;
       font-weight:700;
-      font-size:16px;
+      font-size:15px;
       border:0;
-      border-radius:10px;
-      padding:12px 16px;
+      border-radius:999px;
+      padding:10px 16px;
       cursor:pointer;
       box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
-      min-width:140px;
+      min-width:130px;
       text-align:center;
     }
-    .basket-btn:hover{
-      filter:brightness(1.07);
+    .basket-btn:hover{ filter:brightness(1.07); }
+
+    @media(max-width:640px){
+      .basket-bar{ align-items:flex-start; }
+      .basket-actions{ width:100%; justify-content:flex-end; }
     }
 
-    /* ======= MENU MOBILE SLIDE ======= */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:120;
-    }
-    .mobile-sheet.open{ display:block; }
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.5);
-    }
-    .mobile-panel{
-      position:absolute;
-      top:0;
-      right:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
-      background:#0b1220;
-      padding:22px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
-      box-shadow:-12px 0 30px rgba(0,0,0,.35);
-    }
-    .mobile-panel a{
-      color:#eaf5ee;
-      text-decoration:none;
-      font-weight:700;
-      padding:8px 0;
-    }
-    .mobile-panel hr{
-      border:0;
-      height:1px;
-      background:rgba(255,255,255,.1);
-      margin:10px 0;
-    }
-    .mobile-panel .coach-link{
-      border-top:1px solid rgba(255,255,255,.12);
-      margin-top:8px;
-      padding-top:12px;
-      font-weight:700;
-    }
-
-    /* ======= FAB COACH ======= */
+    /* FAB coach */
     .coach-fab{
-      position: fixed;
-      right:16px;
-      bottom:80px; /* au-dessus de la barre panier */
-      z-index:80;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:12px 14px;
-      border-radius:12px;
+      position: fixed; right:16px; bottom:80px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:12px 14px; border-radius:12px;
       background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312;
-      font-weight:800;
-      text-decoration:none;
+      color:#062312; font-weight:800; text-decoration:none;
       box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
       border:0;
     }
@@ -360,31 +443,26 @@
       .coach-fab{ display:none; }
     }
 
-    /* ======= FOOTER ======= */
+    /* FOOTER */
     .footer-mini .copy{
-      text-align:center;
-      color:#9aa5b1;
-      font-size:14px;
-      padding:24px 0 28px;
-      margin:0;
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:24px 0 28px; margin:0;
       border-top:1px solid rgba(255,255,255,.1);
-      background: transparent;
+      background:transparent;
     }
   </style>
 </head>
 <body>
 
-  <!-- ======= VIDÉO DE FOND ======= -->
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg">
-    <source src="images/trottvideo.mp4" type="video/mp4">
-  </video>
+  <!-- VIDÉO DE FOND -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- ======= NAVBAR ======= -->
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html" aria-label="Accueil RSL">
+        <a class="brand" href="index.html">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
@@ -395,68 +473,114 @@
           <li><a href="ou_rider.html">Où rider ?</a></li>
           <li><a href="evenements.html">Événements</a></li>
           <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
           <li><a href="comite.html">Comité</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
 
         <div class="cta">
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
           <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn green" href="cours.html">Cours RSL</a>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <!-- AVATAR -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png"
+                 alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn" aria-label="Menu">☰</button>
+          <button id="menuBtn">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- ======= MENU MOBILE ======= -->
-  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+  <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
+      <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
-      <a href="disciplines.html">Disciplines</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
-      <hr/>
-      <a href="membres.html">Devenir membre</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <!-- ======= CONTENU PRINCIPAL ======= -->
+  <!-- CONTENU -->
   <main class="container">
     <div class="page-intro">
       <h1>Inscriptions aux cours 2026</h1>
-      <p>Chaque samedi — tarifs auto (Public 30.–, Membre 20.–, packs/intermédiaire/premium selon quota/plan)</p>
+      <p>Chaque samedi — tarifs auto (Public 30.–, Membre 20.–, Progression/Premium selon abo).</p>
     </div>
 
     <div class="filters">
-      <select id="filtreMois" class="select">
-        <option value="all">Tous les mois</option>
-        <option value="01">Jan</option><option value="02">Fév</option><option value="03">Mar</option>
-        <option value="04">Avr</option><option value="05">Mai</option><option value="06">Juin</option>
-        <option value="07">Juil</option><option value="08">Aoû</option><option value="09">Sep</option>
-        <option value="10">Oct</option><option value="11">Nov</option><option value="12">Déc</option>
-      </select>
+      <!-- Mois -->
+      <div class="filter-field">
+        <span class="filter-label">Mois</span>
 
-      <select id="filtreLieu" class="select">
-        <option value="all">Tous les lieux</option>
-      </select>
+        <div class="select-shell" data-select-id="filtreMois">
+          <button type="button" class="select-display" id="filtreMoisDisplay">
+            Tous les mois
+          </button>
+          <div class="select-panel" id="filtreMoisPanel"></div>
+        </div>
 
-      <label><input type="checkbox" id="filtreDispo"/> Seulement dispo</label>
+        <!-- vrai select caché (utilisé par cours.js) -->
+        <select id="filtreMois" class="select-native">
+          <option value="all">Tous les mois</option>
+          <option value="01">Janvier</option>
+          <option value="02">Février</option>
+          <option value="03">Mars</option>
+          <option value="04">Avril</option>
+          <option value="05">Mai</option>
+          <option value="06">Juin</option>
+          <option value="07">Juillet</option>
+          <option value="08">Août</option>
+          <option value="09">Septembre</option>
+          <option value="10">Octobre</option>
+          <option value="11">Novembre</option>
+          <option value="12">Décembre</option>
+        </select>
+      </div>
+
+      <!-- Lieu -->
+      <div class="filter-field">
+        <span class="filter-label">Lieu</span>
+
+        <div class="select-shell" data-select-id="filtreLieu">
+          <button type="button" class="select-display" id="filtreLieuDisplay">
+            Tous les lieux
+          </button>
+          <div class="select-panel" id="filtreLieuPanel"></div>
+        </div>
+
+        <!-- vrai select caché – rempli par js/cours.js -->
+        <select id="filtreLieu" class="select-native">
+          <option value="all">Tous les lieux</option>
+        </select>
+      </div>
+
+      <label class="check-label">
+        <input type="checkbox" id="filtreDispo"/>
+        Seulement dispo
+      </label>
     </div>
 
-    <!-- Liste des cours rendue dynamiquement -->
     <div id="courseList" class="list"></div>
   </main>
 
-  <!-- ======= BAR PANIER BAS ======= -->
+  <!-- BAR PANIER -->
   <div class="basket-bar" id="basketBar">
     <div class="basket-left" id="basketInfo">0 cours sélectionné</div>
     <div class="basket-actions">
@@ -465,74 +589,208 @@
     </div>
   </div>
 
-  <!-- ======= FAB COACH ======= -->
-  <a href="coach.html" class="coach-fab" aria-label="Je suis coach">👨‍🏫 Je suis coach</a>
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
-  <!-- ======= FOOTER ======= -->
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- ======= SCRIPTS LOCAUX ======= -->
+  <!-- SCRIPTS LOCAUX -->
   <script>
     // Vidéo de fond
     (function(){
-      const v=document.getElementById('rslBg');
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
       if(!v) return;
-      const start=()=>{ try{ v.playbackRate=0.6; const p=v.play(); if(p?.catch) p.catch(()=>{});}catch(e){} };
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
       start();
-      document.addEventListener('visibilitychange',()=>{ if(document.hidden) v.pause(); else start(); });
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden){ v.pause(); } else { start(); }
+      });
     })();
 
-    // Burger mobile
-    const menuBtn=document.getElementById('menuBtn');
-    const mobile=document.getElementById('mobileMenu');
-    menuBtn?.addEventListener('click',e=>{
-      e.stopPropagation();
-      mobile.classList.add('open');
-      mobile.setAttribute('aria-hidden','false');
-    });
-    mobile?.querySelector('.mobile-dim')?.addEventListener('click',()=>{
-      mobile.classList.remove('open');
-      mobile.setAttribute('aria-hidden','true');
-    });
-    document.addEventListener('keydown',e=>{
-      if(e.key==='Escape'){
+    // Menu mobile
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
         mobile.classList.remove('open');
         mobile.setAttribute('aria-hidden','true');
-      }
-    });
-
-    // Login ↔ Compte
-    (async function(){
-      if(typeof supabase==='undefined') return;
-      try{
-        const {data:{user}}=await supabase.auth.getUser();
-        const btnLogin=document.getElementById('btnLogin');
-        const btnAccount=document.getElementById('btnAccount');
-        function ui(u){
-          if(u){
-            btnAccount.style.display='inline-flex';
-            btnLogin.style.display='none';
-          } else {
-            btnAccount.style.display='none';
-            btnLogin.style.display='inline-flex';
-            btnLogin.textContent='Login';
-          }
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
         }
-        ui(user);
-        btnLogin?.addEventListener('click',()=>location.href='compte.html');
-        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user??null));
-      }catch(e){}
+      });
     })();
 
-    // Continuer -> panier
-    document.getElementById('basketPay')?.addEventListener('click',()=>{
+    // Login simple → compte
+    document.getElementById('btnLogin')?.addEventListener('click', ()=>{
+      location.href = 'compte.html';
+    });
+
+    /* ===== CUSTOM SELECT (joli popup pour Mois / Lieu) ===== */
+
+    function setupCustomSelect(selectId){
+      const native = document.getElementById(selectId);
+      const shell  = document.querySelector('.select-shell[data-select-id="'+selectId+'"]');
+      if(!native || !shell) return;
+
+      const display = shell.querySelector('.select-display');
+      const panel   = shell.querySelector('.select-panel');
+
+      function syncFromNative(){
+        const opt = native.options[native.selectedIndex];
+        if(opt) display.textContent = opt.textContent;
+      }
+
+      function buildPanel(){
+        panel.innerHTML = "";
+        Array.from(native.options).forEach(opt=>{
+          if(opt.disabled) return;
+          const div = document.createElement('div');
+          div.className = 'select-option' + (opt.value === native.value ? ' is-selected' : '');
+          div.dataset.value = opt.value;
+          div.textContent = opt.textContent;
+          div.addEventListener('click', ()=>{
+            native.value = opt.value;
+            native.dispatchEvent(new Event('change',{bubbles:true}));
+            syncFromNative();
+            shell.classList.remove('open');
+          });
+          panel.appendChild(div);
+        });
+      }
+
+      display.addEventListener('click',(e)=>{
+        e.stopPropagation();
+        const isOpen = shell.classList.contains('open');
+        document.querySelectorAll('.select-shell.open').forEach(sh=>sh.classList.remove('open'));
+        if(!isOpen){
+          buildPanel();
+          shell.classList.add('open');
+        }
+      });
+
+      native.addEventListener('change', syncFromNative);
+      syncFromNative(); // init
+
+      document.addEventListener('click',()=>{
+        shell.classList.remove('open');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      setupCustomSelect('filtreMois');
+      setupCustomSelect('filtreLieu');
+      updateBasketInfo();
+    });
+
+    /* ===== PANIER LOCAL ===== */
+
+    function collectSelectedCourses(){
+      const result = [];
+      document.querySelectorAll(".item").forEach(item=>{
+        const btn = item.querySelector(".inscrire-btn");
+        if(!btn || !btn.classList.contains("selected")) return;
+        const id    = item.dataset.id || null;
+        const date  = item.querySelector(".course-date")?.textContent.trim() || "";
+        const time  = item.querySelector(".course-time")?.textContent.trim() || "";
+        const place = item.querySelector(".course-place")?.textContent.trim() || "";
+        const price = item.querySelector(".course-price")?.textContent.trim() || "";
+        const title = item.querySelector(".course-title")?.textContent.trim() || "";
+        result.push({ id, date, time, place, price, title });
+      });
+      return result;
+    }
+
+    function saveCoursesToLocalStorage(){
+      const courses = collectSelectedCourses();
+      try{
+        const json = JSON.stringify(courses);
+        localStorage.setItem("rsl_panier_cours", json);
+        localStorage.setItem("rsl_panier_courses", json);
+      }catch(e){
+        console.error("Erreur stockage panier cours:", e);
+      }
+      return courses;
+    }
+
+    function goToPanierWithCourses(){
+      const courses = saveCoursesToLocalStorage();
+      if (!courses || !courses.length){
+        alert("Sélectionne au moins un cours avant de continuer.");
+        return;
+      }
       window.location.href = "panier/panier.html";
+    }
+
+    function computeBasketSummary(){
+      const selected = document.querySelectorAll(".inscrire-btn.selected");
+      const nb = selected.length;
+      if(!nb) return { nb:0, total:0 };
+      const total = nb * 30; // estimation simple
+      return { nb, total };
+    }
+
+    function updateBasketInfo(){
+      const basketInfo = document.getElementById("basketInfo");
+      const bar = document.getElementById("basketBar");
+      if(!basketInfo || !bar) return;
+      const { nb, total } = computeBasketSummary();
+      if(!nb){
+        basketInfo.textContent = "0 cours sélectionné";
+        bar.style.display = "none";
+        return;
+      }
+      bar.style.display = "flex";
+      const plural = nb > 1 ? "cours sélectionnés" : "cours sélectionné";
+      basketInfo.textContent = nb + " " + plural + " • Total estimé : " + total + ".–";
+    }
+
+    // clic sur "S'inscrire"
+    document.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".inscrire-btn");
+      if(!btn) return;
+      setTimeout(updateBasketInfo, 50);
+    });
+
+    // Clear
+    document.getElementById('basketClear')?.addEventListener('click', ()=>{
+      document.querySelectorAll('.inscrire-btn.selected').forEach(btn=>{
+        btn.classList.remove('selected');
+      });
+      updateBasketInfo();
+    });
+
+    // Continuer
+    document.getElementById('basketPay')?.addEventListener('click', ()=>{
+      goToPanierWithCourses();
     });
   </script>
 
-  <!-- Script spécifique cours -->
+  <!-- Script qui génère la liste des cours -->
   <script defer src="js/cours.js"></script>
 </body>
 </html>

@@ -3,101 +3,475 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Règlement — Romandie Scooter League</title>
+  <title>Règlement & Conditions — Romandie Scooter League / Ride4Style Montreux</title>
+
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
+
+  <style>
+    html,body{
+      height:100%;
+      margin:0;
+      background:transparent!important;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden;
+    }
+    main{flex:1;position:relative;z-index:10;}
+
+    /* ===== VIDEO ===== */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.85));
+    }
+
+    /* ===== NAVBAR (copiée de l’index) ===== */
+    nav.nav{
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      position: sticky; top:0; z-index:100;
+    }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:48px; border-radius:10px; display:block; }
+    .brand span{ font-weight:800; font-size:17px; letter-spacing:.2px; }
+
+    nav.nav ul{ display:flex; align-items:center; gap:26px; }
+    nav.nav ul li{ list-style:none; }
+    nav.nav ul li a{
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      text-decoration:none;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{ color:#22c55e; }
+
+    .cta{ display:flex; align-items:center; gap:12px; }
+
+    #menuBtn{
+      display:none;
+      align-items:center; justify-content:center;
+      padding:10px 12px;
+      font-size:18px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12);
+      color:#22c55e;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover{ background:rgba(34,197,94,.22); }
+
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:none;
+    }
+
+    @media(max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{ display:inline-flex; }
+    }
+
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{
+      position:absolute; inset:0; background:rgba(0,0,0,.5);
+    }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px;
+      display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+    }
+    .mobile-panel a{
+      color:#eaf5ee;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 0;
+    }
+    .mobile-panel hr{
+      border:0; height:1px; background:rgba(255,255,255,.1);
+      margin:10px 0;
+    }
+
+    /* ===== PAGE RÈGLEMENT ===== */
+    .container-page{
+      max-width:1100px;
+      margin:32px auto 60px;
+      padding:0 20px;
+    }
+    .reg-card{
+      background:rgba(15,23,42,.9);
+      border-radius:20px;
+      border:1px solid rgba(148,163,184,.45);
+      box-shadow:0 24px 60px rgba(0,0,0,.85);
+      padding:24px 22px 26px;
+    }
+    .reg-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#9ca3af;
+      margin-bottom:10px;
+    }
+    .reg-chip span{
+      width:7px;height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.9);
+    }
+
+    .reg-card h1{
+      margin:0 0 10px;
+      font-size:clamp(26px,4vw,32px);
+      font-weight:800;
+    }
+    .reg-card .muted{
+      margin:0 0 20px;
+      font-size:14px;
+      color:#9ca3af;
+    }
+    .reg-card h2{
+      margin:24px 0 6px;
+      font-size:19px;
+      font-weight:800;
+      color:#e5f5ec;
+    }
+    .reg-card h3{
+      margin:14px 0 4px;
+      font-size:16px;
+      font-weight:700;
+      color:#c4f1ce;
+    }
+    .reg-card p,
+    .reg-card ul{
+      font-size:14px;
+      color:#e5e7eb;
+      line-height:1.6;
+    }
+
+    .reg-last{
+      margin-top:24px;
+      font-size:12px;
+      color:#9ca3af;
+    }
+
+    .footer-mini .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:14px;
+      padding:24px 0 28px;
+      margin:0;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+  </style>
 </head>
 <body>
+
+  <!-- FOND VIDÉO -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim"></div>
+
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL"/>
-        <span><b>RSL — Romandie Scooter League</b></span>
-      </a>
-      <ul>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="game.html">Games</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="cours.html">Cours</a></li>
-      </ul>
-      <button id="menuBtn" aria-label="Menu">☰</button>
-      <div class="cta">
-        <button class="btn dark" id="btnLogin">Se connecter</button>
-        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-        <a class="btn green" href="membres.html">Devenir membre</a>
+      <div class="row">
+        <a class="brand" href="index.html" aria-current="page">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar">
+          </a>
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+
+          <button id="menuBtn">☰</button>
+        </div>
       </div>
     </div>
   </nav>
 
+  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
+      <a href="index.html" aria-current="page">Accueil</a>
       <a href="cours.html">Cours</a>
       <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
-      <a href="game.html">Games</a>
       <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <main class='container'><div class='card'><h3>Règlement</h3><p class='muted'>Règlement interne.</p></div></main>
+  <!-- CONTENU -->
+  <main>
+    <div class="container-page">
+      <div class="reg-card">
+        <div class="reg-chip"><span></span> RÈGLEMENT & CONDITIONS GÉNÉRALES</div>
 
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>RSL</h4>
+        <h1>Règlement & Conditions générales</h1>
+
+        <p class="muted">
+          Ces règles s’appliquent à tous les cours, entraînements, événements et abonnements proposés par la
+          Romandie Scooter League (RSL), portée par l’association Ride4Style Montreux.
+        </p>
+
+        <h2>1. Organisation & champ d’application</h2>
+        <p>
+          Le présent règlement s’applique à :
+        </p>
         <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
+          <li>tous les cours et entraînements ;</li>
+          <li>les abonnements mensuels/saisonniers ;</li>
+          <li>les contests, jams et workshops ;</li>
+          <li>les paiements en ligne (Twint, Stripe, Klarna).</li>
         </ul>
-      </div>
-      <div>
-        <h4>Ressources</h4>
+
+        <h2>2. Inscriptions & confirmations</h2>
         <ul>
-          <li><a href="membres.html">Adhésion</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
+          <li>L’inscription se fait via le site RSL ou un lien officiel.</li>
+          <li>Elle devient contractuelle dès la validation du paiement.</li>
+          <li>Les mineurs doivent être inscrits/validés par un parent.</li>
+          <li>L’Association peut refuser une inscription pour raisons de sécurité.</li>
         </ul>
-      </div>
-      <div>
-        <h4>Contest</h4>
+
+        <h2>3. Prix & moyens de paiement</h2>
+        <p>Prix en CHF, par séance, pack ou abonnement.</p>
+
+        <h3>3.1 Moyens acceptés</h3>
         <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
+          <li>Twint</li>
+          <li>Cartes bancaires (Stripe)</li>
+          <li>Klarna (si disponible)</li>
+          <li>Facture/virement (rare, si accord)</li>
         </ul>
-      </div>
-      <div>
-        <h4>Infos légales</h4>
+
+        <h3>3.2 Paiement</h3>
         <ul>
-          <li><a href="conditions.html">Conditions générales</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li>Les cours doivent être payés avant la première séance.</li>
+          <li>En cas de plan Klarna : les échéances doivent être respectées.</li>
+          <li>Retard = suspension possible jusqu'au paiement.</li>
         </ul>
+
+        <h2>4. Abonnements mensuels</h2>
+        <ul>
+          <li>Reconduction automatique mensuelle.</li>
+          <li>Résiliation 14 jours avant le mois suivant.</li>
+          <li>Séances manquées = non-remboursées.</li>
+          <li>Non-paiement = résiliation possible.</li>
+        </ul>
+
+        <h2>5. Annulation, absence & reports</h2>
+        <h3>5.1 Annulation parent/rider</h3>
+        <ul>
+          <li>Annonce écrite (SMS / e-mail).</li>
+          <li>Délai possible de 48h selon le coach.</li>
+          <li>No-show = non remboursé.</li>
+        </ul>
+
+        <h3>5.2 Annulation par l’Association</h3>
+        <ul>
+          <li>Météo, maladie coach, site fermé…</li>
+          <li>Solution : report / remplacement / avoir.</li>
+        </ul>
+
+        <h2>6. Sécurité, équipement & comportement</h2>
+        <ul>
+          <li>Casque obligatoire.</li>
+          <li>Protections recommandées / exigées selon niveau.</li>
+          <li>Trottinette en bon état obligatoire.</li>
+          <li>Comportement dangereux = exclusion possible.</li>
+        </ul>
+
+        <h2>7. Responsabilité & accidents</h2>
+        <p>
+          Le rider participe à ses risques et périls, la trottinette freestyle
+          comportant des risques inhérents.
+        </p>
+        <ul>
+          <li>Assurance accident / RC obligatoire pour chaque participant.</li>
+          <li>Responsabilité de l’Association exclue sauf faute grave.</li>
+          <li>En cas d’accident : l’Association peut contacter les secours. Les frais sont à charge du rider / parents.</li>
+          <li>Les informations médicales fournies servent au suivi mais ne remplacent pas un avis médical.</li>
+        </ul>
+
+        <h2>8. Données personnelles</h2>
+        <ul>
+          <li>Données utilisées pour la gestion, la facturation et la sécurité.</li>
+          <li>Traitement conforme à la législation suisse.</li>
+          <li>Les parents/riders acceptent d’être contactés pour informations liées aux cours.</li>
+        </ul>
+
+        <h2>9. Photos & vidéos — droit à l’image</h2>
+        <ul>
+          <li>Autorisation demandée lors de l’inscription.</li>
+          <li>Contenus utilisés uniquement pour la communication RSL / Ride4Style.</li>
+          <li>Un retrait peut être demandé si techniquement possible.</li>
+        </ul>
+
+        <h2>10. Paiements en ligne & prestataires</h2>
+        <ul>
+          <li>Twint, Stripe, Klarna ont leurs propres conditions d’utilisation.</li>
+          <li>La RSL ne stocke jamais les données complètes des cartes bancaires.</li>
+          <li>En cas de litige bancaire → accès suspendu, montant dû exigible.</li>
+        </ul>
+
+        <h2>11. Droit applicable & for juridique</h2>
+        <ul>
+          <li>Droit suisse.</li>
+          <li>For juridique : siège de l’Association Ride4Style Montreux.</li>
+        </ul>
+
+        <h2>12. Modifications</h2>
+        <ul>
+          <li>Le règlement peut être mis à jour à tout moment.</li>
+          <li>La version en ligne au moment de l’inscription fait foi.</li>
+        </ul>
+
+        <p class="reg-last">
+          Dernière mise à jour : <b>novembre 2025</b>.<br>
+          Ce texte sert de base légale générale pour la RSL & Ride4Style Montreux.
+        </p>
       </div>
     </div>
-    <p class="copy">© <span id="rsl-year"></span> — Romandie Scooter League</p>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-mini">
+    <p class="copy">© <span id="rsl-year"></span> — Romandie Scooter League / Association Ride4Style Montreux. Tous droits réservés.</p>
   </footer>
 
+  <!-- SCRIPTS -->
   <script>
-    (function(){ var y=document.getElementById('rsl-year'); if(y) y.textContent=(new Date()).getFullYear(); })();
+    // Vidéo de fond
+    (function(){
+      const vids=[
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const v=document.getElementById('rslBg');
+      if(!v) return;
+
+      const s=document.createElement('source');
+      s.src=vids[Math.floor(Math.random()*vids.length)];
+      s.type="video/mp4";
+      v.appendChild(s);
+
+      const start=()=>{
+        try{
+          v.playbackRate=0.6;
+          const p=v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+      start();
+
+      document.addEventListener('visibilitychange',()=>{
+        if(document.hidden){ v.pause(); }
+        else{ start(); }
+      });
+    })();
+
+    // Menu mobile
+    (function(){
+      const btn=document.getElementById('menuBtn');
+      const sheet=document.getElementById('mobileMenu');
+      const dim=document.querySelector('.mobile-dim');
+
+      if(!btn || !sheet) return;
+
+      btn.addEventListener('click',()=>{
+        sheet.classList.add('open');
+      });
+
+      dim?.addEventListener('click',()=>{
+        sheet.classList.remove('open');
+      });
+
+      document.addEventListener('keydown',e=>{
+        if(e.key==="Escape"){
+          sheet.classList.remove('open');
+        }
+      });
+    })();
+
+    // Année footer
+    (function(){
+      const y=document.getElementById('rsl-year');
+      if(y) y.textContent=(new Date()).getFullYear();
+    })();
   </script>
+
 </body>
 </html>

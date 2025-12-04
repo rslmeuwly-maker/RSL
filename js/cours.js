@@ -2,8 +2,72 @@
 const { createClient } = supabase;
 let supa = null;
 try {
-  supa = createClient(window.env?.SUPABASE_URL || '', window.env?.SUPABASE_ANON || '');
-} catch (_) {}
+  // essaie d'abord env.js, sinon fallback direct sur ton projet RSL
+  const url  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
+  const anon = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+  supa = createClient(url, anon);
+} catch (e) {
+  console.error("Erreur init Supabase dans cours.js:", e);
+}
+
+// ===== Membership cache =====
+let membershipCode = null;
+
+async function ensureMembershipLoaded() {
+  // déjà en mémoire
+  if (membershipCode !== null) return membershipCode;
+
+  // fallback localStorage si déjà stocké par une autre page
+  const lsCode = localStorage.getItem("rsl_membership_code");
+  if (lsCode) {
+    membershipCode = lsCode;
+    return membershipCode;
+  }
+
+  if (!supa || !supa.auth) {
+    membershipCode = null;
+    return null;
+  }
+
+  try {
+    const { data: { user } } = await supa.auth.getUser();
+    if (!user) {
+      membershipCode = null;
+      return null;
+    }
+
+    // On tente de lire un abonnement actif (table rsl_memberships si elle existe)
+    const { data, error } = await supa
+      .from('rsl_memberships')
+      .select('membership_code,expires_at,is_active')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('expires_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      membershipCode = null;
+      return null;
+    }
+
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      membershipCode = null;
+      return null;
+    }
+
+    membershipCode = data.membership_code || null;
+    if (membershipCode) {
+      localStorage.setItem("rsl_membership_code", membershipCode);
+    }
+    return membershipCode;
+  } catch (e) {
+    console.warn("Erreur chargement abo (ignoré):", e);
+    membershipCode = null;
+    return null;
+  }
+}
 
 // ===== Panier helpers =====
 function getPanier() {
@@ -28,6 +92,39 @@ function updateBasketBar() {
   }
 }
 
+// ===== Calcul du prix d’un cours selon l’abo =====
+function computeCoursePriceForMember(code, panier) {
+  // code = membershipCode (starter, rider, progression, premium, support...)
+  // panier = cours déjà dans le panier (pour gérer les 15 gratuits progression)
+
+  // Aucun abo -> plein tarif
+  if (!code) return 30;
+
+  const normalized = String(code).toLowerCase();
+
+  // Premium : tous les cours gratuits
+  if (normalized === 'premium') return 0;
+
+  // Progression : 15 cours gratuits, puis 20.–
+  if (normalized === 'progression') {
+    const freeUsed = panier.filter(c => Number(c.price) === 0).length;
+    if (freeUsed < 15) return 0;
+    return 20;
+  }
+
+  // Starter / Rider / Support : tarif membre 20.–
+  if (
+    normalized === 'starter' ||
+    normalized === 'rider'   ||
+    normalized === 'support'
+  ) {
+    return 20;
+  }
+
+  // Par défaut, sécurité : 30.–
+  return 30;
+}
+
 // ===== Chargement + rendu des cours =====
 async function loadCourses(){
   const list      = document.getElementById('courseList');
@@ -35,10 +132,15 @@ async function loadCourses(){
   const lieuSel   = document.getElementById('filtreLieu');
   const onlyFree  = document.getElementById('filtreDispo');
 
+  if (!list) return;
+
   list.innerHTML = '<div class="item"><b>Chargement...</b></div>';
 
+  // on essaie de charger l’abo en parallèle (si dispo)
+  await ensureMembershipLoaded();
+
   try {
-    if(!supa) throw new Error('No Supabase env');
+    if(!supa) throw new Error('No Supabase client');
     let { data, error } = await supa
       .from('courses')
       .select('id,location,starts_at,capacity,enrollments(id)')
@@ -59,13 +161,14 @@ async function loadCourses(){
   }
 
   function render(data){
-    const mois = monthSel.value;
-    const lieu = lieuSel.value;
-    const only = onlyFree.checked;
+    const mois = monthSel?.value || 'all';
+    const lieu = lieuSel?.value || 'all';
+    const only = !!onlyFree?.checked;
 
     // filtre des cours
     const filt = data.filter(c=>{
       const d  = new Date(c.starts_at);
+      if (isNaN(d.getTime())) return false;
       const mm = (d.getMonth()+1).toString().padStart(2,'0');
       const r  = c.capacity - (c.enrollments?.length||0); // places restantes
       return (mois==='all' || mm===mois)
@@ -75,9 +178,11 @@ async function loadCourses(){
 
     // remplir le <select> des lieux
     const uniqLieux = [...new Set(data.map(c=>c.location))].sort();
-    lieuSel.innerHTML =
-      '<option value="all">Tous les lieux</option>' +
-      uniqLieux.map(l=>`<option ${l===lieu?'selected':''}>${l}</option>`).join('');
+    if (lieuSel) {
+      lieuSel.innerHTML =
+        '<option value="all">Tous les lieux</option>' +
+        uniqLieux.map(l=>`<option ${l===lieu?'selected':''}>${l}</option>`).join('');
+    }
 
     // panier actuel (pour marquer "Ajouté ✅")
     const panier = getPanier();
@@ -114,23 +219,34 @@ async function loadCourses(){
       let btnDisable = full ? "disabled" : "";
       let btnExtraCl = inPanier ? "selected" : "";
 
+      // prix initial (sera recalculé au moment de l'ajout quand même)
+      const priceInit = 30;
+
       return `
-        <div class="item" style="background:linear-gradient(180deg,rgba(9,13,23,.78),rgba(7,10,18,.78));border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;color:#e7f2eb;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-bottom:12px;">
+        <div class="item"
+             data-id="${c.id}"
+             data-price="${priceInit}">
           <div>
             <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
-              <b style="color:#fff;font-weight:700;font-size:15px;line-height:1.3;">
-                ${c.location}
-              </b>
+              <div>
+                <b class="course-title" style="color:#fff;font-weight:700;font-size:15px;line-height:1.3;">
+                  ${c.location}
+                </b>
+                <div class="muted course-meta" style="color:#cbd5e1;font-size:14px;line-height:1.3;margin-top:4px;">
+                  <span class="course-date">${niceDate}</span> — 
+                  <span class="course-time">${niceTime}</span>
+                </div>
+                <span class="course-place" style="display:none;">${c.location}</span>
+                <div class="course-price" style="color:#a5b4fc;font-size:13px;margin-top:4px;">
+                  ${priceInit}.–
+                </div>
+              </div>
               <span class="badge" style="display:inline-block;border-radius:8px;border:1px solid rgba(255,255,255,.12);padding:4px 8px;font-size:12px;line-height:1.2;font-weight:600;
                 ${full
                   ? "background:rgba(239,68,68,.15);color:#f87171;"
                   : "background:rgba(34,197,94,.12);color:#22c55e;"}">
                 ${full ? 'Complet' : rest+' places'}
               </span>
-            </div>
-
-            <div class="muted" style="color:#cbd5e1;font-size:14px;line-height:1.3;margin-top:4px;">
-              ${niceDate} — ${niceTime}
             </div>
           </div>
 
@@ -139,6 +255,9 @@ async function loadCourses(){
               class="btn green inscrire-btn ${btnExtraCl}"
               data-id="${c.id}"
               data-date="${dateISO}"
+              data-location="${c.location}"
+              data-time="${niceTime}"
+              data-label-date="${niceDate}"
               style="background:#22c55e;color:#062312;font-weight:700;border-radius:8px;padding:8px 12px;font-size:14px;line-height:1.2;border:0;cursor:${full?'not-allowed':'pointer'};min-width:90px;"
               ${btnDisable}
             >${btnLabel}</button>
@@ -169,8 +288,11 @@ document.addEventListener("click", (e) => {
   const btn = e.target.closest(".inscrire-btn");
   if (!btn) return;
 
-  const id   = btn.dataset.id;
-  const date = btn.dataset.date; // "2026-01-03"
+  const id       = btn.dataset.id;
+  const date     = btn.dataset.date;      // "2026-01-03"
+  const location = btn.dataset.location || "";
+  const time     = btn.dataset.time || "";
+  const labelDate= btn.dataset["labelDate"] || btn.getAttribute("data-label-date") || "";
   if (!id || !date) return;
 
   // panier actuel
@@ -199,8 +321,19 @@ document.addEventListener("click", (e) => {
     btn.textContent = "S’inscrire";
     btn.classList.remove("selected");
   } else {
-    // ajouter dans le panier
-    panier.push({ id, date });
+    // calcul du prix à l'ajout, selon abo + panier actuel
+    const price = computeCoursePriceForMember(membershipCode, panier);
+
+    // ajouter dans le panier AVEC le lieu, l'heure et le prix
+    panier.push({
+      id,
+      date,            // YYYY-MM-DD (technique)
+      dateLabel: labelDate, // ex. "sam., 03.01."
+      time,            // "10h00"
+      location,
+      price            // 0, 20 ou 30 selon abo
+    });
+
     btn.textContent = "Ajouté ✅";
     btn.classList.add("selected");
   }

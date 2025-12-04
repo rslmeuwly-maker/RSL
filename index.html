@@ -3,33 +3,34 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>RSL — Romandie Scooter League</title>
+  <title>Accueil — Romandie Scooter League</title>
 
-  <!-- Fonts + style global -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase / scripts site -->
+  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
 
   <style>
-    html,body{
+    html, body {
       height:100%;
       margin:0;
-      background:transparent!important;
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      color:#fff;
+      background: transparent !important;
       display:flex;
       flex-direction:column;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden; /* IMPORTANT: rien ne dépasse */
     }
-    main{flex:1;position:relative;z-index:10;}
+    main { flex:1; }
 
-    /* VIDÉO DE FOND (même base que cours/compte) */
+    /* ======= Vidéo de fond ======= */
     .site-bg-video{
       position:fixed;
       inset:0;
@@ -46,151 +47,92 @@
       background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
     }
 
-    /* NAV (repris du reste du site) */
+    /* ======= NAVBAR ======= */
     nav.nav{
-      background:rgba(0,0,0,.65);
-      backdrop-filter:blur(8px);
-      position:sticky;
-      top:0;
-      z-index:999;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      position: sticky; top:0; z-index:100;
     }
-    nav.nav .container{
-      max-width:1320px;
-      margin:0 auto;
-      padding:12px 28px;
-    }
-    nav.nav .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:#fff;
-      text-decoration:none;
-    }
-    .brand img{
-      height:48px;
-      border-radius:10px;
-    }
-    .brand span{
-      font-weight:800;
-      font-size:17px;
-    }
-    nav.nav ul{
-      display:flex;
-      align-items:center;
-      gap:26px;
-    }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:48px; border-radius:10px; display:block; }
+    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
+    nav.nav ul{ display:flex; align-items:center; gap:26px; }
     nav.nav ul li a{
       font-weight:600;
       color:#e8f0ea;
       font-size:17px;
       letter-spacing:.2px;
-      text-decoration:none;
       white-space:nowrap;
-      transition:.2s;
-    }
-    nav.nav ul li a:hover{color:#22c55e;}
-    .cta{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    #menuBtn{
-      display:none;
-      font-size:18px;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
-      cursor:pointer;
-    }
-    #menuBtn:hover{
-      background:rgba(34,197,94,.22);
-    }
-    @media(max-width:990px){
-      nav.nav ul{display:none!important;}
-      .cta a,#btnAccount,#btnLogin{display:none!important;}
-      #menuBtn{display:inline-flex;}
-    }
-
-    /* MENU MOBILE */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:1400;
-    }
-    .mobile-sheet.open{display:block;}
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.55);
-    }
-    .mobile-panel{
-      position:absolute;
-      right:0;
-      top:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
-      background:#0b1220;
-      padding:22px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
-      box-shadow:-12px 0 30px rgba(0,0,0,.35);
-    }
-    .mobile-panel a{
-      color:#eaf5ee;
       text-decoration:none;
-      font-weight:700;
-      padding:8px 0;
+      transition:.2s ease;
     }
-    .mobile-panel hr{
-      border:0;
-      height:1px;
-      background:rgba(255,255,255,.12);
-      margin:10px 0;
+    nav.nav ul li a:hover{ color:#22c55e; }
+
+    .cta{ display:flex; align-items:center; gap:12px; }
+    #menuBtn{
+      display:none; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; font-size:18px; line-height:1; border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
+      transition:.2s ease;
     }
-    .mobile-panel .coach-link{
-      border-top:1px solid rgba(255,255,255,.12);
-      margin-top:8px;
-      padding-top:12px;
-      font-weight:700;
+    #menuBtn:hover { background:rgba(34,197,94,.22); }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 24px; }
+
+    /* Avatar rond dans la nav */
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
     }
 
-    /* HERO / INTRO INDEX */
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      /* ❗ On cache seulement les boutons, PAS l'avatar */
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{ display:inline-flex; }
+      .coach-fab{ display:none; }
+    }
+
+    /* ===== HERO / INTRO INDEX ===== */
     .hero-wrap{
       max-width:1200px;
-      margin:40px auto 40px;
-      padding:0 20px;
+      margin:40px auto 30px;
+      padding:0 16px;
     }
     .intro-card{
       background:rgba(0,0,0,.65);
       border-radius:18px;
       border:1px solid rgba(148,163,184,.45);
       box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 60px rgba(34,197,94,.18);
-      padding:22px 22px 26px;
+      padding:20px 20px 24px;
       position:relative;
       overflow:hidden;
-    }
-    .intro-card::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background:
-        radial-gradient(circle at 0% 0%,rgba(34,197,94,.25),transparent 60%),
-        radial-gradient(circle at 100% 80%,rgba(56,189,248,.25),transparent 60%);
-      opacity:.65;
-      mix-blend-mode:soft-light;
-      pointer-events:none;
+      max-width:100%;
+      box-sizing:border-box;
     }
     .intro-inner{position:relative;z-index:1;}
 
@@ -280,8 +222,10 @@
       background:rgba(15,23,42,.96);
       border-radius:14px;
       border:1px solid rgba(148,163,184,.55);
-      padding:16px 16px 14px;
+      padding:16px 16px 18px;
       box-shadow:0 20px 60px rgba(0,0,0,.7);
+      max-width:100%;
+      box-sizing:border-box;
     }
     .cta-title{
       font-size:15px;
@@ -298,14 +242,16 @@
     .btn-ghost{
       display:block;
       width:100%;
+      max-width:100%;
       text-align:center;
-      border-radius:10px;
-      font-size:14px;
+      border-radius:12px;
+      font-size:16px;
       font-weight:800;
-      padding:11px 14px;
+      padding:14px 16px;
       cursor:pointer;
       text-decoration:none;
-      margin-bottom:8px;
+      margin-bottom:10px;
+      box-sizing:border-box;
     }
     .btn-main{
       background:linear-gradient(180deg,#22c55e,#16a34a);
@@ -313,29 +259,30 @@
       border:0;
       box-shadow:0 12px 26px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.2);
     }
-    .btn-main:hover{
-      filter:brightness(1.05);
-    }
+    .btn-main:hover{filter:brightness(1.05);}
     .btn-ghost{
       background:rgba(0,0,0,.4);
       border:1px solid rgba(255,255,255,.25);
       color:#e5e7eb;
     }
-    .btn-ghost:hover{
-      background:rgba(15,23,42,.9);
+    .btn-ghost:hover{background:rgba(15,23,42,.9);}
+
+    @media(max-width:480px){
+      .hero-wrap{padding:0 12px;}
+      .intro-card{padding:18px 14px 22px;border-radius:14px;}
+      .cta-block{padding:14px 12px 16px;border-radius:12px;}
+      .btn-main,
+      .btn-ghost{
+        padding:13px 14px;
+        font-size:15px;
+      }
     }
 
-    .small-note{
-      margin-top:6px;
-      font-size:11px;
-      color:#9aa5b1;
-    }
-
-    /* SECTION OVERVIEW (cartes rapides) */
+    /* ===== SECTION OVERVIEW ===== */
     .overview{
       max-width:1200px;
-      margin:0 auto 50px;
-      padding:0 20px;
+      margin:0 auto 40px;
+      padding:0 16px;
     }
     .overview-title{
       font-size:14px;
@@ -346,43 +293,20 @@
     }
     .overview-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
       gap:16px;
     }
     .overview-card{
       background:rgba(15,23,42,.9);
       border-radius:14px;
       border:1px solid rgba(148,163,184,.4);
-      padding:14px 14px 14px;
+      padding:14px;
       box-shadow:0 20px 50px rgba(0,0,0,.7);
       font-size:13px;
       line-height:1.5;
-      position:relative;
-      overflow:hidden;
     }
-    .overview-card h3{
-      margin:0 0 6px;
-      font-size:15px;
-      font-weight:800;
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .overview-card h3 span.emoji{
-      font-size:16px;
-    }
-    .overview-card p{
-      margin:0 0 6px;
-      color:#cdd6ff;
-    }
-    .overview-card ul{
-      margin:4px 0 0;
-      padding-left:16px;
-      color:#9fb3ff;
-    }
-    .overview-card li{
-      margin-bottom:2px;
-    }
+    .overview-card h3{margin:0 0 6px;font-size:15px;font-weight:800;}
+    .overview-card p{margin:0 0 6px;color:#cdd6ff;}
     .overview-link{
       display:inline-flex;
       align-items:center;
@@ -393,21 +317,16 @@
       color:#22c55e;
       text-decoration:none;
     }
-    .overview-link:hover{
-      text-decoration:underline;
-    }
 
+    /* ===== Footer ===== */
     .footer-mini .copy{
-      text-align:center;
-      color:#9aa5b1;
-      font-size:14px;
-      padding:24px 0 28px;
-      margin:0;
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:24px 0 28px; margin:0;
       border-top:1px solid rgba(255,255,255,.1);
       background:transparent;
     }
 
-    /* FAB JE SUIS COACH */
+    /* FAB coach */
     .coach-fab{
       position: fixed; right:16px; bottom:16px; z-index:80;
       display:inline-flex; align-items:center; gap:8px;
@@ -422,16 +341,16 @@
       transform:translateY(-1px);
       transition:.15s ease;
     }
-    @media(max-width:990px){
-      .coach-fab{display:none;}
+    @media (max-width:990px){
+      .coach-fab{ display:none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- VIDÉO DE FOND -->
+  <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
-  <div class="site-bg-dim"></div>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
   <!-- NAV -->
   <nav class="nav">
@@ -456,6 +375,14 @@
         <div class="cta">
           <button class="btn dark" id="btnLogin">Login</button>
           <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <!-- AVATAR (géré par auth.js) -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" 
+                 alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
@@ -484,9 +411,8 @@
     </nav>
   </div>
 
-  <!-- CONTENU -->
+  <!-- CONTENU INDEX -->
   <main>
-    <!-- HERO -->
     <div class="hero-wrap">
       <section class="intro-card">
         <div class="intro-inner">
@@ -523,9 +449,6 @@
                 <li>une carte des <b>spots & skateparks</b> en Romandie ;</li>
                 <li>des infos sur les coachs, l’association et les événements.</li>
               </ul>
-              <p style="margin-top:8px;">
-                La RSL est un projet à long terme, construit petit à petit avec la communauté.
-              </p>
             </div>
 
             <div class="cta-block">
@@ -534,74 +457,40 @@
                 Parents, riders, coachs : commence par les cours, les événements ou ton compte membre.
               </p>
 
-              <a href="cours.html" class="btn-main">
-                Cours trottinette
-              </a>
-
-              <a href="membres.html" class="btn-ghost">
-                Devenir membre RSL
-              </a>
-
-              <a href="coach.html" class="btn-ghost">
-                🏫Devenir coach RSL
-              </a>
-
-              <p class="small-note">
-                Besoin d’un accès spécial / inscription anticipée ?  
-                → <a href="access.html" style="color:#22c55e;text-decoration:underline;">Page d’accès RSL 2026</a><br>
-                En entrant sur le site, tu acceptes notre règlement et nos conditions générales.
-              </p>
+              <a href="cours.html" class="btn-main">Cours trottinette</a>
+              <a href="membres.html" class="btn-ghost">Devenir membre RSL</a>
+              <a href="coach.html" class="btn-ghost">🏫 Devenir coach RSL</a>
             </div>
           </div>
         </div>
       </section>
     </div>
 
-    <!-- OVERVIEW RAPIDE DU SITE -->
+    <!-- OVERVIEW -->
     <section class="overview">
       <p class="overview-title">Ce que tu trouveras sur la RSL</p>
       <div class="overview-grid">
         <article class="overview-card">
-          <h3><span class="emoji">🎓</span> Cours & stages</h3>
+          <h3>🎓 Cours & stages</h3>
           <p>Sessions encadrées en skatepark, pour apprendre proprement et progresser en sécurité.</p>
-          <ul>
-            <li>Niveaux débutant à avancé</li>
-            <li>Groupes réduits</li>
-            <li>Coachs certifiés RSL</li>
-          </ul>
           <a href="cours.html" class="overview-link">Voir les cours</a>
         </article>
 
         <article class="overview-card">
-          <h3><span class="emoji">🏆</span> Contest & ligue</h3>
+          <h3>🏆 Contest & ligue</h3>
           <p>Une vraie structure de ligue romande, avec jams, contests et classements officiels.</p>
-          <ul>
-            <li>Montreux Scooter Contest & co</li>
-            <li>Catégories par âge / niveau</li>
-            <li>Ambiance family & good vibes</li>
-          </ul>
           <a href="evenements.html" class="overview-link">Voir les événements</a>
         </article>
 
         <article class="overview-card">
-          <h3><span class="emoji">📍</span> Spots & skateparks</h3>
+          <h3>📍 Spots & skateparks</h3>
           <p>Une carte vivante des spots en Romandie, connectée à l’écosystème RIDLY.</p>
-          <ul>
-            <li>Skateparks, pumptracks, street spots</li>
-            <li>Infos pratiques & sécurité</li>
-            <li>Liens avec les shops locaux</li>
-          </ul>
           <a href="ou_rider.html" class="overview-link">Où rider ?</a>
         </article>
 
         <article class="overview-card">
-          <h3><span class="emoji">🤝</span> Association & membres</h3>
+          <h3>🤝 Association & membres</h3>
           <p>La RSL est portée par l’association Ride4Style Montreux, reconnue dans la scène depuis des années.</p>
-          <ul>
-            <li>Adhésion annuelle RSL</li>
-            <li>Avantages membres & réductions</li>
-            <li>Soutien direct au développement du sport</li>
-          </ul>
           <a href="membres.html" class="overview-link">Devenir membre</a>
         </article>
       </div>
@@ -609,53 +498,67 @@
   </main>
 
   <footer class="footer-mini">
-    <p class="copy">© 2026 — Romandie Scooter League / Association Ride4Style Montreux. Tous droits réservés.</p>
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- FAB JE SUIS COACH -->
   <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
+  <!-- SCRIPTS -->
   <script>
-    // VIDÉO DE FOND (même logique que cours/compte)
+    // Vidéo de fond
     (function(){
-      const vids=[
+      const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
       ];
-      const v=document.getElementById('rslBg');
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
       if(!v) return;
-      const s=document.createElement('source');
-      s.src=vids[Math.floor(Math.random()*vids.length)];
-      s.type="video/mp4";
+
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
       v.appendChild(s);
 
-      const start=()=>{
+      const start = () => {
         try{
-          v.playbackRate=0.6;
-          const p=v.play();
+          v.playbackRate = 0.6;
+          const p = v.play();
           if(p && p.catch) p.catch(()=>{});
         }catch(e){}
       };
+
       start();
 
-      document.addEventListener('visibilitychange',()=>{
-        if(document.hidden){ v.pause(); } else { start(); }
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden){
+          v.pause();
+        }else{
+          start();
+        }
       });
     })();
 
-    // MENU MOBILE
+    // Menu mobile
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
       if(!menuBtn || !mobile) return;
-      menuBtn.addEventListener('click',()=>{
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
         mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
       });
       mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
         mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
       });
       document.addEventListener('keydown',e=>{
-        if(e.key==='Escape'){ mobile.classList.remove('open'); }
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
       });
     })();
   </script>

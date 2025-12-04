@@ -4,100 +4,833 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Games — Romandie Scooter League</title>
+
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
+
+  <style>
+    html, body {
+      height:100%;
+      margin:0;
+      background: transparent !important;
+      display:flex;
+      flex-direction:column;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
+    }
+    main { flex:1; position:relative; z-index:10; }
+
+    /* ======= Vidéo de fond ======= */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+    }
+
+    /* ======= NAVBAR ======= */
+    nav.nav{
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(8px);
+      position: sticky; top:0; z-index:100;
+    }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:48px; border-radius:10px; display:block; }
+    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
+    nav.nav ul{ display:flex; align-items:center; gap:26px; list-style:none; padding:0; margin:0; }
+    nav.nav ul li a{
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      text-decoration:none;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{ color:#22c55e; }
+
+    .cta{ display:flex; align-items:center; gap:12px; }
+    .btn.dark{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:600;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .btn.green{
+      border-radius:999px;
+      border:0;
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#022c16;
+      padding:8px 16px;
+      font-size:14px;
+      font-weight:700;
+      text-decoration:none;
+      cursor:pointer;
+      box-shadow:0 12px 26px rgba(0,0,0,.6);
+    }
+
+    .nav-avatar{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid #22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+    }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12);
+      color:#22c55e;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover { background:rgba(34,197,94,.22); }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 24px; }
+
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+    }
+    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart,
+      #btnLogin,
+      #btnAccount,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{ display:inline-flex; }
+    }
+
+    /* ===== HERO / GAME CARD ===== */
+    .game-wrap{
+      max-width:1200px;
+      margin:40px auto 30px;
+      padding:0 16px;
+    }
+    .game-card{
+      background:rgba(0,0,0,.65);
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,.45);
+      box-shadow:0 30px 80px rgba(0,0,0,.85),0 0 60px rgba(34,197,94,.18);
+      padding:20px 20px 24px;
+      position:relative;
+      overflow:hidden;
+      max-width:100%;
+      box-sizing:border-box;
+    }
+    .game-card-inner{ position:relative; z-index:1; }
+
+    .game-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .game-title-block h1{
+      margin:0;
+      font-size:clamp(26px,4vw,32px);
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .game-title-block p{
+      margin:4px 0 0;
+      font-size:13px;
+      color:#cdd6ff;
+    }
+
+    .badge-game{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:rgba(15,23,42,.9);
+      border:1px solid rgba(148,163,184,.6);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#9ca3af;
+    }
+    .badge-game span{
+      width:7px;height:7px;
+      border-radius:999px;
+      background:#22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,.9);
+    }
+
+    .game-main{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr);
+      gap:22px;
+    }
+    @media(max-width:900px){
+      .game-main{ grid-template-columns:1fr; }
+    }
+
+    /* Bloc gauche : générateur */
+    .generator-card{
+      background:rgba(15,23,42,.96);
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.55);
+      padding:18px 16px 18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);
+    }
+    .generator-label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:#9ca3af;
+      margin-bottom:8px;
+    }
+    .current-trick-box{
+      border-radius:14px;
+      border:1px solid rgba(34,197,94,.5);
+      background:radial-gradient(circle at top,#0b1220,#020617 60%);
+      padding:18px 16px 14px;
+      text-align:center;
+      box-shadow:0 20px 60px rgba(0,0,0,.85);
+      margin-bottom:14px;
+      min-height:80px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    #currentTrick{
+      font-size:clamp(20px,4vw,26px);
+      font-weight:800;
+      margin:0 0 4px;
+    }
+    #trickMeta{
+      font-size:12px;
+      color:#9ca3af;
+    }
+
+    .generator-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+    .btn-main-game,
+    .btn-ghost-game{
+      flex:1;
+      min-width:140px;
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      text-align:center;
+    }
+    .btn-main-game{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#062312;
+      border:0;
+      box-shadow:0 12px 26px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .btn-main-game:hover{ filter:brightness(1.05); }
+    .btn-ghost-game{
+      background:rgba(0,0,0,.4);
+      border:1px solid rgba(255,255,255,.25);
+      color:#e5e7eb;
+    }
+    .btn-ghost-game:hover{ background:rgba(15,23,42,.9); }
+
+    .hint-text{
+      margin-top:10px;
+      font-size:12px;
+      color:#9ca3af;
+    }
+
+    /* Bloc droite : ajout + liste */
+    .side-card{
+      background:rgba(15,23,42,.96);
+      border-radius:16px;
+      border:1px solid rgba(148,163,184,.55);
+      padding:18px 16px 18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.7);
+    }
+    .side-card h2{
+      margin:0 0 6px;
+      font-size:16px;
+      font-weight:800;
+    }
+    .side-card p{
+      margin:0 0 12px;
+      font-size:13px;
+      color:#cdd6ff;
+    }
+
+    .add-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .add-row input{
+      flex:1;
+      min-width:140px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      padding:9px 12px;
+      font-size:14px;
+      outline:none;
+    }
+    .add-row input:focus{
+      border-color:#22c55e;
+      box-shadow:0 0 0 2px rgba(34,197,94,.35);
+    }
+    .add-row button{
+      border-radius:999px;
+      border:0;
+      padding:9px 14px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      background:#22c55e;
+      color:#062312;
+      box-shadow:0 8px 20px rgba(0,0,0,.7);
+      white-space:nowrap;
+    }
+    .add-row button:hover{ filter:brightness(1.05); }
+
+    .custom-actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+      font-size:12px;
+      color:#9ca3af;
+    }
+    .custom-actions button{
+      border-radius:999px;
+      border:1px solid rgba(248,113,113,.7);
+      background:rgba(127,29,29,.85);
+      color:#fecaca;
+      padding:6px 10px;
+      font-size:11px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .trick-list-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:#9ca3af;
+      margin:6px 0 4px;
+    }
+    .trick-list{
+      max-height:210px;
+      overflow:auto;
+      padding:0;
+      margin:0;
+      list-style:none;
+      font-size:13px;
+    }
+    .trick-list li{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      padding:5px 0;
+      border-bottom:1px solid rgba(148,163,184,.22);
+    }
+    .trick-list li:last-child{
+      border-bottom:none;
+    }
+    .trick-name{
+      flex:1;
+      color:#e5e7eb;
+    }
+    .pill{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      color:#cdd6ff;
+      white-space:nowrap;
+    }
+    .pill-default{ border-color:rgba(52,211,153,.8); color:#bbf7d0; }
+    .pill-custom{ border-color:rgba(251,191,36,.8); color:#facc15; }
+
+    .del-btn{
+      border-radius:999px;
+      border:1px solid rgba(248,113,113,.7);
+      background:rgba(127,29,29,.9);
+      color:#fecaca;
+      padding:3px 8px;
+      font-size:11px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    /* Footer */
+    .footer-mini .copy{
+      text-align:center; color:#9aa5b1; font-size:14px;
+      padding:24px 0 28px; margin:0;
+      border-top:1px solid rgba(255,255,255,.1);
+      background:transparent;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
+
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL"/>
-        <span><b>RSL — Romandie Scooter League</b></span>
-      </a>
-      <ul>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="game.html">Games</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="cours.html">Cours</a></li>
-      </ul>
-      <button id="menuBtn" aria-label="Menu">☰</button>
-      <div class="cta">
-        <button class="btn dark" id="btnLogin">Se connecter</button>
-        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-        <a class="btn green" href="membres.html">Devenir membre</a>
+      <div class="row">
+        <a class="brand" href="index.html" aria-current="page">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <!-- AVATAR (géré par auth.js) -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" 
+                 alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn">☰</button>
+        </div>
       </div>
     </div>
   </nav>
 
+  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
+      <a href="index.html" aria-current="page">Accueil</a>
       <a href="cours.html">Cours</a>
       <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
-      <a href="game.html">Games</a>
       <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <main class='container'><div class='card'><h3>Games</h3><p class='muted'>Modules ludiques (à venir).</p></div></main>
+  <!-- CONTENU GAME -->
+  <main>
+    <div class="game-wrap">
+      <section class="game-card">
+        <div class="game-card-inner">
+          <div class="game-header">
+            <div class="game-title-block">
+              <h1>RSL Trick Game</h1>
+              <p>Un générateur de tricks pour JAM, échauffement ou défis entre potes.</p>
+            </div>
+            <div>
+              <div class="badge-game">
+                <span></span> 20 tricks simples + tes idées
+              </div>
+            </div>
+          </div>
 
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>RSL</h4>
-        <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Ressources</h4>
-        <ul>
-          <li><a href="membres.html">Adhésion</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contest</h4>
-        <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Infos légales</h4>
-        <ul>
-          <li><a href="conditions.html">Conditions générales</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </div>
+          <div class="game-main">
+            <!-- Générateur -->
+            <div class="generator-card">
+              <div class="generator-label">Générateur de tricks</div>
+              <div class="current-trick-box">
+                <p id="currentTrick">Clique sur “Nouveau trick”</p>
+                <p id="trickMeta">0 / 0 trick possibles</p>
+              </div>
+
+              <div class="generator-buttons">
+                <button type="button" class="btn-main-game" id="btnNewTrick">Nouveau trick</button>
+                <button type="button" class="btn-ghost-game" id="btnNewLine">3 tricks (ligne)</button>
+              </div>
+
+              <p class="hint-text">
+                Astuce : pour une JAM, tu peux lancer un trick par rider, ou une ligne de 3 tricks pour les plus chauds.
+              </p>
+            </div>
+
+            <!-- Ajout + liste -->
+            <div class="side-card">
+              <h2>Ajoute tes propres tricks</h2>
+              <p>Par exemple des combos locaux, des noms de figures du crew, ou des variantes plus engagées.</p>
+
+              <div class="add-row">
+                <input id="newTrickInput" type="text" placeholder="Ex: 180 barspin, whip à plat, manual to 180…">
+                <button type="button" id="btnAddTrick">Ajouter</button>
+              </div>
+
+              <div class="custom-actions">
+                <span id="customCountText">0 trick perso enregistré</span>
+                <button type="button" id="btnClearCustom">Effacer mes tricks persos</button>
+              </div>
+
+              <div class="trick-list-title">Liste des tricks</div>
+              <ul class="trick-list" id="trickList"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-    <p class="copy">© <span id="rsl-year"></span> — Romandie Scooter League</p>
+  </main>
+
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
+  <!-- SCRIPTS -->
   <script>
-    (function(){ var y=document.getElementById('rsl-year'); if(y) y.textContent=(new Date()).getFullYear(); })();
+    // Vidéo de fond
+    (function(){
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
+
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
+
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
+      start();
+
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden){
+          v.pause();
+        }else{
+          start();
+        }
+      });
+    })();
+
+    // Menu mobile
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // Login simple → compte
+    document.getElementById('btnLogin')?.addEventListener('click', ()=>{
+      location.href = 'compte.html';
+    });
+
+    /* ====== GENERATEUR DE TRICKS ====== */
+
+    const defaultTricks = [
+      "Bunny hop (jump à plat)",
+      "Drop in simple",
+      "Roll-in (descendre la rampe en roulant)",
+      "180 à plat",
+      "360 à plat",
+      "Fakie (rouler en arrière)",
+      "Revert (demi-tour en slideant les roues)",
+      "Manual (rouler sur la roue arrière)",
+      "Nose manual (rouler sur la roue avant)",
+      "One foot (un pied en l’air)",
+      "No footer (les deux pieds en l’air)",
+      "No hander (sans les mains sur le guidon)",
+      "Tailwhip (whip classique)",
+      "Barspin (tour de guidon)",
+      "X-up (croiser le guidon)",
+      "180 out du quarter",
+      "Rock to fakie",
+      "Feeble grind sur curb",
+      "Boardslide sur rail/curb bas",
+      "Footjam (bloquer la roue avant avec le pied)"
+    ];
+
+    const STORAGE_KEY = "rsl_game_tricks_custom_v1";
+
+    function loadCustomTricks(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed)) return parsed.filter(t => typeof t === "string" && t.trim().length>0);
+        return [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function saveCustomTricks(list){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      }catch(e){}
+    }
+
+    let customTricks = loadCustomTricks();
+    function getAllTricks(){
+      return [...defaultTricks, ...customTricks];
+    }
+
+    const currentTrickEl = document.getElementById("currentTrick");
+    const trickMetaEl   = document.getElementById("trickMeta");
+    const trickListEl   = document.getElementById("trickList");
+    const customCountEl = document.getElementById("customCountText");
+    const btnNewTrick   = document.getElementById("btnNewTrick");
+    const btnNewLine    = document.getElementById("btnNewLine");
+
+    function renderMeta(){
+      const total = getAllTricks().length;
+      trickMetaEl.textContent = total > 0 ? "1 trick tiré au hasard parmi " + total : "0 / 0 trick possibles";
+    }
+
+    function renderList(){
+      const all = getAllTricks();
+      trickListEl.innerHTML = "";
+
+      defaultTricks.forEach((t, idx)=>{
+        const li = document.createElement("li");
+        const name = document.createElement("span");
+        name.className = "trick-name";
+        name.textContent = t;
+        const pill = document.createElement("span");
+        pill.className = "pill pill-default";
+        pill.textContent = "Base";
+        li.appendChild(name);
+        li.appendChild(pill);
+        trickListEl.appendChild(li);
+      });
+
+      customTricks.forEach((t, idx)=>{
+        const li = document.createElement("li");
+        const name = document.createElement("span");
+        name.className = "trick-name";
+        name.textContent = t;
+        const pill = document.createElement("span");
+        pill.className = "pill pill-custom";
+        pill.textContent = "Perso";
+        const del = document.createElement("button");
+        del.className = "del-btn";
+        del.textContent = "Suppr.";
+        del.addEventListener("click", ()=>{
+          customTricks.splice(idx,1);
+          saveCustomTricks(customTricks);
+          renderList();
+          updateMetaCount();
+        });
+        li.appendChild(name);
+        li.appendChild(pill);
+        li.appendChild(del);
+        trickListEl.appendChild(li);
+      });
+    }
+
+    function updateMetaCount(){
+      const n = customTricks.length;
+      if(n === 0){
+        customCountEl.textContent = "0 trick perso enregistré";
+      }else if(n === 1){
+        customCountEl.textContent = "1 trick perso enregistré";
+      }else{
+        customCountEl.textContent = n + " tricks persos enregistrés";
+      }
+      renderMeta();
+    }
+
+    // picking
+    function pickRandomTrick(){
+      const all = getAllTricks();
+      if(!all.length) return "Aucun trick (ajoute-en un !)";
+      const idx = Math.floor(Math.random()*all.length);
+      return all[idx];
+    }
+
+    function buildLine(){
+      const all = getAllTricks();
+      if(all.length === 0) return { line: ["Aucun trick (ajoute-en un !)"], total: 0 };
+      const copy = [...all];
+      const line = [];
+      for(let i=0;i<3 && copy.length>0;i++){
+        const idx = Math.floor(Math.random()*copy.length);
+        line.push(copy[idx]);
+        copy.splice(idx,1);
+      }
+      return { line, total: all.length };
+    }
+
+    // ===== Effet "roulette" avant d'afficher le trick =====
+    let rolling = false;
+
+    function startRolling(mode){
+      if(rolling) return;
+      const all = getAllTricks();
+      if(!all.length){
+        currentTrickEl.textContent = "Aucun trick (ajoute-en un !)";
+        trickMetaEl.textContent = "0 / 0";
+        return;
+      }
+
+      rolling = true;
+      btnNewTrick.disabled = true;
+      btnNewLine.disabled  = true;
+
+      let i = 0;
+      const total = all.length;
+
+      const interval = setInterval(()=>{
+        currentTrickEl.textContent = all[i % total];
+        trickMetaEl.textContent = "Trick roulette…";
+        i++;
+      }, 80); // vitesse du défilement
+
+      // durée de la roulette (ms)
+      const duration = 1100;
+      setTimeout(()=>{
+        clearInterval(interval);
+
+        if(mode === "single"){
+          const t = pickRandomTrick();
+          currentTrickEl.textContent = t;
+          trickMetaEl.textContent = "1 trick sur " + total + " possible(s)";
+        }else{
+          const { line, total: tTotal } = buildLine();
+          currentTrickEl.innerHTML = line.map((t,i)=> (i+1)+". "+t).join("<br>");
+          trickMetaEl.textContent = line.length + " tricks sur " + tTotal + " possible(s)";
+        }
+
+        rolling = false;
+        btnNewTrick.disabled = false;
+        btnNewLine.disabled  = false;
+      }, duration);
+    }
+
+    // Boutons
+    btnNewTrick?.addEventListener("click", ()=> startRolling("single"));
+    btnNewLine?.addEventListener("click", ()=> startRolling("line"));
+
+    document.getElementById("btnAddTrick")?.addEventListener("click", ()=>{
+      const input = document.getElementById("newTrickInput");
+      const value = (input.value || "").trim();
+      if(!value) return;
+      if(getAllTricks().some(t => t.toLowerCase() === value.toLowerCase())){
+        input.value = "";
+        return;
+      }
+      customTricks.push(value);
+      saveCustomTricks(customTricks);
+      input.value = "";
+      renderList();
+      updateMetaCount();
+    });
+
+    document.getElementById("btnClearCustom")?.addEventListener("click", ()=>{
+      if(!customTricks.length) return;
+      if(!confirm("Effacer tous tes tricks persos ?")) return;
+      customTricks = [];
+      saveCustomTricks(customTricks);
+      renderList();
+      updateMetaCount();
+    });
+
+    // Init
+    renderList();
+    updateMetaCount();
   </script>
 </body>
 </html>

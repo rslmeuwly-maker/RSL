@@ -4,100 +4,1106 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Mon compte — Romandie Scooter League</title>
+
+  <!-- Fonts + style global -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase (comme les autres pages) -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
+
+  <style>
+    html,body{
+      height:100%;
+      margin:0;
+      background:transparent!important;
+      color:#fff;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+    }
+    main{flex:1;}
+
+    /* === Vidéo de fond === */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+    }
+
+    /* === HEADER === */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(8px);
+      position:sticky;
+      top:0;
+      z-index:999;
+    }
+    nav.nav .container{
+      max-width:1320px;
+      margin:0 auto;
+      padding:12px 28px;
+    }
+    nav.nav .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      text-decoration:none;
+    }
+    .brand img{
+      height:48px;
+      border-radius:10px;
+    }
+    .brand span{
+      font-weight:800;
+      font-size:17px;
+    }
+
+    nav.nav ul{
+      display:flex;
+      align-items:center;
+      gap:26px;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:#e8f0ea;
+      font-size:17px;
+      letter-spacing:.2px;
+      text-decoration:none;
+      white-space:nowrap;
+      transition:.2s;
+    }
+    nav.nav ul li a:hover{color:#22c55e;}
+
+    .cta{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    #menuBtn{
+      display:none;
+      font-size:18px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(34,197,94,.12);
+      color:#22c55e;
+      cursor:pointer;
+    }
+    #menuBtn:hover{
+      background:rgba(34,197,94,.22);
+    }
+
+    /* Avatar dans la navbar */
+    .nav-avatar{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid rgba(34,197,94,.8);
+      box-shadow:0 0 0 2px rgba(0,0,0,.7);
+    }
+
+    @media(max-width:990px){
+      nav.nav ul{display:none!important;}
+      .cta a,#btnAccount,#btnLogin{display:none!important;}
+      #menuBtn{display:inline-flex;}
+    }
+
+    /* === MENU MOBILE === */
+    .mobile-sheet{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:1400;
+    }
+    .mobile-sheet.open{display:block;}
+    .mobile-dim{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.55);
+    }
+    .mobile-panel{
+      position:absolute;
+      right:0;
+      top:0;
+      height:100%;
+      width:82vw;
+      max-width:360px;
+      background:#0b1220;
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+    }
+    .mobile-panel a{
+      color:#eaf5ee;
+      text-decoration:none;
+      font-weight:700;
+      padding:8px 0;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(255,255,255,.12);
+      margin:10px 0;
+    }
+
+    /* === LAYOUT COMPTE === */
+    .account-layout{
+      max-width:1200px;
+      margin:40px auto 60px;
+      padding:0 20px;
+      display:grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+      gap:24px;
+      position:relative;
+      z-index:10;
+    }
+    @media(max-width:1000px){
+      .account-layout{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .account-box{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:16px;
+      backdrop-filter:blur(4px);
+      box-shadow:0 20px 40px rgba(0,0,0,.6);
+      padding:24px 22px;
+    }
+    .account-box h2{
+      margin:0 0 6px;
+      font-size:22px;
+      font-weight:800;
+      color:#22c55e;
+    }
+    .account-box p.muted{
+      font-size:14px;
+      color:#9ca3af;
+      margin:0 0 16px;
+    }
+
+    .badge-email{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.5);
+      font-size:13px;
+      margin-bottom:8px;
+    }
+    .badge-email strong{
+      text-transform:uppercase;
+      font-size:11px;
+      opacity:.85;
+    }
+
+    .membership-info{
+      font-size:13px;
+      color:#e5e7eb;
+      margin:4px 0 14px;
+    }
+    .membership-info b{
+      color:#bbf7d0;
+    }
+
+    .form-grid{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .form-grid > div{
+      flex:1;
+      min-width:150px;
+    }
+    label{
+      font-size:13px;
+      font-weight:600;
+      color:#e5e7eb;
+      display:block;
+      margin-bottom:4px;
+    }
+    input{
+      width:100%;
+      background-color:rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.25);
+      border-radius:10px;
+      padding:9px 11px;
+      color:#fff;
+      font-size:14px;
+      font-weight:500;
+      outline:none;
+      box-sizing:border-box;
+    }
+    input:focus{
+      border-color:#22c55e;
+      box-shadow:0 0 0 3px rgba(34,197,94,0.25);
+    }
+
+    .btn-save{
+      margin-top:12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      background:#22c55e;
+      color:#02140a;
+      border:0;
+      border-radius:999px;
+      padding:8px 16px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.6);
+    }
+
+    .btn-admin{
+      margin-top:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      background:#0f172a;
+      color:#e5e7eb;
+      border:1px solid rgba(56,189,248,.8);
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(15,23,42,.8);
+    }
+
+    .btn-logout{
+      margin-top:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      background:#7f1d1d;
+      color:#fecaca;
+      border:1px solid rgba(248,113,113,.9);
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(15,23,42,.8);
+    }
+
+    .small-info{
+      font-size:12px;
+      color:#9ca3af;
+      margin-top:8px;
+    }
+
+    /* COURSES TABLE */
+    .courses-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .courses-header span{
+      font-size:13px;
+      color:#9ca3af;
+    }
+
+    table.courses{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin-top:4px;
+    }
+    table.courses thead{
+      background:rgba(15,23,42,.9);
+    }
+    table.courses th,
+    table.courses td{
+      padding:8px 10px;
+      border-bottom:1px solid rgba(148,163,184,.3);
+      text-align:left;
+      vertical-align:middle;
+    }
+    table.courses th{
+      font-weight:600;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:#9ca3af;
+    }
+    table.courses tbody tr:nth-child(even){
+      background:rgba(15,23,42,.6);
+    }
+    table.courses tbody tr:nth-child(odd){
+      background:rgba(15,23,42,.3);
+    }
+
+    .chip-status{
+      display:inline-flex;
+      align-items:center;
+      padding:3px 9px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+    .chip-status.paye{
+      background:rgba(34,197,94,.1);
+      border:1px solid rgba(34,197,94,.5);
+      color:#bbf7d0;
+    }
+    .chip-status.non-paye{
+      background:rgba(250,204,21,.1);
+      border:1px solid rgba(250,204,21,.6);
+      color:#facc15;
+    }
+
+    .btn-small{
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      font-size:11px;
+      padding:4px 9px;
+      cursor:pointer;
+      white-space:nowrap;
+      margin-right:4px;
+    }
+    .btn-small.danger{
+      border-color:rgba(248,113,113,.8);
+      color:#fecaca;
+      background:rgba(127,29,29,.9);
+    }
+
+    .courses-empty{
+      font-size:13px;
+      color:#9ca3af;
+      padding:12px 0 4px;
+    }
+
+    .footer-mini .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:14px;
+      padding:24px 0 28px;
+      margin:0;
+      border-top:1px solid rgba(255,255,255,.1);
+      background:transparent;
+    }
+
+    #accountStatus{
+      font-size:13px;
+      color:#9ca3af;
+      margin:0 20px 8px;
+      text-align:center;
+    }
+
+    /* Bloc avatar dans le compte */
+    .avatar-block{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      margin:12px 0 16px;
+      flex-wrap:wrap;
+    }
+    .avatar-preview{
+      width:80px;
+      height:80px;
+      border-radius:50%;
+      overflow:hidden;
+      border:2px solid rgba(34,197,94,.8);
+      box-shadow:0 10px 24px rgba(0,0,0,.7);
+      background:#020617;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .avatar-preview img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- VIDEO de fond -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim"></div>
+
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL"/>
-        <span><b>RSL — Romandie Scooter League</b></span>
-      </a>
-      <ul>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="game.html">Games</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="cours.html">Cours</a></li>
-      </ul>
-      <button id="menuBtn" aria-label="Menu">☰</button>
-      <div class="cta">
-        <button class="btn dark" id="btnLogin">Se connecter</button>
-        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-        <a class="btn green" href="membres.html">Devenir membre</a>
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="compte.html" aria-current="page" style="color:#22c55e">
+            Mon compte</a></li>
+        </ul>
+
+        <div class="cta">
+          <button class="btn dark" id="btnLogin">Login</button>
+          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <!-- Avatar rond de l'utilisateur -->
+          <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar RSL" style="display:none;">
+          <!-- Panier à côté de Mon compte -->
+          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn">☰</button>
+        </div>
       </div>
     </div>
   </nav>
 
+  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
       <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
-      <a href="game.html">Games</a>
       <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
-      <a href="compte.html">Mon compte</a>
+      <a href="compte.html" aria-current="page">Mon compte</a>
+      <a id="mobileLogout" style="display:none;color:#fca5a5;font-weight:700;cursor:pointer;">Déconnexion</a>
     </nav>
   </div>
 
-  <main class='container'><div class='card'><h3>Espace membre</h3><p class='muted'>Historique des cours, etc.</p></div></main>
+  <p id="accountStatus">Chargement de ton compte...</p>
 
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>RSL</h4>
-        <ul>
-          <li><a href="formation.html">Formation</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="reglement.html">Règlement</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Ressources</h4>
-        <ul>
-          <li><a href="membres.html">Adhésion</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="ou_rider.html">Où rider</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Contest</h4>
-        <ul>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="inscriptions.html">Inscriptions</a></li>
-          <li><a href="resultats.html">Résultats</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Infos légales</h4>
-        <ul>
-          <li><a href="conditions.html">Conditions générales</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </div>
+  <!-- CONTENU -->
+  <main>
+    <div class="account-layout" id="accountContent" style="display:none;">
+
+      <!-- COLONNE GAUCHE : INFOS PROFIL -->
+      <section class="account-box">
+        <h2>Infos du rider / parent</h2>
+        <p class="muted">Tu peux mettre à jour tes informations. Elles seront utilisées pour les cours et inscriptions.</p>
+
+        <div class="badge-email">
+          <strong>Compte</strong><span id="badgeEmail">—</span>
+        </div>
+
+        <!-- Boutons Admin + Déconnexion -->
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button class="btn-admin" id="btnAdminRsl" style="display:none;">
+            ⚙️ Administration RSL
+          </button>
+          <button class="btn-logout" id="btnLogout" style="display:none;">
+            Déconnexion
+          </button>
+        </div>
+
+        <!-- Bloc avatar / photo de profil -->
+        <div class="avatar-block">
+          <div class="avatar-preview">
+            <img id="profileAvatarPreview" src="images/default-avatar.png" alt="Photo de profil RSL">
+          </div>
+          <div>
+            <label for="avatarInput">Photo de profil</label>
+            <input type="file" id="avatarInput" accept="image/*">
+            <p class="small-info">
+              Choisis une image (de préférence carrée). Elle s’affichera en rond à côté de ton compte en haut.
+            </p>
+          </div>
+        </div>
+
+        <!-- 🟢 Infos abonnement -->
+        <p class="membership-info" id="membershipInfo"></p>
+
+        <div class="form-grid">
+          <div>
+            <label>Prénom du rider</label>
+            <input id="riderFirst" placeholder="Prénom du rider">
+          </div>
+          <div>
+            <label>Nom du rider</label>
+            <input id="riderLast" placeholder="Nom du rider">
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-top:10px;">
+          <div>
+            <label>Prénom du parent</label>
+            <input id="parentFirst" placeholder="Prénom du parent">
+          </div>
+          <div>
+            <label>Nom du parent</label>
+            <input id="parentLast" placeholder="Nom du parent">
+          </div>
+        </div>
+
+        <div class="form-grid" style="margin-top:10px;">
+          <div>
+            <label>Téléphone (parent)</label>
+            <input id="parentPhone" placeholder="+41 ...">
+          </div>
+          <div>
+            <label>Email de contact</label>
+            <input id="contactEmail" placeholder="mail@example.ch">
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label>Remarque médicale / allergie</label>
+          <input id="noteMed" placeholder="Rien de spécial">
+        </div>
+
+        <button class="btn-save" id="btnSaveProfile">Enregistrer les infos</button>
+        <div class="small-info" id="profileMsg"></div>
+      </section>
+
+      <!-- COLONNE DROITE : COURS & PAIEMENTS -->
+      <section class="account-box">
+        <div class="courses-header">
+          <div>
+            <h2>Mes cours & paiements</h2>
+            <p class="muted">Cours sélectionnés (panier). Tu peux les marquer comme payés ou les retirer.</p>
+          </div>
+          <span id="coursesCount">0 cours</span>
+        </div>
+
+        <div id="coursesContainer">
+          <!-- tableau injecté en JS -->
+        </div>
+
+        <p class="small-info">
+          Les cours <b>payés</b> sont marqués manuellement ici pour ton suivi.<br>
+          Les cours <b>non payés</b> peuvent encore être retirés (avant facturation définitive).
+        </p>
+      </section>
+
     </div>
-    <p class="copy">© <span id="rsl-year"></span> — Romandie Scooter League</p>
+  </main>
+
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
   <script>
-    (function(){ var y=document.getElementById('rsl-year'); if(y) y.textContent=(new Date()).getFullYear(); })();
+  // BACKGROUND VIDEO
+  (function(){
+    const vids=[
+      "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+      "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+    ];
+    const v=document.getElementById('rslBg');
+    if(!v) return;
+    const s=document.createElement('source');
+    s.src=vids[Math.floor(Math.random()*vids.length)];
+    s.type="video/mp4";
+    v.appendChild(s);
+
+    const start=()=>{
+      try{
+        v.playbackRate=0.6;
+        const p=v.play();
+        if(p && p.catch) p.catch(()=>{});
+      }catch(e){}
+    };
+    start();
+
+    document.addEventListener('visibilitychange',()=>{
+      if(document.hidden){ v.pause(); } else { start(); }
+    });
+  })();
+
+  // MENU MOBILE
+  (function(){
+    const menuBtn=document.getElementById('menuBtn');
+    const mobile=document.getElementById('mobileMenu');
+    if(!menuBtn || !mobile) return;
+    menuBtn.addEventListener('click',()=>{
+      mobile.classList.add('open');
+    });
+    mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+      mobile.classList.remove('open');
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ mobile.classList.remove('open'); }
+    });
+  })();
+
+  // SUPABASE
+  const supabaseUrl = "https://jynxifufaauoxwzjapzq.supabase.co";
+  const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+  let sb = null;
+  if (window.supabase && window.supabase.createClient) {
+    sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+  } else {
+    console.error("Supabase JS non chargé");
+  }
+
+  const statusEl = document.getElementById('accountStatus');
+  const contentEl = document.getElementById('accountContent');
+
+  const badgeEmail = document.getElementById('badgeEmail');
+  const membershipInfo = document.getElementById('membershipInfo');
+
+  const riderFirst = document.getElementById('riderFirst');
+  const riderLast  = document.getElementById('riderLast');
+  const parentFirst= document.getElementById('parentFirst');
+  const parentLast = document.getElementById('parentLast');
+  const parentPhone= document.getElementById('parentPhone');
+  const contactEmail= document.getElementById('contactEmail');
+  const noteMed    = document.getElementById('noteMed');
+  const btnSaveProfile = document.getElementById('btnSaveProfile');
+  const profileMsg = document.getElementById('profileMsg');
+
+  const coursesContainer = document.getElementById('coursesContainer');
+  const coursesCount     = document.getElementById('coursesCount');
+
+  const navAvatar = document.getElementById('navAvatar');
+  const profileAvatarPreview = document.getElementById('profileAvatarPreview');
+  const avatarInput = document.getElementById('avatarInput');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnAccountTop = document.getElementById('btnAccount');
+
+  const btnAdminRsl = document.getElementById('btnAdminRsl');
+  const btnLogout   = document.getElementById('btnLogout');
+  const mobileLogout = document.getElementById('mobileLogout');
+
+  const DEFAULT_AVATAR = "images/default-avatar.png";
+
+  // helpers localStorage
+  function getProfileLS(){
+    try{
+      return JSON.parse(localStorage.getItem('rsl_profile')||'{}');
+    }catch{ return {}; }
+  }
+  function saveProfileLS(obj){
+    localStorage.setItem('rsl_profile', JSON.stringify(obj));
+  }
+
+  function getPanierLS(){
+    try{
+      return JSON.parse(localStorage.getItem('rsl_panier_courses')||'[]');
+    }catch{ return []; }
+  }
+  function savePanierLS(list){
+    localStorage.setItem('rsl_panier_courses', JSON.stringify(list));
+  }
+
+  function getAvatarLS(){
+    try{
+      return localStorage.getItem('rsl_avatar') || null;
+    }catch{
+      return null;
+    }
+  }
+  function saveAvatarLS(dataUrl){
+    try{
+      localStorage.setItem('rsl_avatar', dataUrl);
+    }catch(e){
+      console.warn("Impossible de sauvegarder l’avatar dans localStorage", e);
+    }
+  }
+
+  function applyAvatarToUI(){
+    const stored = getAvatarLS();
+    const src = stored || DEFAULT_AVATAR;
+    if(profileAvatarPreview){
+      profileAvatarPreview.src = src;
+    }
+    if(navAvatar){
+      navAvatar.src = src;
+    }
+  }
+
+  // change avatar depuis input file
+  if(avatarInput){
+    avatarInput.addEventListener('change', (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        const dataUrl = ev.target.result;
+        if(typeof dataUrl !== "string") return;
+        saveAvatarLS(dataUrl);
+        if(profileAvatarPreview){
+          profileAvatarPreview.src = dataUrl;
+        }
+        if(navAvatar){
+          navAvatar.src = dataUrl;
+          navAvatar.style.display = "inline-block";
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // 🔎 Récup abo depuis Supabase
+  async function fetchMembership(sbClient, userId){
+    if(!sbClient || !sbClient.from || !userId) return null;
+    try{
+      const { data, error } = await sbClient
+        .from('rsl_memberships')
+        .select('membership_code,expires_at,is_active')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('expires_at',{ascending:false})
+        .limit(1)
+        .maybeSingle();
+
+      if(error || !data) return null;
+      if(data.expires_at && new Date(data.expires_at) < new Date()) return null;
+      return data;
+    }catch(e){
+      console.warn("Erreur fetch abo:", e);
+      return null;
+    }
+  }
+
+  function updateMembershipInfoUI(record){
+    if(!membershipInfo) return;
+
+    if(!record){
+      membershipInfo.innerHTML =
+        `Tu n’as pas encore d’abonnement RSL actif. Tu peux voir les options sur la page <a href="membres.html" style="color:#22c55e;font-weight:600;">Devenir membre</a>.`;
+      return;
+    }
+
+    const labelMap = {
+      starter: "Starter",
+      rider: "Rider",
+      progression: "Progression",
+      premium: "Premium",
+      support: "Soutien / Pro"
+    };
+    const key = (record.membership_code || "").toLowerCase();
+    const label = labelMap[key] || record.membership_code || "Membre";
+
+    let expTxt = "";
+    if(record.expires_at){
+      const d = new Date(record.expires_at);
+      expTxt = d.toLocaleDateString("fr-CH");
+    }
+
+    membershipInfo.innerHTML =
+      `Tu es actuellement <b>membre ${label}</b>` +
+      (expTxt ? ` (valable jusqu’au ${expTxt}).` : ".");
+  }
+
+  // Afficher / cacher les boutons de déconnexion
+  function showLogoutButtons(user){
+    if(btnLogout){
+      btnLogout.style.display = user ? "inline-flex" : "none";
+    }
+    if(mobileLogout){
+      mobileLogout.style.display = user ? "block" : "none";
+    }
+  }
+
+  // 🔐 Vérifier si user est admin et afficher le bouton
+  async function checkAdminAndShowButton(user){
+    if(!btnAdminRsl) return false;
+
+    let isAdmin = false;
+
+    // hardcode : ton user ID = admin garanti
+    const HARD_ADMIN_ID = "36a00c9e-9321-41bf-b043-298ad5089593";
+
+    // si c'est ton compte → bouton direct
+    if(user && user.id === HARD_ADMIN_ID){
+      console.log("Admin détecté par ID hardcodé");
+      isAdmin = true;
+    } else if(sb && sb.from && user){
+      try{
+        const { data, error } = await sb
+          .from('rsl_admins')
+          .select('user_id,is_admin,role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        console.log("rsl_admins pour ce user:", data, error);
+
+        if(!error && data){
+          isAdmin =
+            data.is_admin === true ||
+            (data.role && data.role.toLowerCase() === 'admin');
+        }
+      }catch(e){
+        console.warn("Erreur check admin:", e);
+      }
+    }
+
+    btnAdminRsl.style.display = isAdmin ? "inline-flex" : "none";
+    return isAdmin;
+  }
+
+  // Déconnexion
+  function logout(){
+    try{
+      localStorage.removeItem("rsl_profile");
+      localStorage.removeItem("rsl_avatar");
+      localStorage.removeItem("rsl_panier_courses");
+    }catch(e){}
+
+    if(sb && sb.auth){
+      sb.auth.signOut().finally(()=>{
+        window.location.href = "index.html";
+      });
+    }else{
+      window.location.href = "index.html";
+    }
+  }
+
+  btnLogout?.addEventListener("click", logout);
+  mobileLogout?.addEventListener("click", logout);
+
+  // INIT
+  (async () => {
+    // profil depuis localStorage
+    const p = getProfileLS();
+    riderFirst.value = p.riderFirst || "";
+    riderLast.value  = p.riderLast  || "";
+    parentFirst.value= p.parentFirst|| "";
+    parentLast.value = p.parentLast || "";
+    parentPhone.value= p.parentPhone|| "";
+    contactEmail.value= p.contactEmail || "";
+    noteMed.value    = p.noteMed    || "";
+
+    // avatar localStorage -> UI
+    applyAvatarToUI();
+
+    if(!sb || !sb.auth){
+      statusEl.textContent = "Impossible de connecter ton compte (Supabase non chargé).";
+      contentEl.style.display = "grid";
+      updateMembershipInfoUI(null);
+      renderCourses();
+      if(navAvatar){
+        navAvatar.style.display = "none";
+      }
+      if(btnAdminRsl){
+        btnAdminRsl.style.display = "none";
+      }
+      showLogoutButtons(null);
+      return;
+    }
+
+    try{
+      const { data:{ user } } = await sb.auth.getUser();
+      if(!user){
+        statusEl.innerHTML = "Tu n’es pas connecté. Clique sur <b>Login</b> en haut pour accéder à ton compte.";
+        badgeEmail.textContent = "Non connecté";
+        updateMembershipInfoUI(null);
+        contentEl.style.display = "grid";
+
+        if(btnLogin) btnLogin.style.display = "inline-flex";
+        if(btnAccountTop) btnAccountTop.style.display = "none";
+        if(navAvatar) navAvatar.style.display = "none";
+        if(btnAdminRsl) btnAdminRsl.style.display = "none";
+        showLogoutButtons(null);
+      }else{
+        badgeEmail.textContent = user.email || "—";
+        if(!contactEmail.value){
+          contactEmail.value = user.email || "";
+        }
+        statusEl.textContent = "Bienvenue dans ton espace RSL.";
+
+        // 🔔 Récup abo pour ce user
+        const membership = await fetchMembership(sb, user.id);
+        updateMembershipInfoUI(membership);
+
+        contentEl.style.display = "grid";
+
+        // affichage boutons top + avatar
+        if(btnLogin) btnLogin.style.display = "none";
+        if(btnAccountTop) btnAccountTop.style.display = "inline-flex";
+        if(navAvatar){
+          applyAvatarToUI();
+          navAvatar.style.display = "inline-block";
+        }
+
+        const isAdmin = await checkAdminAndShowButton(user);
+        // Déconnexion visible pour tout user connecté (admin ou pas)
+        showLogoutButtons(user);
+      }
+      renderCourses();
+    }catch(e){
+      console.error(e);
+      statusEl.textContent = "Erreur lors du chargement de ton compte.";
+      updateMembershipInfoUI(null);
+      contentEl.style.display = "grid";
+      renderCourses();
+      if(navAvatar){
+        navAvatar.style.display = "none";
+      }
+      if(btnAdminRsl){
+        btnAdminRsl.style.display = "none";
+      }
+      showLogoutButtons(null);
+    }
+  })();
+
+  // Enregistrer profil (LOCAL)
+  btnSaveProfile.addEventListener('click', ()=>{
+    const obj = {
+      riderFirst : riderFirst.value.trim(),
+      riderLast  : riderLast.value.trim(),
+      parentFirst: parentFirst.value.trim(),
+      parentLast : parentLast.value.trim(),
+      parentPhone: parentPhone.value.trim(),
+      contactEmail: contactEmail.value.trim(),
+      noteMed    : noteMed.value.trim()
+    };
+    saveProfileLS(obj);
+    profileMsg.textContent = "Infos enregistrées ✅";
+    setTimeout(()=>profileMsg.textContent="", 2500);
+  });
+
+  // RENDER COURSES (depuis localStorage)
+  function renderCourses(){
+    const list = getPanierLS();
+
+    if(!list || !list.length){
+      coursesContainer.innerHTML = '<p class="courses-empty">Aucun cours pour l’instant. Tu peux en réserver sur la page <a href="cours.html">Cours</a>.</p>';
+      coursesCount.textContent = "0 cours";
+      return;
+    }
+
+    coursesCount.textContent = list.length + (list.length>1 ? " cours" : " cours");
+
+    const rows = list.map(c=>{
+      const date = c.date || "-";
+      const loc =
+        c.location ||
+        c.lieu ||
+        c.spot ||
+        c.spot_name ||
+        c.park ||
+        c.name ||
+        "Lieu inconnu";
+
+      let priceTxt = "CHF 30.–";
+      if (typeof c.price === "number") {
+        priceTxt = "CHF " + c.price.toFixed(2);
+      } else if (typeof c.price === "string" && c.price.trim() !== "") {
+        priceTxt = c.price;
+      }
+
+      const paid = c.paid === true;
+
+      return `
+        <tr>
+          <td>${loc}</td>
+          <td>${date}</td>
+          <td>${priceTxt}</td>
+          <td>
+            <span class="chip-status ${paid ? 'paye':'non-paye'}">${paid ? 'Payé':'Non payé'}</span>
+          </td>
+          <td>
+            <button class="btn-small" onclick="togglePaid(${c.id})">${paid ? 'Marquer non payé':'Marquer payé'}</button>
+            <button class="btn-small danger" onclick="removeCourse(${c.id})">Retirer</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    coursesContainer.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="courses">
+          <thead>
+            <tr>
+              <th>Lieu</th>
+              <th>Date</th>
+              <th>Prix</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // Actions sur les cours (LOCAL)
+  function togglePaid(id){
+    const list = getPanierLS();
+    const updated = list.map(c=>{
+      if(c.id === id){
+        return {...c, paid: !(c.paid === true)};
+      }
+      return c;
+    });
+    savePanierLS(updated);
+    renderCourses();
+  }
+
+  function removeCourse(id){
+    if(!confirm("Retirer ce cours de ta liste ?")) return;
+    const list = getPanierLS().filter(c=>c.id !== id);
+    savePanierLS(list);
+    renderCourses();
+  }
+
+  // rendre accessible aux onclick
+  window.togglePaid = togglePaid;
+  window.removeCourse = removeCourse;
+
+  // Bouton Login simple
+  document.getElementById('btnLogin')?.addEventListener('click', ()=>{
+    location.href = "access.html";
+  });
+
+  // 🔁 Bouton Administration RSL → admin-rsl.html
+  btnAdminRsl?.addEventListener('click', ()=>{
+    window.location.href = "admin-rsl.html";
+  });
   </script>
 </body>
 </html>

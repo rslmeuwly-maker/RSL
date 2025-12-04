@@ -3,62 +3,169 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Feed Riders — RSL</title>
+<title>Feed Riders — RIDLY</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#22c55e">
 
 <!-- Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/env.js"></script>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
+  /* ========== THEME GLOBAL (dark + light) ========== */
   :root{
     --green:#22c55e;
     --green-dark:#16a34a;
+
+    --bg:#000000;
+    --text:#ffffff;
     --panel:#0b1220;
     --border:rgba(255,255,255,.15);
     --dim:#9aa5b1;
+    --nav-bg:rgba(0,0,0,.65);
+    --tab-bg:rgba(0,0,0,.78);
   }
+  :root[data-theme="light"]{
+    --bg:#f3f4f6;
+    --text:#020617;
+    --panel:#ffffff;
+    --border:rgba(15,23,42,.12);
+    --dim:#4b5563;
+    --nav-bg:rgba(243,244,246,.96);
+    --tab-bg:rgba(243,244,246,.98);
+  }
+
   *{box-sizing:border-box}
 
   html,body{height:100%}
   body{
     margin:0;
-    background:#000;
-    color:#fff;
+    background:var(--bg);
+    color:var(--text);
     font-family:Outfit,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    display:flex;
+    flex-direction:column;
+  }
+  main{flex:1}
+
+  /* ===== BG vidéo (comme les autres pages RIDLY) ===== */
+  .rsl-bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .rsl-bg-video{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;background:#000;
+    filter:brightness(.48) saturate(1.05);
+  }
+  .rsl-bg-dim{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.6));
+  }
+  :root[data-theme="light"] .rsl-bg-dim{
+    background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.9));
   }
 
-  /* BG vidéo */
-  .bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none}
-  .bg-video{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;
-    filter:brightness(.45) saturate(1.05);
+  /* ===== NAV top (base = ton ancien feed, juste thème ajouté) ===== */
+  nav.nav{
+    position:sticky;top:0;z-index:1000;
+    background:var(--nav-bg);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+  }
+  nav .row{
+    max-width:1200px;margin:0 auto;
+    padding:12px 20px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  nav .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    color:var(--text);
+    text-decoration:none;
+  }
+  nav .brand img{
+    height:52px;
+    width:52px;
+    border-radius:12px;
+    background:#fff;
+    padding:6px;
+    box-shadow:0 0 14px rgba(34,197,94,.6);
+  }
+  nav a{color:var(--text);text-decoration:none;font-weight:700}
+  nav a:hover{color:var(--green)}
+
+  .nav-right-login{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-left:auto;
   }
 
-  /* Header */
-  header{
-    position:sticky;top:0;z-index:10;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:12px 14px;border-bottom:1px solid var(--border);
-    background:rgba(0,0,0,.6);backdrop-filter:blur(8px);
+  /* petit bouton thème rond */
+  .btn-theme{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(15,23,42,.95);
+    color:#fff;
+    cursor:pointer;
+    font-size:17px;
+    box-shadow:0 0 10px rgba(34,197,94,.4);
   }
-  header .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
-  header .brand img{height:34px;width:34px;border-radius:8px;background:#fff;padding:4px}
-  header .brand b{font-size:16px}
-  header .auth{font-size:13px;color:var(--dim);font-weight:600}
-  header .auth a{color:var(--green);font-weight:800;text-decoration:none}
+  :root[data-theme="light"] .btn-theme{
+    background:#ffffff;
+    color:#111827;
+    border-color:rgba(15,23,42,.15);
+  }
+  .btn-theme:hover{
+    box-shadow:0 0 14px rgba(34,197,94,.9);
+  }
 
-  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:10px 12px 88px}
+  .btn-login{
+    background:linear-gradient(180deg,var(--green),var(--green-dark));
+    color:#062312;
+    font-weight:800;
+    border-radius:999px;
+    padding:6px 16px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    box-shadow:0 0 10px rgba(34,197,94,.6);
+  }
 
-  /* Flashs (stories) */
+  /* ===== Mini hero (comme Où rider / Ajouter) ===== */
+  .page-mini-hero{position:relative;z-index:10;padding:16px 0 6px}
+  .page-mini-hero .container{max-width:1200px;margin:0 auto;padding:0 20px}
+  .page-mini-hero h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);font-weight:800}
+  .page-mini-hero p{margin:0;color:var(--dim);font-size:14px;max-width:720px}
+
+  /* ===== CONTENU FEED ===== */
+  main .container{
+    max-width:980px;
+    margin:0 auto 110px;
+    padding:10px 12px 110px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* ===== Flashs (stories) ===== */
   .flash-bar{
-    display:flex;gap:12px;overflow-x:auto;padding:8px 2px 2px 2px;margin-bottom:10px;scroll-snap-type:x proximity
+    display:flex;gap:12px;overflow-x:auto;
+    padding:8px 2px 2px 2px;margin-bottom:10px;
+    scroll-snap-type:x proximity;
   }
   .flash{
     scroll-snap-align:start;
-    min-width:76px;width:76px;text-align:center;user-select:none;cursor:pointer
+    min-width:76px;width:76px;text-align:center;user-select:none;cursor:pointer;
   }
   .flash .ring{
     width:66px;height:66px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;
@@ -68,33 +175,41 @@
     padding:3px;
   }
   .flash .ring img{
-    width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #000
+    width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #000;
   }
   .flash .name{
-    font-size:12px;line-height:1.2;font-weight:700;color:#fff;max-width:72px;margin:0 auto
+    font-size:12px;line-height:1.2;font-weight:700;color:var(--text);max-width:72px;margin:0 auto;
   }
-  .flash.me .ring{background:
-    radial-gradient(farthest-side,rgba(0,0,0,.7) 60%,transparent 62%) top/100% 100%,
-    conic-gradient(#60a5fa,#22c55e,#60a5fa)
+  .flash.me .ring{
+    background:
+      radial-gradient(farthest-side,rgba(0,0,0,.7) 60%,transparent 62%) top/100% 100%,
+      conic-gradient(#60a5fa,#22c55e,#60a5fa);
   }
 
-  /* Lightbox flash */
+  /* ===== Lightbox flash ===== */
   .lightbox{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8)}
   .lightbox.open{display:flex}
   .lightbox .content{
     max-width:min(92vw,780px);max-height:80vh;background:#000;border:1px solid var(--border);border-radius:12px;overflow:hidden
   }
   .lightbox header{
-    position:relative;top:auto;background:#000;border:0;padding:10px 12px
+    position:relative;top:auto;background:#000;border:0;padding:10px 12px;display:flex;align-items:center;gap:8px;color:#fff;
   }
   .lightbox .media{display:block;max-width:100%;max-height:70vh;margin:0 auto;background:#000}
   .lightbox .cap{padding:10px 12px;font-size:13px;color:#e5e7eb;border-top:1px solid var(--border)}
   .lightbox .close{position:absolute;right:12px;top:10px;font-weight:800;color:#fff;background:transparent;border:0;font-size:18px;cursor:pointer}
 
-  /* Feed cards */
+  /* ===== Feed cards ===== */
   .post{
-    background:rgba(0,0,0,.6);border:1px solid var(--border);border-radius:16px;padding:12px;margin:14px 0;
-    box-shadow:0 30px 80px rgba(0,0,0,.8)
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:12px;
+    margin:14px 0;
+    box-shadow:0 30px 80px rgba(0,0,0,.85)
+  }
+  :root[data-theme="light"] .post{
+    box-shadow:0 10px 30px rgba(15,23,42,.18);
   }
   .post .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
   .post .ava{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #000;background:#111}
@@ -103,15 +218,17 @@
   .media-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
   .media{display:block;width:100%;max-height:64vh;object-fit:cover}
   .cap{font-size:14px;line-height:1.5;margin:8px 2px 0;color:#e5e7eb}
+  :root[data-theme="light"] .cap{color:#111827}
   .meta{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
   .wheels{display:flex;gap:6px}
   .wheel{
-    width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;background:#1f2937;cursor:pointer;font-weight:900;font-size:12px
+    width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;background:#1f2937;cursor:pointer;font-weight:900;font-size:12px;color:#e5e7eb;
   }
   .wheel.on{background:#22c55e;color:#062312;border-color:#22c55e}
   .avg{font-size:12px;color:#9ddbb0;font-weight:800}
+  :root[data-theme="light"] .avg{color:#16a34a}
 
-  /* Bottom nav */
+  /* ===== Tabbar (même que sur les autres pages) ===== */
   .tabbar{
     position:fixed;
     left:0;right:0;bottom:0;
@@ -119,9 +236,9 @@
     display:flex;
     align-items:center;
     justify-content:space-around;
-    padding:10px 12px;
+    padding:14px 18px;
     border-top:1px solid var(--border);
-    background:rgba(0,0,0,.78);
+    background:var(--tab-bg);
     backdrop-filter:blur(10px);
   }
   .tab{
@@ -131,34 +248,57 @@
     gap:4px;
     text-decoration:none;
   }
-  .tab .ic{font-size:20px}
-  .tab span{font-size:11px;color:#e5e7eb;font-weight:700}
+  .tab .ic{font-size:24px}
+  .tab span{font-size:13px;color:#e5e7eb;font-weight:700}
   .tab.active span{color:#22c55e}
+  :root[data-theme="light"] .tab span{color:#111827}
+  :root[data-theme="light"] .tab.active span{color:#16a34a}
   @media (min-width:900px){.tab span{font-size:12px}}
 </style>
 </head>
 <body>
 
-<div class="bg-wrap" aria-hidden="true">
-  <video class="bg-video" id="bgVid" autoplay muted loop playsinline preload="auto"></video>
+<!-- BG vidéo RIDLY -->
+<div class="rsl-bg-wrap" aria-hidden="true">
+  <video class="rsl-bg-video" id="rslBg" autoplay muted loop playsinline preload="auto"></video>
+  <div class="rsl-bg-dim"></div>
 </div>
 
-<header>
-  <a class="brand" href="ou_rider.html">
-    <img src="images/logo_rsl.png" alt="RSL"/>
-    <b>RSL — Feed Riders</b>
-  </a>
-  <div class="auth" id="authState">Vérif session…</div>
-</header>
+<!-- Nav top (ton nav d'origine + bouton thème ajouté) -->
+<nav class="nav">
+  <div class="row">
+    <a class="brand" href="ou_rider.html">
+      <img src="image/logo_pn360.png" alt="RIDLY"/>
+      <span>RIDLY</span>
+    </a>
+    <div class="nav-right-login">
+      <button id="themeToggle" class="btn-theme" type="button" title="Mode clair / sombre">🌙</button>
+      <a href="compte.html" class="btn-login">Connexion</a>
+    </div>
+  </div>
+</nav>
 
-<div class="wrap">
-  <div class="flash-bar" id="flashBar"></div>
+<!-- Mini hero -->
+<section class="page-mini-hero">
+  <div class="container">
+    <h1>Feed Riders</h1>
+    <p>
+      Les derniers clips et photos des riders RIDLY. Note les tricks, découvre de nouveaux spots
+      et motive-toi avant ta prochaine session.
+    </p>
+  </div>
+</section>
 
-  <!-- UNIQUEMENT LE FEED, plus de formulaire ici -->
-  <section id="feedList">
-    <p style="color:#9aa5b1">Chargement du feed…</p>
-  </section>
-</div>
+<main>
+  <div class="container">
+    <div class="flash-bar" id="flashBar"></div>
+
+    <!-- Feed -->
+    <section id="feedList">
+      <p style="color:var(--dim)">Chargement du feed…</p>
+    </section>
+  </div>
+</main>
 
 <!-- Lightbox Flash -->
 <div class="lightbox" id="flashBox" role="dialog" aria-modal="true">
@@ -173,7 +313,7 @@
   </div>
 </div>
 
-<!-- Bottom nav : Feed actif, + va sur ajouter.html -->
+<!-- Bottom nav : Feed actif -->
 <nav class="tabbar" aria-label="Navigation">
   <a class="tab" href="ou_rider.html" title="Carte / Spots">
     <div class="ic">🏠</div><span>Spots</span>
@@ -181,11 +321,17 @@
   <a class="tab" href="ajouter.html" title="Ajouter">
     <div class="ic">➕</div><span>Ajouter</span>
   </a>
-  <a class="tab active" href="feed.html" title="Vidéos">
+  <a class="tab active" href="feed.html" title="Feed">
     <div class="ic">🎬</div><span>Feed</span>
   </a>
   <a class="tab" href="recherche.html" title="Recherche">
     <div class="ic">🔎</div><span>Recherche</span>
+  </a>
+  <a class="tab" href="games.html" title="Games">
+    <div class="ic">🎮</div><span>Game</span>
+  </a>
+  <a class="tab" href="classement.html" title="Classement">
+    <div class="ic">🏆</div><span>Classement</span>
   </a>
   <a class="tab" href="profil_ou_rider.html" title="Profil">
     <div class="ic">👤</div><span>Profil</span>
@@ -193,7 +339,7 @@
 </nav>
 
 <script>
-/* Supabase init */
+/* Supabase init (comme ton fichier d'origine) */
 const SUPABASE_URL_FALLBACK = "https://jynxifufaauoxwzjapzq.supabase.co";
 const SUPABASE_ANON_FALLBACK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
 const supa = supabase.createClient(
@@ -201,23 +347,34 @@ const supa = supabase.createClient(
   window.env?.SUPABASE_ANON || SUPABASE_ANON_FALLBACK
 );
 
-/* BG video */
+/* BG vidéo (même que les autres pages) */
 (function(){
-  const vids=[
-    `${SUPABASE_URL_FALLBACK}/storage/v1/object/public/videos_rsl/trottvideo1.mp4`,
-    `${SUPABASE_URL_FALLBACK}/storage/v1/object/public/videos_rsl/trottvideo2.mp4`
-  ];
-  const v=document.getElementById('bgVid'); if(!v) return;
+  const v=document.getElementById('rslBg'); if(!v) return;
   const s=document.createElement('source');
-  s.src=vids[Math.floor(Math.random()*vids.length)];
+  s.src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/ridly/ridly.mp4";
   s.type="video/mp4"; v.appendChild(s);
   const play=()=>{try{v.playbackRate=0.6;const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}};
   play(); document.addEventListener('visibilitychange',()=>{document.hidden?v.pause():play();});
 })();
 
+/* THEME (clé commune ridlyTheme comme sur ajouter.html) */
+(function(){
+  const root=document.documentElement;
+  const btn=document.getElementById('themeToggle');
+  if(!btn) return;
+  const saved = localStorage.getItem('ridlyTheme') || 'dark';
+  root.dataset.theme = saved;
+  const syncIcon = ()=>{ btn.textContent = root.dataset.theme === 'light' ? '☀️' : '🌙'; };
+  syncIcon();
+  btn.addEventListener('click',()=>{
+    root.dataset.theme = (root.dataset.theme === 'light') ? 'dark' : 'light';
+    localStorage.setItem('ridlyTheme', root.dataset.theme);
+    syncIcon();
+  });
+})();
+
 /* State */
 let me=null;
-const authState=document.getElementById('authState');
 const flashBar=document.getElementById('flashBar');
 const feedList=document.getElementById('feedList');
 const flashBox=document.getElementById('flashBox');
@@ -227,20 +384,14 @@ const flashVid=document.getElementById('flashVid');
 const flashCap=document.getElementById('flashCap');
 const flashClose=document.getElementById('flashClose');
 
-/* Auth (pour likes + header) */
+/* Auth (juste pour les likes / stories, pas d'affichage différent dans le header) */
 (async()=>{
   try{
     const { data:{ user } } = await supa.auth.getUser();
     if(user){
       me=user;
-      const displayName=user.user_metadata?.full_name || user.email || "Rider";
-      authState.innerHTML=`Connecté : <b>${displayName}</b>`;
-    }else{
-      authState.innerHTML=`Pas connecté — <a href="compte.html">Se connecter</a>`;
     }
-  }catch(e){
-    authState.textContent="Session inconnue";
-  }
+  }catch(e){}
 })();
 
 /* Flashes */
@@ -291,7 +442,7 @@ flashClose.onclick=()=>{flashBox.classList.remove('open');flashVid.pause();};
 
 /* Feed */
 async function loadFeed(){
-  feedList.innerHTML='<p style="color:#9aa5b1">Chargement…</p>';
+  feedList.innerHTML='<p style="color:var(--dim)">Chargement…</p>';
   try{
     const { data:posts } = await supa
       .from('spot_posts')
@@ -300,7 +451,7 @@ async function loadFeed(){
       .limit(50);
 
     if(!posts || !posts.length){
-      feedList.innerHTML='<p style="color:#9aa5b1">Encore aucun post. Sois le premier 👑</p>';
+      feedList.innerHTML='<p style="color:var(--dim)">Encore aucun post. Sois le premier 👑</p>';
       return;
     }
 
@@ -388,5 +539,13 @@ function escapeAttr(s){return escapeHTML(s)}
 
 (async()=>{await loadFlashes();await loadFeed();})();
 </script>
+
+<script>
+  // Service worker (comme les autres pages)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  }
+</script>
+
 </body>
 </html>
