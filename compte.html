@@ -482,8 +482,7 @@
           <li><a href="comite.html">Comité</a></li>
           <li><a href="contact.html">Contact</a></li>
           <li><a href="cours.html">Cours</a></li>
-          <li><a href="compte.html" aria-current="page" style="color:#22c55e">
-            Mon compte</a></li>
+          <li><a href="compte.html" aria-current="page" style="color:#22c55e">Mon compte</a></li>
         </ul>
 
         <div class="cta">
@@ -608,9 +607,11 @@
         <div class="courses-header">
           <div>
             <h2>Mes cours & paiements</h2>
-            <p class="muted">Cours sélectionnés (panier). Tu peux les marquer comme payés ou les retirer.</p>
+            <p class="muted">
+              Voici toutes tes commandes et les cours associés (y compris les tests 1.–).
+            </p>
           </div>
-          <span id="coursesCount">0 cours</span>
+          <span id="coursesCount">0 lignes</span>
         </div>
 
         <div id="coursesContainer">
@@ -618,8 +619,8 @@
         </div>
 
         <p class="small-info">
-          Les cours <b>payés</b> sont marqués manuellement ici pour ton suivi.<br>
-          Les cours <b>non payés</b> peuvent encore être retirés (avant facturation définitive).
+          Les lignes <b>payées</b> sont marquées ici pour ton suivi.<br>
+          Les lignes <b>non payées</b> peuvent encore être retirées (avant validation définitive).
         </p>
       </section>
 
@@ -674,11 +675,10 @@
     });
   })();
 
-  // ===== SUPABASE CONFIG (même projet que RIDLY) =====
+  // ===== SUPABASE CONFIG =====
   const supabaseUrl = "https://jynxifufaauoxwzjapzq.supabase.co";
   const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
 
-  // client local pour cette page (warning multiple clients possible, mais ok)
   let sb = null;
   if (window.supabase && window.supabase.createClient) {
     sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
@@ -715,10 +715,12 @@
   const btnLogout   = document.getElementById('btnLogout');
   const mobileLogout = document.getElementById('mobileLogout');
 
-  // avatar par défaut pour cette page (pas le même nom que DEFAULT_AVATAR de site.js)
   const RSL_DEFAULT_AVATAR = "images/logo_rsl.png";
 
-  // helpers localStorage
+  let currentUser = null;
+  let currentCourses = []; // chaque entrée = une ligne (un cours dans une commande)
+
+  // helpers localStorage profil + avatar
   function getProfileLS(){
     try{
       return JSON.parse(localStorage.getItem('rsl_profile')||'{}');
@@ -726,15 +728,6 @@
   }
   function saveProfileLS(obj){
     localStorage.setItem('rsl_profile', JSON.stringify(obj));
-  }
-
-  function getPanierLS(){
-    try{
-      return JSON.parse(localStorage.getItem('rsl_panier_courses')||'[]');
-    }catch{ return []; }
-  }
-  function savePanierLS(list){
-    localStorage.setItem('rsl_panier_courses', JSON.stringify(list));
   }
 
   function getAvatarLS(){
@@ -764,7 +757,7 @@
     }
   }
 
-  // changement d’avatar → uniquement localStorage (pas de Supabase Storage)
+  // changement d’avatar → uniquement localStorage
   if(avatarInput){
     avatarInput.addEventListener('change', (e)=>{
       const file = e.target.files && e.target.files[0];
@@ -854,11 +847,9 @@
     if(!btnAdminRsl) return false;
 
     let isAdmin = false;
-
     const HARD_ADMIN_ID = "36a00c9e-9321-41bf-b043-298ad5089593";
 
     if(user && user.id === HARD_ADMIN_ID){
-      console.log("Admin détecté par ID hardcodé");
       isAdmin = true;
     } else if(sb && sb.from && user){
       try{
@@ -867,8 +858,6 @@
           .select('user_id,is_admin,role')
           .eq('user_id', user.id)
           .maybeSingle();
-
-        console.log("rsl_admins pour ce user:", data, error);
 
         if(!error && data){
           isAdmin =
@@ -904,6 +893,292 @@
   btnLogout?.addEventListener("click", logout);
   mobileLogout?.addEventListener("click", logout);
 
+  // === CHARGER LES COMMANDES / COURS DEPUIS SUPABASE ===
+  async function loadCoursesFromDb(userId){
+    if(!sb || !sb.from || !userId){
+      renderCourses([]);
+      return;
+    }
+
+    // On essaie d’abord la vue rsl_booking_full_view (commandes + cours)
+    try{
+      const { data, error } = await sb
+        .from('rsl_booking_full_view')
+        .select('*')
+        .eq('user_id', userId)
+        .order('booking_created_at', { ascending:false })
+        .order('course_date', { ascending:true });
+
+      if(error){
+        console.warn("Erreur vue rsl_booking_full_view, fallback rsl_course_registrations:", error);
+        return await loadCoursesFallback(userId);
+      }
+
+      const list = (data || []).map(row=>{
+        // on garde l’id de la registration pour update/delete
+        row._regId = row.registration_id || row.id || null;
+        return row;
+      });
+
+      currentCourses = list;
+      renderCourses(list, true); // true = data venant de la vue
+      return;
+    }catch(e){
+      console.error("Exception loadCoursesFromDb (vue):", e);
+      return await loadCoursesFallback(userId);
+    }
+  }
+
+  // Fallback si la vue n’existe pas encore (ou erreur)
+  async function loadCoursesFallback(userId){
+    try{
+      const { data, error } = await sb
+        .from('rsl_course_registrations')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending:true });
+
+      if(error){
+        console.warn("Erreur chargement cours (fallback):", error);
+        renderCourses([]);
+        return;
+      }
+
+      const list = (data || []).map(row=>{
+        row._regId = row.id || null;
+        return row;
+      });
+
+      currentCourses = list;
+      renderCourses(list, false);
+    }catch(e){
+      console.error("Exception loadCoursesFallback:", e);
+      renderCourses([]);
+    }
+  }
+
+  // RENDER COURSES
+  function renderCourses(list, fromView){
+    if(!list || !list.length){
+      coursesContainer.innerHTML =
+        '<p class="courses-empty">Aucun cours / commande pour l’instant. Tu peux en réserver sur la page <a href="cours.html">Cours</a>.</p>';
+      coursesCount.textContent = "0 lignes";
+      return;
+    }
+
+    coursesCount.textContent = list.length + (list.length>1 ? " lignes" : " ligne");
+
+    const rows = list.map(c=>{
+      // Commande (booking)
+      const bookingId = c.booking_id || null;
+      const bookingLabel = bookingId ? ("#" + String(bookingId).slice(0,8)) : "—";
+      let bookingDateTxt = "—";
+      if(c.booking_created_at){
+        try{
+          bookingDateTxt = new Date(c.booking_created_at).toLocaleDateString("fr-CH");
+        }catch{}
+      }
+      // Total commande si dispo (même répété sur chaque ligne, mais visible)
+      let bookingTotalTxt = "";
+      if(typeof c.total_chf === "number"){
+        bookingTotalTxt = "Total: CHF " + c.total_chf.toFixed(2);
+      }
+
+      // Date du cours
+      let dateStr = "-";
+      const rawDate =
+        c.course_date ||
+        c.date ||
+        c.session_date ||
+        null;
+      if(rawDate){
+        try{
+          dateStr = new Date(rawDate).toLocaleDateString("fr-CH");
+        }catch{
+          dateStr = rawDate;
+        }
+      }
+
+      // Lieu
+      const loc =
+        c.course_spot_name ||
+        c.spot_name ||
+        c.location ||
+        c.lieu ||
+        c.name ||
+        "Lieu inconnu";
+
+      // Prix
+      let rawPrice =
+        (typeof c.course_price_chf !== "undefined" ? c.course_price_chf :
+        (typeof c.price_chf         !== "undefined" ? c.price_chf :
+        (typeof c.price             !== "undefined" ? c.price :
+        (typeof c.amount_chf        !== "undefined" ? c.amount_chf :
+        (typeof c.amount            !== "undefined" ? c.amount : null)))));
+
+      let priceTxt = "CHF 30.–";
+      if (typeof rawPrice === "number") {
+        priceTxt = "CHF " + rawPrice.toFixed(2);
+      } else if (typeof rawPrice === "string" && rawPrice.trim() !== "") {
+        priceTxt = rawPrice;
+      }
+
+      // Statut payé
+      const paid =
+        c.course_is_paid === true ||
+        c.is_paid === true ||
+        c.paid === true ||
+        c.status === 'paid' ||
+        c.payment_status === 'paid' ||
+        c.payment_status === 'succeeded';
+
+      // Validation / références paiement
+      let validation = "";
+      if (c.payment_status) {
+        validation += "Statut: " + c.payment_status;
+      } else if (c.status) {
+        validation += "Statut: " + c.status;
+      }
+      if (c.payment_method) {
+        validation += (validation ? " • " : "") + "Méthode: " + c.payment_method;
+      }
+      if (c.twint_ref) {
+        validation += (validation ? " • " : "") + "Twint: " + c.twint_ref;
+      }
+      if (c.stripe_session_id) {
+        validation += (validation ? " • " : "") + "Stripe: " + c.stripe_session_id;
+      }
+      if (!validation) validation = "—";
+
+      // Id de la ligne (registration)
+      const regId = c._regId || c.registration_id || c.id;
+
+      return `
+        <tr>
+          <td>
+            ${bookingLabel}<br>
+            <span style="font-size:11px;color:#9ca3af;">
+              ${bookingDateTxt}${bookingTotalTxt ? " • " + bookingTotalTxt : ""}
+            </span>
+          </td>
+          <td>${loc}</td>
+          <td>${dateStr}</td>
+          <td>${priceTxt}</td>
+          <td>
+            <span class="chip-status ${paid ? 'paye':'non-paye'}">${paid ? 'Payé':'Non payé'}</span>
+          </td>
+          <td>${validation}</td>
+          <td>
+            <button class="btn-small" onclick="togglePaidDb('${regId}')">
+              ${paid ? 'Marquer non payé':'Marquer payé'}
+            </button>
+            <button class="btn-small danger" onclick="removeCourseDb('${regId}')">Retirer</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    coursesContainer.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="courses">
+          <thead>
+            <tr>
+              <th>Commande</th>
+              <th>Lieu</th>
+              <th>Date du cours</th>
+              <th>Prix</th>
+              <th>Statut</th>
+              <th>Validation / réf.</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // Actions sur les lignes (SUPABASE) → on travaille toujours sur la table rsl_course_registrations
+  async function togglePaidDb(regId){
+    if(!currentUser || !sb || !sb.from || !regId) return;
+
+    const course = currentCourses.find(c=>c._regId === regId);
+    if(!course) return;
+
+    const paid =
+      course.course_is_paid === true ||
+      course.is_paid === true ||
+      course.paid === true ||
+      course.status === 'paid' ||
+      course.payment_status === 'paid' ||
+      course.payment_status === 'succeeded';
+
+    const newPaid = !paid;
+
+    try{
+      const { error } = await sb
+        .from('rsl_course_registrations')
+        .update({ is_paid:newPaid })
+        .eq('id', regId)
+        .eq('user_id', currentUser.id);
+
+      if(error){
+        alert("Impossible de mettre à jour le statut de paiement.");
+        console.error(error);
+        return;
+      }
+      await loadCoursesFromDb(currentUser.id);
+    }catch(e){
+      console.error(e);
+      alert("Erreur réseau lors de la mise à jour.");
+    }
+  }
+
+  async function removeCourseDb(regId){
+    if(!currentUser || !sb || !sb.from || !regId) return;
+
+    const course = currentCourses.find(c=>c._regId === regId);
+    if(!course) return;
+
+    const paid =
+      course.course_is_paid === true ||
+      course.is_paid === true ||
+      course.paid === true ||
+      course.status === 'paid' ||
+      course.payment_status === 'paid' ||
+      course.payment_status === 'succeeded';
+
+    if(paid){
+      alert("Tu ne peux pas retirer une ligne déjà payée ici. Merci de contacter l’organisation si besoin.");
+      return;
+    }
+
+    if(!confirm("Retirer cette ligne de ta liste ?")) return;
+
+    try{
+      const { error } = await sb
+        .from('rsl_course_registrations')
+        .delete()
+        .eq('id', regId)
+        .eq('user_id', currentUser.id);
+
+      if(error){
+        alert("Impossible de retirer cette ligne.");
+        console.error(error);
+        return;
+      }
+      await loadCoursesFromDb(currentUser.id);
+    }catch(e){
+      console.error(e);
+      alert("Erreur réseau lors de la suppression.");
+    }
+  }
+
+  window.togglePaidDb = togglePaidDb;
+  window.removeCourseDb = removeCourseDb;
+
   // INIT
   (async () => {
     // profil depuis localStorage
@@ -923,7 +1198,7 @@
       statusEl.textContent = "Impossible de connecter ton compte (Supabase non chargé).";
       contentEl.style.display = "grid";
       updateMembershipInfoUI(null);
-      renderCourses();
+      renderCourses([]);
       if(navAvatar){
         navAvatar.style.display = "none";
       }
@@ -936,6 +1211,8 @@
 
     try{
       const { data:{ user } } = await sb.auth.getUser();
+      currentUser = user || null;
+
       if(!user){
         statusEl.innerHTML = "Tu n’es pas connecté. Clique sur <b>Login</b> en haut pour accéder à ton compte.";
         badgeEmail.textContent = "Non connecté";
@@ -947,6 +1224,8 @@
         if(navAvatar) navAvatar.style.display = "none";
         if(btnAdminRsl) btnAdminRsl.style.display = "none";
         showLogoutButtons(null);
+
+        renderCourses([]);
       }else{
         badgeEmail.textContent = user.email || "—";
         if(!contactEmail.value){
@@ -967,16 +1246,18 @@
           navAvatar.style.display = "inline-block";
         }
 
-        const isAdmin = await checkAdminAndShowButton(user);
+        await checkAdminAndShowButton(user);
         showLogoutButtons(user);
+
+        // CHARGER LES COMMANDES / COURS DEPUIS SUPABASE
+        await loadCoursesFromDb(user.id);
       }
-      renderCourses();
     }catch(e){
       console.error(e);
       statusEl.textContent = "Erreur lors du chargement de ton compte.";
       updateMembershipInfoUI(null);
       contentEl.style.display = "grid";
-      renderCourses();
+      renderCourses([]);
       if(navAvatar){
         navAvatar.style.display = "none";
       }
@@ -1003,99 +1284,7 @@
     setTimeout(()=>profileMsg.textContent="", 2500);
   });
 
-  // RENDER COURSES (depuis localStorage)
-  function renderCourses(){
-    const list = getPanierLS();
-
-    if(!list || !list.length){
-      coursesContainer.innerHTML = '<p class="courses-empty">Aucun cours pour l’instant. Tu peux en réserver sur la page <a href="cours.html">Cours</a>.</p>';
-      coursesCount.textContent = "0 cours";
-      return;
-    }
-
-    coursesCount.textContent = list.length + (list.length>1 ? " cours" : " cours");
-
-    const rows = list.map(c=>{
-      const date = c.date || "-";
-      const loc =
-        c.location ||
-        c.lieu ||
-        c.spot ||
-        c.spot_name ||
-        c.park ||
-        c.name ||
-        "Lieu inconnu";
-
-      let priceTxt = "CHF 30.–";
-      if (typeof c.price === "number") {
-        priceTxt = "CHF " + c.price.toFixed(2);
-      } else if (typeof c.price === "string" && c.price.trim() !== "") {
-        priceTxt = c.price;
-      }
-
-      const paid = c.paid === true;
-
-      return `
-        <tr>
-          <td>${loc}</td>
-          <td>${date}</td>
-          <td>${priceTxt}</td>
-          <td>
-            <span class="chip-status ${paid ? 'paye':'non-paye'}">${paid ? 'Payé':'Non payé'}</span>
-          </td>
-          <td>
-            <button class="btn-small" onclick="togglePaid(${c.id})">${paid ? 'Marquer non payé':'Marquer payé'}</button>
-            <button class="btn-small danger" onclick="removeCourse(${c.id})">Retirer</button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    coursesContainer.innerHTML = `
-      <div style="overflow-x:auto;">
-        <table class="courses">
-          <thead>
-            <tr>
-              <th>Lieu</th>
-              <th>Date</th>
-              <th>Prix</th>
-              <th>Statut</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  // Actions sur les cours (LOCAL)
-  function togglePaid(id){
-    const list = getPanierLS();
-    const updated = list.map(c=>{
-      if(c.id === id){
-        return {...c, paid: !(c.paid === true)};
-      }
-      return c;
-    });
-    savePanierLS(updated);
-    renderCourses();
-  }
-
-  function removeCourse(id){
-    if(!confirm("Retirer ce cours de ta liste ?")) return;
-    const list = getPanierLS().filter(c=>c.id !== id);
-    savePanierLS(list);
-    renderCourses();
-  }
-
-  // rendre accessible aux onclick
-  window.togglePaid = togglePaid;
-  window.removeCourse = removeCourse;
-
-  // Bouton Login simple
+  // Bouton Login simple (sécurité)
   document.getElementById('btnLogin')?.addEventListener('click', ()=>{
     location.href = "access.html";
   });
