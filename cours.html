@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Cours — Romandie Scooter League</title>
 
-  <!-- Fonts + Styles globaux -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Style global -->
   <link rel="stylesheet" href="css/common.css"/>
 
   <!-- Supabase + scripts globaux -->
@@ -28,7 +30,7 @@
     }
     main{ position:relative; z-index:10; }
 
-    /* ======= VIDÉO DE FOND ======= */
+    /* ===== VIDÉO DE FOND ===== */
     .site-bg-video{
       position:fixed;
       inset:0;
@@ -37,38 +39,72 @@
       object-fit:cover;
       z-index:-2;
       background:#000;
+      pointer-events:none !important;
     }
     .site-bg-dim{
       position:fixed;
       inset:0;
       z-index:-1;
       background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.82));
+      pointer-events:none !important;
     }
 
-    /* ======= NAVBAR (comme index) ======= */
+    /* ===== NAV ===== */
     nav.nav{
       background: rgba(0,0,0,.65);
       backdrop-filter: blur(8px);
-      position: sticky; top:0; z-index:100;
+      position: sticky;
+      top:0;
+      z-index:100;
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; display:block; }
-    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
-    nav.nav ul{ display:flex; align-items:center; gap:26px; list-style:none; margin:0; padding:0; }
+    nav.nav .container{
+      max-width:1320px;
+      margin:0 auto;
+      padding:12px 28px;
+    }
+    nav.nav .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+      text-decoration:none;
+    }
+    .brand img{
+      height:48px;
+      border-radius:10px;
+      display:block;
+    }
+    .brand span{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:17px;
+    }
+
+    nav.nav ul{
+      display:flex;
+      gap:26px;
+      list-style:none;
+      margin:0;
+      padding:0;
+    }
     nav.nav ul li a{
       font-weight:600;
       color:#e8f0ea;
       font-size:17px;
-      letter-spacing:.2px;
-      white-space:nowrap;
       text-decoration:none;
       transition:.2s ease;
+      white-space:nowrap;
     }
-    nav.nav ul li a:hover{ color:#22c55e; }
-
-    .cta{ display:flex; align-items:center; gap:12px; }
+    nav.nav ul li a:hover{
+      color:#22c55e;
+    }
 
     .btn.dark{
       border-radius:999px;
@@ -78,8 +114,8 @@
       padding:8px 14px;
       font-size:14px;
       font-weight:600;
-      text-decoration:none;
       cursor:pointer;
+      text-decoration:none;
     }
     .btn.green{
       border-radius:999px;
@@ -89,8 +125,8 @@
       padding:8px 16px;
       font-size:14px;
       font-weight:700;
-      text-decoration:none;
       cursor:pointer;
+      text-decoration:none;
       box-shadow:0 12px 26px rgba(0,0,0,.6);
     }
 
@@ -103,49 +139,70 @@
       box-shadow:0 0 10px rgba(34,197,94,.5);
     }
 
+    .cta{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
     #menuBtn{
       display:none;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
       padding:10px 12px;
       font-size:18px;
-      line-height:1;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
       background:rgba(34,197,94,.12);
       color:#22c55e;
+      border:1px solid rgba(255,255,255,.12);
       cursor:pointer;
-      transition:.2s ease;
     }
-    #menuBtn:hover{ background:rgba(34,197,94,.22); }
+    #menuBtn:hover{
+      background:rgba(34,197,94,.22);
+    }
 
     @media (max-width:990px){
       nav.nav ul{ display:none !important; }
       #btnCart,
       #btnLogin,
       #btnAccount,
-      .btn.green{
+      nav.nav .btn.green{          /* on ne cache QUE le bouton vert de la NAV */
         display:none !important;
       }
       #menuBtn{ display:inline-flex; }
-      .coach-fab{ display:none; }
     }
 
     .container{
       max-width:1200px;
-      margin:0 auto;
       padding:0 24px;
+      margin:0 auto;
     }
 
-    /* ======= MENU MOBILE ======= */
-    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    /* ===== MENU MOBILE ===== */
+    .mobile-sheet{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:120;
+    }
     .mobile-sheet.open{ display:block; }
-    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-dim{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.5);
+    }
     .mobile-panel{
-      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
-      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+      position:absolute;
+      top:0;
+      right:0;
+      height:100%;
+      width:82vw;
+      max-width:360px;
+      background:#0b1220;
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      border-left:1px solid rgba(255,255,255,.08);
+      box-shadow:-12px 0 30px rgba(0,0,0,.35);
     }
     .mobile-panel a{
       color:#eaf5ee;
@@ -153,20 +210,10 @@
       font-weight:700;
       padding:8px 0;
     }
-    .mobile-panel hr{
-      border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0;
-    }
-    .mobile-panel .coach-link{
-      border-top:1px solid rgba(255,255,255,.12);
-      margin-top:8px;
-      padding-top:12px;
-      font-weight:700;
-    }
 
-    /* ======= INTRO PAGE ======= */
+    /* ===== INTRO ===== */
     .page-intro{
       color:#fff;
-      text-align:left;
       padding:28px 0 10px;
     }
     .page-intro h1{
@@ -176,38 +223,48 @@
     }
     .page-intro p{
       margin:0;
-      opacity:.95;
       font-size:clamp(15px,2.2vw,18px);
+      opacity:.95;
     }
 
-    /* ======= FILTRES + CUSTOM SELECT ======= */
+    /* ===== FILTRES ===== */
     .filters{
       display:flex;
       flex-wrap:wrap;
       gap:12px;
-      align-items:flex-end;
       margin:8px 0 16px;
+      align-items:flex-end;
     }
 
     .filter-field{
       display:flex;
       flex-direction:column;
       gap:4px;
-      min-width:160px;
       flex:1 1 180px;
-      position:relative;
+      min-width:160px;
     }
     .filter-label{
       font-size:13px;
       font-weight:600;
-      color:#e5e7eb;
       opacity:.9;
     }
 
+    .check-label{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+    }
+    .check-label input{
+      width:16px;
+      height:16px;
+      accent-color:#22c55e;
+    }
+
+    /* ===== CUSTOM SELECT ===== */
     .select-shell{
       position:relative;
     }
-
     .select-display{
       width:100%;
       background:rgba(15,23,42,.95);
@@ -218,7 +275,6 @@
       font-weight:600;
       color:#f9fafb;
       text-align:left;
-      box-shadow:0 10px 30px rgba(0,0,0,.7);
       cursor:pointer;
       background-image:
         linear-gradient(45deg, transparent 50%, #22c55e 50%),
@@ -226,38 +282,38 @@
       background-position:
         calc(100% - 22px) center,
         calc(100% - 16px) center;
-      background-size: 6px 6px, 6px 6px;
+      background-size: 6px 6px;
       background-repeat:no-repeat;
       transition:.18s ease;
     }
     .select-shell.open .select-display{
       border-color:#22c55e;
-      box-shadow:0 0 0 2px rgba(34,197,94,.35),0 18px 40px rgba(0,0,0,.85);
+      box-shadow:0 0 0 2px rgba(34,197,94,.35);
     }
 
     .select-panel{
       position:absolute;
-      left:0; right:0;
       top:calc(100% + 4px);
+      left:0;
+      right:0;
       background:#020617;
       border-radius:14px;
       border:1px solid rgba(148,163,184,.6);
-      box-shadow:0 18px 50px rgba(0,0,0,.9);
       padding:6px 0;
+      display:none;
       max-height:260px;
       overflow:auto;
-      display:none;
-      z-index:200;
+      z-index:3000;
     }
-    .select-shell.open .select-panel{ display:block; }
+    .select-shell.open .select-panel{
+      display:block;
+    }
 
     .select-option{
       padding:8px 14px;
       font-size:14px;
       color:#e5e7eb;
       cursor:pointer;
-      display:flex;
-      align-items:center;
     }
     .select-option:hover{
       background:rgba(34,197,94,.12);
@@ -268,38 +324,15 @@
       color:#bbf7d0;
     }
 
-    /* vrai select caché */
     .select-native{
       position:absolute;
       left:-9999px;
       width:1px;
       height:1px;
       opacity:0;
-      pointer-events:none;
     }
 
-    .filters label.check-label{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:14px;
-      margin-left:4px;
-    }
-    .filters label.check-label input{
-      width:16px;
-      height:16px;
-      accent-color:#22c55e;
-    }
-
-    @media(max-width:640px){
-      .filters{
-        flex-direction:column;
-        align-items:stretch;
-      }
-      .filter-field{ flex:1 1 auto; }
-    }
-
-    /* ======= LISTE COURS ======= */
+    /* ===== LISTE COURS ===== */
     .list{
       margin:10px 0 120px;
     }
@@ -307,26 +340,22 @@
       background:linear-gradient(180deg,rgba(9,13,23,.88),rgba(7,10,18,.95));
       border-radius:14px;
       border:1px solid rgba(148,163,184,.45);
-      padding:12px 12px 10px;
+      padding:12px;
       margin-bottom:10px;
       box-shadow:0 14px 40px rgba(0,0,0,.8);
+      color:#e5e7eb;
       display:flex;
       flex-direction:column;
       gap:6px;
-      color:#e5e7eb;
+      position:relative;
+      z-index:10;
     }
+
     .item-top{
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
       flex-wrap:wrap;
-    }
-    .item-main{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
+      gap:10px;
     }
     .course-title{
       font-weight:700;
@@ -336,117 +365,121 @@
       font-size:13px;
       color:#cbd5f5;
     }
-    .course-meta span{ margin-right:6px; white-space:nowrap; }
+    .course-meta span{
+      margin-right:6px;
+      white-space:nowrap;
+    }
     .course-price{
       font-size:14px;
       font-weight:700;
       color:#bbf7d0;
     }
+
     .item-actions{
       width:100%;
       margin-top:4px;
+      position:relative;
+      z-index:20;
     }
-    .inscrire-btn{
+
+    /* bouton cours (si cours.js utilise .btn.green) */
+    .list .btn.green{
+      display:block;
       width:100%;
-      border-radius:12px;
+      text-align:center;
+      margin-top:4px;
+    }
+
+    .inscrire-btn,
+    .btn-inscrire{
+      display:block;
+      width:100%;
       border:0;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
       padding:10px 12px;
+      border-radius:12px;
       font-size:14px;
       font-weight:700;
       cursor:pointer;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
       color:#062312;
       box-shadow:0 10px 26px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.16);
+      text-align:center;
     }
-    .inscrire-btn.selected{
-      filter:brightness(1.06);
+    .inscrire-btn.selected,
+    .btn-inscrire.selected{
+      filter:brightness(1.05);
       background:#16a34a;
     }
 
-    /* ======= BAR PANIER BAS ======= */
+    /* ===== BAR PANIER ===== */
     .basket-bar{
       position:fixed;
-      left:0; right:0; bottom:0;
+      bottom:0;
+      left:0;
+      right:0;
       background:rgba(0,0,0,.93);
-      backdrop-filter:blur(10px) saturate(140%);
-      border-top:1px solid rgba(255,255,255,.15);
-      box-shadow:0 -20px 40px rgba(0,0,0,.8);
       padding:12px 16px;
+      border-top:1px solid rgba(255,255,255,.15);
       display:none;
       justify-content:space-between;
       align-items:center;
       flex-wrap:wrap;
       z-index:300;
       gap:10px;
-    }
-    .basket-left{
       font-size:14px;
       font-weight:600;
     }
     .basket-actions{
       display:flex;
-      align-items:center;
       gap:10px;
       flex-wrap:wrap;
     }
     .basket-clear-btn{
       background:rgba(0,0,0,.6);
-      color:#fff;
-      font-weight:600;
-      font-size:13px;
+      color:#e5e7eb;
       border-radius:999px;
-      padding:8px 12px;
-      line-height:1.2;
+      padding:8px 14px;
+      font-size:13px;
+      font-weight:600;
       border:1px solid rgba(255,255,255,.25);
-      box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
       cursor:pointer;
       min-width:130px;
       text-align:center;
     }
-    .basket-clear-btn:hover{ filter:brightness(1.07); }
+    .basket-clear-btn:hover{
+      filter:brightness(1.07);
+    }
+
     .basket-btn{
       background:#22c55e;
       color:#062312;
-      font-weight:700;
-      font-size:15px;
-      border:0;
       border-radius:999px;
       padding:10px 16px;
+      font-size:15px;
+      font-weight:700;
+      border:0;
       cursor:pointer;
-      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
       min-width:130px;
       text-align:center;
     }
-    .basket-btn:hover{ filter:brightness(1.07); }
 
     @media(max-width:640px){
-      .basket-bar{ align-items:flex-start; }
-      .basket-actions{ width:100%; justify-content:flex-end; }
-    }
-
-    /* FAB coach */
-    .coach-fab{
-      position: fixed; right:16px; bottom:80px; z-index:80;
-      display:inline-flex; align-items:center; gap:8px;
-      padding:12px 14px; border-radius:12px;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312; font-weight:800; text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
-      border:0;
-    }
-    .coach-fab:hover{
-      filter:brightness(1.05);
-      transform:translateY(-1px);
-      transition:.15s ease;
-    }
-    @media (max-width:990px){
-      .coach-fab{ display:none; }
+      .basket-bar{
+        align-items:flex-start;
+      }
+      .basket-actions{
+        width:100%;
+        justify-content:flex-end;
+      }
     }
 
     /* FOOTER */
     .footer-mini .copy{
-      text-align:center; color:#9aa5b1; font-size:14px;
-      padding:24px 0 28px; margin:0;
+      text-align:center;
+      color:#9aa5b1;
+      font-size:14px;
+      padding:24px 0 28px;
+      margin:0;
       border-top:1px solid rgba(255,255,255,.1);
       background:transparent;
     }
@@ -454,9 +487,9 @@
 </head>
 <body>
 
-  <!-- VIDÉO DE FOND -->
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
-  <div class="site-bg-dim" aria-hidden="true"></div>
+  <!-- FOND VIDÉO -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg"></video>
+  <div class="site-bg-dim"></div>
 
   <!-- NAV -->
   <nav class="nav">
@@ -468,7 +501,7 @@
         </a>
 
         <ul>
-          <li><a href="cours.html">Cours</a></li>
+          <li><a href="cours.html" aria-current="page">Cours</a></li>
           <li><a href="formation.html">Formation RSL</a></li>
           <li><a href="ou_rider.html">Où rider ?</a></li>
           <li><a href="evenements.html">Événements</a></li>
@@ -481,13 +514,7 @@
         <div class="cta">
           <button class="btn dark" id="btnLogin">Login</button>
           <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-
-          <!-- AVATAR -->
-          <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png"
-                 alt="Avatar" style="display:none;">
-          </a>
-
+          <a href="compte.html"><img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" style="display:none" alt="Avatar"></a>
           <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
           <button id="menuBtn">☰</button>
@@ -501,19 +528,17 @@
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
       <a href="index.html">Accueil</a>
-      <a href="cours.html">Cours</a>
+      <a href="cours.html" aria-current="page">Cours</a>
       <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
-      <a href="game.html">Games</a>
       <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
@@ -528,15 +553,10 @@
       <!-- Mois -->
       <div class="filter-field">
         <span class="filter-label">Mois</span>
-
         <div class="select-shell" data-select-id="filtreMois">
-          <button type="button" class="select-display" id="filtreMoisDisplay">
-            Tous les mois
-          </button>
+          <button type="button" class="select-display" id="filtreMoisDisplay">Tous les mois</button>
           <div class="select-panel" id="filtreMoisPanel"></div>
         </div>
-
-        <!-- vrai select caché (utilisé par cours.js) -->
         <select id="filtreMois" class="select-native">
           <option value="all">Tous les mois</option>
           <option value="01">Janvier</option>
@@ -557,91 +577,81 @@
       <!-- Lieu -->
       <div class="filter-field">
         <span class="filter-label">Lieu</span>
-
         <div class="select-shell" data-select-id="filtreLieu">
-          <button type="button" class="select-display" id="filtreLieuDisplay">
-            Tous les lieux
-          </button>
+          <button type="button" class="select-display" id="filtreLieuDisplay">Tous les lieux</button>
           <div class="select-panel" id="filtreLieuPanel"></div>
         </div>
-
-        <!-- vrai select caché – rempli par js/cours.js -->
         <select id="filtreLieu" class="select-native">
           <option value="all">Tous les lieux</option>
         </select>
       </div>
 
+      <!-- Dispo -->
       <label class="check-label">
-        <input type="checkbox" id="filtreDispo"/>
-        Seulement dispo
+        <input type="checkbox" id="filtreDispo"> Seulement dispo
       </label>
     </div>
 
+    <!-- Liste cours générée par js/cours.js -->
     <div id="courseList" class="list"></div>
   </main>
 
   <!-- BAR PANIER -->
   <div class="basket-bar" id="basketBar">
-    <div class="basket-left" id="basketInfo">0 cours sélectionné</div>
+    <div id="basketInfo">0 cours sélectionné</div>
     <div class="basket-actions">
-      <button class="basket-clear-btn" id="basketClear">Annuler toutes les sélections</button>
+      <button class="basket-clear-btn" id="basketClear">Tout désélectionner</button>
       <button class="basket-btn" id="basketPay">Continuer</button>
     </div>
   </div>
-
-  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- SCRIPTS LOCAUX -->
+  <!-- ===== SCRIPTS LOCAUX ===== -->
   <script>
-    // Vidéo de fond
+    /* ===== Vidéo de fond ===== */
     (function(){
-      const vids = [
+      const vids=[
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
       ];
-      const pick = vids[Math.floor(Math.random()*vids.length)];
-      const v = document.getElementById('rslBg');
+      const pick=vids[Math.floor(Math.random()*vids.length)];
+      const v=document.getElementById('rslBg');
       if(!v) return;
-      const s = document.createElement('source');
-      s.src = pick;
-      s.type = 'video/mp4';
+      const s=document.createElement('source');
+      s.src=pick;
+      s.type="video/mp4";
       v.appendChild(s);
-      const start = () => {
+
+      const start=()=>{
         try{
-          v.playbackRate = 0.6;
-          const p = v.play();
+          v.playbackRate=0.6;
+          const p=v.play();
           if(p && p.catch) p.catch(()=>{});
         }catch(e){}
       };
       start();
-      document.addEventListener('visibilitychange', () => {
-        if(document.hidden){ v.pause(); } else { start(); }
+      document.addEventListener("visibilitychange",()=>{
+        if(document.hidden) v.pause();
+        else start();
       });
     })();
 
-    // Menu mobile
+    /* ===== Menu mobile ===== */
     (function(){
-      const menuBtn=document.getElementById('menuBtn');
-      const mobile=document.getElementById('mobileMenu');
+      const menuBtn=document.getElementById("menuBtn");
+      const mobile=document.getElementById("mobileMenu");
       if(!menuBtn || !mobile) return;
-      menuBtn.addEventListener('click',e=>{
+
+      menuBtn.addEventListener("click",e=>{
         e.stopPropagation();
-        mobile.classList.add('open');
-        mobile.setAttribute('aria-hidden','false');
+        mobile.classList.add("open");
       });
-      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
-        mobile.classList.remove('open');
-        mobile.setAttribute('aria-hidden','true');
-      });
-      document.addEventListener('keydown',e=>{
-        if(e.key==='Escape'){
-          mobile.classList.remove('open');
-          mobile.setAttribute('aria-hidden','true');
-        }
+
+      mobile.querySelector(".mobile-dim")?.addEventListener("click",()=>{
+        mobile.classList.remove("open");
       });
     })();
 
@@ -650,147 +660,123 @@
       location.href = 'compte.html';
     });
 
-    /* ===== CUSTOM SELECT (joli popup pour Mois / Lieu) ===== */
-
-    function setupCustomSelect(selectId){
-      const native = document.getElementById(selectId);
-      const shell  = document.querySelector('.select-shell[data-select-id="'+selectId+'"]');
+    /* ===== Custom Select ===== */
+    function setupSelect(id){
+      const native=document.getElementById(id);
+      const shell=document.querySelector('[data-select-id="'+id+'"]');
       if(!native || !shell) return;
+      const display=shell.querySelector(".select-display");
+      const panel=shell.querySelector(".select-panel");
 
-      const display = shell.querySelector('.select-display');
-      const panel   = shell.querySelector('.select-panel');
-
-      function syncFromNative(){
-        const opt = native.options[native.selectedIndex];
-        if(opt) display.textContent = opt.textContent;
+      function sync(){
+        const opt=native.options[native.selectedIndex];
+        if(opt) display.textContent=opt.textContent;
       }
 
-      function buildPanel(){
-        panel.innerHTML = "";
-        Array.from(native.options).forEach(opt=>{
-          if(opt.disabled) return;
-          const div = document.createElement('div');
-          div.className = 'select-option' + (opt.value === native.value ? ' is-selected' : '');
-          div.dataset.value = opt.value;
-          div.textContent = opt.textContent;
-          div.addEventListener('click', ()=>{
-            native.value = opt.value;
-            native.dispatchEvent(new Event('change',{bubbles:true}));
-            syncFromNative();
-            shell.classList.remove('open');
+      function openPanel(){
+        panel.innerHTML="";
+        Array.from(native.options).forEach(op=>{
+          if(op.disabled) return;
+          const div=document.createElement("div");
+          div.className="select-option"+(op.value===native.value?" is-selected":"");
+          div.textContent=op.textContent;
+          div.dataset.value=op.value;
+          div.addEventListener("click",()=>{
+            native.value=op.value;
+            native.dispatchEvent(new Event("change",{bubbles:true}));
+            sync();
+            shell.classList.remove("open");
           });
           panel.appendChild(div);
         });
+        shell.classList.add("open");
       }
 
-      display.addEventListener('click',(e)=>{
+      display.addEventListener("click",(e)=>{
         e.stopPropagation();
-        const isOpen = shell.classList.contains('open');
-        document.querySelectorAll('.select-shell.open').forEach(sh=>sh.classList.remove('open'));
-        if(!isOpen){
-          buildPanel();
-          shell.classList.add('open');
-        }
+        const already=shell.classList.contains("open");
+        document.querySelectorAll(".select-shell.open").forEach(sh=>sh.classList.remove("open"));
+        if(!already) openPanel();
       });
 
-      native.addEventListener('change', syncFromNative);
-      syncFromNative(); // init
-
-      document.addEventListener('click',()=>{
-        shell.classList.remove('open');
-      });
+      document.addEventListener("click",()=>shell.classList.remove("open"));
+      native.addEventListener("change",sync);
+      sync();
     }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      setupCustomSelect('filtreMois');
-      setupCustomSelect('filtreLieu');
-      updateBasketInfo();
+    document.addEventListener("DOMContentLoaded",()=>{
+      setupSelect("filtreMois");
+      setupSelect("filtreLieu");
+      updateBasket();
     });
 
-    /* ===== PANIER LOCAL ===== */
+    /* ===== PANIER + BOUTONS S'INSCRIRE ===== */
 
     function collectSelectedCourses(){
-      const result = [];
-      document.querySelectorAll(".item").forEach(item=>{
-        const btn = item.querySelector(".inscrire-btn");
-        if(!btn || !btn.classList.contains("selected")) return;
-        const id    = item.dataset.id || null;
-        const date  = item.querySelector(".course-date")?.textContent.trim() || "";
-        const time  = item.querySelector(".course-time")?.textContent.trim() || "";
-        const place = item.querySelector(".course-place")?.textContent.trim() || "";
-        const price = item.querySelector(".course-price")?.textContent.trim() || "";
-        const title = item.querySelector(".course-title")?.textContent.trim() || "";
-        result.push({ id, date, time, place, price, title });
+      const res=[];
+      document.querySelectorAll(".inscrire-btn.selected, .btn-inscrire.selected, .list .btn.green.selected").forEach(btn=>{
+        const item=btn.closest(".item");
+        if(!item) return;
+        res.push({
+          id:item.dataset.id || "",
+          date:item.querySelector(".course-date")?.textContent.trim() || "",
+          time:item.querySelector(".course-time")?.textContent.trim() || "",
+          place:item.querySelector(".course-place")?.textContent.trim() || "",
+          price:item.querySelector(".course-price")?.textContent.trim() || "",
+          title:item.querySelector(".course-title")?.textContent.trim() || ""
+        });
       });
-      return result;
+      return res;
     }
 
-    function saveCoursesToLocalStorage(){
-      const courses = collectSelectedCourses();
-      try{
-        const json = JSON.stringify(courses);
-        localStorage.setItem("rsl_panier_cours", json);
-        localStorage.setItem("rsl_panier_courses", json);
-      }catch(e){
-        console.error("Erreur stockage panier cours:", e);
-      }
-      return courses;
-    }
+    function updateBasket(){
+      const items=collectSelectedCourses();
+      const bar=document.getElementById("basketBar");
+      const info=document.getElementById("basketInfo");
+      if(!bar || !info) return;
 
-    function goToPanierWithCourses(){
-      const courses = saveCoursesToLocalStorage();
-      if (!courses || !courses.length){
-        alert("Sélectionne au moins un cours avant de continuer.");
+      if(items.length===0){
+        bar.style.display="none";
+        info.textContent="0 cours sélectionné";
         return;
       }
-      window.location.href = "panier/panier.html";
+      bar.style.display="flex";
+      const nb=items.length;
+      info.textContent = nb + (nb>1 ? " cours sélectionnés" : " cours sélectionné");
     }
 
-    function computeBasketSummary(){
-      const selected = document.querySelectorAll(".inscrire-btn.selected");
-      const nb = selected.length;
-      if(!nb) return { nb:0, total:0 };
-      const total = nb * 30; // estimation simple
-      return { nb, total };
-    }
+    // Tout désélectionner
+    document.getElementById("basketClear")?.addEventListener("click", ()=>{
+      document.querySelectorAll(".inscrire-btn.selected, .btn-inscrire.selected, .list .btn.green.selected")
+        .forEach(btn=>btn.classList.remove("selected"));
+      // On vide aussi le localStorage pour le panier de cours
+      localStorage.removeItem("rsl_panier_cours");
+      localStorage.removeItem("rsl_panier_courses");
+      updateBasket();
+    });
 
-    function updateBasketInfo(){
-      const basketInfo = document.getElementById("basketInfo");
-      const bar = document.getElementById("basketBar");
-      if(!basketInfo || !bar) return;
-      const { nb, total } = computeBasketSummary();
-      if(!nb){
-        basketInfo.textContent = "0 cours sélectionné";
-        bar.style.display = "none";
-        return;
-      }
-      bar.style.display = "flex";
-      const plural = nb > 1 ? "cours sélectionnés" : "cours sélectionné";
-      basketInfo.textContent = nb + " " + plural + " • Total estimé : " + total + ".–";
-    }
-
-    // clic sur "S'inscrire"
-    document.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".inscrire-btn");
+    // Toggle sélection sur les boutons "S'inscrire"
+    document.addEventListener("click",(e)=>{
+      const btn=e.target.closest(".inscrire-btn, .btn-inscrire, .list .btn.green");
       if(!btn) return;
-      setTimeout(updateBasketInfo, 50);
+      btn.classList.toggle("selected");
+      updateBasket();
     });
 
-    // Clear
-    document.getElementById('basketClear')?.addEventListener('click', ()=>{
-      document.querySelectorAll('.inscrire-btn.selected').forEach(btn=>{
-        btn.classList.remove('selected');
-      });
-      updateBasketInfo();
-    });
-
-    // Continuer
-    document.getElementById('basketPay')?.addEventListener('click', ()=>{
-      goToPanierWithCourses();
+    // Bouton continuer
+    document.getElementById("basketPay")?.addEventListener("click",()=>{
+      const data=collectSelectedCourses();
+      if(!data.length){
+        alert("Sélectionne au moins un cours.");
+        return;
+      }
+      localStorage.setItem("rsl_panier_cours",JSON.stringify(data));
+      localStorage.setItem("rsl_panier_courses",JSON.stringify(data));
+      window.location.href="panier/panier.html";
     });
   </script>
 
-  <!-- Script qui génère la liste des cours -->
-  <script defer src="js/cours.js"></script>
+  <!-- Script liste des cours -->
+  <script src="js/cours.js" defer></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mon compte — Romandie Scooter League</title>
 
   <!-- Fonts + style global -->
@@ -86,6 +86,7 @@
       align-items:center;
       gap:26px;
     }
+    nav.nav ul li{list-style:none;}
     nav.nav ul li a{
       font-weight:600;
       color:#e8f0ea;
@@ -489,7 +490,7 @@
           <button class="btn dark" id="btnLogin">Login</button>
           <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
           <!-- Avatar rond de l'utilisateur -->
-          <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar RSL" style="display:none;">
+          <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar RSL" style="display:none;">
           <!-- Panier à côté de Mon compte -->
           <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
@@ -546,18 +547,18 @@
         <!-- Bloc avatar / photo de profil -->
         <div class="avatar-block">
           <div class="avatar-preview">
-            <img id="profileAvatarPreview" src="images/default-avatar.png" alt="Photo de profil RSL">
+            <img id="profileAvatarPreview" src="images/logo_rsl.png" alt="Photo de profil RSL">
           </div>
           <div>
             <label for="avatarInput">Photo de profil</label>
             <input type="file" id="avatarInput" accept="image/*">
             <p class="small-info">
-              Choisis une image (de préférence carrée). Elle s’affichera en rond à côté de ton compte en haut.
+              Choisis une image (de préférence carrée). Elle s’affichera en rond à côté de ton compte en haut (enregistrée dans ton navigateur).
             </p>
           </div>
         </div>
 
-        <!-- 🟢 Infos abonnement -->
+        <!-- Infos abonnement -->
         <p class="membership-info" id="membershipInfo"></p>
 
         <div class="form-grid">
@@ -673,10 +674,11 @@
     });
   })();
 
-  // SUPABASE
+  // ===== SUPABASE CONFIG (même projet que RIDLY) =====
   const supabaseUrl = "https://jynxifufaauoxwzjapzq.supabase.co";
   const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
 
+  // client local pour cette page (warning multiple clients possible, mais ok)
   let sb = null;
   if (window.supabase && window.supabase.createClient) {
     sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
@@ -713,7 +715,8 @@
   const btnLogout   = document.getElementById('btnLogout');
   const mobileLogout = document.getElementById('mobileLogout');
 
-  const DEFAULT_AVATAR = "images/default-avatar.png";
+  // avatar par défaut pour cette page (pas le même nom que DEFAULT_AVATAR de site.js)
+  const RSL_DEFAULT_AVATAR = "images/logo_rsl.png";
 
   // helpers localStorage
   function getProfileLS(){
@@ -751,16 +754,17 @@
 
   function applyAvatarToUI(){
     const stored = getAvatarLS();
-    const src = stored || DEFAULT_AVATAR;
+    const src = stored || RSL_DEFAULT_AVATAR;
     if(profileAvatarPreview){
       profileAvatarPreview.src = src;
     }
     if(navAvatar){
       navAvatar.src = src;
+      navAvatar.style.display = "inline-block";
     }
   }
 
-  // change avatar depuis input file
+  // changement d’avatar → uniquement localStorage (pas de Supabase Storage)
   if(avatarInput){
     avatarInput.addEventListener('change', (e)=>{
       const file = e.target.files && e.target.files[0];
@@ -783,7 +787,7 @@
     });
   }
 
-  // 🔎 Récup abo depuis Supabase
+  // Récup abo depuis Supabase
   async function fetchMembership(sbClient, userId){
     if(!sbClient || !sbClient.from || !userId) return null;
     try{
@@ -845,16 +849,14 @@
     }
   }
 
-  // 🔐 Vérifier si user est admin et afficher le bouton
+  // Vérifier si user est admin et afficher le bouton
   async function checkAdminAndShowButton(user){
     if(!btnAdminRsl) return false;
 
     let isAdmin = false;
 
-    // hardcode : ton user ID = admin garanti
     const HARD_ADMIN_ID = "36a00c9e-9321-41bf-b043-298ad5089593";
 
-    // si c'est ton compte → bouton direct
     if(user && user.id === HARD_ADMIN_ID){
       console.log("Admin détecté par ID hardcodé");
       isAdmin = true;
@@ -952,13 +954,12 @@
         }
         statusEl.textContent = "Bienvenue dans ton espace RSL.";
 
-        // 🔔 Récup abo pour ce user
         const membership = await fetchMembership(sb, user.id);
         updateMembershipInfoUI(membership);
 
         contentEl.style.display = "grid";
 
-        // affichage boutons top + avatar
+        // boutons top + avatar
         if(btnLogin) btnLogin.style.display = "none";
         if(btnAccountTop) btnAccountTop.style.display = "inline-flex";
         if(navAvatar){
@@ -967,7 +968,6 @@
         }
 
         const isAdmin = await checkAdminAndShowButton(user);
-        // Déconnexion visible pour tout user connecté (admin ou pas)
         showLogoutButtons(user);
       }
       renderCourses();
@@ -1100,7 +1100,7 @@
     location.href = "access.html";
   });
 
-  // 🔁 Bouton Administration RSL → admin-rsl.html
+  // Bouton Administration RSL → admin-rsl.html
   btnAdminRsl?.addEventListener('click', ()=>{
     window.location.href = "admin-rsl.html";
   });
