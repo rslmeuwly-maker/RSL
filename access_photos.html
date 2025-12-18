@@ -157,7 +157,6 @@
       box-shadow:0 10px 26px rgba(22,163,74,.45);
     }
 
-    /* ✅ EXACT COMITÉ : avatar caché au départ */
     .nav-avatar{
       width:34px; height:34px;
       border-radius:999px;
@@ -699,11 +698,11 @@
 
       const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
 
-      async function waitForEnv(timeoutMs=5000){
+      async function waitForEnv(timeoutMs=8000){
         const start = Date.now();
         while(Date.now()-start < timeoutMs){
           if(window.env?.SUPABASE_URL && window.env?.SUPABASE_ANON) return true;
-          await sleep(40);
+          await sleep(50);
         }
         return false;
       }
@@ -715,19 +714,19 @@
         return window.__rslSupa;
       }
 
-      async function waitForUser(maxMs=3500){
+      async function getSessionSafe(maxMs = 12000){
         const start = Date.now();
-        while(Date.now()-start < maxMs){
+        while(Date.now() - start < maxMs){
           const supa = getSupa();
           if(supa){
             try{
-              const { data } = await supa.auth.getUser();
-              if(data?.user) return true;
+              const { data } = await supa.auth.getSession();
+              if(data?.session) return data.session;
             }catch(_){}
           }
-          await sleep(200);
+          await sleep(250);
         }
-        return false;
+        return null;
       }
 
       function openLightbox(src, alt){
@@ -860,21 +859,30 @@
         const startPhotoNumber = batchIndex * BATCH_SIZE + 1;
         const endPhotoNumber   = startPhotoNumber + BATCH_SIZE - 1;
 
-        for(let num = startPhotoNumber; num <= endPhotoNumber && num <= MAX_PHOTO; num++){
+        for(let num = startPhotoNumber; num <= endPhotoNumber; num++){
+          if(num > 200) break;
           grid.appendChild(createPhotoCard(num));
         }
       }
 
       async function start(){
-        const envOk = await waitForEnv(5000);
+        const envOk = await waitForEnv(8000);
         if(!envOk){
           if(loadingBox) loadingBox.textContent = "Erreur: env.js non chargé.";
           return;
         }
 
-        const okUser = await waitForUser(3500);
-        if(!okUser){
-          window.location.replace("access_photos.html");
+        // ✅ Anti-boucle + session fiable
+        const session = await getSessionSafe(12000);
+
+        if(!session){
+          // ✅ Anti ping-pong: redirection max 1 fois par onglet
+          if(!sessionStorage.getItem("rsl_photos_redirected")){
+            sessionStorage.setItem("rsl_photos_redirected", "1");
+            window.location.replace("access_photos.html?next=galerie_photos_hd.html");
+          }else{
+            if(loadingBox) loadingBox.textContent = "Connexion requise (merci de te connecter).";
+          }
           return;
         }
 
