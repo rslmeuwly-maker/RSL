@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Paiement confirmé — Romandie Scooter League</title>
 
-  <!-- Fonts + style global comme le reste du site -->
+  <!-- Fonts + style global -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -94,97 +94,148 @@
   <main class="card">
     <div class="check">✔</div>
     <h1>Paiement confirmé</h1>
-    <p id="status-text">Nous mettons à jour votre compte…</p>
+    <p id="status-text">On met à jour tes cours…</p>
     <p class="loader" id="loader-text">Merci de patienter quelques secondes.</p>
     <p class="error" id="error-text" style="display:none;"></p>
 
     <a href="compte.html" class="btn">Aller dans mon compte</a>
 
-    <p class="small">
+    <p class="small" id="hint-text">
       Si les cours n’apparaissent pas tout de suite,<br/>
-      actualisez la page « Mon compte » après quelques instants.
+      actualise la page « Mon compte » après quelques instants.
     </p>
   </main>
 
   <script>
-    // Même projet que ton panier
     const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
 
-    let sb = null;
-    if(window.supabase && window.supabase.createClient){
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     document.addEventListener("DOMContentLoaded", async () => {
       const statusText = document.getElementById("status-text");
       const loaderText = document.getElementById("loader-text");
       const errorText  = document.getElementById("error-text");
+      const hintText   = document.getElementById("hint-text");
 
-      if(!sb){
-        statusText.textContent = "Erreur de configuration Supabase.";
-        loaderText.style.display = "none";
-        errorText.style.display = "block";
-        errorText.textContent = "Impossible de contacter la base de données.";
-        return;
-      }
-
-      try{
-        // 1) Récupérer l’utilisateur connecté
-        const { data:{ user }, error:userErr } = await sb.auth.getUser();
-        if(userErr) throw userErr;
-
-        if(!user){
-          statusText.textContent = "Paiement confirmé, mais aucun compte n’est connecté.";
+      try {
+        // 1) Vérifier si un utilisateur est connecté
+        const { data: { user }} = await sb.auth.getUser();
+        if (!user) {
           loaderText.style.display = "none";
+          statusText.textContent = "Paiement confirmé, mais aucun utilisateur n’est connecté.";
           errorText.style.display = "block";
-          errorText.textContent = "Connectez-vous à votre compte RSL puis contactez l’organisation si besoin.";
+          errorText.textContent = "Connecte-toi à ton compte RSL puis contacte l’organisation si besoin.";
           return;
         }
 
-        // 2) Prendre la DERNIÈRE commande de ce user
-        const { data: booking, error: bookErr } = await sb
+        // 2) Récupérer l'ID de commande stocké localement (créé au moment de la création du booking)
+        const bookingId = localStorage.getItem("rsl_last_booking_id");
+
+        if (!bookingId) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Paiement confirmé, mais aucune commande récente trouvée.";
+          errorText.style.display = "block";
+          errorText.textContent = "Si tu as payé, contacte la RSL avec ta preuve de paiement.";
+          return;
+        }
+
+        // 3) Récupérer la commande dans Supabase et vérifier qu’elle appartient bien à ce compte
+        const { data: booking, error: bookingErr } = await sb
           .from("rsl_course_bookings")
-          .select("id, created_at")
+          .select("*")
+          .eq("id", bookingId)
           .eq("user_id", user.id)
-          .order("created_at", { ascending:false })
-          .limit(1)
           .maybeSingle();
 
-        if(bookErr) throw bookErr;
+        // On nettoie le localStorage pour éviter les réutilisations
+        localStorage.removeItem("rsl_last_booking_id");
 
-        if(!booking){
-          statusText.textContent = "Paiement confirmé, mais aucune commande récente n’a été trouvée.";
+        if (bookingErr) {
           loaderText.style.display = "none";
+          statusText.textContent = "Erreur lors de la récupération de la commande.";
           errorText.style.display = "block";
-          errorText.textContent = "Si vous avez un doute, contactez la RSL avec votre preuve de paiement.";
+          errorText.textContent = bookingErr.message;
           return;
         }
 
-        // 3) Marquer tous les cours de cette commande comme payés
-        const { data: updatedRegs, error: regErr } = await sb
+        if (!booking) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Commande introuvable.";
+          errorText.style.display = "block";
+          errorText.textContent = "Si tu as un doute, contacte la RSL avec ta preuve de paiement.";
+          return;
+        }
+
+        // 4) Anti-triche : vérifier que la commande est récente (ex: moins de 60 minutes)
+        const createdAt   = new Date(booking.created_at);
+        const diffMinutes = (Date.now() - createdAt.getTime()) / 60000;
+
+        if (diffMinutes > 60) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Commande trop ancienne pour être validée automatiquement.";
+          errorText.style.display = "block";
+          errorText.textContent = "Contacte la RSL pour vérifier manuellement ta situation.";
+          return;
+        }
+
+        // 5) Si déjà payée, on ne refait rien
+        if (booking.is_paid === true) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Ta commande était déjà marquée comme payée ✔";
+          hintText.textContent = "Tu peux vérifier tes cours dans la page « Mon compte ».";
+          return;
+        }
+
+        // 6) Marquer la commande comme payée
+        const { data: updatedBooking, error: updBookingErr } = await sb
+          .from("rsl_course_bookings")
+          .update({ is_paid: true })
+          .eq("id", bookingId)
+          .eq("user_id", user.id)
+          .eq("is_paid", false)
+          .select();
+
+        if (updBookingErr) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Le paiement est confirmé, mais la validation de la commande a échoué.";
+          errorText.style.display = "block";
+          errorText.textContent = updBookingErr.message;
+          return;
+        }
+
+        // 7) Marquer toutes les inscriptions liées comme payées
+        const { data: updatedRegs, error: updRegsErr } = await sb
           .from("rsl_course_registrations")
-          .update({ is_paid:true })
-          .eq("booking_id", booking.id)
-          .eq("is_paid", false)   // on ne touche que ceux qui ne l’étaient pas
+          .update({ is_paid: true })
+          .eq("booking_id", bookingId)
+          .eq("is_paid", false)
           .select("id");
 
-        if(regErr) throw regErr;
+        loaderText.style.display = "none";
 
-        if(!updatedRegs || updatedRegs.length === 0){
-          statusText.textContent = "Votre commande était déjà marquée comme payée ✅";
-          loaderText.textContent = "Vous pouvez vérifier vos cours dans « Mon compte ».";
+        if (updRegsErr) {
+          statusText.textContent = "Commande payée, mais la validation des cours a partiellement échoué.";
+          errorText.style.display = "block";
+          errorText.textContent = "La RSL reçoit quand même ton paiement, contacte-nous pour corriger tes cours.";
           return;
         }
 
-        statusText.textContent = "Votre commande a bien été marquée comme payée ✅";
-        loaderText.textContent = "Vos cours devraient apparaître dans « Mon compte ».";
-      }catch(e){
+        if (!updatedRegs || updatedRegs.length === 0) {
+          statusText.textContent = "Ta commande a été validée, mais les cours étaient déjà marqués comme payés ✔";
+          hintText.textContent = "Tu peux vérifier tes cours dans la page « Mon compte ».";
+          return;
+        }
+
+        // Succès complet
+        statusText.textContent = "Tes cours ont bien été validés pour cette commande ✔";
+        hintText.textContent = "Tes cours devraient apparaître dans la page « Mon compte ». Si ce n’est pas le cas, actualise la page.";
+      } catch (e) {
         console.error(e);
-        statusText.textContent = "Le paiement est confirmé, mais la mise à jour du compte a échoué.";
         loaderText.style.display = "none";
+        statusText.textContent = "Le paiement est confirmé, mais la mise à jour de ton compte a échoué.";
         errorText.style.display = "block";
-        errorText.textContent = "Pas de panique : la RSL voit le paiement sur Stripe. Contactez-nous et on corrigera votre compte.";
+        errorText.textContent = "Pas de panique : la RSL voit le paiement sur Stripe/Twint. Contacte-nous et on corrigera tes cours.";
       }
     });
   </script>

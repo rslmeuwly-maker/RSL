@@ -5,7 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Événements — Romandie Scooter League</title>
 
-  <!-- Fonts + Styles globaux -->
+  <!-- ✅ Anti-scintillement : applique le thème AVANT le rendu -->
+  <script>
+    (function(){
+      const KEY='rsl-theme';
+      let t=null;
+      try{ t=localStorage.getItem(KEY); }catch(e){}
+      if(!t){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        t = prefersLight ? 'light' : 'dark';
+      }
+      if(t==='light') document.documentElement.classList.add('theme-preload-light');
+    })();
+  </script>
+  <style>
+    /* ✅ bloque les transitions pendant le tout premier paint (anti flash) */
+    html.theme-preload-light * { transition:none !important; }
+  </style>
+
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -18,293 +36,616 @@
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body { height:100%; margin:0; background:transparent!important; color:#fff; font-family:"Outfit"; }
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.9);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+    }
+
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:transparent!important;
+      display:flex;
+      flex-direction:column;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
+    }
     main{ flex:1; }
 
-    /* Fond vidéo */
-    .site-bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; background:#000; }
-    .site-bg-dim{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8)); }
+    /* ======= Fond vidéo ======= */
+    .site-bg-video{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed; inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
+      transition:background .25s ease;
+      pointer-events:none;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
+    }
 
-    /* NAV identique à l’index */
+    /* ======= NAVBAR (copie index) ======= */
     nav.nav{
       background:rgba(0,0,0,.65);
-      backdrop-filter:blur(8px);
+      backdrop-filter:blur(10px);
       position:sticky; top:0; z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; }
-    .brand span{ font-weight:800; font-size:17px; }
-    nav.nav ul{ display:flex; align-items:center; gap:26px; }
-    nav.nav ul li a{ font-weight:600; color:#e8f0ea; font-size:17px; text-decoration:none; }
-    nav.nav ul li a:hover{ color:#22c55e; }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 
-    .cta{ display:flex; align-items:center; gap:12px; }
-    #menuBtn{
-      display:none; align-items:center; justify-content:center; padding:10px 12px;
-      border-radius:10px; border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
 
-    /* Avatar */
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
+    }
+    .brand img{
+      height:42px; border-radius:10px;
+      display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    .brand span{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:16px;
+      white-space:nowrap;
+    }
+
+    nav.nav ul{
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0;
+      list-style:none;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
+      white-space:nowrap;
+      text-decoration:none;
+      opacity:.9;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
+
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
     .nav-avatar{
-      width:38px; height:38px; border-radius:999px; object-fit:cover;
-      border:2px solid #22c55e; box-shadow:0 0 10px rgba(34,197,94,.5);
+      width:34px; height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
     }
 
-    /* Mobile menu */
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover{ filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
+
+    /* ===== Menu mobile (copie index) ===== */
     .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
-    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
     .mobile-panel{
-      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column;
-      gap:12px; border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
-    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-panel a{
+      color:var(--rsl-fg);
+      text-decoration:none;
+      font-weight:700;
+      padding:6px 0;
+      font-size:14px;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(148,163,184,.4);
+      margin:10px 0;
+    }
 
-    @media(max-width:990px){
-      nav.nav ul{ display:none!important; }
-      #btnCart,#btnLogin,#btnAccount,.btn.green{ display:none!important; }
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart, .btn.green{ display:none !important; }
       #menuBtn{ display:inline-flex; }
       .coach-fab{ display:none; }
     }
 
-    /* Layout */
-    .container-page{ max-width:1100px; margin:0 auto; padding:0 24px 40px; }
-    .page-intro{ padding:32px 0 10px; }
-    .page-intro h1{ font-size:clamp(32px,4.5vw,46px); font-weight:800; margin:6px 0 8px; }
-    .page-intro p{ opacity:.95; font-size:clamp(15px,2.1vw,19px); max-width:720px; }
+    /* ===== Page ===== */
+    .container-page{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 16px 44px;
+    }
 
-    /* MontreuxTV */
+    .page-intro{
+      padding:32px 0 10px;
+    }
+    .page-intro h1{
+      margin:6px 0 8px;
+      font-size:clamp(32px,4.5vw,46px);
+      font-weight:900;
+      color:var(--rsl-fg);
+    }
+    .page-intro p{
+      margin:0;
+      opacity:.95;
+      font-size:clamp(15px,2.1vw,19px);
+      max-width:720px;
+      color:var(--rsl-muted);
+      line-height:1.55;
+    }
+
+    /* MontreuxTV highlight */
     .msc-highlight{
-      margin:10px 0 18px; padding:12px 14px; border-radius:14px;
-      border:1px solid rgba(148,163,184,.5); background:rgba(15,23,42,.9);
-      display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;
-      box-shadow:0 10px 30px rgba(0,0,0,.6);
+      margin:14px 0 18px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--rsl-border);
+      background:var(--rsl-card-soft);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      box-shadow:0 16px 50px rgba(15,23,42,.75);
     }
-    .msc-text{ font-size:13px; color:#e5e7eb; max-width:720px; }
+    body.theme-light .msc-highlight{ box-shadow:0 18px 44px rgba(15,23,42,.12); }
+
+    .msc-text{
+      font-size:13px;
+      color:var(--rsl-fg);
+      max-width:760px;
+      line-height:1.55;
+    }
+    .msc-text b{ color:var(--rsl-fg); }
     .msc-btn{
-      padding:8px 14px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.2); background:rgba(34,197,94,.12);
-      color:#bbf7d0; font-size:13px; font-weight:700; text-decoration:none;
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(34,197,94,.12);
+      color:var(--rsl-accent);
+      font-size:13px;
+      font-weight:800;
+      text-decoration:none;
+      transition:.15s ease;
+      white-space:nowrap;
     }
+    .msc-btn:hover{ transform:translateY(-1px); filter:brightness(1.06); }
 
     /* Cards */
-    .cards{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); margin-top:10px; }
-    .card{
-      background:rgba(15,23,42,.88); border:1px solid rgba(255,255,255,.08);
-      border-radius:18px; padding:18px 16px 20px; box-shadow:0 8px 24px rgba(0,0,0,.35);
+    .cards{
+      display:grid;
+      gap:16px;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      margin-top:10px;
     }
-    .card h3{ color:#22c55e; font-weight:800; margin:0 0 4px; font-size:17px; }
-    .meta{ font-size:14px; opacity:.9; margin-bottom:6px; }
-    .card p{ font-size:15px; color:#e5e7eb; margin-bottom:10px; }
+    .card{
+      background:var(--rsl-card-soft);
+      border-radius:16px;
+      border:1px solid var(--rsl-border);
+      padding:16px;
+      box-shadow:0 18px 44px rgba(15,23,42,.85);
+      transition:transform .15s ease, filter .15s ease;
+    }
+    body.theme-light .card{ box-shadow:0 18px 44px rgba(15,23,42,.12); }
+    .card:hover{ transform:translateY(-2px); filter:brightness(1.02); }
+
+    .card h3{
+      margin:0 0 6px;
+      font-size:16px;
+      font-weight:900;
+      color:var(--rsl-accent);
+    }
+    .meta{
+      font-size:14px;
+      color:var(--rsl-muted);
+      margin-bottom:8px;
+    }
+    .card p{
+      margin:0 0 12px;
+      font-size:14px;
+      line-height:1.55;
+      color:var(--rsl-fg);
+      opacity:.92;
+    }
+    body.theme-light .card p{ opacity:1; }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    /* Footer (copie index) */
+    .footer-mini .copy{
+      text-align:center;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
+      margin:0;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
+    }
+
+    /* FAB coach */
+    .coach-fab{
+      position:fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:800; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
+      border:0;
+      font-size:13px;
+      line-height:1;
+    }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+    @media (max-width:990px){ .coach-fab{ display:none; } }
   </style>
 </head>
+
 <body>
 
-<!-- FOND VIDÉO -->
-<video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
-<div class="site-bg-dim"></div>
+  <!-- Fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
-<!-- NAV (identique index) -->
-<nav class="nav">
-  <div class="container">
-    <div class="row">
-
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL"/>
-        <span>RSL — Romandie Scooter League</span>
-      </a>
-
-      <ul>
-        <li><a href="cours.html">Cours</a></li>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="shop-rsl.html">Shop</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-
-      <div class="cta">
-        <button class="btn dark" id="btnLogin">Login</button>
-        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-
-        <a href="compte.html">
-          <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar" style="display:none;">
+  <!-- NAV (copie index) -->
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
         </a>
 
-        <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
-        <a class="btn green" href="membres.html">Devenir membre</a>
-        <button id="menuBtn">☰</button>
-      </div>
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html" aria-current="page">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
 
-    </div>
-  </div>
-</nav>
+        <div class="cta">
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-<!-- MENU MOBILE -->
-<div class="mobile-sheet" id="mobileMenu">
-  <div class="mobile-dim"></div>
-  <nav class="mobile-panel">
-    <a href="index.html">Accueil</a>
-    <a href="cours.html">Cours</a>
-    <a href="membres.html">Devenir membre</a>
-    <a href="formation.html">Formation RSL</a>
-    <a href="disciplines.html">Disciplines</a>
-    <a href="ou_rider.html">Où rider ?</a>
-    <a href="evenements.html">Événements</a>
-    <a href="game.html">Games</a>
-    <a href="shop-rsl.html">Shop</a>
-    <a href="comite.html">Comité</a>
-    <a href="contact.html">Contact</a>
-    <a href="conditions.html">Conditions générales</a>
-    <a href="compte.html">Mon compte</a>
-    <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
-  </nav>
-</div>
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
 
-<main>
-  <div class="container-page">
-
-    <header class="page-intro">
-      <h1>Événements RSL</h1>
-      <p>Contests officiels, jams, journées street encadrées et événements partenaires.</p>
-
-      <div class="msc-highlight">
-        <div class="msc-text">
-          <b>Montreux Scooter Contest</b> is one of the pioneer freestyle scooter contests in Switzerland,
-          hosted in Montreux since 2005. Watch the history on <b>MontreuxTV</b>.
-        </div>
-        <a class="msc-btn" href="https://rsl-swiss.ch/montreuxtv" target="_blank">Video history ▶</a>
-      </div>
-    </header>
-
-    <section class="section">
-      <div class="cards">
-        <!-- Montreux -->
-        <article class="card">
-          <h3>Montreux Scooter Contest — 20e édition</h3>
-          <div class="meta">📍 Montreux — 6 décembre 2025</div>
-          <p>Le plus grand contest de Suisse romande fête ses 20 ans ! Park, street, kids & pros.</p>
-
-          <a class="btn green"
-             href="https://www.jfrideshop.ch/shop?order=website_sequence+asc&category=67"
-             target="_blank">
-             Infos & programme
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <!-- 📸 Accès photos -->
-          <a class="btn dark" href="access_photos.html">📸 Accès photos 2025</a>
-        </article>
-
-        <!-- À venir -->
-        <article class="card">
-          <h3>Événement RSL — à venir</h3>
-          <div class="meta">📍 À définir — À venir</div>
-          <p>Prochains contests, jams et journées street annoncés bientôt.</p>
-          <button class="btn dark" disabled>À venir</button>
-        </article>
-
-        <article class="card">
-          <h3>Événement RSL — à venir</h3>
-          <div class="meta">📍 À définir — À venir</div>
-          <p>Prochains contests, jams et journées street annoncés bientôt.</p>
-          <button class="btn dark" disabled>À venir</button>
-        </article>
-
-        <article class="card">
-          <h3>Événement RSL — à venir</h3>
-          <div class="meta">📍 À définir — À venir</div>
-          <p>Prochains contests, jams et journées street annoncés bientôt.</p>
-          <button class="btn dark" disabled>À venir</button>
-        </article>
-
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
       </div>
-    </section>
+    </div>
+  </nav>
 
+  <!-- MENU MOBILE (copie index) -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
+      <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html" aria-current="page">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
   </div>
-</main>
 
-<!-- FOOTER -->
-<footer class="footer-mini">
-  <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
-</footer>
+  <!-- CONTENU -->
+  <main>
+    <div class="container-page">
 
-<!-- BOUTON COACH -->
-<a href="coach.html" class="coach-fab">👨‍🏫 Devenir coach</a>
+      <header class="page-intro">
+        <h1>Événements RSL</h1>
+        <p>Contests officiels, jams, journées street encadrées et événements partenaires.</p>
 
-<!-- SCRIPTS -->
-<script>
-/* Vidéo de fond */
-(function(){
-  const vids = [
-    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
-    "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
-  ];
-  const pick = vids[Math.floor(Math.random()*vids.length)];
-  const v = document.getElementById('rslBg');
-  if(!v) return;
+        <div class="msc-highlight">
+          <div class="msc-text">
+            <b>Montreux Scooter Contest</b> est l’un des contests pionniers en Suisse, organisé à Montreux depuis 2005.
+            Découvre l’histoire sur <b>MontreuxTV</b>.
+          </div>
+          <a class="msc-btn" href="https://rsl-swiss.ch/montreuxtv" target="_blank" rel="noopener">Video history ▶</a>
+        </div>
+      </header>
 
-  const s = document.createElement('source');
-  s.src = pick;
-  s.type = 'video/mp4';
-  v.appendChild(s);
+      <section class="section">
+        <div class="cards">
 
-  const start = () => {
-    try{
-      v.playbackRate = 0.6;
-      const p = v.play();
-      if(p && p.catch) p.catch(()=>{});
-    }catch(e){}
-  };
-  start();
-})();
-</script>
+          <article class="card">
+            <h3>Montreux Scooter Contest — 20e édition</h3>
+            <div class="meta">📍 Montreux — 6 décembre 2025</div>
+            <p>Le plus grand contest de Suisse romande fête ses 20 ans ! Park, street, kids &amp; pros.</p>
+            <div class="actions">
+              <a class="btn green"
+                 href="https://www.jfrideshop.ch/shop?order=website_sequence+asc&category=67"
+                 target="_blank" rel="noopener">Infos &amp; programme</a>
+              <a class="btn" href="access_photos.html">📸 Accès photos 2025</a>
+            </div>
+          </article>
 
-<script>
-/* Menu mobile */
-(function(){
-  const menuBtn=document.getElementById('menuBtn');
-  const mobile=document.getElementById('mobileMenu');
-  if(!menuBtn || !mobile) return;
+          <article class="card">
+            <h3>Événement RSL — à venir</h3>
+            <div class="meta">📍 À définir — À venir</div>
+            <p>Prochains contests, jams et journées street annoncés bientôt.</p>
+            <div class="actions">
+              <button class="btn" type="button" disabled>À venir</button>
+            </div>
+          </article>
 
-  menuBtn.addEventListener('click',e=>{
-    e.stopPropagation();
-    mobile.classList.add('open');
-  });
-  mobile.querySelector('.mobile-dim').addEventListener('click',()=>{
-    mobile.classList.remove('open');
-  });
-})();
-</script>
+          <article class="card">
+            <h3>Événement RSL — à venir</h3>
+            <div class="meta">📍 À définir — À venir</div>
+            <p>Prochains contests, jams et journées street annoncés bientôt.</p>
+            <div class="actions">
+              <button class="btn" type="button" disabled>À venir</button>
+            </div>
+          </article>
 
-<script>
-/* Login / Compte Supabase */
-(async function(){
-  if(typeof supabase==='undefined') return;
-  const {data:{user}} = await supabase.auth.getUser();
-  const btnLogin   = document.getElementById('btnLogin');
-  const btnAccount = document.getElementById('btnAccount');
+          <article class="card">
+            <h3>Événement RSL — à venir</h3>
+            <div class="meta">📍 À définir — À venir</div>
+            <p>Prochains contests, jams et journées street annoncés bientôt.</p>
+            <div class="actions">
+              <button class="btn" type="button" disabled>À venir</button>
+            </div>
+          </article>
 
-  function ui(u){
-    if(u){
-      btnAccount.style.display = 'inline-flex';
-      btnLogin.style.display   = 'none';
-    } else {
-      btnAccount.style.display = 'none';
-      btnLogin.style.display   = 'inline-flex';
-    }
-  }
+        </div>
+      </section>
 
-  ui(user);
-  btnLogin?.addEventListener('click',()=>location.href='compte.html');
-  supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
-})();
-</script>
+    </div>
+  </main>
 
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
+
+  <a href="coach.html" class="coach-fab">👨‍🏫 Devenir coach</a>
+
+  <script>
+    // ✅ Thème (clair / sombre) — EXACT index + sans flash
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme, withNoTransition){
+        if(withNoTransition){
+          document.documentElement.classList.add('no-theme-anim');
+          // force reflow
+          void document.documentElement.offsetHeight;
+        }
+
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+
+        // enlève le preload (si présent)
+        document.documentElement.classList.remove('theme-preload-light');
+
+        if(withNoTransition){
+          requestAnimationFrame(()=>{
+            document.documentElement.classList.remove('no-theme-anim');
+          });
+        }
+      }
+
+      // style anti transition pendant switch
+      const st = document.createElement('style');
+      st.textContent = 'html.no-theme-anim *,html.no-theme-anim *:before,html.no-theme-anim *:after{transition:none!important}';
+      document.head.appendChild(st);
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+
+      // ✅ applique tout de suite (sans transition)
+      applyTheme(saved, true);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next, true);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
+    // Vidéo de fond (index)
+    (function(){
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
+
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
+
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
+      start();
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden) v.pause();
+        else start();
+      });
+    })();
+
+    // Menu mobile (index)
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

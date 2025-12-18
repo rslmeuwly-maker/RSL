@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Abonnement confirmé — Romandie Scooter League</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/common.css"/>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    html,body{
+      margin:0;
+      padding:0;
+      height:100%;
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:#020617;
+      color:#e5e7eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    main.card{
+      background:rgba(15,23,42,.96);
+      border-radius:24px;
+      border:1px solid rgba(148,163,184,.35);
+      padding:26px 22px 24px;
+      max-width:420px;
+      width:90%;
+      box-shadow:0 18px 45px rgba(0,0,0,.75);
+      text-align:center;
+    }
+    .check{
+      width:64px;
+      height:64px;
+      border-radius:999px;
+      border:2px solid #22c55e;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto 16px;
+      font-size:32px;
+    }
+    h1{
+      margin:0 0 6px;
+      font-size:1.6rem;
+      font-weight:800;
+    }
+    p{
+      margin:4px 0;
+      font-size:.95rem;
+      color:#cbd5f5;
+    }
+    .small{
+      font-size:.8rem;
+      opacity:.8;
+      margin-top:10px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 18px;
+      border-radius:999px;
+      border:none;
+      background:#22c55e;
+      color:#022c22;
+      font-weight:700;
+      font-size:.95rem;
+      text-decoration:none;
+      margin-top:18px;
+      cursor:pointer;
+      box-shadow:0 12px 28px rgba(0,0,0,.7);
+    }
+    .loader{
+      font-size:.8rem;
+      opacity:.8;
+      margin-top:6px;
+    }
+    .error{
+      color:#fecaca;
+      font-size:.85rem;
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="check">✔</div>
+    <h1>Abonnement confirmé</h1>
+    <p id="status-text">On met à jour ton compte…</p>
+    <p class="loader" id="loader-text">Merci de patienter quelques secondes.</p>
+    <p class="error" id="error-text" style="display:none;"></p>
+
+    <a href="/compte.html" class="btn">Aller dans mon compte</a>
+
+    <p class="small" id="hint-text">
+      Si ton abonnement n’apparaît pas tout de suite,<br/>
+      actualise la page « Mon compte » après quelques instants.
+    </p>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      const statusText = document.getElementById("status-text");
+      const loaderText = document.getElementById("loader-text");
+      const errorText  = document.getElementById("error-text");
+      const hintText   = document.getElementById("hint-text");
+
+      try {
+        // Vérifier si user connecté
+        const { data: { user }} = await sb.auth.getUser();
+        if (!user) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Aucun utilisateur connecté.";
+          errorText.style.display = "block";
+          errorText.textContent = "Connecte-toi pour activer ton abonnement.";
+          return;
+        }
+
+        // Récupérer l'ID d'abonnement stocké localement
+        const membershipId = localStorage.getItem("rsl_last_membership_id");
+
+        if (!membershipId) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Aucun abonnement récent trouvé.";
+          errorText.style.display = "block";
+          errorText.textContent = "Si tu as payé, contacte l’organisation avec ta preuve.";
+          return;
+        }
+
+        // Récupérer la ligne dans Supabase
+        const { data: membership } = await sb
+          .from("rsl_memberships")
+          .select("*")
+          .eq("id", membershipId)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        // Nettoyer localStorage pour empêcher la réactivation
+        localStorage.removeItem("rsl_last_membership_id");
+
+        if (!membership) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Abonnement introuvable.";
+          errorText.style.display = "block";
+          return;
+        }
+
+        // Vérifier âge de la ligne (anti-triche)
+        const createdAt = new Date(membership.created_at);
+        const diffMinutes = (Date.now() - createdAt.getTime()) / 60000;
+
+        if (diffMinutes > 60) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Abonnement trop ancien pour être activé automatiquement.";
+          errorText.style.display = "block";
+          return;
+        }
+
+        // Si déjà payé
+        if (membership.is_paid === true) {
+          loaderText.style.display = "none";
+          statusText.textContent = "Ton abonnement est déjà activé ✔";
+          return;
+        }
+
+        // ACTIVER l'abonnement
+        const { data: updated, error: updErr } = await sb
+          .from("rsl_memberships")
+          .update({ is_paid: true })
+          .eq("id", membershipId)
+          .eq("user_id", user.id)
+          .eq("is_paid", false)
+          .select();
+
+        loaderText.style.display = "none";
+
+        if (updErr) {
+          statusText.textContent = "Erreur lors de l’activation.";
+          errorText.textContent = updErr.message;
+          errorText.style.display = "block";
+          return;
+        }
+
+        if (updated && updated.length > 0) {
+          statusText.textContent = "Ton abonnement a bien été activé ✔";
+        } else {
+          statusText.textContent = "Ton abonnement était déjà activé ✔";
+        }
+
+      } catch (err) {
+        loaderText.style.display = "none";
+        statusText.textContent = "Erreur inattendue.";
+        errorText.style.display = "block";
+        errorText.textContent = err.message;
+      }
+    });
+  </script>
+
+</body>
+</html>

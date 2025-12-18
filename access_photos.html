@@ -3,916 +3,894 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Accès aux photos HD — Montreux Scooter Contest</title>
+  <title>Galerie Photos HD — RSL</title>
 
-  <!-- Fonts -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase + scripts (PAREIL QUE COMITÉ) -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
 
   <style>
     :root{
-      --green:#22c55e;
-      --green-dark:#16a34a;
-      --panel-bg:rgba(9,13,23,.78);
-      --panel-border:rgba(255,255,255,.12);
-      --txt-main:#fff;
-      --txt-dim:#cdd6ff;
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.90);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+      --rsl-shadow:0 30px 80px rgba(15,23,42,.90);
     }
-    *{box-sizing:border-box;}
-
-    html, body { height:100%; }
-    body{
-      margin:0;
-      background: transparent !important;
-      color:var(--txt-main);
-      font-family:"Outfit",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+      --rsl-shadow:0 24px 60px rgba(15,23,42,.16);
     }
+    *,:before,:after{ box-sizing:border-box; }
 
-    /* ===== VIDÉO DE FOND ===== */
-    .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
+    html, body{
       height:100%;
+      margin:0;
+      background:transparent!important;
+      display:flex;
+      flex-direction:column;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
+    }
+    main{ flex:1; position:relative; z-index:10; }
+
+    /* Fond vidéo */
+    .site-bg-video{
+      position:fixed; inset:0;
+      width:100%; height:100%;
       object-fit:cover;
       z-index:-2;
       background:#000;
     }
     .site-bg-dim{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       z-index:-1;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.90));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.92),rgba(15,23,42,.85));
     }
 
-    /* ===== MINI HEADER ===== */
-    .mini-header{
-      position:fixed;
-      top:16px;
-      left:16px;
-      z-index:10;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      background:rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:12px;
-      padding:10px 14px;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);
-      backdrop-filter:blur(8px) saturate(140%);
-      user-select:none;
+    /* NAV */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
+      position:sticky;
+      top:0;
+      z-index:100;
+      border-bottom:1px solid rgba(15,23,42,.8);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
-    .mini-header img{
-      height:44px;
-      width:auto;
-      border-radius:10px;
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
+    }
+    .brand img{
+      height:42px; border-radius:10px;
       display:block;
-      filter:brightness(1.1);
       background:#fff;
-      padding:6px;
-      box-shadow:0 2px 10px rgba(0,0,0,.35);
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
-    .mini-header .brand-text{
-      display:flex;
-      flex-direction:column;
-      line-height:1.2;
+    .brand span{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:16px;
+      white-space:nowrap;
     }
-    .mini-header .brand-main{
-      font-size:15px;
-      font-weight:700;
-      color:#fff;
+
+    nav.nav ul{
+      display:flex; align-items:center; gap:20px;
+      list-style:none; padding:0; margin:0;
     }
-    .mini-header .brand-sub{
-      font-size:12px;
+    nav.nav ul li a{
       font-weight:600;
-      color:#22c55e;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
+      white-space:nowrap;
+      text-decoration:none;
       opacity:.9;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
+
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
     }
 
-    /* ===== PAGE WRAP ===== */
-    .page-wrap{
-      max-width:480px;
-      margin:0 auto;
-      padding:120px 20px 80px;
-      color:#fff;
-      position:relative;
-      z-index:10;
-      text-align:center;
+    /* ✅ EXACT COMITÉ : avatar caché au départ */
+    .nav-avatar{
+      width:34px; height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
     }
 
-    .logo-wrap{
-      width:84px;
-      height:84px;
-      border-radius:16px;
-      background:#fff;
-      padding:10px;
-      margin:0 auto 16px;
-      box-shadow:0 6px 20px rgba(0,0,0,.6);
-      display:flex;
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
       align-items:center;
       justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
     }
-    .logo-wrap img{
-      max-width:100%;
-      max-height:100%;
-      object-fit:contain;
-      display:block;
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
     }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+    }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+
+    /* Menu mobile */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:var(--rsl-card);
+      padding:22px 18px;
+      display:flex; flex-direction:column; gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
+    }
+    .mobile-panel a{ color:var(--rsl-fg); text-decoration:none; font-weight:700; padding:6px 0; font-size:14px; }
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none!important; }
+      #btnCart, .btn.green{ display:none!important; }
+      #menuBtn{ display:inline-flex; }
+    }
+
+    /* Page */
+    .page{ max-width:1200px; margin:0 auto; padding:0 16px 80px; }
+    .intro{
+      margin:26px auto 14px;
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      box-shadow:var(--rsl-shadow);
+      border-radius:22px;
+      padding:22px 18px 18px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .intro:before{
+      content:"";
+      position:absolute; inset:-40% -20%;
+      background:
+        radial-gradient(circle at 20% 30%, var(--rsl-accent-soft), transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(99,102,241,.12), transparent 58%),
+        radial-gradient(circle at 60% 85%, rgba(34,197,94,.10), transparent 60%);
+      pointer-events:none;
+    }
+    .intro > *{ position:relative; z-index:1; }
 
     .eyebrow{
-      display:inline-block;
-      background:linear-gradient(180deg,var(--green),var(--green-dark));
-      color:#062312;
-      font-weight:800;
-      font-size:12px;
-      line-height:1.2;
-      border-radius:8px;
-      padding:4px 8px;
-      box-shadow:0 10px 24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2);
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      background:rgba(15,23,42,.90);
+      border:1px solid rgba(148,163,184,.60);
+      font-size:11px; text-transform:uppercase; letter-spacing:.14em;
+      color:var(--rsl-muted);
     }
+    body.theme-light .eyebrow{ background:#f9fafb; }
+    .eyebrow i{ width:7px;height:7px;border-radius:999px; background:var(--rsl-accent); box-shadow:0 0 10px rgba(34,197,94,.9); display:inline-block; }
 
-    h1.title{
-      margin:16px 0 8px;
-      font-size:clamp(24px,4vw,32px);
-      font-weight:800;
-      color:#fff;
-      line-height:1.2;
-    }
-
-    .subtitle{
-      font-size:15px;
-      font-weight:500;
-      line-height:1.45;
-      color:#fff;
-      opacity:.9;
-      max-width:460px;
-      margin:0 auto;
-    }
-    .subtitle b{
-      color:var(--green);
-      font-weight:700;
-    }
-
-    /* PANNEAU (login/signup + compte) */
-    .panel{
-      background:var(--panel-bg);
-      border:1px solid var(--panel-border);
+    .logo-wrap{
+      width:64px; height:64px;
       border-radius:14px;
-      box-shadow:0 20px 60px rgba(0,0,0,.6);
-      padding:20px;
-      margin:24px auto 0;
-      text-align:left;
-      max-width:480px;
+      background:#fff;
+      padding:8px;
+      margin:12px auto 10px;
+      box-shadow:0 18px 44px rgba(15,23,42,.45);
+      display:flex; align-items:center; justify-content:center;
     }
-    .panel h2{
-      margin:0 0 16px;
-      font-size:16px;
-      line-height:1.3;
-      font-weight:700;
-      color:#fff;
-    }
-    .tag-free{
-      font-size:12px;
-      line-height:1.2;
-      font-weight:700;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.15);
-      color:#fff;
-      border-radius:6px;
-      padding:3px 6px;
-      margin-left:8px;
-    }
+    .logo-wrap img{ width:100%; height:100%; object-fit:contain; display:block; }
 
-    .field{margin-bottom:14px;}
-    .field label{
-      display:block;
-      font-size:13px;
-      font-weight:600;
-      color:#fff;
-      margin-bottom:6px;
+    .intro h1{
+      margin:8px 0 6px;
+      font-size:clamp(26px,4.2vw,40px);
+      font-weight:900;
+      letter-spacing:.01em;
     }
-    .input{
-      width:100%;
-      background:rgba(0,0,0,.6);
-      border:1px solid rgba(255,255,255,.25);
-      border-radius:10px;
-      color:#fff;
+    .badge-free{
+      display:inline-block; margin-left:8px;
+      font-size:12px; padding:3px 7px;
+      border-radius:8px;
+      border:1px solid var(--rsl-border);
+      background:rgba(255,255,255,.06);
+      color:var(--rsl-muted);
+      font-weight:900;
+      vertical-align:middle;
+    }
+    body.theme-light .badge-free{ background:#ffffff; }
+
+    .intro p{ margin:10px 0 0; font-size:15px; line-height:1.55; color:var(--rsl-muted); }
+    .intro p b{ color:var(--rsl-accent); }
+
+    .notice{ margin:12px auto 0; font-size:12px; line-height:1.5; color:var(--rsl-muted); }
+
+    .results-link{ margin:16px 0 0; }
+    .results-link a{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:12px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:900;
       font-size:14px;
-      font-weight:600;
-      padding:10px 12px;
-      outline:none;
-    }
-    .input:focus{
-      border-color:var(--green);
-      box-shadow:0 0 0 3px rgba(34,197,94,.25);
+      text-decoration:none;
+      box-shadow:0 12px 26px rgba(22,163,74,.45);
     }
 
-    .checkline{
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-      font-size:12px;
-      line-height:1.4;
-      font-weight:500;
-      color:#fff;
-      margin-bottom:10px;
-    }
-    .checkline input[type="checkbox"]{
-      width:18px;
-      height:18px;
-      flex:0 0 18px;
-      margin-top:2px;
-    }
-    .checkline span b{
-      color:var(--green);
-      font-weight:700;
-    }
-
-    .btn-main,
-    .btn-alt,
-    .btn-small,
-    .btn-change{
-      width:100%;
-      background:linear-gradient(180deg,var(--green),var(--green-dark));
-      border:0;
-      border-radius:10px;
-      color:#062312;
-      font-weight:800;
-      font-size:15px;
-      line-height:1.2;
+    .loading{
+      max-width:980px;
+      margin:14px auto 0;
       padding:12px 14px;
-      cursor:pointer;
-      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      border-radius:14px;
+      border:1px solid var(--rsl-border);
+      background:var(--rsl-card-soft);
+      color:var(--rsl-muted);
+      font-size:13px;
+      text-align:center;
+      box-shadow:0 16px 50px rgba(15,23,42,.35);
+    }
+
+    .batch-bar{
+      max-width:980px;
+      margin:16px auto 0;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      gap:12px;
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      box-shadow:0 18px 44px rgba(15,23,42,.35);
+      border-radius:16px;
+      padding:12px 14px;
+      font-size:14px;
       text-align:center;
     }
-    .btn-main:disabled,
-    .btn-change:disabled{
-      filter:grayscale(1) brightness(.6);
-      cursor:default;
+    .batch-bar label{ font-weight:900; color:var(--rsl-muted); }
+
+    .batch-select{
+      appearance:none;
+      background-color: rgba(0,0,0,0.35);
+      border: 1px solid rgba(148,163,184,.50);
+      color: var(--rsl-fg);
+      padding:10px 36px 10px 14px;
+      border-radius:12px;
+      font-size:15px;
+      font-weight:800;
+      min-width:220px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--rsl-accent) 50%),
+        linear-gradient(135deg, var(--rsl-accent) 50%, transparent 50%);
+      background-position: calc(100% - 22px) center, calc(100% - 17px) center;
+      background-size:6px 6px,6px 6px;
+      background-repeat:no-repeat;
+    }
+    body.theme-light .batch-select{
+      background-color:#ffffff;
+      border-color:rgba(148,163,184,.55);
+      color:#0f172a;
     }
 
-    .btn-alt{
-      background:rgba(255,255,255,.08);
-      color:#fff;
-      font-size:13px;
-      line-height:1.2;
-      padding:10px 12px;
-      font-weight:700;
-      border:1px solid rgba(255,255,255,.25);
-      box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
-    }
-
-    .btn-small{
-      font-size:13px;
-      padding:10px 12px;
-    }
-
-    .msg-err,
-    .msg-ok{
-      display:none;
-      margin-top:10px;
-      border-radius:10px;
-      font-size:13px;
-      font-weight:600;
-      line-height:1.4;
-      padding:10px 12px;
-    }
-    .msg-err{
-      background:rgba(255,80,80,.12);
-      border:1px solid rgba(255,80,80,.4);
-      color:#ff9f9f;
-    }
-    .msg-ok{
-      background:rgba(34,197,94,.12);
-      border:1px solid rgba(34,197,94,.4);
-      color:#7cffb0;
-    }
-
-    .switch-link{
-      text-align:center;
-      font-size:13px;
-      font-weight:500;
-      color:#fff;
-      opacity:.9;
+    .gallery-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:16px;
       margin-top:16px;
-      text-align:center;
     }
-    .switch-link button{
-      background:none;
-      border:0;
-      color:var(--green);
-      font-weight:700;
-      cursor:pointer;
+    .ph-card{
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      border-radius:16px;
+      box-shadow:0 18px 44px rgba(15,23,42,.35);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      transition:.18s ease;
     }
 
-    .footnote{
-      margin-top:24px;
-      font-size:12px;
-      line-height:1.45;
-      color:var(--txt-dim);
-      font-weight:500;
-      max-width:460px;
-      text-align:center;
-      margin-left:auto;
-      margin-right:auto;
+    .ph-media{
+      background:#000;
+      width:100%;
+      aspect-ratio:4/3;
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
     }
-    .footnote b{
-      color:#fff;
-      font-weight:600;
+    .ph-media img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      opacity:0;
+      transition:opacity .18s ease;
+    }
+
+    .ph-info{ padding:12px; display:flex; flex-direction:column; gap:8px; font-size:14px; }
+    .dl-btn{
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:900;
+      font-size:14px;
+      border-radius:12px;
+      padding:10px 12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      box-shadow:0 12px 26px rgba(22,163,74,.45);
+      cursor:pointer;
+      border:0;
     }
 
     .copy{
       text-align:center;
-      color:#9aa5b1;
+      color:var(--rsl-muted);
       font-size:12px;
-      padding:40px 0 30px;
-      margin:0;
-      position:relative;
-      z-index:10;
+      padding:28px 0 10px;
+      margin:26px 0 0;
+      border-top:1px solid rgba(148,163,184,.25);
     }
 
-    .hide{ display:none; }
-
-    /* === petit bloc pour compte déjà connecté === */
-    .acc-email{
-      font-size:13px;
-      font-weight:500;
-      color:#9aa5b1;
-      margin-bottom:16px;
-    }
-    .acc-email b{
-      color:#fff;
-      font-weight:600;
-    }
-
-    .pw-block-label{
-      font-size:13px;
-      font-weight:600;
-      color:#fff;
-      margin:16px 0 8px;
-    }
-
-    .pw-msg-err,
-    .pw-msg-ok{
+    .lightbox{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.90);
       display:none;
-      border-radius:10px;
-      font-size:13px;
-      font-weight:600;
-      line-height:1.4;
-      padding:10px 12px;
-      margin-top:10px;
+      align-items:center;
+      justify-content:center;
+      z-index:2000;
+      flex-direction:column;
+      padding:24px;
     }
-    .pw-msg-err{
-      background:rgba(255,80,80,.12);
-      border:1px solid rgba(255,80,80,.4);
-      color:#ff9f9f;
+    .lightbox.open{ display:flex; }
+    .lightbox img{
+      max-width:95vw;
+      max-height:80vh;
+      object-fit:contain;
+      border-radius:12px;
+      box-shadow:0 0 50px rgba(0,0,0,.8);
     }
-    .pw-msg-ok{
-      background:rgba(34,197,94,.12);
-      border:1px solid rgba(34,197,94,.4);
-      color:#7cffb0;
+    .lightbox .actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      width:95%;
+      max-width:900px;
+      margin-top:16px;
+      flex-wrap:wrap;
+      gap:12px;
     }
-
+    .dl-big-btn{
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:900;
+      font-size:15px;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      min-width:180px;
+      border:0;
+      box-shadow:0 12px 26px rgba(22,163,74,.45);
+    }
+    .close-btn{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.2);
+      font-weight:900;
+      font-size:15px;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      min-width:180px;
+    }
+    body.theme-light .close-btn{
+      background:rgba(15,23,42,.08);
+      color:#0f172a;
+      border-color:rgba(148,163,184,.45);
+    }
   </style>
 </head>
+
 <body>
 
-  <!-- VIDÉO DE FOND -->
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg">
-    <!-- plus de <source> ici, on injecte depuis Supabase en JS -->
-  </video>
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- MINI HEADER -->
-  <div class="mini-header">
-    <img src="images/logo_rsl.png" alt="RSL"/>
-    <div class="brand-text">
-      <div class="brand-main">RSL — Romandie Scooter League</div>
-      <div class="brand-sub">Montreux Scooter Contest</div>
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
+      </div>
     </div>
+  </nav>
+
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
+      <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html">👨‍🏫 Je suis coach</a>
+    </nav>
   </div>
 
-  <!-- CONTENU -->
-  <main class="page-wrap">
+  <main class="page">
+    <section class="intro">
+      <div class="eyebrow"><i></i> Montreux Scooter Contest 2025</div>
 
-    <div class="logo-wrap">
-      <img src="images/logo_rsl.png" alt="RSL"/>
-    </div>
-
-    <div class="eyebrow">Montreux Scooter Contest 2025</div>
-
-    <h1 class="title">Accès aux photos HD</h1>
-
-    <p class="subtitle">
-      Les photos officielles seront mises en ligne ici.<br/>
-      Crée ton compte <b>gratuit</b> ou connecte-toi pour pouvoir les voir et les télécharger.
-    </p>
-
-
-    <!-- ===== PANEL COMPTE DÉJÀ CONNECTÉ ===== -->
-    <section class="panel hide" id="accountPanel">
-      <h2>Mon accès photos <span class="tag-free">actif</span></h2>
-
-      <div class="acc-email">
-        Connecté en tant que <b id="accEmail">(email)</b>
+      <div class="logo-wrap">
+        <img src="images/logo_rsl.png" alt="RSL">
       </div>
 
-      <div class="field">
-        <button class="btn-main" id="goGalleryBtn" type="button">Aller à la galerie HD</button>
+      <h1>Galerie Photos HD <span class="badge-free">téléchargement gratuit</span></h1>
+
+      <p>Merci d’avoir ridé avec nous 💚<br/>Si tu repostes une image, tag <b>@rsl_swiss</b>.</p>
+
+      <div class="notice">
+        Tu veux qu’on retire une photo où tu apparais ?<br/>
+        Écris sur <b>Instagram @rsl_swiss</b> avec le numéro de la photo.
       </div>
 
-      <div class="field">
-        <button class="btn-alt" id="logoutBtn" type="button">Se déconnecter</button>
-      </div>
-
-      <div class="pw-block-label">Changer mon mot de passe</div>
-
-      <div class="field">
-        <label for="oldPass">Ancien mot de passe</label>
-        <input id="oldPass" class="input" type="password" placeholder="Ancien mot de passe"/>
-      </div>
-
-      <div class="field">
-        <label for="newPass1">Nouveau mot de passe</label>
-        <input id="newPass1" class="input" type="password" placeholder="Nouveau mot de passe (min 6 caractères)"/>
-      </div>
-
-      <div class="field">
-        <label for="newPass2">Confirme le nouveau mot de passe</label>
-        <input id="newPass2" class="input" type="password" placeholder="Confirme le nouveau mot de passe"/>
-      </div>
-
-      <div id="pwMsgErr" class="pw-msg-err"></div>
-      <div id="pwMsgOk"  class="pw-msg-ok"></div>
-
-      <div class="field">
-        <button class="btn-change" id="pwChangeBtn" type="button">Mettre à jour mon mot de passe</button>
+      <div class="results-link">
+        <a href="resultatmtx2025.html">📊 Voir les résultats du Montreux Contest 2025</a>
       </div>
     </section>
 
+    <div class="loading" id="loadingBox">Vérification d’accès…</div>
 
-    <!-- ===== PANEL LOGIN ===== -->
-    <form class="panel" id="loginForm" autocomplete="off" novalidate>
-      <h2>Connexion à ton compte</h2>
+    <section class="batch-bar" id="batchBar" style="display:none">
+      <label for="batchSelect">Afficher :</label>
+      <select id="batchSelect" class="batch-select">
+        <option value="0">Photos m1 → m40</option>
+        <option value="1">Photos m41 → m80</option>
+        <option value="2">Photos m81 → m120</option>
+        <option value="3">Photos m121 → m160</option>
+        <option value="4">Photos m161 → m200</option>
+      </select>
+    </section>
 
-      <div class="field">
-        <label for="loginEmail">Email</label>
-        <input id="loginEmail" class="input" type="email" placeholder="ton.email@example.com" required/>
-      </div>
+    <section>
+      <div id="galleryGrid" class="gallery-grid"></div>
+    </section>
 
-      <div class="field">
-        <label for="loginPass">Mot de passe</label>
-        <input id="loginPass" class="input" type="password" placeholder="••••••••" required minlength="6"/>
-      </div>
-
-      <div id="loginErr" class="msg-err"></div>
-
-      <button class="btn-main" id="btnLogin" type="submit">Se connecter</button>
-
-      <div class="field" style="margin-top:12px;">
-        <button class="btn-alt btn-small" id="forgotBtn" type="button">J'ai oublié mon mot de passe</button>
-        <div id="forgotOk" class="msg-ok" style="margin-top:8px;">Un lien de réinitialisation a été envoyé (si l'email existe).</div>
-      </div>
-
-      <div class="switch-link">
-        Pas encore inscrit ? <button type="button" id="showSignupBtn">Créer un compte</button>
-      </div>
-    </form>
-
-
-    <!-- ===== PANEL SIGNUP ===== -->
-    <form class="panel hide" id="signupForm" autocomplete="off" novalidate>
-      <h2>
-        Crée ton accès RSL
-        <span class="tag-free">gratuit</span>
-      </h2>
-
-      <div class="field">
-        <label for="signupEmail">Email</label>
-        <input id="signupEmail" class="input" type="email" placeholder="ton.email@example.com" required/>
-      </div>
-
-      <div class="field">
-        <label for="signupPass1">Mot de passe</label>
-        <input id="signupPass1" class="input" type="password" placeholder="••••••••" required minlength="6"/>
-      </div>
-
-      <div class="field">
-        <label for="signupPass2">Confirme le mot de passe</label>
-        <input id="signupPass2" class="input" type="password" placeholder="••••••••" required minlength="6"/>
-      </div>
-
-      <div class="checkline">
-        <input id="okMail" type="checkbox" required/>
-        <span>J'autorise RSL à me prévenir quand les photos sont en ligne.</span>
-      </div>
-
-      <div class="checkline">
-        <input id="okImage" type="checkbox" required/>
-        <span>J'accepte l'utilisation des photos prises pendant l'événement (<b>@rsl_swiss</b> pour toute demande de retrait).</span>
-      </div>
-
-      <div id="signupErr" class="msg-err"></div>
-      <div id="signupOk" class="msg-ok"></div>
-
-      <button class="btn-main" id="btnCreate" type="submit">Créer mon compte</button>
-
-      <div class="switch-link">
-        Déjà un compte ? <button type="button" id="showLoginBtn">Connexion</button>
-      </div>
-    </form>
-
-
-    <div class="footnote">
-      En créant un compte, tu pourras télécharger gratuitement toutes les photos HD du contest.
-    </div>
-
-    <p class="copy">© 2025 — Romandie Scooter League. Tous droits réservés.</p>
+    <p class="copy">© 2025 — RSL Romandie Scooter League</p>
   </main>
 
-  <!-- SUPABASE -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="js/env.js"></script>
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <img id="lightboxImg" src="" alt=""/>
+    <div class="actions">
+      <button class="dl-big-btn" id="downloadLightboxBtn" type="button">⬇ Télécharger</button>
+      <button class="close-btn" id="closeLightbox" type="button">✕ Fermer</button>
+    </div>
+  </div>
 
   <script>
-  (function(){
-    // ====== VIDÉO DE FOND SUPABASE (aléatoire) ======
-    window.addEventListener('DOMContentLoaded', () => {
-      const v = document.getElementById('rslBg');
-      if(!v) return;
+    // Thème
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
 
-      // tes 2 vidéos hébergées sur Supabase
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      btn?.addEventListener('click', ()=>{
+        const next = body.classList.contains('theme-light') ? 'dark' : 'light';
+        applyTheme(next);
+        try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+      });
+    })();
+
+    // Vidéo bg
+    (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
       ];
-
-      // on prend une au hasard
       const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
 
-      // on crée le <source>
-      const srcEl = document.createElement('source');
-      srcEl.src = pick;
-      srcEl.type = "video/mp4";
-      v.appendChild(srcEl);
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
 
-      // lecture ralentie comme avant
       const start = () => {
-        try {
+        try{
           v.playbackRate = 0.6;
           const p = v.play();
-          if(p && p.catch){ p.catch(()=>{}); }
-        } catch(e){}
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
       };
+
       start();
-
-      // pause si onglet pas visible
-      document.addEventListener('visibilitychange',()=>{
-        if(document.hidden){
-          v.pause();
-        } else {
-          start();
-        }
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden) v.pause();
+        else start();
       });
-    });
-
-    // refs DOM existants
-    const accountPanel = document.getElementById('accountPanel');
-    const accEmail     = document.getElementById('accEmail');
-    const goGalleryBtn = document.getElementById('goGalleryBtn');
-    const logoutBtn    = document.getElementById('logoutBtn');
-
-    const oldPass      = document.getElementById('oldPass');
-    const newPass1     = document.getElementById('newPass1');
-    const newPass2     = document.getElementById('newPass2');
-    const pwChangeBtn  = document.getElementById('pwChangeBtn');
-    const pwMsgErr     = document.getElementById('pwMsgErr');
-    const pwMsgOk      = document.getElementById('pwMsgOk');
-
-    const loginForm    = document.getElementById('loginForm');
-    const loginEmail   = document.getElementById('loginEmail');
-    const loginPass    = document.getElementById('loginPass');
-    const loginBtn     = document.getElementById('btnLogin');
-    const loginErr     = document.getElementById('loginErr');
-
-    const forgotBtn    = document.getElementById('forgotBtn');
-    const forgotOk     = document.getElementById('forgotOk');
-
-    const signupForm   = document.getElementById('signupForm');
-    const signupEmail  = document.getElementById('signupEmail');
-    const signupPass1  = document.getElementById('signupPass1');
-    const signupPass2  = document.getElementById('signupPass2');
-    const okMail       = document.getElementById('okMail');
-    const okImage      = document.getElementById('okImage');
-    const signupBtn    = document.getElementById('btnCreate');
-    const signupErr    = document.getElementById('signupErr');
-    const signupOk     = document.getElementById('signupOk');
-
-    const showSignupBtn= document.getElementById('showSignupBtn');
-    const showLoginBtn = document.getElementById('showLoginBtn');
-
-    function show(el){ if(el) el.classList.remove('hide'); }
-    function hide(el){ if(el) el.classList.add('hide'); }
-
-    function showLoginPanel(){
-      show(loginForm);
-      hide(signupForm);
-    }
-    function showSignupPanel(){
-      show(signupForm);
-      hide(loginForm);
-    }
-    showSignupBtn?.addEventListener('click', showSignupPanel);
-    showLoginBtn?.addEventListener('click', showLoginPanel);
-
-    function showLoginErr(msg){
-      loginErr.textContent = msg;
-      loginErr.style.display='block';
-    }
-    function clearLoginErr(){
-      loginErr.style.display='none';
-    }
-
-    function showSignupErr(msg){
-      signupErr.textContent = msg;
-      signupErr.style.display='block';
-      signupOk.style.display='none';
-    }
-    function showSignupOk(msg){
-      signupErr.style.display='none';
-      signupOk.textContent = msg || "Compte créé. Redirection…";
-      signupOk.style.display='block';
-    }
-
-    function clearPwMsg(){
-      pwMsgErr.style.display='none';
-      pwMsgOk.style.display='none';
-    }
-    function showPwErr(msg){
-      pwMsgErr.textContent=msg;
-      pwMsgErr.style.display='block';
-      pwMsgOk.style.display='none';
-    }
-    function showPwOk(msg){
-      pwMsgOk.textContent=msg;
-      pwMsgOk.style.display='block';
-      pwMsgErr.style.display='none';
-    }
-
-    function hideForgotOk(){
-      forgotOk.style.display='none';
-    }
-    function showForgotOk(){
-      forgotOk.style.display='block';
-    }
-
-    // init supabase
-    let supa=null;
-    try{
-      supa = supabase.createClient(
-        window.env?.SUPABASE_URL || '',
-        window.env?.SUPABASE_ANON || ''
-      );
-    }catch(e){
-      console.warn("Init Supabase fail:",e);
-    }
-
-    // État initial : check session
-    (async function initState(){
-      hide(accountPanel);
-      hideForgotOk();
-
-      // Par défaut: login visible, signup caché (ton HTML)
-      show(loginForm);
-      hide(signupForm);
-
-      let sessionOK=false;
-      let emailNow="";
-
-      if(supa){
-        try{
-          const { data:{ user } } = await supa.auth.getUser();
-          if(user){
-            sessionOK=true;
-            emailNow = user.email || "";
-          }
-        }catch(e){ console.warn(e); }
-      }
-
-      if(sessionOK){
-        if(accEmail) accEmail.textContent=emailNow||"(inconnu)";
-        show(accountPanel);
-        hide(loginForm);
-        hide(signupForm);
-
-        try{
-          localStorage.setItem('rsl_photos_ok','1');
-          localStorage.setItem('rsl_pre_email', emailNow);
-        }catch(_){}
-      }
     })();
 
-    // Aller à la galerie
-    goGalleryBtn?.addEventListener('click', ()=>{
-      window.location.href="photos.html";
-    });
+    // Menu mobile
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
 
-    // Logout
-    logoutBtn?.addEventListener('click', async ()=>{
-      try{ await supa.auth.signOut(); }catch(e){}
-      try{
-        localStorage.removeItem('rsl_photos_ok');
-        localStorage.removeItem('rsl_pre_email');
-      }catch(_){}
-      window.location.reload();
-    });
-
-    // Changer mot de passe
-    pwChangeBtn?.addEventListener('click', async ()=>{
-      clearPwMsg();
-
-      const oldP=(oldPass.value||"").trim();
-      const np1 =(newPass1.value||"").trim();
-      const np2 =(newPass2.value||"").trim();
-
-      if(np1.length<6){
-        showPwErr("Nouveau mot de passe trop court (min 6 caractères).");
-        return;
-      }
-      if(np1!==np2){
-        showPwErr("Le nouveau mot de passe ne correspond pas dans les deux champs.");
-        return;
-      }
-
-      // quel email actuel ?
-      let currentEmail="";
-      try{
-        const { data:{ user } } = await supa.auth.getUser();
-        if(user){ currentEmail=user.email||""; }
-      }catch(e){ console.warn(e); }
-
-      if(!currentEmail){
-        showPwErr("Session expirée. Reconnecte-toi.");
-        return;
-      }
-
-      pwChangeBtn.disabled=true;
-
-      try{
-        // Vérifier l'ancien mot de passe:
-        const { error:checkErr } = await supa.auth.signInWithPassword({
-          email: currentEmail,
-          password: oldP
-        });
-        if(checkErr){
-          showPwErr("Ancien mot de passe incorrect.");
-          pwChangeBtn.disabled=false;
-          return;
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
         }
+      });
+    })();
 
-        // Mettre à jour
-        const { error:updateErr } = await supa.auth.updateUser({
-          password: np1
-        });
-        if(updateErr){
-          showPwErr("Impossible de modifier le mot de passe.");
-          pwChangeBtn.disabled=false;
-          return;
+    // Guard + Galerie (NE TOUCHE PAS AU LOGIN/AVATAR => auth.js fait tout)
+    (function(){
+      const loadingBox = document.getElementById('loadingBox');
+      const batchBar   = document.getElementById('batchBar');
+      const grid       = document.getElementById('galleryGrid');
+      const select     = document.getElementById('batchSelect');
+
+      const lightbox            = document.getElementById('lightbox');
+      const lightboxImg         = document.getElementById('lightboxImg');
+      const closeLightboxBtn    = document.getElementById('closeLightbox');
+      const downloadLightboxBtn = document.getElementById('downloadLightboxBtn');
+
+      const BASE_URL   = "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/contest_photos_2025";
+      const MAX_PHOTO  = 200;
+      const BATCH_SIZE = 40;
+
+      let currentFullUrl = "";
+
+      const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+      async function waitForEnv(timeoutMs=5000){
+        const start = Date.now();
+        while(Date.now()-start < timeoutMs){
+          if(window.env?.SUPABASE_URL && window.env?.SUPABASE_ANON) return true;
+          await sleep(40);
         }
-
-        showPwOk("Mot de passe mis à jour ✔");
-        oldPass.value="";
-        newPass1.value="";
-        newPass2.value="";
-        pwChangeBtn.disabled=false;
-
-      }catch(e){
-        console.warn(e);
-        showPwErr("Erreur technique, réessaie.");
-        pwChangeBtn.disabled=false;
-      }
-    });
-
-    // Mot de passe oublié
-    forgotBtn?.addEventListener('click', async ()=>{
-      hideForgotOk();
-      clearLoginErr();
-
-      const em=(loginEmail.value||"").trim();
-      if(!em){
-        showLoginErr("Mets d'abord ton email.");
-        return;
+        return false;
       }
 
-      try{
-        const redirectUrl = window.location.origin + "/photos.html";
-        const { error } = await supa.auth.resetPasswordForEmail(em,{
-          redirectTo: redirectUrl
-        });
-        if(error){
-          showLoginErr("Impossible d'envoyer l'email de récupération.");
-          return;
-        }
-        showForgotOk();
-      }catch(e){
-        console.warn(e);
-        showLoginErr("Erreur envoi email. Réessaie.");
-      }
-    });
-
-    // LOGIN
-    loginForm?.addEventListener('submit', async (ev)=>{
-      ev.preventDefault();
-      clearLoginErr();
-
-      const em=(loginEmail.value||'').trim();
-      const pw=(loginPass.value||'').trim();
-
-      loginBtn.disabled=true;
-      try{
-        if(!supa) throw new Error("Supabase manquant");
-
-        const { data, error } = await supa.auth.signInWithPassword({
-          email:em,
-          password:pw
-        });
-        if(error || !data?.user){
-          showLoginErr("Email ou mot de passe incorrect.");
-          loginBtn.disabled=false;
-          return;
-        }
-
-        localStorage.setItem('rsl_photos_ok','1');
-        localStorage.setItem('rsl_pre_email', em);
-
-        window.location.href="photos.html";
-
-      }catch(ex){
-        console.warn(ex);
-        showLoginErr("Erreur. Réessaie.");
-        loginBtn.disabled=false;
-      }
-    });
-
-    // SIGNUP
-    signupForm?.addEventListener('submit', async (ev)=>{
-      ev.preventDefault();
-      signupErr.style.display='none';
-      signupOk.style.display='none';
-
-      const em=(signupEmail.value||'').trim();
-      const p1=(signupPass1.value||'').trim();
-      const p2=(signupPass2.value||'').trim();
-
-      if(p1!==p2){
-        showSignupErr("Les mots de passe ne correspondent pas.");
-        return;
-      }
-      if(p1.length<6){
-        showSignupErr("Mot de passe trop court (min 6).");
-        return;
-      }
-      if(!okMail.checked || !okImage.checked){
-        showSignupErr("Merci d'accepter les conditions.");
-        return;
+      function getSupa(){
+        if(window.__rslSupa) return window.__rslSupa;
+        if(!window.env?.SUPABASE_URL || !window.env?.SUPABASE_ANON) return null;
+        window.__rslSupa = supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+        return window.__rslSupa;
       }
 
-      signupBtn.disabled=true;
-      try{
-        if(!supa) throw new Error("Supabase manquant");
-
-        const { error } = await supa.auth.signUp({
-          email:em,
-          password:p1,
-          options:{
-            data:{
-              contest:'msc_2025',
-              marketing_ok:true
-            }
+      async function waitForUser(maxMs=3500){
+        const start = Date.now();
+        while(Date.now()-start < maxMs){
+          const supa = getSupa();
+          if(supa){
+            try{
+              const { data } = await supa.auth.getUser();
+              if(data?.user) return true;
+            }catch(_){}
           }
+          await sleep(200);
+        }
+        return false;
+      }
+
+      function openLightbox(src, alt){
+        currentFullUrl = src;
+        lightboxImg.src = src;
+        lightboxImg.alt = alt || "RSL Photo";
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden','false');
+      }
+      function closeLightbox(){
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden','true');
+        lightboxImg.src = "";
+        currentFullUrl = "";
+      }
+
+      closeLightboxBtn?.addEventListener('click', closeLightbox);
+      lightbox?.addEventListener('click', e=>{ if(e.target === lightbox) closeLightbox(); });
+      document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeLightbox(); });
+
+      downloadLightboxBtn?.addEventListener('click', async (e)=>{
+        e.preventDefault();
+        e.stopPropagation();
+        if(currentFullUrl) await forceDownloadSmart(currentFullUrl);
+      });
+
+      async function forceDownloadSmart(url){
+        try{
+          const response = await fetch(url, { cache:"no-cache" });
+          if(!response.ok) throw new Error("fetch failed "+response.status);
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = (url.split('/').pop() || 'photo.jpg');
+          a.style.display='none';
+          document.body.appendChild(a);
+          a.click();
+
+          setTimeout(()=>{
+            URL.revokeObjectURL(blobUrl);
+            a.remove();
+          }, 250);
+          return;
+        }catch(_){}
+
+        try{
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = (url.split('/').pop() || 'photo.jpg');
+          a.target = "_self";
+          a.style.display='none';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(()=>a.remove(), 250);
+          return;
+        }catch(_){}
+
+        window.location.href = url;
+      }
+
+      async function resolveImageUrl(lower, upper){
+        try{ const r = await fetch(lower, { method:"HEAD", cache:"force-cache" }); if(r.ok) return lower; }catch(_){}
+        try{ const r2 = await fetch(upper, { method:"HEAD", cache:"force-cache" }); if(r2.ok) return upper; }catch(_){}
+        return null;
+      }
+
+      function createPhotoCard(photoId){
+        const article = document.createElement('article');
+        article.className = 'ph-card';
+
+        const media = document.createElement('div');
+        media.className = 'ph-media';
+
+        const img = document.createElement('img');
+        img.loading = "lazy";
+        img.decoding = "async";
+
+        let baseName, label;
+        if(photoId === 0){ baseName="m0"; label="Flyer m0"; }
+        else{ baseName="m"+photoId; label="Photo "+baseName; }
+
+        const lower = BASE_URL + "/" + baseName + ".jpg";
+        const upper = BASE_URL + "/" + baseName + ".JPG";
+        img.alt = "RSL " + label;
+
+        img.addEventListener('click', () => { if(img.src) openLightbox(img.src, img.alt); });
+
+        media.appendChild(img);
+        article.appendChild(media);
+
+        const info = document.createElement('div');
+        info.className = 'ph-info';
+
+        const txt = document.createElement('div');
+        txt.textContent = label;
+
+        const btn = document.createElement('button');
+        btn.className = 'dl-btn';
+        btn.type = "button";
+        btn.textContent = '⬇ Télécharger';
+        btn.addEventListener('click', async (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          if(img.src) await forceDownloadSmart(img.src);
         });
-        if(error){
-          showSignupErr("Impossible de créer le compte.");
-          signupBtn.disabled=false;
+
+        info.appendChild(txt);
+        info.appendChild(btn);
+        article.appendChild(info);
+
+        (async ()=>{
+          const url = await resolveImageUrl(lower, upper);
+          if(!url){ article.style.display = "none"; return; }
+          img.src = url;
+          const show = ()=>{ img.style.opacity="1"; };
+          img.onload = show;
+          if(img.complete) show();
+        })();
+
+        return article;
+      }
+
+      function renderBatch(batchIndex){
+        if(!grid) return;
+        grid.innerHTML = "";
+        grid.appendChild(createPhotoCard(0));
+
+        const startPhotoNumber = batchIndex * BATCH_SIZE + 1;
+        const endPhotoNumber   = startPhotoNumber + BATCH_SIZE - 1;
+
+        for(let num = startPhotoNumber; num <= endPhotoNumber && num <= MAX_PHOTO; num++){
+          grid.appendChild(createPhotoCard(num));
+        }
+      }
+
+      async function start(){
+        const envOk = await waitForEnv(5000);
+        if(!envOk){
+          if(loadingBox) loadingBox.textContent = "Erreur: env.js non chargé.";
           return;
         }
 
-        localStorage.setItem('rsl_photos_ok','1');
-        localStorage.setItem('rsl_pre_email', em);
+        const okUser = await waitForUser(3500);
+        if(!okUser){
+          window.location.replace("access_photos.html");
+          return;
+        }
 
-        showSignupOk("Compte créé ✅ Redirection...");
+        if(loadingBox) loadingBox.style.display = "none";
+        if(batchBar) batchBar.style.display = "flex";
 
-        setTimeout(()=>{ window.location.href="photos.html"; },1000);
-
-      }catch(ex){
-        console.warn(ex);
-        showSignupErr("Erreur. Réessaie.");
-        signupBtn.disabled=false;
+        renderBatch(0);
+        select?.addEventListener('change', e=>{
+          const batchIndex = parseInt(e.target.value,10);
+          renderBatch(Number.isFinite(batchIndex) ? batchIndex : 0);
+        });
       }
-    });
 
-  })();
+      window.addEventListener('load', start);
+    })();
   </script>
+
 </body>
 </html>

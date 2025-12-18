@@ -5,362 +5,449 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Panier — Romandie Scooter League</title>
 
-  <!-- Fonts + Styles globaux -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/common.css"/>
 
-  <!-- Supabase + scripts du site (toujours là si tu en as besoin ailleurs) -->
+  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="../js/env.js"></script>
   <script defer src="../js/auth.js"></script>
   <script defer src="../js/site.js"></script>
 
   <style>
-    html, body{
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.9);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+    }
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
+    html,body{
       height:100%;
       margin:0;
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:transparent !important;
-      color:#fff;
+      background:transparent!important;
       display:flex;
       flex-direction:column;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
     }
     main{ flex:1; position:relative; z-index:10; }
 
-    /* ======= NAVBAR ======= */
-    nav.nav {
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* ======= Fond vidéo ======= */
+    .site-bg-video{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+      pointer-events:none !important;
     }
-    nav.nav .container {
-      max-width:1320px;
-      margin:0 auto;
-      padding:12px 28px;
+    .site-bg-dim{
+      position:fixed; inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
+      transition:background .25s ease;
+      pointer-events:none !important;
     }
-    nav.nav .row {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:#fff;
-      text-decoration:none;
+    /* ======= NAVBAR (même style que l’accueil) ======= */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
+      position:sticky; top:0; z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
     }
-    .brand img {
-      height:48px;
-      border-radius:10px;
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
+    }
+    .brand img{
+      height:42px; border-radius:10px;
       display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
-    .brand span {
+    .brand span{
       font-weight:800;
       letter-spacing:.2px;
-      font-size:17px;
+      font-size:16px;
+      white-space:nowrap;
     }
 
-    nav.nav ul {
-      display:flex;
-      align-items:center;
-      gap:26px;
+    nav.nav ul{
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0;
+      list-style:none;
     }
-    nav.nav ul li a {
+    nav.nav ul li a{
       font-weight:600;
-      color:#e8f0ea;
-      transition:.2s ease;
-      font-size:17px;
-      letter-spacing:.2px;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
       text-decoration:none;
+      opacity:.9;
+      transition:.2s ease;
     }
-    nav.nav ul li a:hover {
-      color:#22c55e;
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
+
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
+    .nav-avatar{
+      width:34px; height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
     }
 
-    .cta {
-      display:flex;
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
       align-items:center;
-      gap:12px;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
     }
 
     #menuBtn{
       display:none;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      padding:10px 12px;
+      padding:7px 10px;
       font-size:18px;
       line-height:1;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
       cursor:pointer;
       transition:.2s ease;
     }
-    #menuBtn:hover{
-      background:rgba(34,197,94,.22);
+    #menuBtn:hover { filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
     }
 
-    @media (max-width:990px){
-      #menuBtn{ display:inline-flex; }
-      nav.nav ul{ display:none; }
-      .cta a,#btnAccount,#btnLogin,#btnLogout{ display:none!important; }
-    }
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
 
-    /* Avatar dans la navbar */
-    .nav-avatar{
-      width:32px;
-      height:32px;
-      border-radius:50%;
-      object-fit:cover;
-      border:2px solid rgba(34,197,94,.8);
-      box-shadow:0 0 0 2px rgba(0,0,0,.7);
-    }
-
-    /* ======= VIDÉO DE FOND ======= */
-    .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      z-index:-2;
-      background:#000;
-    }
-    .site-bg-dim{
-      position:fixed;
-      inset:0;
-      z-index:-1;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
-    }
-
-    /* ======= MENU MOBILE ======= */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:120;
-    }
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.5);
-    }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
     .mobile-panel{
-      position:absolute;
-      top:0;
-      right:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
-      background:#0b1220;
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
       padding:22px 18px;
       display:flex;
       flex-direction:column;
-      gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
-      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
     .mobile-panel a{
-      color:#eaf5ee;
+      color:var(--rsl-fg);
       text-decoration:none;
       font-weight:700;
-      padding:8px 0;
-    }
-
-    /* ======= FOOTER ======= */
-    .footer-mini .copy{
-      text-align:center;
-      color:#9aa5b1;
+      padding:6px 0;
       font-size:14px;
-      padding:24px 0 28px;
-      margin:0;
-      border-top:1px solid rgba(255,255,255,.1);
-      background: transparent;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(148,163,184,.4);
+      margin:10px 0;
     }
 
-    /* ======= CONTENU PANIER ======= */
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart, .btn.green{ display:none !important; }
+      #menuBtn{ display:inline-flex; }
+    }
 
-    .wrap {
-      max-width:1200px;
-      margin:0 auto;
-      padding:30px 20px 80px;
+    /* ======= CONTENU PANIER (même esprit que hero cards) ======= */
+    .wrap{
+      max-width:1120px;
+      margin:26px auto 54px;
+      padding:0 16px;
       display:grid;
-      grid-template-columns:1fr 420px;
-      gap:20px;
+      grid-template-columns:minmax(0, 1.25fr) minmax(0, 0.95fr);
+      gap:18px;
     }
-    @media(max-width:990px){ .wrap{grid-template-columns:1fr;} }
+    @media(max-width:990px){ .wrap{ grid-template-columns:1fr; } }
 
-    h1 {
-      font-size:32px;
+    .card{
+      background:var(--rsl-card);
+      border-radius:22px;
+      border:1px solid var(--rsl-border);
+      box-shadow:0 30px 80px rgba(15,23,42,.9);
+      position:relative;
+      overflow:hidden;
+    }
+    body.theme-light .card{ box-shadow:0 24px 60px rgba(15,23,42,.16); }
+
+    .card:before{
+      content:"";
+      position:absolute; inset:-40% -30%;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(34,197,94,.12), transparent 60%),
+        radial-gradient(circle at 60% 90%, rgba(99,102,241,.10), transparent 62%);
+      pointer-events:none;
+      z-index:0;
+    }
+    .card-inner{ position:relative; z-index:1; padding:18px 18px 16px; }
+
+    h1{
+      margin:0 0 6px;
+      font-size:clamp(22px,3.2vw,28px);
       font-weight:800;
-      margin:0 0 8px;
+      letter-spacing:.02em;
     }
-    p.sub { color:#9ca3af; margin:0 0 24px; }
+    p.sub{ margin:0 0 14px; color:var(--rsl-muted); font-size:14px; }
 
-    .chosen-list {
-      background:rgba(0,0,0,.4);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      box-shadow:0 20px 40px rgba(0,0,0,.6);
-      padding:20px;
-    }
-    .chosen-header {
+    .chosen-header{
       display:flex;
       justify-content:space-between;
-      align-items:center;
+      align-items:flex-end;
+      gap:8px;
       flex-wrap:wrap;
+      margin:0 0 8px;
     }
-    .chosen-header h2 {
-      font-size:18px;
-      font-weight:700;
-      margin:0;
+    .chosen-header h2{ margin:0; font-size:16px; font-weight:800; }
+    .chosen-header small{ color:var(--rsl-muted); font-size:13px; font-weight:600; }
+
+    details{
+      margin-top:8px;
+      border-radius:14px;
+      background:var(--rsl-card-soft);
+      border:1px solid var(--rsl-border);
+      padding:8px 10px 10px;
     }
-    .chosen-header small {
-      color:#9ca3af;
-      font-size:13px;
-      font-weight:500;
-    }
-    details summary {
+    details summary{
       cursor:pointer;
-      padding:10px 0;
-      font-weight:700;
-      color:#22c55e;
+      padding:6px 0;
+      font-weight:800;
+      color:var(--rsl-accent);
+      font-size:13px;
+      list-style:none;
+    }
+    details summary::marker,
+    details summary::-webkit-details-marker{ display:none; }
+
+    /* ✅ MODE PC: plusieurs sessions sur la même ligne */
+    @media (min-width: 990px){
+      #chosenSessions{
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+        gap:10px;
+        margin-top:10px;
+      }
+      .session-card{ margin:0 !important; height:100%; }
     }
 
-    .session-card {
-      background:rgba(9,13,23,.78);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:14px;
-      color:#e7f2eb;
-      box-shadow:0 8px 24px rgba(0,0,0,.5);
-      padding:14px;
-      margin-bottom:12px;
-      font-size:14px;
+    .session-card{
+      background:rgba(15,23,42,1);
+      border:1px solid var(--rsl-border);
+      border-radius:16px;
+      box-shadow:0 12px 34px rgba(0,0,0,.7);
+      padding:12px 12px;
+      font-size:13px;
       display:flex;
       justify-content:space-between;
       gap:10px;
+      color:var(--rsl-fg);
     }
-    .session-meta div{
-      margin-bottom:2px;
-    }
-    .session-card button{
-      border-radius:8px;
-      border:1px solid rgba(248,113,113,.7);
-      background:rgba(127,29,29,.9);
+    body.theme-light .session-card{ background:#ffffff; box-shadow:0 18px 44px rgba(15,23,42,.12); }
+
+    .session-meta div{ margin-bottom:2px; }
+    .session-meta b{ font-size:14px; }
+    .session-price{ font-size:12px; color:var(--rsl-muted); }
+
+    .remove-btn{
+      border-radius:999px;
+      border:1px solid rgba(248,113,113,.75);
+      background:rgba(127,29,29,1);
       color:#fecaca;
-      padding:6px 10px;
+      padding:7px 10px;
       cursor:pointer;
-      font-size:13px;
-      font-weight:600;
+      font-size:12px;
+      font-weight:800;
       height:fit-content;
       white-space:nowrap;
+      align-self:center;
+      box-shadow:0 10px 22px rgba(0,0,0,.65);
     }
-    .session-card button:hover{
-      filter:brightness(1.05);
-    }
+    .remove-btn:hover{ filter:brightness(1.1); }
 
-    /* ===== FORMULAIRE À DROITE ===== */
-
-    aside.side-box{
-      background:rgba(0,0,0,.65);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      box-shadow:0 20px 40px rgba(0,0,0,.6),0 0 40px rgba(34,197,94,.08);
-      padding:22px;
+    .price-line{
       display:flex;
-      flex-direction:column;
-      gap:22px;
+      justify-content:space-between;
+      align-items:center;
+      border-top:1px solid var(--rsl-border);
+      padding-top:12px;
+      margin-top:12px;
+      font-weight:800;
+      font-size:14px;
     }
-    .side-box h2 {
+    .price-big{
+      color:var(--rsl-accent);
+      font-weight:900;
       font-size:20px;
-      font-weight:700;
-      margin:0;
+      text-shadow:0 0 8px rgba(34,197,94,.25);
     }
-    .side-box p.small { color:#9ca3af; font-size:14px; margin:0; }
+
+    /* ===== Form à droite ===== */
+    .side h2{ margin:0; font-size:17px; font-weight:900; }
+    .side p.small{ margin:2px 0 0; color:var(--rsl-muted); font-size:13px; line-height:1.5; }
 
     .section-header-row{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:8px;
+      gap:10px;
+      margin-top:6px;
     }
 
-    .form-grid{
-      display:flex;
-      gap:14px;
-      flex-wrap:wrap;
-    }
+    .form-grid{ display:flex; gap:12px; flex-wrap:wrap; }
     .form-grid > div{ flex:1; }
-
-    @media(max-width:900px){
-      .form-grid{ flex-direction:column; }
-    }
+    @media(max-width:900px){ .form-grid{ flex-direction:column; } }
 
     label{
-      font-size:14px;
-      font-weight:600;
-      color:#fff;
+      font-size:13px;
+      font-weight:800;
+      color:var(--rsl-fg);
       display:block;
-      margin-bottom:5px;
+      margin-bottom:6px;
     }
     input{
       width:100%;
-      background-color:rgba(0,0,0,0.6);
-      border:1px solid rgba(255,255,255,0.25);
-      border-radius:10px;
-      padding:11px 12px;
-      color:#fff;
-      font-size:15px;
+      background:rgba(15,23,42,.9);
+      border:1px solid var(--rsl-border);
+      border-radius:12px;
+      padding:10px 12px;
+      color:var(--rsl-fg);
+      font-size:14px;
       font-weight:600;
       outline:none;
       box-sizing:border-box;
     }
+    body.theme-light input{
+      background:#ffffff;
+      color:#0f172a;
+    }
+    input::placeholder{ color:rgba(148,163,184,.9); }
     input:focus{
-      border-color:#22c55e;
-      box-shadow:0 0 0 3px rgba(34,197,94,0.25);
+      border-color:var(--rsl-accent);
+      box-shadow:0 0 0 2px rgba(34,197,94,.35);
     }
 
-    .auth-status {
-      font-size:12px;
-      color:#9ca3af;
+    .auth-status{
+      font-size:11px;
+      color:var(--rsl-muted);
       margin-top:4px;
     }
-    .auth-status b{
-      color:#e5e7eb;
-    }
-    .auth-status a{
-      color:#22c55e;
-      text-decoration:underline;
-      font-weight:600;
-    }
+    .auth-status b{ color:var(--rsl-fg); }
 
     .same-btn{
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.25);
+      border:1px solid var(--rsl-border);
       background:rgba(15,23,42,.9);
-      color:#e5e7eb;
-      font-size:12px;
+      color:var(--rsl-fg);
+      font-size:11px;
       padding:6px 10px;
       cursor:pointer;
+      font-weight:900;
       white-space:nowrap;
     }
+    body.theme-light .same-btn{ background:#ffffff; color:#0f172a; }
 
     .legal{
       margin-top:4px;
-      display:block;
       width:100%;
-      font-size:14px;
+      font-size:13px;
       line-height:1.45;
     }
     .legal-row{
@@ -375,56 +462,51 @@
       width:18px;
       height:18px;
       margin-top:2px;
-      accent-color:#22c55e;
+      accent-color:var(--rsl-accent);
     }
-    .legal-row span{
-      flex:1;
-      white-space:normal;
-    }
+    .legal-row span{ flex:1; white-space:normal; }
+    .legal p{ margin:8px 0 0; font-size:12px; color:var(--rsl-muted); }
+    .legal a{ color:#a5b4fc; text-decoration:underline; }
 
-    .price-line {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-top:1px solid rgba(255,255,255,.15);
-      padding-top:14px;
-      margin-top:8px;
-      font-weight:600;
-    }
-    .price-big {
-      color:#22c55e;
-      font-weight:800;
-      font-size:20px;
-      text-shadow:0 0 8px rgba(34,197,94,.3);
-    }
-
-    .confirm-btn {
+    .confirm-btn{
       width:100%;
       margin-top:10px;
-      background:#22c55e;
-      color:#062312;
-      font-weight:800;
-      font-size:16px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:900;
+      font-size:15px;
       border:0;
-      border-radius:12px;
-      padding:12px 16px;
+      border-radius:14px;
+      padding:12px 14px;
       cursor:pointer;
-      box-shadow:0 12px 28px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2);
+      box-shadow:0 14px 30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.25);
     }
-    .confirm-btn[disabled] {
-      opacity:.4;
-      cursor:not-allowed;
+    .confirm-btn[disabled]{ opacity:.4; cursor:not-allowed; box-shadow:none; }
+
+    /* Footer (même style) */
+    .footer-mini .copy{
+      text-align:center;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
+      margin:0;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
   </style>
 </head>
 
 <body>
 
-  <!-- VIDÉO DE FOND -->
+  <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="../images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-   <!-- NAV -->
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
@@ -445,31 +527,31 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="../compte.html" style="display:none">Mon compte</a>
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <button class="btn dark" id="btnLogout" style="display:none;">Déconnexion</button>
+          <button class="btn" id="btnLogin">Login</button>
+          <a class="btn" id="btnAccount" href="../compte.html" style="display:none">Mon compte</a>
+          <button class="btn" id="btnLogout" style="display:none;">Déconnexion</button>
 
-          <!-- AVATAR -->
-          <a href="../compte.html">
-            <img id="navAvatar" class="nav-avatar" src="../images/default-avatar.png"
-                 alt="Avatar" style="display:none;">
+          <a href="../compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="../images/default-avatar.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn dark" id="btnCart" href="../panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="../panier/panier.html">Panier</a>
           <a class="btn green" href="../membres.html">Devenir membre</a>
-          <button id="menuBtn">☰</button>
+          <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-   <!-- MENU MOBILE -->
-  <div class="mobile-sheet" id="mobileMenu">
+  <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="../index.html" aria-current="page">Accueil</a>
+      <a href="../index.html">Accueil</a>
       <a href="../cours.html">Cours</a>
+      <a href="../panier/panier.html">Panier</a>
       <a href="../membres.html">Devenir membre</a>
       <a href="../formation.html">Formation RSL</a>
       <a href="../disciplines.html">Disciplines</a>
@@ -481,22 +563,22 @@
       <a href="../contact.html">Contact</a>
       <a href="../conditions.html">Conditions générales</a>
       <a href="../compte.html">Mon compte</a>
+      <hr>
       <a href="../coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
-      <a id="mobileLogout" style="display:none; color:#f87171; font-weight:700; cursor:pointer;">
-        Déconnexion
-      </a>
+      <a id="mobileLogout" style="display:none; color:#f87171; font-weight:800; cursor:pointer;">Déconnexion</a>
     </nav>
   </div>
 
-  <!-- CONTENU PANIER -->
+  <!-- CONTENU -->
   <main>
     <div class="wrap">
-      <!-- Colonne gauche -->
-      <section>
-        <h1>Récapitulatif de tes cours</h1>
-        <p class="sub">Vérifie les dates et lieux. Tu peux retirer un cours avant la validation.</p>
 
-        <div class="chosen-list">
+      <!-- GAUCHE -->
+      <section class="card">
+        <div class="card-inner">
+          <h1>Récapitulatif de tes cours</h1>
+          <p class="sub">Vérifie les dates et lieux. Tu peux retirer un cours avant la validation.</p>
+
           <div class="chosen-header">
             <h2>Mes cours sélectionnés</h2>
             <small id="chosenCount">0 cours sélectionné(s)</small>
@@ -514,91 +596,92 @@
         </div>
       </section>
 
-      <!-- Colonne droite -->
-      <aside class="side-box">
-        <!-- PAYEUR -->
-        <div>
-          <h2>Infos du payeur</h2>
-          <p class="small">Personne qui reçoit la facture / confirmation.</p>
-        </div>
+      <!-- DROITE -->
+      <aside class="card side">
+        <div class="card-inner">
+          <div>
+            <h2>Infos du payeur</h2>
+            <p class="small">Personne qui reçoit la facture / confirmation.</p>
+          </div>
 
-        <div class="form-grid">
-          <div>
-            <label>Prénom</label>
-            <input id="payFirst">
+          <div class="form-grid">
+            <div>
+              <label>Prénom</label>
+              <input id="payFirst">
+            </div>
+            <div>
+              <label>Nom</label>
+              <input id="payLast">
+            </div>
           </div>
-          <div>
-            <label>Nom</label>
-            <input id="payLast">
-          </div>
-        </div>
 
-        <div class="form-grid">
-          <div>
-            <label>Téléphone</label>
-            <input id="payPhone" placeholder="+41 ...">
+          <div class="form-grid">
+            <div>
+              <label>Téléphone</label>
+              <input id="payPhone" placeholder="+41 ...">
+            </div>
+            <div>
+              <label>Email</label>
+              <input id="payEmail" placeholder="mail@example.ch">
+              <div id="authStatus" class="auth-status"></div>
+            </div>
           </div>
-          <div>
-            <label>Email</label>
-            <input id="payEmail" placeholder="mail@example.ch">
-            <div id="authStatus" class="auth-status"></div>
-          </div>
-        </div>
 
-        <!-- RIDER -->
-        <div class="section-header-row">
-          <div>
-            <h2>Rider</h2>
-            <p class="small">Rider inscrit aux cours.</p>
+          <div class="section-header-row">
+            <div>
+              <h2>Rider</h2>
+              <p class="small">Rider inscrit aux cours.</p>
+            </div>
+            <button type="button" id="sameAsPayerBtn" class="same-btn">C’est la même personne</button>
           </div>
-          <button type="button" id="sameAsPayerBtn" class="same-btn">C’est la même personne</button>
-        </div>
 
-        <div class="form-grid">
-          <div>
-            <label>Prénom du rider</label>
-            <input id="riderFirst">
+          <div class="form-grid">
+            <div>
+              <label>Prénom du rider</label>
+              <input id="riderFirst">
+            </div>
+            <div>
+              <label>Nom du rider</label>
+              <input id="riderLast">
+            </div>
           </div>
-          <div>
-            <label>Nom du rider</label>
-            <input id="riderLast">
+
+          <div class="form-grid">
+            <div>
+              <label>Âge du rider</label>
+              <input id="riderAge" type="number" min="3" max="99" placeholder="8">
+            </div>
+            <div>
+              <label>Remarque médicale / allergie (optionnel)</label>
+              <input id="noteMed" placeholder="Rien de spécial">
+            </div>
           </div>
-        </div>
 
-        <div class="form-grid">
-          <div>
-            <label>Âge du rider</label>
-            <input id="riderAge" type="number" min="3" max="99" placeholder="8">
+          <div class="legal">
+            <label class="legal-row">
+              <input type="checkbox" id="repLegal">
+              <span>J’atteste être le représentant légal et j’autorise la participation.</span>
+            </label>
+            <label class="legal-row">
+              <input type="checkbox" id="discharge">
+              <span>J’accepte la décharge RSL (hors faute grave) et l’intervention en cas d’urgence médicale.</span>
+            </label>
+            <label class="legal-row">
+              <input type="checkbox" id="photoOk">
+              <span>J’autorise l’utilisation de photos / vidéos (optionnel).</span>
+            </label>
+            <p>En validant, j’accepte le <a href="../reglement.html" target="_blank">règlement / conditions de participation</a>.</p>
           </div>
-          <div>
-            <label>Remarque médicale / allergie (optionnel)</label>
-            <input id="noteMed" placeholder="Rien de spécial">
+
+          <div class="price-line">
+            <span>Total</span>
+            <span class="price-big" id="totalRight">CHF 0.–</span>
           </div>
-        </div>
 
-        <div class="legal">
-          <label class="legal-row">
-            <input type="checkbox" id="repLegal">
-            <span>J’atteste être le représentant légal et j’autorise la participation.</span>
-          </label>
-          <label class="legal-row">
-            <input type="checkbox" id="discharge">
-            <span>J’accepte la décharge RSL (hors faute grave) et l’intervention en cas d’urgence médicale.</span>
-          </label>
-          <label class="legal-row">
-            <input type="checkbox" id="photoOk">
-            <span>J’autorise l’utilisation de photos / vidéos (optionnel).</span>
-          </label>
-          <p>En validant, j’accepte le <a href="../reglement.html" target="_blank">règlement / conditions de participation</a>.</p>
+          <button class="confirm-btn" id="confirmBtn" onclick="handleConfirm()" disabled>
+            Valider et payer
+          </button>
         </div>
-
-        <div class="price-line">
-          <span>Total</span>
-          <span class="price-big" id="totalRight">CHF 0.–</span>
-        </div>
-
-        <!-- Bouton : onClick direct -->
-        <button class="confirm-btn" id="confirmBtn" onclick="handleConfirm()" disabled>Valider et payer</button>
       </aside>
     </div>
   </main>
@@ -608,16 +691,49 @@
   </footer>
 
   <script>
-    // ==== Constantes Supabase ====
+    // === Thème (identique à l'accueil) ===
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
+    // ==== Supabase client (comme ton panier actuel) ====
     const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
-
     let sb = null;
     if (window.supabase && window.supabase.createClient) {
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    // ==== Vidéo de fond ====
+    // ==== Vidéo de fond (identique) ====
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -643,7 +759,7 @@
       });
     })();
 
-    // ==== Menu mobile ====
+    // ==== Menu mobile (identique) ====
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -651,12 +767,17 @@
       menuBtn.addEventListener('click',e=>{
         e.stopPropagation();
         mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
       });
       mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
         mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
       });
       document.addEventListener('keydown',e=>{
-        if(e.key==='Escape') mobile.classList.remove('open');
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
       });
     })();
 
@@ -668,27 +789,19 @@
     // ==== Avatar nav (depuis localStorage) ====
     const navAvatar = document.getElementById('navAvatar');
     function getAvatarLS(){
-      try{
-        return localStorage.getItem('rsl_avatar') || null;
-      }catch(e){
-        return null;
-      }
+      try{ return localStorage.getItem('rsl_avatar') || null; }catch(e){ return null; }
     }
     function applyAvatarToUI(){
       const stored = getAvatarLS();
       if(navAvatar){
         navAvatar.src = stored || "../images/default-avatar.png";
-        if(stored){
-          navAvatar.style.display = "inline-block";
-        }
+        if(stored) navAvatar.style.display = "inline-block";
       }
     }
 
     // ==== Helpers profil LS ====
     function getProfileLS(){
-      try{
-        return JSON.parse(localStorage.getItem('rsl_profile')||'{}');
-      }catch(e){ return {}; }
+      try{ return JSON.parse(localStorage.getItem('rsl_profile')||'{}'); }catch(e){ return {}; }
     }
     function saveProfileLS(obj){
       localStorage.setItem('rsl_profile', JSON.stringify(obj));
@@ -722,7 +835,7 @@
     const mobileLogout = document.getElementById("mobileLogout");
     const btnLoginEl = document.getElementById("btnLogin");
 
-    // ==== Panier localStorage ====
+    // ==== Panier localStorage (compatible cours.html) ====
     function getPanier(){
       try{
         const rawNew = localStorage.getItem("rsl_panier_courses");
@@ -744,7 +857,7 @@
       let count30 = 0;
       data.forEach(c=>{
         let p = Number(c.price);
-        if(!Number.isFinite(p) || p <= 0) p = 30; // fallback public
+        if(!Number.isFinite(p) || p <= 0) p = 30;
         total += p;
         if(p === 20) count20++;
         else if(p === 30) count30++;
@@ -757,7 +870,7 @@
       chosenCount.textContent = data.length+" cours sélectionné(s)";
 
       if(!data.length){
-        chosenSessions.innerHTML="<p>Aucun cours sélectionné.</p>";
+        chosenSessions.innerHTML="<p style='color:var(--rsl-muted);margin:6px 0 0;'>Aucun cours sélectionné.</p>";
         totalEst.textContent = "CHF 0.–";
         totalRight.textContent = "CHF 0.–";
         confirmBtn.disabled = true;
@@ -767,7 +880,6 @@
       const { total } = computeTotals(data);
       totalEst.textContent = "CHF "+total+".–";
       totalRight.textContent = "CHF "+total+".–";
-      confirmBtn.disabled = false;
 
       chosenSessions.innerHTML = data.map((c, idx)=>{
         const dateTxt = c.dateLabel || c.date || "";
@@ -776,18 +888,19 @@
         const title = c.title || "";
         let p = Number(c.price);
         if(!Number.isFinite(p) || p <= 0) p = 30;
-        const priceLabel = "CHF "+p+".–";
 
         return `<div class="session-card">
           <div class="session-meta">
             <div><b>${place}</b></div>
             <div>${dateTxt} ${time}</div>
             ${title ? `<div>${title}</div>` : ""}
-            <div style="font-size:12px;color:#9ca3af;">${priceLabel}</div>
+            <div class="session-price">CHF ${p}.–</div>
           </div>
-          <button type="button" onclick="removeSession(${idx})">Retirer</button>
+          <button class="remove-btn" type="button" onclick="removeSession(${idx})">Retirer</button>
         </div>`;
       }).join("");
+
+      checkValid();
     }
 
     function removeSession(index){
@@ -798,13 +911,12 @@
     }
     window.removeSession = removeSession;
 
-    // Bouton "C’est la même personne"
     sameAsPayerBtn?.addEventListener("click", ()=>{
       riderFirst.value = payFirst.value;
       riderLast.value  = payLast.value;
+      checkValid();
     });
 
-    // Champs obligatoires -> (dés)activation bouton
     function checkValid(){
       const data = getPanier();
       if(!data.length){ confirmBtn.disabled = true; return; }
@@ -820,20 +932,16 @@
       el.addEventListener("change",checkValid);
     });
 
-    // Pré-remplir email si user Supabase + gérer nav (login / compte / avatar / déconnexion)
+    // Pré-remplir email si user Supabase + gérer nav
     (async ()=>{
       try{
         if(!sb || !sb.auth) return;
-        const { data:{ user } } = await sb.auth.getUser();
+        const { data:{ user } = {} } = await sb.auth.getUser();
 
         if(user){
-          // préremplir email
-          if(user.email && !payEmail.value){
-            payEmail.value = user.email;
-          }
+          if(user.email && !payEmail.value) payEmail.value = user.email;
           if(authStatus) authStatus.innerHTML = `Connecté avec <b>${user.email}</b>.`;
 
-          // nav : connecté
           if(btnLoginEl) btnLoginEl.style.display = "none";
           if(btnAccount) btnAccount.style.display = "inline-flex";
           if(btnLogout) btnLogout.style.display = "inline-flex";
@@ -841,7 +949,6 @@
 
           applyAvatarToUI();
         }else{
-          // nav : non connecté
           if(btnLoginEl) btnLoginEl.style.display = "inline-flex";
           if(btnAccount) btnAccount.style.display = "none";
           if(btnLogout) btnLogout.style.display = "none";
@@ -853,61 +960,23 @@
       }
     })();
 
-    // Logout
     async function logout(){
-      try{
-        if(sb && sb.auth){
-          await sb.auth.signOut();
-        }
-      }catch(e){
-        console.warn("Erreur logout:", e);
-      }
-      // nettoyage local
+      try{ if(sb && sb.auth) await sb.auth.signOut(); }catch(e){ console.warn("Erreur logout:", e); }
       localStorage.removeItem("rsl_profile");
       localStorage.removeItem("rsl_avatar");
-      // tu peux garder le panier si tu veux, ici je le laisse
       window.location.href = "../index.html";
     }
-
     btnLogout?.addEventListener("click", logout);
     mobileLogout?.addEventListener("click", logout);
 
-    // Stripe mappings
-    const stripe30 = {
-      1: "https://buy.stripe.com/6oU14g6Wte78gfc1xmeUU0a",
-      2: "https://buy.stripe.com/4gMeV6fsZ3sud302BqeUU0b",
-      3: "https://buy.stripe.com/aFa4gs1C90gi2om8ZOeUU0c",
-      4: "https://buy.stripe.com/4gM14gfsZ9QSd308ZOeUU0d",
-      5: "https://buy.stripe.com/7sYbIU1C90gie74foceUU0e",
-      6: "https://buy.stripe.com/9B6cMY94BbZ0aUSb7WeUU0f",
-      7: "https://buy.stripe.com/9B63coeoV8MOfb8ek8eUU0g",
-      8: "https://buy.stripe.com/fZucMYeoVe78bYW0tieUU0h",
-      9: "https://buy.stripe.com/3cIeV6eoVaUW9QO2BqeUU0i",
-      10:"https://buy.stripe.com/14AdR294B3sugfcgsgeUU0j"
-    };
+    // Stripe mappings (inchangé)
+    const stripe30 = {1:"https://buy.stripe.com/6oU14g6Wte78gfc1xmeUU0a",2:"https://buy.stripe.com/4gMeV6fsZ3sud302BqeUU0b",3:"https://buy.stripe.com/aFa4gs1C90gi2om8ZOeUU0c",4:"https://buy.stripe.com/4gM14gfsZ9QSd308ZOeUU0d",5:"https://buy.stripe.com/7sYbIU1C90gie74foceUU0e",6:"https://buy.stripe.com/9B6cMY94BbZ0aUSb7WeUU0f",7:"https://buy.stripe.com/9B63coeoV8MOfb8ek8eUU0g",8:"https://buy.stripe.com/fZucMYeoVe78bYW0tieUU0h",9:"https://buy.stripe.com/3cIeV6eoVaUW9QO2BqeUU0i",10:"https://buy.stripe.com/14AdR294B3sugfcgsgeUU0j"};
+    const stripe20 = {1:"https://buy.stripe.com/bJeaEQ1C97IK9QOek8eUU09",2:"https://buy.stripe.com/aFa14g4Ol7IKe741xmeUU0k",3:"https://buy.stripe.com/5kQ6oA2Gd1km0ge4JyeUU0l",4:"https://buy.stripe.com/4gM00ca8FaUWbYW3FueUU0m",5:"https://buy.stripe.com/eVq28k0y52oqbYWek8eUU0n",6:"https://buy.stripe.com/7sY28kfsZ7IK3sqgsgeUU0o",7:"https://buy.stripe.com/dRm8wI6Wt6EGe74b7WeUU0p",8:"https://buy.stripe.com/4gMaEQ5Spe78aUSek8eUU0q",9:"https://buy.stripe.com/3cIeV65Sp0gid303FueUU0r",10:"https://buy.stripe.com/6oUaEQ4OlbZ01kigsgeUU0s"};
 
-    const stripe20 = {
-      1: "https://buy.stripe.com/bJeaEQ1C97IK9QOek8eUU09",
-      2: "https://buy.stripe.com/aFa14g4Ol7IKe741xmeUU0k",
-      3: "https://buy.stripe.com/5kQ6oA2Gd1km0ge4JyeUU0l",
-      4: "https://buy.stripe.com/4gM00ca8FaUWbYW3FueUU0m",
-      5: "https://buy.stripe.com/eVq28k0y52oqbYWek8eUU0n",
-      6: "https://buy.stripe.com/7sY28kfsZ7IK3sqgsgeUU0o",
-      7: "https://buy.stripe.com/dRm8wI6Wt6EGe74b7WeUU0p",
-      8: "https://buy.stripe.com/4gMaEQ5Spe78aUSek8eUU0q",
-      9: "https://buy.stripe.com/3cIeV65Sp0gid303FueUU0r",
-      10:"https://buy.stripe.com/6oUaEQ4OlbZ01kigsgeUU0s"
-    };
-
-    // ==== Validation + redirection Stripe ====
     function handleConfirm(){
       const data = getPanier();
-      if(!data.length){
-        alert("Ton panier est vide.");
-        return;
-      }
+      if(!data.length){ alert("Ton panier est vide."); return; }
 
-      // Vérif champs
       const missing = [];
       if(!payFirst.value.trim()) missing.push("Prénom du payeur");
       if(!payLast.value.trim())  missing.push("Nom du payeur");
@@ -923,7 +992,6 @@
         return;
       }
 
-      // Sauvegarde profil minimal
       saveProfileLS({
         riderFirst : riderFirst.value.trim(),
         riderLast  : riderLast.value.trim(),

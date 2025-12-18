@@ -11,19 +11,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase -->
+  <!-- Supabase + scripts site -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body { height:100%; margin:0; }
+    :root{
+      --rsl-bg: #020617;
+      --rsl-fg: #e5e7eb;
+      --rsl-muted: #9ca3af;
+      --rsl-card: rgba(15,23,42,.96);
+      --rsl-card-soft: rgba(15,23,42,.9);
+      --rsl-border: rgba(148,163,184,.45);
+      --rsl-accent: #22c55e;
+      --rsl-accent-soft: rgba(34,197,94,.14);
+    }
+
+    body.theme-light{
+      --rsl-bg: #f3f4f6;
+      --rsl-fg: #0f172a;
+      --rsl-muted: #6b7280;
+      --rsl-card: #ffffff;
+      --rsl-card-soft: #f9fafb;
+      --rsl-border: rgba(148,163,184,.35);
+      --rsl-accent: #16a34a;
+      --rsl-accent-soft: rgba(22,163,74,.12);
+    }
+
+    html, body {
+      height:100%;
+      margin:0;
+    }
     body{
       background: transparent !important;
-      color:#fff;
+      color:var(--rsl-fg);
       font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       display:flex;
       flex-direction:column;
+      overflow-x:hidden;
     }
     main{flex:1;position:relative;z-index:10;}
 
@@ -41,94 +68,120 @@
       position:fixed;
       inset:0;
       z-index:-1;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.9));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ===== NAVBAR ===== */
+    /* ===== NAVBAR (alignée sur index) ===== */
     nav.nav {
       background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom:1px solid rgba(15,23,42,.8);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+    }
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
     nav.nav .container {
       max-width:1320px;
       margin:0 auto;
-      padding:12px 28px;
+      padding:10px 18px;
     }
     nav.nav .row {
       display:flex;
       align-items:center;
       justify-content:space-between;
       flex-wrap:wrap;
+      gap:12px;
     }
 
     .brand {
       display:flex;
       align-items:center;
       gap:10px;
-      color:#fff;
+      color:inherit;
       text-decoration:none;
     }
     .brand img {
-      height:48px;
+      height:42px;
       border-radius:10px;
       display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
     .brand span {
       font-weight:800;
       letter-spacing:.2px;
-      font-size:17px;
+      font-size:16px;
+      white-space:nowrap;
     }
 
     nav.nav ul {
       display:flex;
       align-items:center;
-      gap:26px;
+      gap:20px;
     }
     nav.nav ul li { list-style:none; }
     nav.nav ul li a {
       font-weight:600;
-      color:#e8f0ea;
+      color:var(--rsl-fg);
       transition:.2s ease;
-      font-size:17px;
-      letter-spacing:.2px;
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
       text-decoration:none;
+      opacity:.9;
     }
     nav.nav ul li a:hover {
-      color:#22c55e;
+      color:var(--rsl-accent);
+      opacity:1;
     }
 
     .cta {
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
     }
 
-    #menuBtn{
-      display:none;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:10px 12px;
-      font-size:18px;
-      line-height:1;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
+    /* Boutons globaux (comme index) */
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
       cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
       transition:.2s ease;
     }
-    #menuBtn:hover{
-      background:rgba(34,197,94,.22);
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
     }
-    @media (max-width:990px){
-      #menuBtn{ display:inline-flex; }
-      nav.nav ul{ display:none; }
-      .cta a,#btnLogin,#btnAccount{display:none!important;}
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
     }
 
     .nav-avatar{
@@ -136,7 +189,69 @@
       height:34px;
       border-radius:999px;
       object-fit:cover;
-      border:2px solid rgba(255,255,255,.7);
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+    }
+
+    /* Toggle thème */
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px;
+      height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+    }
+    .theme-toggle:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.08);
+    }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:7px 10px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover{
+      filter:brightness(1.1);
+    }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
+
+    @media (max-width:990px){
+      #menuBtn{ display:inline-flex; }
+      nav.nav ul{ display:none !important; }
+      #btnCart,
+      .btn.green{
+        display:none !important;
+      }
     }
 
     /* ===== MENU MOBILE SLIDE ===== */
@@ -159,7 +274,7 @@
       height:100%;
       width:82vw;
       max-width:360px;
-      background:#0b1220;
+      background:var(--rsl-card);
       padding:22px 18px;
       display:flex;
       flex-direction:column;
@@ -168,11 +283,12 @@
       box-shadow:-12px 0 30px rgba(0,0,0,.35);
     }
     .mobile-panel a{
-      color:#eaf5ee;
+      color:var(--rsl-fg);
       text-decoration:none;
       font-weight:700;
       padding:8px 0;
       border-bottom:1px solid rgba(255,255,255,.1);
+      font-size:14px;
     }
     .mobile-panel a:last-child{border-bottom:0;}
     .mobile-panel .coach-link{
@@ -187,10 +303,11 @@
       max-width:1200px;
       margin:0 auto;
       padding:0 24px 40px;
+      box-sizing:border-box;
     }
 
     .page-intro{
-      color:#fff;
+      color:var(--rsl-fg);
       text-align:left;
       padding:28px 0 8px;
     }
@@ -207,13 +324,13 @@
     .coach-welcome{
       margin-top:6px;
       font-size:14px;
-      color:#cbd5e1;
+      color:var(--rsl-muted);
     }
 
     .coach-info{
       margin-top:10px;
       font-size:14px;
-      color:#cbd5e1;
+      color:var(--rsl-muted);
     }
 
     .coach-status{
@@ -221,9 +338,9 @@
       padding:8px 10px;
       border-radius:10px;
       font-size:14px;
-      background:rgba(15,23,42,.9);
-      border:1px solid rgba(148,163,184,.5);
-      color:#e5e7eb;
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      color:var(--rsl-fg);
     }
     .coach-status.error{
       border-color:rgba(248,113,113,.8);
@@ -244,8 +361,8 @@
     }
 
     .coach-card{
-      background:linear-gradient(180deg,rgba(9,13,23,.78),rgba(7,10,18,.78));
-      border:1px solid rgba(255,255,255,.08);
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
       border-radius:16px;
       padding:18px 16px;
       box-shadow:0 10px 26px rgba(0,0,0,.45);
@@ -253,12 +370,12 @@
     .coach-card h2{
       margin:0 0 6px;
       font-size:20px;
-      color:#22c55e;
+      color:var(--rsl-accent);
     }
     .coach-card p{
       margin:4px 0;
       font-size:14px;
-      color:#e5e7eb;
+      color:var(--rsl-fg);
     }
     .coach-card ul{
       margin:6px 0 0;
@@ -280,6 +397,10 @@
       font-size:14px;
       color:#e5e7eb;
     }
+    body.theme-light .course-item{
+      background:#ffffff;
+      color:#0f172a;
+    }
     .course-header{
       display:flex;
       justify-content:space-between;
@@ -294,6 +415,9 @@
     .course-meta{
       font-size:13px;
       color:#cbd5e1;
+    }
+    body.theme-light .course-meta{
+      color:#6b7280;
     }
     .course-badge{
       display:inline-block;
@@ -357,15 +481,31 @@
       color:#94a3b8;
     }
 
+    .course-enrollments{
+      margin-top:10px;
+      font-size:13px;
+      color:#cbd5e1;
+      border-top:1px dashed rgba(148,163,184,.5);
+      padding-top:6px;
+    }
+    .course-enrollments ul{
+      margin:4px 0 0;
+      padding-left:18px;
+    }
+
     /* FOOTER */
     .footer-mini .copy{
       text-align:center;
-      color:#9aa5b1;
+      color:var(--rsl-muted);
       font-size:14px;
       padding:24px 0 28px;
       margin:0;
-      border-top:1px solid rgba(255,255,255,.1);
+      border-top:1px solid rgba(15,23,42,.7);
       background: transparent;
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
 
     /* ===== MODAL RESTRICTION COACH ===== */
@@ -433,11 +573,11 @@
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV -->
+  <!-- NAV (comme index) -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html" aria-current="page">
+        <a class="brand" href="index.html">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
@@ -454,16 +594,20 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <!-- Toggle thème -->
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <!-- Login / compte -->
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
 
           <!-- AVATAR NAV -->
           <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png"
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png"
                  alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
@@ -497,7 +641,7 @@
     <div class="container-main">
       <section class="page-intro">
         <h1>Disponibilités coach</h1>
-        <p>Choisis les cours sur lesquels tu es disponible pour coacher. Les infos remontent ensuite dans la partie admin.</p>
+        <p>Choisis les cours sur lesquels tu es disponible pour coacher. Tu vois les dates, heures, lieux et les inscriptions, mais tu ne modifies rien ici.</p>
         <p id="coachWelcome" class="coach-welcome"></p>
         <div id="coachStatus" class="coach-status" style="display:none;"></div>
       </section>
@@ -530,7 +674,7 @@
       <section class="coach-card" style="margin-top:24px;">
         <h2>Liste des cours</h2>
         <p style="font-size:14px;color:#cbd5e1;margin-bottom:6px;">
-          Les cours ci-dessous sont chargés directement depuis Supabase (table <code>courses</code>).
+          Les cours ci-dessous sont chargés directement depuis Supabase (table <code>courses</code> et <code>rsl_course_registrations</code>).
         </p>
 
         <!-- MENU DÉROULANT POUR TRIER / FILTRER PAR VILLE -->
@@ -569,6 +713,40 @@
   </footer>
 
   <script>
+    // ===== Thème (comme index) =====
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
     // ===== Vidéo de fond =====
     (function(){
       const vids = [
@@ -622,15 +800,33 @@
       }
     });
 
-    // ===== Supabase init DIRECT =====
-    const { createClient } = supabase;
-    let supa = null;
-    try {
-      const SUPABASE_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
-      const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
-      supa = createClient(SUPABASE_URL, SUPABASE_ANON);
-    } catch (e) {
-      console.error("Erreur init Supabase:", e);
+    // ===== Avatar nav depuis localStorage (même logique que compte) =====
+    const navAvatar = document.getElementById('navAvatar');
+    function getAvatarLS(){
+      try{
+        return localStorage.getItem('rsl_avatar') || null;
+      }catch(e){ return null; }
+    }
+    function applyAvatar(){
+      const stored = getAvatarLS();
+      const src = stored || "images/logo_rsl.png";
+      if(navAvatar){
+        navAvatar.src = src;
+        if(stored) navAvatar.style.display = "inline-block";
+      }
+    }
+    applyAvatar();
+
+    // ===== Supabase init (réutilise le client global) =====
+    const SUPABASE_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+    let sb = null;
+    if (window.supabaseClient) {
+      sb = window.supabaseClient;
+    } else if (window.supabase && window.supabase.createClient) {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      window.supabaseClient = sb;
     }
 
     let currentUser      = null;
@@ -639,6 +835,7 @@
     let courses          = [];        // liste des cours
     let cityFilter       = "";        // filtre par ville
     let reservedByOthers = new Set(); // course_id réservés par un autre coach
+    let registrationsByCourse = {};   // course_id -> [inscriptions]
 
     const coachStatusEl   = document.getElementById('coachStatus');
     const coachSummaryEl  = document.getElementById('coachSummary');
@@ -755,7 +952,6 @@
       coachModalBackdrop.classList.add('open');
     }
 
-    // clic sur backdrop → ferme le popup
     coachModalBackdrop?.addEventListener('click', e=>{
       if(e.target === coachModalBackdrop){
         coachModalBackdrop.classList.remove('open');
@@ -764,15 +960,15 @@
 
     // ===== Restriction : seuls les coachs ont accès fonctionnel =====
     async function loadUser(){
-      if(!supa || !supa.auth){
+      if(!sb || !sb.auth){
         showStatus("Impossible de contacter Supabase (clé ou URL manquante).", true);
         return false;
       }
       try{
-        const { data:{ user } } = await supa.auth.getUser();
+        const { data:{ user } } = await sb.auth.getUser();
         currentUser = user || null;
 
-        // 1) PAS CONNECTÉ → popup connexion
+        // 1) PAS CONNECTÉ
         if(!user){
           showStatus("Tu dois être connecté pour accéder à cette page coach.", true);
           if(coachCoursesEl){
@@ -793,7 +989,7 @@
         }
 
         // 2) CONNECTÉ → check profile
-        const { data: profile } = await supa
+        const { data: profile } = await sb
           .from('profiles')
           .select('is_coach, full_name')
           .eq('id', user.id)
@@ -837,13 +1033,13 @@
       coachAvail = [];
       reservedByOthers = new Set();
 
-      if(!supa || !currentUser || !isCoachProfile){
+      if(!sb || !currentUser || !isCoachProfile){
         updateSummary();
         return;
       }
 
       try{
-        const { data, error } = await supa
+        const { data, error } = await sb
           .from('rsl_coach_availabilities')
           .select('course_id,coach_id');
 
@@ -884,8 +1080,53 @@
         locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
     }
 
+    async function loadRegistrations(){
+      registrationsByCourse = {};
+
+      if(!sb || !courses.length) return;
+
+      const courseIds = courses.map(c => c.id);
+
+      try{
+        const { data, error } = await sb
+          .from('rsl_course_registrations')
+          .select(`
+            id,
+            course_id,
+            rider_first_name,
+            rider_last_name,
+            rider_age,
+            parent_first_name,
+            parent_last_name,
+            parent_phone,
+            parent_email,
+            medical_note,
+            membership_included,
+            is_paid,
+            course_is_paid,
+            payment_status
+          `)
+          .in('course_id', courseIds);
+
+        if(error){
+          console.error("Erreur chargement inscriptions:", error);
+          showStatus("Erreur chargement inscriptions : " + (error.message || error.code || ""), true);
+          return;
+        }
+
+        (data || []).forEach(r=>{
+          const cid = String(r.course_id);
+          if(!registrationsByCourse[cid]) registrationsByCourse[cid] = [];
+          registrationsByCourse[cid].push(r);
+        });
+      }catch(e){
+        console.error("Erreur chargement inscriptions:", e);
+        showStatus("Erreur chargement inscriptions.", true);
+      }
+    }
+
     async function loadCourses(){
-      if(!supa){
+      if(!sb){
         coachCoursesEl.innerHTML =
           '<p style="color:#fca5a5">Supabase non configuré.</p>';
         return;
@@ -894,9 +1135,9 @@
         '<p style="color:#e5e7eb">Chargement des cours…</p>';
 
       try{
-        const { data, error } = await supa
+        const { data, error } = await sb
           .from('courses')
-          .select('id,location,starts_at,capacity,enrollments(id)')
+          .select('id,location,starts_at,capacity')
           .order('starts_at', { ascending:true });
 
         if(error) throw error;
@@ -908,6 +1149,8 @@
           '<p style="color:#fca5a5">Impossible de charger les cours : ' + (e.message || "") + '</p>';
         return;
       }
+
+      await loadRegistrations();
 
       buildCityOptions();
       renderCourses();
@@ -939,19 +1182,23 @@
         const dateTxt = formatDateFR(d);
         const timeTxt = formatTimeFR(d);
 
-        const taken = (c.enrollments || []).length || 0;
+        const cid  = String(c.id);
+        const regs = registrationsByCourse[cid] || [];
+
+        const taken = regs.length;
         const cap   = c.capacity || 0;
         const rest  = cap ? (cap - taken) : null;
         const isFull= rest !== null && rest <= 0;
         const inPast= d.getTime() + 2*60*60*1000 < now.getTime(); // 2h après début
 
-        const idStr          = String(c.id);
+        const idStr          = cid;
         const isAvailable    = coachAvail.includes(idStr);
         const hasOtherCoach  = reservedByOthers.has(idStr);
 
         const badgeTxt =
           isFull ? 'Complet' :
-          (rest === null ? 'Capacité non définie' : (rest + ' places restantes'));
+          (rest === null ? (taken + " inscription(s)") :
+           (taken + "/" + cap + " inscrits (" + rest + " places)"));
 
         const badgeClass = isFull ? 'course-badge full' : 'course-badge';
 
@@ -974,6 +1221,44 @@
           btnDisabled = true;
         } else {
           btnLabel = isAvailable ? "Je ne suis plus dispo" : "Je suis dispo";
+        }
+
+        let enrollHtml = "";
+        if(regs.length){
+          const items = regs.map(r=>{
+            const riderName =
+              (r.rider_first_name || r.rider_last_name)
+                ? `${r.rider_first_name || ""} ${r.rider_last_name || ""}`.trim()
+                : "Rider (nom manquant)";
+            const ageTxt = r.rider_age ? ` (${r.rider_age} ans)` : "";
+
+            let paidFlag = "à payer";
+            const paid =
+              r.membership_included === true ||
+              r.is_paid === true ||
+              r.course_is_paid === true ||
+              (r.payment_status && r.payment_status.toLowerCase().includes("pay"));
+
+            if(r.membership_included) paidFlag = "inclus abo";
+            else if(paid) paidFlag = "payé";
+
+            const phoneTxt = r.parent_phone ? ` — Tél parent: ${r.parent_phone}` : "";
+
+            return `<li>${riderName}${ageTxt} — ${paidFlag}${phoneTxt}</li>`;
+          }).join("");
+
+          enrollHtml = `
+            <div class="course-enrollments">
+              <strong>${regs.length} inscription(s) :</strong>
+              <ul>${items}</ul>
+            </div>
+          `;
+        }else{
+          enrollHtml = `
+            <div class="course-enrollments">
+              <strong>0 inscription</strong> — aucun rider pour l’instant.
+            </div>
+          `;
         }
 
         return `
@@ -1004,6 +1289,7 @@
                 ID cours: ${c.id}
               </span>
             </div>
+            ${enrollHtml}
           </div>
         `;
       }).join('');
@@ -1017,7 +1303,7 @@
         showStatus("Accès réservé aux coachs RSL.", true);
         return;
       }
-      if(!supa) return;
+      if(!sb) return;
 
       if(!courseId){
         showStatus("ID de cours manquant, impossible d’enregistrer.", true);
@@ -1025,17 +1311,15 @@
         return;
       }
 
-      const cid          = String(courseId); // UUID
+      const cid          = String(courseId);
       const isAvailable  = coachAvail.includes(cid);
       const hasOtherCoach= reservedByOthers.has(cid);
 
-      // Si un autre coach a déjà réservé → blocage
       if(!isAvailable && hasOtherCoach){
         showStatus("Ce cours a déjà un coach réservé.", true);
         return;
       }
 
-      // Si le coach veut enlever sa dispo < 7 jours avant → blocage
       if(isAvailable){
         const course = courses.find(c => String(c.id) === cid);
         if(course){
@@ -1050,15 +1334,12 @@
         }
       }
 
-      console.log("toggleAvailability", { courseId, cid, isAvailable });
-
       btn.disabled   = true;
       btn.textContent= "Mise à jour…";
 
       try{
         if(isAvailable){
-          // retirer
-          const { error } = await supa
+          const { error } = await sb
             .from('rsl_coach_availabilities')
             .delete()
             .eq('coach_id', currentUser.id)
@@ -1069,8 +1350,7 @@
           coachAvail = coachAvail.filter(x => x !== cid);
           showStatus("Disponibilité retirée pour ce cours.");
         }else{
-          // ajouter
-          const { data, error } = await supa
+          const { data, error } = await sb
             .from('rsl_coach_availabilities')
             .insert({
               coach_id: currentUser.id,
@@ -1099,12 +1379,12 @@
 
     // ===== Login / Account basique (nav) =====
     (async function initAuthButtons(){
-      if(!supa || !supa.auth) return;
+      if(!sb || !sb.auth) return;
       const btnLogin   = document.getElementById('btnLogin');
       const btnAccount = document.getElementById('btnAccount');
 
       try{
-        const { data:{ user } } = await supa.auth.getUser();
+        const { data:{ user } } = await sb.auth.getUser();
         function ui(u){
           if(!btnLogin || !btnAccount) return;
           if(u){
@@ -1117,9 +1397,8 @@
           }
         }
         ui(user);
-        btnLogin?.addEventListener('click',()=>location.href='compte.html');
-        supa.auth.onAuthStateChange((_e,s)=>{
-          // ici pas de reload pour éviter que ça "saute"
+        btnLogin?.addEventListener('click',()=>location.href='access.html');
+        sb.auth.onAuthStateChange((_e,s)=>{
           currentUser = s?.user ?? null;
         });
       }catch(e){

@@ -18,11 +18,33 @@
   <script defer src="js/site.js"></script>
 
   <style>
+    :root{
+      --rsl-bg: #020617;
+      --rsl-fg: #e5e7eb;
+      --rsl-muted: #9ca3af;
+      --rsl-card: rgba(15,23,42,.96);
+      --rsl-card-soft: rgba(15,23,42,.9);
+      --rsl-border: rgba(148,163,184,.45);
+      --rsl-accent: #22c55e;
+      --rsl-accent-soft: rgba(34,197,94,.14);
+    }
+
+    body.theme-light{
+      --rsl-bg: #f3f4f6;
+      --rsl-fg: #0f172a;
+      --rsl-muted: #6b7280;
+      --rsl-card: #ffffff;
+      --rsl-card-soft: #f9fafb;
+      --rsl-border: rgba(148,163,184,.35);
+      --rsl-accent: #16a34a;
+      --rsl-accent-soft: rgba(22,163,74,.12);
+    }
+
     html,body{
       height:100%;
       margin:0;
       background:transparent!important;
-      color:#fff;
+      color:var(--rsl-fg);
       font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       display:flex;
       flex-direction:column;
@@ -45,57 +67,150 @@
       inset:0;
       z-index:-1;
       background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.85));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.94),rgba(15,23,42,.85));
     }
 
-    /* ===== NAVBAR (copiée de l’index) ===== */
+    /* ===== NAVBAR (même logique que index) ===== */
     nav.nav{
       background: rgba(0,0,0,.65);
       backdrop-filter: blur(8px);
       position: sticky; top:0; z-index:100;
+      border-bottom:1px solid rgba(15,23,42,.8);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; display:block; }
-    .brand span{ font-weight:800; font-size:17px; letter-spacing:.2px; }
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
 
-    nav.nav ul{ display:flex; align-items:center; gap:26px; }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+
+    .brand{ display:flex; align-items:center; gap:10px; color:var(--rsl-fg); text-decoration:none; }
+    .brand img{
+      height:42px;
+      border-radius:10px;
+      display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    .brand span{
+      font-weight:800;
+      font-size:16px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+
+    nav.nav ul{ display:flex; align-items:center; gap:20px; }
     nav.nav ul li{ list-style:none; }
     nav.nav ul li a{
       font-weight:600;
-      color:#e8f0ea;
-      font-size:17px;
-      letter-spacing:.2px;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
       text-decoration:none;
+      opacity:.9;
       transition:.2s ease;
     }
-    nav.nav ul li a:hover{ color:#22c55e; }
+    nav.nav ul li a:hover{
+      color:var(--rsl-accent);
+      opacity:1;
+    }
 
-    .cta{ display:flex; align-items:center; gap:12px; }
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
+    }
+
+    /* Avatar dans la nav */
+    .nav-avatar{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+    }
+
+    /* Toggle thème */
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px;
+      height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+    }
+    .theme-toggle:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.08);
+    }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
 
     #menuBtn{
       display:none;
-      align-items:center; justify-content:center;
-      padding:10px 12px;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
       font-size:18px;
+      line-height:1;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
       cursor:pointer;
       transition:.2s ease;
     }
-    #menuBtn:hover{ background:rgba(34,197,94,.22); }
-
-    .nav-avatar{
-      width:38px;
-      height:38px;
-      border-radius:999px;
-      object-fit:cover;
-      border:2px solid #22c55e;
-      box-shadow:0 0 10px rgba(34,197,94,.5);
-      display:none;
+    #menuBtn:hover { filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
     }
 
     @media(max-width:990px){
@@ -113,22 +228,25 @@
     .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
     .mobile-dim{
-      position:absolute; inset:0; background:rgba(0,0,0,.5);
+      position:absolute; inset:0; background:rgba(0,0,0,.55);
     }
     .mobile-panel{
       position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px;
+      background:var(--rsl-card);
+      padding:22px 18px;
       display:flex; flex-direction:column; gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
     .mobile-panel a{
-      color:#eaf5ee;
+      color:var(--rsl-fg);
       text-decoration:none;
       font-weight:700;
       padding:8px 0;
+      font-size:14px;
     }
     .mobile-panel hr{
-      border:0; height:1px; background:rgba(255,255,255,.1);
+      border:0; height:1px; background:rgba(148,163,184,.4);
       margin:10px 0;
     }
 
@@ -139,12 +257,16 @@
       padding:0 20px;
     }
     .reg-card{
-      background:rgba(15,23,42,.9);
+      background:var(--rsl-card);
       border-radius:20px;
-      border:1px solid rgba(148,163,184,.45);
+      border:1px solid var(--rsl-border);
       box-shadow:0 24px 60px rgba(0,0,0,.85);
       padding:24px 22px 26px;
     }
+    body.theme-light .reg-card{
+      box-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
+
     .reg-chip{
       display:inline-flex;
       align-items:center;
@@ -155,13 +277,13 @@
       font-size:11px;
       text-transform:uppercase;
       letter-spacing:.16em;
-      color:#9ca3af;
+      color:var(--rsl-muted);
       margin-bottom:10px;
     }
     .reg-chip span{
       width:7px;height:7px;
       border-radius:999px;
-      background:#22c55e;
+      background:var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.9);
     }
 
@@ -169,44 +291,50 @@
       margin:0 0 10px;
       font-size:clamp(26px,4vw,32px);
       font-weight:800;
+      color:var(--rsl-fg);
     }
     .reg-card .muted{
       margin:0 0 20px;
       font-size:14px;
-      color:#9ca3af;
+      color:var(--rsl-muted);
     }
     .reg-card h2{
       margin:24px 0 6px;
       font-size:19px;
       font-weight:800;
-      color:#e5f5ec;
+      color:var(--rsl-fg);
     }
     .reg-card h3{
       margin:14px 0 4px;
       font-size:16px;
       font-weight:700;
-      color:#c4f1ce;
+      color:var(--rsl-fg);
     }
     .reg-card p,
     .reg-card ul{
       font-size:14px;
-      color:#e5e7eb;
+      color:var(--rsl-fg);
       line-height:1.6;
     }
 
     .reg-last{
       margin-top:24px;
       font-size:12px;
-      color:#9ca3af;
+      color:var(--rsl-muted);
     }
 
     .footer-mini .copy{
       text-align:center;
-      color:#9aa5b1;
+      color:var(--rsl-muted);
       font-size:14px;
       padding:24px 0 28px;
       margin:0;
-      border-top:1px solid rgba(255,255,255,.1);
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
   </style>
 </head>
@@ -237,14 +365,18 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <!-- Toggle thème -->
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <button class="btn" id="btnLogin">Login</button>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
 
           <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar">
+            <!-- logo par défaut, remplacé par l’avatar si trouvé dans localStorage -->
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar">
           </a>
 
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
 
           <button id="menuBtn">☰</button>
@@ -414,6 +546,40 @@
 
   <!-- SCRIPTS -->
   <script>
+    // Thème (clair / sombre) — même logique que index.html
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
     // Vidéo de fond
     (function(){
       const vids=[
@@ -464,6 +630,26 @@
           sheet.classList.remove('open');
         }
       });
+    })();
+
+    // Avatar nav depuis localStorage (rsl_avatar) ou logo par défaut
+    (function(){
+      const navAvatar = document.getElementById('navAvatar');
+      if(!navAvatar) return;
+
+      function getAvatarLS(){
+        try{
+          return localStorage.getItem('rsl_avatar') || null;
+        }catch(e){ return null; }
+      }
+
+      const stored = getAvatarLS();
+      const src = stored || "images/logo_rsl.png";
+
+      navAvatar.src = src;
+      if(stored){
+        navAvatar.style.display = "inline-block";
+      }
     })();
 
     // Année footer

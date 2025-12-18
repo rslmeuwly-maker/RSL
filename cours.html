@@ -5,235 +5,289 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Cours — Romandie Scooter League</title>
 
-  <!-- Fonts -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Style global -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase + scripts globaux -->
+  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body{
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.9);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+    }
+
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
+    html,body{
       height:100%;
       margin:0;
-      background:transparent !important;
-      color:#fff;
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:transparent!important;
+      display:flex;
+      flex-direction:column;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       overflow-x:hidden;
     }
-    main{ position:relative; z-index:10; }
+    main{ flex:1; position:relative; z-index:10; }
 
-    /* ===== VIDÉO DE FOND ===== */
+    /* ======= Fond vidéo ======= */
     .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
+      position:fixed; inset:0;
+      width:100%; height:100%;
       object-fit:cover;
       z-index:-2;
       background:#000;
       pointer-events:none !important;
     }
     .site-bg-dim{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       z-index:-1;
-      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.82));
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
+      transition:background .25s ease;
       pointer-events:none !important;
     }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
+    }
 
-    /* ===== NAV ===== */
+    /* ======= NAVBAR ======= */
     nav.nav{
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      position: sticky;
-      top:0;
-      z-index:100;
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
+      position:sticky; top:0; z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
     }
-    nav.nav .container{
-      max-width:1320px;
-      margin:0 auto;
-      padding:12px 28px;
-    }
-    nav.nav .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
 
     .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:#fff;
-      text-decoration:none;
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
     }
     .brand img{
-      height:48px;
-      border-radius:10px;
+      height:42px; border-radius:10px;
       display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
     .brand span{
       font-weight:800;
       letter-spacing:.2px;
-      font-size:17px;
+      font-size:16px;
+      white-space:nowrap;
     }
 
     nav.nav ul{
-      display:flex;
-      gap:26px;
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0;
       list-style:none;
-      margin:0;
-      padding:0;
     }
     nav.nav ul li a{
       font-weight:600;
-      color:#e8f0ea;
-      font-size:17px;
-      text-decoration:none;
-      transition:.2s ease;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
+      text-decoration:none;
+      opacity:.9;
+      transition:.2s ease;
     }
     nav.nav ul li a:hover{
-      color:#22c55e;
+      color:var(--rsl-accent);
+      opacity:1;
     }
 
-    .btn.dark{
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
       border-radius:999px;
-      border:1px solid rgba(148,163,184,.7);
-      background:rgba(15,23,42,.9);
-      color:#e5e7eb;
       padding:8px 14px;
       font-size:14px;
-      font-weight:600;
-      cursor:pointer;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
       text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
     }
     .btn.green{
-      border-radius:999px;
-      border:0;
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      color:#022c16;
-      padding:8px 16px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-      text-decoration:none;
-      box-shadow:0 12px 26px rgba(0,0,0,.6);
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
     }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
     .nav-avatar{
-      width:38px;
-      height:38px;
+      width:34px; height:34px;
       border-radius:999px;
       object-fit:cover;
-      border:2px solid #22c55e;
+      border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
     }
 
-    .cta{
-      display:flex;
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
       align-items:center;
-      gap:12px;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
     }
 
+    /* ✅ MENU MOBILE SIMPLE NOIR */
     #menuBtn{
       display:none;
-      padding:10px 12px;
-      font-size:18px;
-      border-radius:10px;
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
-      border:1px solid rgba(255,255,255,.12);
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#0b0f19;
+      color:#fff;
       cursor:pointer;
+      font-size:20px;
+      line-height:1;
+      padding:0;
+      align-items:center;
+      justify-content:center;
+      -webkit-tap-highlight-color: transparent;
     }
-    #menuBtn:hover{
-      background:rgba(34,197,94,.22);
+    body.theme-light #menuBtn{
+      border-color:#0b0f19;
+      background:#0b0f19;
+      color:#fff;
+    }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
+
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
+    }
+    .mobile-panel a{
+      color:var(--rsl-fg);
+      text-decoration:none;
+      font-weight:800;
+      padding:6px 0;
+      font-size:14px;
     }
 
     @media (max-width:990px){
       nav.nav ul{ display:none !important; }
-      #btnCart,
-      #btnLogin,
-      #btnAccount,
-      nav.nav .btn.green{          /* on ne cache QUE le bouton vert de la NAV */
-        display:none !important;
-      }
+      #btnCart, nav.nav .cta > .btn.green{ display:none !important; }
       #menuBtn{ display:inline-flex; }
-    }
-
-    .container{
-      max-width:1200px;
-      padding:0 24px;
-      margin:0 auto;
-    }
-
-    /* ===== MENU MOBILE ===== */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:120;
-    }
-    .mobile-sheet.open{ display:block; }
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.5);
-    }
-    .mobile-panel{
-      position:absolute;
-      top:0;
-      right:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
-      background:#0b1220;
-      padding:22px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
-      box-shadow:-12px 0 30px rgba(0,0,0,.35);
-    }
-    .mobile-panel a{
-      color:#eaf5ee;
-      text-decoration:none;
-      font-weight:700;
-      padding:8px 0;
+      .coach-fab{ display:none; }
     }
 
     /* ===== INTRO ===== */
     .page-intro{
       color:#fff;
-      padding:28px 0 10px;
+      padding:22px 0 10px;
     }
+    body.theme-light .page-intro{ color:#0f172a !important; }
+
     .page-intro h1{
       margin:10px 0 6px;
       font-size:clamp(28px,4.2vw,42px);
-      font-weight:800;
+      font-weight:900;
+      letter-spacing:.2px;
+      line-height:1.05;
     }
     .page-intro p{
       margin:0;
       font-size:clamp(15px,2.2vw,18px);
       opacity:.95;
+      max-width:860px;
     }
+    body.theme-light .page-intro p{ color:#334155 !important; opacity:1; }
 
     /* ===== FILTRES ===== */
     .filters{
       display:flex;
       flex-wrap:wrap;
       gap:12px;
-      margin:8px 0 16px;
+      margin:10px 0 14px;
       align-items:flex-end;
+
+      background:rgba(15,23,42,.72);
+      border:1px solid rgba(148,163,184,.35);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 16px 40px rgba(0,0,0,.35);
+    }
+    body.theme-light .filters{
+      background:rgba(255,255,255,.92);
+      border-color:rgba(148,163,184,.35);
+      box-shadow:0 16px 40px rgba(15,23,42,.10);
     }
 
     .filter-field{
@@ -245,16 +299,20 @@
     }
     .filter-label{
       font-size:13px;
-      font-weight:600;
-      opacity:.9;
+      font-weight:800;
+      opacity:.95;
     }
+    body.theme-light .filter-label{ color:#0f172a; opacity:1; }
 
     .check-label{
       display:flex;
       align-items:center;
       gap:8px;
       font-size:14px;
+      font-weight:800;
+      user-select:none;
     }
+    body.theme-light .check-label{ color:#0f172a; }
     .check-label input{
       width:16px;
       height:16px;
@@ -262,17 +320,15 @@
     }
 
     /* ===== CUSTOM SELECT ===== */
-    .select-shell{
-      position:relative;
-    }
+    .select-shell{ position:relative; }
     .select-display{
       width:100%;
       background:rgba(15,23,42,.95);
       border:1px solid rgba(148,163,184,.7);
       border-radius:12px;
-      padding:11px 40px 11px 14px;
+      padding:12px 40px 12px 14px;
       font-size:15px;
-      font-weight:600;
+      font-weight:900;
       color:#f9fafb;
       text-align:left;
       cursor:pointer;
@@ -285,15 +341,20 @@
       background-size: 6px 6px;
       background-repeat:no-repeat;
       transition:.18s ease;
+      -webkit-tap-highlight-color:transparent;
+    }
+    body.theme-light .select-display{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.65);
     }
     .select-shell.open .select-display{
       border-color:#22c55e;
       box-shadow:0 0 0 2px rgba(34,197,94,.35);
     }
-
     .select-panel{
       position:absolute;
-      top:calc(100% + 4px);
+      top:calc(100% + 6px);
       left:0;
       right:0;
       background:#020617;
@@ -305,24 +366,24 @@
       overflow:auto;
       z-index:3000;
     }
-    .select-shell.open .select-panel{
-      display:block;
-    }
+    body.theme-light .select-panel{ background:#ffffff; }
+    .select-shell.open .select-panel{ display:block; }
 
     .select-option{
-      padding:8px 14px;
+      padding:10px 14px;
       font-size:14px;
       color:#e5e7eb;
       cursor:pointer;
+      font-weight:800;
     }
-    .select-option:hover{
-      background:rgba(34,197,94,.12);
-    }
+    body.theme-light .select-option{ color:#0f172a; }
+    .select-option:hover{ background:rgba(34,197,94,.12); }
     .select-option.is-selected{
       background:rgba(34,197,94,.18);
-      font-weight:700;
+      font-weight:900;
       color:#bbf7d0;
     }
+    body.theme-light .select-option.is-selected{ color:#052e16; }
 
     .select-native{
       position:absolute;
@@ -333,20 +394,19 @@
     }
 
     /* ===== LISTE COURS ===== */
-    .list{
-      margin:10px 0 120px;
-    }
+    .list{ margin:12px 0 140px; }
+
     .item{
       background:linear-gradient(180deg,rgba(9,13,23,.88),rgba(7,10,18,.95));
-      border-radius:14px;
+      border-radius:16px;
       border:1px solid rgba(148,163,184,.45);
-      padding:12px;
-      margin-bottom:10px;
+      padding:14px;
+      margin-bottom:12px;
       box-shadow:0 14px 40px rgba(0,0,0,.8);
       color:#e5e7eb;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:10px;
       position:relative;
       z-index:10;
     }
@@ -356,57 +416,67 @@
       justify-content:space-between;
       flex-wrap:wrap;
       gap:10px;
+      align-items:flex-start;
     }
     .course-title{
-      font-weight:700;
-      font-size:15px;
+      font-weight:1000;
+      font-size:16px;
+      letter-spacing:.1px;
     }
+
+    /* ✅ TOUTES LES BULLES EN VERT */
     .course-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-top:2px;
       font-size:13px;
-      color:#cbd5f5;
+      font-weight:900;
     }
     .course-meta span{
-      margin-right:6px;
+      margin-right:0;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+
+      /* vert partout */
+      background:linear-gradient(180deg, var(--rsl-accent), #16a34a);
+      border:1px solid rgba(255,255,255,.10);
+      color:#052e16;
+      box-shadow:0 10px 22px rgba(22,163,74,.28), inset 0 1px 0 rgba(255,255,255,.18);
       white-space:nowrap;
     }
+    /* icônes / petits éléments en vert foncé aussi */
+    .course-meta span *{ color:inherit; }
+
     .course-price{
-      font-size:14px;
-      font-weight:700;
+      font-size:15px;
+      font-weight:1000;
       color:#bbf7d0;
     }
+    body.theme-light .course-price{ color:#052e16; }
 
-    .item-actions{
-      width:100%;
-      margin-top:4px;
-      position:relative;
-      z-index:20;
-    }
-
-    /* bouton cours (si cours.js utilise .btn.green) */
-    .list .btn.green{
-      display:block;
-      width:100%;
-      text-align:center;
-      margin-top:4px;
-    }
-
-    .inscrire-btn,
-    .btn-inscrire{
+    /* ✅ bouton inscrire (par cours) */
+    .inscrire-btn{
       display:block;
       width:100%;
       border:0;
       background:linear-gradient(180deg,#22c55e,#16a34a);
-      padding:10px 12px;
-      border-radius:12px;
-      font-size:14px;
-      font-weight:700;
+      padding:12px 12px;
+      border-radius:14px;
+      font-size:15px;
+      font-weight:1000;
       cursor:pointer;
       color:#062312;
       box-shadow:0 10px 26px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.16);
       text-align:center;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
     }
-    .inscrire-btn.selected,
-    .btn-inscrire.selected{
+    .inscrire-btn.selected{
       filter:brightness(1.05);
       background:#16a34a;
     }
@@ -427,69 +497,142 @@
       z-index:300;
       gap:10px;
       font-size:14px;
-      font-weight:600;
+      font-weight:900;
+      border-top-left-radius:16px;
+      border-top-right-radius:16px;
+      box-shadow:0 -16px 50px rgba(0,0,0,.45);
     }
-    .basket-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+    body.theme-light .basket-bar{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
+      color:#0f172a;
+      box-shadow:0 -16px 50px rgba(15,23,42,.10);
+    }
+    .basket-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .basket-btn{
+      background:#22c55e;
+      color:#062312;
+      border-radius:999px;
+      padding:11px 16px;
+      font-size:15px;
+      font-weight:1000;
+      border:0;
+      cursor:pointer;
+      min-width:130px;
+      text-align:center;
+      -webkit-tap-highlight-color:transparent;
     }
     .basket-clear-btn{
       background:rgba(0,0,0,.6);
       color:#e5e7eb;
       border-radius:999px;
-      padding:8px 14px;
+      padding:10px 14px;
       font-size:13px;
-      font-weight:600;
+      font-weight:900;
       border:1px solid rgba(255,255,255,.25);
       cursor:pointer;
-      min-width:130px;
+      min-width:160px;
       text-align:center;
+      -webkit-tap-highlight-color:transparent;
     }
-    .basket-clear-btn:hover{
-      filter:brightness(1.07);
-    }
-
-    .basket-btn{
-      background:#22c55e;
-      color:#062312;
-      border-radius:999px;
-      padding:10px 16px;
-      font-size:15px;
-      font-weight:700;
-      border:0;
-      cursor:pointer;
-      min-width:130px;
-      text-align:center;
+    body.theme-light .basket-clear-btn{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.65);
     }
 
-    @media(max-width:640px){
-      .basket-bar{
-        align-items:flex-start;
-      }
-      .basket-actions{
-        width:100%;
-        justify-content:flex-end;
-      }
-    }
-
-    /* FOOTER */
+    /* Footer */
     .footer-mini .copy{
       text-align:center;
-      color:#9aa5b1;
-      font-size:14px;
-      padding:24px 0 28px;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
       margin:0;
-      border-top:1px solid rgba(255,255,255,.1);
-      background:transparent;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
     }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
+    }
+
+    /* ✅ Mobile: filtres en grille propre */
+    @media (max-width:640px){
+      .filters{
+        display:grid !important;
+        grid-template-columns:1fr 1fr;
+        align-items:end;
+      }
+      .filters .filter-field{
+        min-width:0 !important;
+        flex:unset !important;
+      }
+      .filters .check-label{
+        grid-column:1 / -1;
+        padding-top:2px;
+      }
+    }
+
+    /* ✅ MODE PC : grille cours */
+    @media (min-width: 900px){
+      #courseList{
+        display:grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap:16px;
+      }
+      .item{ margin-bottom:0; height:100%; }
+    }
+
+    /* ✅ BOUTON MOBILE FIXE */
+    #mobileInscrireBtn{
+      display:block !important;
+      position:fixed !important;
+      left:16px !important;
+      right:16px !important;
+      bottom:calc(16px + env(safe-area-inset-bottom)) !important;
+      z-index:99999 !important;
+      height:56px !important;
+      border-radius:16px !important;
+      border:0 !important;
+      background:linear-gradient(180deg,#22c55e,#16a34a) !important;
+      color:#062312 !important;
+      font-weight:1000 !important;
+      font-size:16px !important;
+      cursor:pointer !important;
+      box-shadow:0 18px 50px rgba(0,0,0,.55) !important;
+      pointer-events:auto !important;
+      -webkit-tap-highlight-color:transparent !important;
+      touch-action:manipulation !important;
+    }
+    @media (min-width: 991px){
+      #mobileInscrireBtn{ display:none !important; }
+    }
+    @media (max-width: 990px){
+      main.container{ padding-bottom:170px !important; }
+    }
+
+    /* FAB coach */
+    .coach-fab{
+      position:fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:900; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
+      border:0;
+      font-size:13px;
+      line-height:1;
+    }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+    @media (max-width:990px){ .coach-fab{ display:none; } }
   </style>
 </head>
+
 <body>
 
-  <!-- FOND VIDÉO -->
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg"></video>
-  <div class="site-bg-dim"></div>
+  <!-- Fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
   <!-- NAV -->
   <nav class="nav">
@@ -512,19 +655,25 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-          <a href="compte.html"><img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" style="display:none" alt="Avatar"></a>
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn">☰</button>
+          <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- MENU MOBILE -->
-  <div class="mobile-sheet" id="mobileMenu">
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
       <a href="index.html">Accueil</a>
@@ -534,23 +683,25 @@
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
       <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
       <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
   <!-- CONTENU -->
   <main class="container">
     <div class="page-intro">
-      <h1>Inscriptions aux cours 2026</h1>
-      <p>Chaque samedi — tarifs auto (Public 30.–, Membre 20.–, Progression/Premium selon abo).</p>
+      <h1>Inscriptions aux cours</h1>
+      <p>Choisis un cours, ajoute-le au panier, puis continue pour finaliser l’inscription.</p>
     </div>
 
     <div class="filters">
-      <!-- Mois -->
       <div class="filter-field">
         <span class="filter-label">Mois</span>
         <div class="select-shell" data-select-id="filtreMois">
@@ -559,22 +710,13 @@
         </div>
         <select id="filtreMois" class="select-native">
           <option value="all">Tous les mois</option>
-          <option value="01">Janvier</option>
-          <option value="02">Février</option>
-          <option value="03">Mars</option>
-          <option value="04">Avril</option>
-          <option value="05">Mai</option>
-          <option value="06">Juin</option>
-          <option value="07">Juillet</option>
-          <option value="08">Août</option>
-          <option value="09">Septembre</option>
-          <option value="10">Octobre</option>
-          <option value="11">Novembre</option>
-          <option value="12">Décembre</option>
+          <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option>
+          <option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option>
+          <option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option>
+          <option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
         </select>
       </div>
 
-      <!-- Lieu -->
       <div class="filter-field">
         <span class="filter-label">Lieu</span>
         <div class="select-shell" data-select-id="filtreLieu">
@@ -586,81 +728,121 @@
         </select>
       </div>
 
-      <!-- Dispo -->
       <label class="check-label">
         <input type="checkbox" id="filtreDispo"> Seulement dispo
       </label>
     </div>
 
-    <!-- Liste cours générée par js/cours.js -->
     <div id="courseList" class="list"></div>
   </main>
 
-  <!-- BAR PANIER -->
   <div class="basket-bar" id="basketBar">
     <div id="basketInfo">0 cours sélectionné</div>
     <div class="basket-actions">
-      <button class="basket-clear-btn" id="basketClear">Tout désélectionner</button>
-      <button class="basket-btn" id="basketPay">Continuer</button>
+      <button class="basket-clear-btn" id="basketClear" type="button">Tout désélectionner</button>
+      <button class="basket-btn" id="basketPay" type="button">Continuer</button>
     </div>
   </div>
+
+  <!-- ✅ Bouton mobile fixe -->
+  <button id="mobileInscrireBtn" type="button">S’inscrire</button>
 
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- ===== SCRIPTS LOCAUX ===== -->
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+
   <script>
-    /* ===== Vidéo de fond ===== */
+    // Thème (clair / sombre)
     (function(){
-      const vids=[
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
+    // Vidéo de fond
+    (function(){
+      const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
       ];
-      const pick=vids[Math.floor(Math.random()*vids.length)];
-      const v=document.getElementById('rslBg');
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
       if(!v) return;
-      const s=document.createElement('source');
-      s.src=pick;
-      s.type="video/mp4";
+
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
       v.appendChild(s);
 
-      const start=()=>{
+      const start = () => {
         try{
-          v.playbackRate=0.6;
-          const p=v.play();
+          v.playbackRate = 0.6;
+          const p = v.play();
           if(p && p.catch) p.catch(()=>{});
         }catch(e){}
       };
+
       start();
-      document.addEventListener("visibilitychange",()=>{
+
+      document.addEventListener('visibilitychange', () => {
         if(document.hidden) v.pause();
         else start();
       });
     })();
 
-    /* ===== Menu mobile ===== */
+    // Menu mobile
     (function(){
-      const menuBtn=document.getElementById("menuBtn");
-      const mobile=document.getElementById("mobileMenu");
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
       if(!menuBtn || !mobile) return;
 
-      menuBtn.addEventListener("click",e=>{
+      menuBtn.addEventListener('click',e=>{
         e.stopPropagation();
-        mobile.classList.add("open");
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
       });
-
-      mobile.querySelector(".mobile-dim")?.addEventListener("click",()=>{
-        mobile.classList.remove("open");
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
       });
     })();
 
-    // Login simple → compte
-    document.getElementById('btnLogin')?.addEventListener('click', ()=>{
-      location.href = 'compte.html';
-    });
-
-    /* ===== Custom Select ===== */
+    // Selects custom
     function setupSelect(id){
       const native=document.getElementById(id);
       const shell=document.querySelector('[data-select-id="'+id+'"]');
@@ -704,79 +886,86 @@
       sync();
     }
 
-    document.addEventListener("DOMContentLoaded",()=>{
-      setupSelect("filtreMois");
-      setupSelect("filtreLieu");
-      updateBasket();
-    });
-
-    /* ===== PANIER + BOUTONS S'INSCRIRE ===== */
-
+    // Panier
     function collectSelectedCourses(){
       const res=[];
-      document.querySelectorAll(".inscrire-btn.selected, .btn-inscrire.selected, .list .btn.green.selected").forEach(btn=>{
+      document.querySelectorAll(".inscrire-btn.selected").forEach(btn=>{
         const item=btn.closest(".item");
         if(!item) return;
         res.push({
           id:item.dataset.id || "",
+          title:item.querySelector(".course-title")?.textContent.trim() || "",
           date:item.querySelector(".course-date")?.textContent.trim() || "",
           time:item.querySelector(".course-time")?.textContent.trim() || "",
           place:item.querySelector(".course-place")?.textContent.trim() || "",
-          price:item.querySelector(".course-price")?.textContent.trim() || "",
-          title:item.querySelector(".course-title")?.textContent.trim() || ""
+          price:item.querySelector(".course-price")?.textContent.trim() || ""
         });
       });
       return res;
     }
 
-    function updateBasket(){
+    function updateBasketUI(){
       const items=collectSelectedCourses();
       const bar=document.getElementById("basketBar");
       const info=document.getElementById("basketInfo");
-      if(!bar || !info) return;
+      const mobileBtn=document.getElementById("mobileInscrireBtn");
+      const n=items.length;
 
-      if(items.length===0){
-        bar.style.display="none";
-        info.textContent="0 cours sélectionné";
-        return;
-      }
-      bar.style.display="flex";
-      const nb=items.length;
-      info.textContent = nb + (nb>1 ? " cours sélectionnés" : " cours sélectionné");
+      if(info) info.textContent = n + (n>1 ? " cours sélectionnés" : " cours sélectionné");
+      if(bar) bar.style.display = n>0 ? "flex" : "none";
+      if(mobileBtn) mobileBtn.textContent = n>0 ? `Continuer (${n})` : "S’inscrire";
     }
 
-    // Tout désélectionner
-    document.getElementById("basketClear")?.addEventListener("click", ()=>{
-      document.querySelectorAll(".inscrire-btn.selected, .btn-inscrire.selected, .list .btn.green.selected")
-        .forEach(btn=>btn.classList.remove("selected"));
-      // On vide aussi le localStorage pour le panier de cours
-      localStorage.removeItem("rsl_panier_cours");
-      localStorage.removeItem("rsl_panier_courses");
-      updateBasket();
-    });
-
-    // Toggle sélection sur les boutons "S'inscrire"
-    document.addEventListener("click",(e)=>{
-      const btn=e.target.closest(".inscrire-btn, .btn-inscrire, .list .btn.green");
-      if(!btn) return;
-      btn.classList.toggle("selected");
-      updateBasket();
-    });
-
-    // Bouton continuer
-    document.getElementById("basketPay")?.addEventListener("click",()=>{
-      const data=collectSelectedCourses();
-      if(!data.length){
+    function goToBasket(){
+      const items=collectSelectedCourses();
+      if(!items.length){
         alert("Sélectionne au moins un cours.");
         return;
       }
-      localStorage.setItem("rsl_panier_cours",JSON.stringify(data));
-      localStorage.setItem("rsl_panier_courses",JSON.stringify(data));
+      try{
+        localStorage.setItem("rsl_panier_cours", JSON.stringify(items));
+        localStorage.setItem("rsl_panier_courses", JSON.stringify(items));
+      }catch(_){}
       window.location.href="panier/panier.html";
+    }
+
+    document.addEventListener("click",(e)=>{
+      const btn = e.target.closest(".inscrire-btn");
+      if(!btn) return;
+      e.preventDefault();
+      btn.classList.toggle("selected");
+      updateBasketUI();
+    });
+
+    document.addEventListener("DOMContentLoaded",()=>{
+      setupSelect("filtreMois");
+      setupSelect("filtreLieu");
+      updateBasketUI();
+
+      document.getElementById("basketPay")?.addEventListener("click", goToBasket);
+      document.getElementById("basketClear")?.addEventListener("click", ()=>{
+        document.querySelectorAll(".inscrire-btn.selected").forEach(b=>b.classList.remove("selected"));
+        try{
+          localStorage.removeItem("rsl_panier_cours");
+          localStorage.removeItem("rsl_panier_courses");
+        }catch(_){}
+        updateBasketUI();
+      });
+
+      document.getElementById("mobileInscrireBtn")?.addEventListener("click", ()=>{
+        const n = collectSelectedCourses().length;
+        if(n>0){ goToBasket(); return; }
+        document.getElementById("courseList")?.scrollIntoView({behavior:"smooth", block:"start"});
+      }, {passive:true});
+
+      const list=document.getElementById("courseList");
+      if(list){
+        const obs=new MutationObserver(()=>updateBasketUI());
+        obs.observe(list,{childList:true,subtree:true});
+      }
     });
   </script>
 
-  <!-- Script liste des cours -->
   <script src="js/cours.js" defer></script>
 </body>
 </html>

@@ -18,180 +18,336 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase + scripts -->
+  <!-- RSL scripts -->
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body {
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.90);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+      --rsl-shadow:0 24px 70px rgba(0,0,0,.55);
+    }
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+      --rsl-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
+    html,body{
       height:100%;
       margin:0;
-      background: transparent !important;
+      background:transparent!important;
       display:flex;
       flex-direction:column;
-      color:#fff;
+      color:var(--rsl-fg);
       font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       overflow-x:hidden;
     }
-    main { flex:1; }
+    main{ flex:1; position:relative; z-index:10; }
 
-    /* ======= Vidéo de fond ======= */
+    /* ======= Fond vidéo (comme index) ======= */
     .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
+      position:fixed; inset:0;
+      width:100%; height:100%;
       object-fit:cover;
       z-index:-2;
       background:#000;
     }
     .site-bg-dim{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       z-index:-1;
-      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ======= NAVBAR (copiée de l’index) ======= */
+    /* ======= NAVBAR (copie index) ======= */
     nav.nav{
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(8px);
-      position: sticky; top:0; z-index:100;
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
+      position:sticky; top:0; z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; display:block; }
-    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
-    nav.nav ul{ display:flex; align-items:center; gap:26px; }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
+    }
+    .brand img{
+      height:42px; border-radius:10px;
+      display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    .brand span{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:16px;
+      white-space:nowrap;
+    }
+
+    nav.nav ul{
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0;
+      list-style:none;
+    }
     nav.nav ul li a{
       font-weight:600;
-      color:#e8f0ea;
-      font-size:17px;
-      letter-spacing:.2px;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
       text-decoration:none;
+      opacity:.9;
       transition:.2s ease;
     }
-    nav.nav ul li a:hover{ color:#22c55e; }
-
-    .cta{ display:flex; align-items:center; gap:12px; }
-    #menuBtn{
-      display:none; align-items:center; justify-content:center; gap:8px;
-      padding:10px 12px; font-size:18px; line-height:1; border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12); color:#22c55e; cursor:pointer;
-      transition:.2s ease;
+    nav.nav ul li a:hover{
+      color:var(--rsl-accent);
+      opacity:1;
     }
-    #menuBtn:hover { background:rgba(34,197,94,.22); }
 
-    .container{ max-width:1200px; margin:0 auto; padding:0 24px; }
+    .cta{ display:flex; align-items:center; gap:10px; }
 
-    /* Avatar rond dans la nav */
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
     .nav-avatar{
-      width:38px;
-      height:38px;
+      width:34px; height:34px;
       border-radius:999px;
       object-fit:cover;
-      border:2px solid #22c55e;
+      border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
     }
 
-    /* ===== Menu mobile (copié index) ===== */
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover { filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
+
+    /* ===== Menu mobile (copie index) ===== */
     .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
-    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
     .mobile-panel{
-      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
-      border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
-    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
-    .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
+    .mobile-panel a{
+      color:var(--rsl-fg);
+      text-decoration:none;
+      font-weight:700;
+      padding:6px 0;
+      font-size:14px;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(148,163,184,.4);
+      margin:10px 0;
+    }
 
     @media (max-width:990px){
       nav.nav ul{ display:none !important; }
-      #btnCart,
-      #btnLogin,
-      #btnAccount,
-      .btn.green{
-        display:none !important;
-      }
+      #btnCart, .btn.green{ display:none !important; }
       #menuBtn{ display:inline-flex; }
       .coach-fab{ display:none; }
     }
 
-    /* ======= Intro / texte page ======= */
-    .page-intro{ color:#fff; padding:28px 0 12px; }
-    .page-intro h1{ font-size:clamp(28px,4.2vw,42px); font-weight:800; margin:8px 0 6px; }
-    .page-intro p{ margin:0; opacity:.95; font-size:clamp(15px,2.2vw,18px); }
+    /* ===== PAGE ===== */
+    .page{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 16px 40px;
+    }
+
+    .intro{
+      margin:18px 0 12px;
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      border-radius:20px;
+      padding:18px 16px;
+      box-shadow:var(--rsl-shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .intro:before{
+      content:"";
+      position:absolute; inset:-40% -20%;
+      background:
+        radial-gradient(circle at 15% 25%, var(--rsl-accent-soft), transparent 55%),
+        radial-gradient(circle at 85% 10%, rgba(99,102,241,.12), transparent 60%),
+        radial-gradient(circle at 60% 90%, rgba(34,197,94,.10), transparent 60%);
+      pointer-events:none;
+    }
+    .intro > *{ position:relative; z-index:1; }
+
+    .intro h1{
+      margin:0 0 6px;
+      font-size:clamp(26px,4.2vw,40px);
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+    .intro p{
+      margin:0;
+      color:var(--rsl-muted);
+      font-size:15px;
+      line-height:1.55;
+      max-width:980px;
+    }
+    .intro p b{ color:var(--rsl-accent); }
 
     .disclaimer{
-      margin:-2px 0 18px;
-      font-size:13px;
-      max-width:720px;
-      color:#e5e7eb;
-      opacity:.9;
+      margin:10px 0 0;
+      font-size:12.5px;
+      color:var(--rsl-muted);
+      max-width:980px;
+      line-height:1.5;
     }
-    .disclaimer a{
-      color:#22c55e;
-      font-weight:700;
-      text-decoration:none;
-    }
-    .disclaimer a:hover{
-      text-decoration:underline;
-    }
+    .disclaimer a{ color:var(--rsl-accent); font-weight:900; text-decoration:none; }
+    .disclaimer a:hover{ text-decoration:underline; }
 
     /* ===== Carte ===== */
-    .map-wrap{
-      position:relative;
-      margin-bottom:40px;
-    }
+    .map-wrap{ position:relative; margin-top:12px; margin-bottom:26px; }
     #map{
       height:88vh;
       min-height:620px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.18);
-      background:#0b1220;
-      box-shadow:0 8px 24px rgba(0,0,0,.25);
+      border-radius:18px;
+      border:1px solid var(--rsl-border);
+      background:var(--rsl-card-soft);
+      box-shadow:var(--rsl-shadow);
+      overflow:hidden;
     }
-    @media(max-width:900px){
-      #map{height:88vh;min-height:70vh}
-    }
-    .leaflet-pane,.leaflet-top,.leaflet-bottom{z-index:2}
+    @media(max-width:900px){ #map{ height:88vh; min-height:70vh; } }
+    .leaflet-pane,.leaflet-top,.leaflet-bottom{ z-index:2; }
 
-    /* ===== Bouton Filtres (spécifique carte) ===== */
-    .filters-fab{
-      position:absolute;
-      right:12px;
-      top:12px;
-      z-index:80;
-      display:block;
-    }
+    /* ===== Bouton Filtres ===== */
+    .filters-fab{ position:absolute; right:12px; top:12px; z-index:80; }
     .map-btn{
       appearance:none;
-      border:1px solid rgba(255,255,255,.15);
-      background:rgba(255,255,255,.12);
-      color:#fff;
-      border-radius:10px;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      border-radius:12px;
       padding:10px 12px;
-      font:800 13px "Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      font:900 13px "Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       cursor:pointer;
+      transition:.2s ease;
     }
+    body.theme-light .map-btn{ background:#0f172a; border-color:#0f172a; }
     .map-btn.green{
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
       border:0;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
     }
-
-    .filters-fab .map-btn{
-      background:rgba(0,0,0,.85);
-      border-color:rgba(255,255,255,.35);
-    }
+    .map-btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
     /* ===== Panneau Filtres ===== */
-    body.show-filters .filters-wrap{display:block}
+    body.show-filters .filters-wrap{ display:block; }
     .filters-wrap{
       position:absolute;
       top:12px;
@@ -203,50 +359,70 @@
     .filters-card{
       background:rgba(0,0,0,.78);
       border:1px solid rgba(255,255,255,.15);
-      border-radius:14px;
+      border-radius:16px;
       padding:12px;
       box-shadow:0 20px 60px rgba(0,0,0,.6);
       backdrop-filter:blur(6px) saturate(140%);
       max-height:70vh;
       overflow:auto;
     }
+    body.theme-light .filters-card{
+      background:rgba(248,250,252,.96);
+      border-color:rgba(148,163,184,.55);
+      box-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
     .filters-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:8px;
-      margin-top:8px;
+      margin-top:10px;
     }
     .chip{
-      display:flex;align-items:center;gap:8px;
+      display:flex; align-items:center; gap:8px;
       background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
-      padding:10px 12px;border-radius:10px;
-      font:700 13px "Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      padding:10px 12px;
+      border-radius:12px;
+      font:800 13px "Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:#fff;
     }
-    .chip input{width:18px;height:18px}
-    .input,.select{
+    body.theme-light .chip{
+      background:rgba(15,23,42,.06);
+      border-color:rgba(148,163,184,.45);
+      color:#0f172a;
+    }
+    .chip input{ width:18px; height:18px; }
+
+    .input, .select{
       width:100%;
       background:#0b1220;
       border:1px solid rgba(255,255,255,.18);
-      border-radius:10px;
+      border-radius:12px;
       color:#fff;
       padding:10px 12px;
-      font:600 14px "Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      font:700 14px "Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      outline:none;
     }
-    .filters-foot{
-      display:flex;flex-wrap:wrap;gap:8px;
-      margin-top:10px;
+    body.theme-light .input, body.theme-light .select{
+      background:#ffffff;
+      border-color:rgba(148,163,184,.55);
+      color:#0f172a;
     }
 
     .select{
-      appearance:none; padding-right:42px;
+      appearance:none;
+      padding-right:42px;
       background-image:
-        linear-gradient(45deg, transparent 50%, #22c55e 50%),
-        linear-gradient(135deg, #22c55e 50%, transparent 50%);
+        linear-gradient(45deg, transparent 50%, var(--rsl-accent) 50%),
+        linear-gradient(135deg, var(--rsl-accent) 50%, transparent 50%);
       background-position: calc(100% - 24px) center, calc(100% - 18px) center;
-      background-size: 7px 7px, 7px 7px; background-repeat:no-repeat;
+      background-size: 7px 7px, 7px 7px;
+      background-repeat:no-repeat;
     }
     select option{ background:#0b1220; color:#fff; }
+    body.theme-light select option{ background:#ffffff; color:#0f172a; }
+
+    .filters-foot{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
 
     /* ===== Popups ===== */
     .leaflet-popup-content-wrapper{
@@ -256,52 +432,69 @@
       box-shadow:0 30px 60px rgba(0,0,0,.8);
       color:#fff;
     }
+    body.theme-light .leaflet-popup-content-wrapper{
+      background:rgba(248,250,252,.98);
+      border-color:rgba(22,163,74,.55);
+      color:#0f172a;
+      box-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
     .leaflet-popup-tip{
       background:rgba(0,0,0,.85);
       border:1px solid rgba(34,197,94,.5);
     }
-    .leaflet-popup-content{margin:10px;min-width:200px;max-width:240px}
-    .rsl-pop-title{font:700 14px/1.25 "Outfit"}
-    .rsl-pop-loc{color:#9aa5b1;font:600 12px/1.3 "Outfit";margin:2px 0 6px}
-    .rsl-pop-desc{color:#cdd6ff;font:500 12px/1.4 "Outfit";margin-bottom:8px}
+    body.theme-light .leaflet-popup-tip{
+      background:rgba(248,250,252,.98);
+      border-color:rgba(22,163,74,.55);
+    }
+    .leaflet-popup-content{ margin:10px; min-width:200px; max-width:260px; }
+    .rsl-pop-title{ font:900 14px/1.25 "Outfit"; }
+    .rsl-pop-loc{ color:var(--rsl-muted); font:800 12px/1.3 "Outfit"; margin:2px 0 6px; }
+    .rsl-pop-desc{ color:#cdd6ff; font:600 12px/1.45 "Outfit"; margin-bottom:8px; }
+    body.theme-light .rsl-pop-desc{ color:#334155; }
+
     .rsl-pop-btn{
       display:inline-block;
-      font:800 12px/1.2 "Outfit";
+      font:900 12px/1.2 "Outfit";
       padding:8px 10px;
-      border-radius:8px;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312;
+      border-radius:10px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
       text-decoration:none;
+      box-shadow:0 10px 26px rgba(22,163,74,.35);
     }
 
-    /* ======= Footer ======= */
+    /* Footer (copie index) */
     .footer-mini .copy{
-      text-align:center; color:#9aa5b1; font-size:14px;
-      padding:24px 0 28px; margin:0;
-      border-top:1px solid rgba(255,255,255,.1);
-      background:transparent;
+      text-align:center;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
+      margin:0;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
 
-    /* ======= Bouton coach ======= */
+    /* FAB coach (copie index) */
     .coach-fab{
-      position: fixed; right:16px; bottom:16px; z-index:80;
+      position:fixed; right:16px; bottom:16px; z-index:80;
       display:inline-flex; align-items:center; gap:8px;
-      padding:12px 14px; border-radius:12px;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312; font-weight:800; text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:800; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
       border:0;
+      font-size:13px;
+      line-height:1;
     }
-    .coach-fab:hover{
-      filter:brightness(1.05);
-      transform:translateY(-1px);
-      transition:.15s ease;
-    }
-    @media (max-width:990px){
-      .coach-fab{ display:none; }
-    }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+    @media (max-width:990px){ .coach-fab{ display:none; } }
   </style>
 </head>
+
 <body>
 
   <!-- Fond vidéo -->
@@ -329,25 +522,25 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <!-- AVATAR (géré par auth.js) -->
-          <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png"
-                 alt="Avatar" style="display:none;">
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn">☰</button>
+          <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- MENU MOBILE (identique index) -->
-  <div class="mobile-sheet" id="mobileMenu">
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
       <a href="index.html">Accueil</a>
@@ -362,41 +555,40 @@
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
   <!-- CONTENU -->
-  <main class="container">
-    <div class="page-intro">
+  <main class="page">
+    <section class="intro">
       <h1>Où rider ?</h1>
       <p>
         Carte des <b>skateparks</b>, <b>street spots</b>, <b>shops partenaires</b> et <b>lieux de cours RSL</b>.<br/>
         Partage ta position avec l’app, et retrouve les riders sur la carte.
       </p>
-      <p class="disclaimer">
+      <div class="disclaimer">
         ⚠️ Les street spots sont à titre indicatif et ajoutés par les riders via
         <a href="https://ridly.ch" target="_blank" rel="noopener">Ridly.ch</a>.
         Nous déclinons toute responsabilité en cas d’usage du mobilier urbain ou de dommages liés à ces spots.
-      </p>
-    </div>
+      </div>
+    </section>
 
     <div class="map-wrap">
-      <!-- bouton filtres -->
       <div class="filters-fab">
         <button id="btnToggleFilters" class="map-btn">Filtres</button>
       </div>
 
-      <!-- panneau filtres -->
       <div class="filters-wrap" id="filtersWrap">
         <div class="filters-card">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-            <b style="font:800 13px 'Outfit'">Filtres</b>
+            <b style="font:900 13px 'Outfit';color:inherit">Filtres</b>
             <button id="btnCloseFilters" class="map-btn" style="padding:6px 10px">✕</button>
           </div>
 
-          <div class="filters-grid" style="margin-top:8px">
+          <div class="filters-grid">
             <label class="chip"><input type="checkbox" id="f-park" checked/> Parks</label>
             <label class="chip"><input type="checkbox" id="f-street" checked/> Street</label>
             <label class="chip"><input type="checkbox" id="f-shop" checked/> Shops</label>
@@ -433,9 +625,42 @@
 
   <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
-  <!-- SCRIPTS LOCAUX -->
   <script>
-    // Vidéo de fond Supabase (même logique index)
+    // Thème (clair / sombre) — identique index
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
+    // Vidéo de fond — identique index
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -461,15 +686,12 @@
       start();
 
       document.addEventListener('visibilitychange', () => {
-        if(document.hidden){
-          v.pause();
-        }else{
-          start();
-        }
+        if(document.hidden) v.pause();
+        else start();
       });
     })();
 
-    // Menu mobile (copié index)
+    // Menu mobile — identique index
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -492,281 +714,282 @@
       });
     })();
 
-    // Login ↔ Compte
+    /* ===== Supabase singleton (IMPORTANT) ===== */
+    function waitForEnv(timeoutMs=3500){
+      return new Promise((resolve)=>{
+        const start=Date.now();
+        (function tick(){
+          const ok = !!(window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON);
+          if(ok) return resolve(true);
+          if(Date.now()-start>timeoutMs) return resolve(false);
+          setTimeout(tick,30);
+        })();
+      });
+    }
+    function getSupa(){
+      if(window.__rslSupa) return window.__rslSupa;
+      if(!window.env?.SUPABASE_URL || !window.env?.SUPABASE_ANON) return null;
+      window.__rslSupa = supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+      return window.__rslSupa;
+    }
+
+    /* ===== APP MAP ===== */
     (async function(){
-      if(typeof supabase==='undefined') return;
-      try{
-        const {data:{user}}=await supabase.auth.getUser();
-        const btnLogin=document.getElementById('btnLogin');
-        const btnAccount=document.getElementById('btnAccount');
-        function ui(u){
-          if(!btnLogin || !btnAccount) return;
-          if(u){
-            btnAccount.style.display='inline-flex';
-            btnLogin.style.display='none';
-          } else {
-            btnAccount.style.display='none';
-            btnLogin.style.display='inline-flex';
-            btnLogin.textContent='Login';
+      await waitForEnv(3500);
+      const supa = getSupa();
+
+      // UI login/account (même logique que tes pages)
+      if(supa){
+        try{
+          const {data:{user}} = await supa.auth.getUser();
+          const btnLogin=document.getElementById('btnLogin');
+          const btnAccount=document.getElementById('btnAccount');
+          const navAvatar=document.getElementById('navAvatar');
+
+          function ui(u){
+            if(u){
+              if(btnAccount) btnAccount.style.display='inline-flex';
+              if(btnLogin) btnLogin.style.display='none';
+              if(navAvatar) navAvatar.style.display='inline-block';
+            }else{
+              if(btnAccount) btnAccount.style.display='none';
+              if(btnLogin) btnLogin.style.display='inline-flex';
+              if(navAvatar) navAvatar.style.display='none';
+            }
           }
-        }
-        ui(user);
-        btnLogin?.addEventListener('click',()=>location.href='compte.html');
-        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user??null));
-      }catch(e){}
-    })();
+          ui(user);
+          supa.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
+        }catch(_){}
+      }
 
-    // ===== Supabase client pour la carte =====
-    const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
-    const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
-    const supa = (window.supa) ? window.supa : supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      /* ===== Leaflet ===== */
+      const map = L.map('map', { zoomControl:true }).setView([46.8, 8.2], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19,
+        attribution:'© OpenStreetMap'
+      }).addTo(map);
 
-    /* ===== Carte ===== */
-    let map = L.map('map').setView([46.8, 8.2], 8);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      maxZoom:19,
-      attribution:'© OpenStreetMap'
-    }).addTo(map);
+      const mk = (bg, emoji='🛹') => L.divIcon({
+        className:'rsl-marker',
+        html:`<div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${bg};border:2px solid #fff;color:#fff;font-size:18px">${emoji}</div>`,
+        iconSize:[34,34], iconAnchor:[17,17]
+      });
 
-    const mk = (bg, emoji='🛹') => L.divIcon({
-      className:'rsl-marker',
-      html:`<div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${bg};border:2px solid #fff;color:#fff;font-size:18px">${emoji}</div>`,
-      iconSize:[34,34], iconAnchor:[17,17]
-    });
-    const icons = {
-      park:  mk('#7c3aed','🛹'),
-      street:mk('#f97316','🧱'),
-      shop:  mk('#ef4444','🏪'),
-      int:   mk('#16a34a','🏫'),
-      ext:   mk('#0ea5e9','🛼'),
-      rider: mk('#06b6d4','👤')
-    };
-
-    const layers = {
-      park:L.layerGroup().addTo(map),
-      street:L.layerGroup().addTo(map),
-      shop:L.layerGroup().addTo(map),
-      int:L.layerGroup().addTo(map),
-      ext:L.layerGroup().addTo(map),
-      riders:L.layerGroup().addTo(map)
-    };
-
-    const ALL_MARKERS = []; // {marker, group, canton, country, text}
-
-    /* ===== Filtres UI ===== */
-    const body = document.body;
-    document.getElementById('btnToggleFilters').onclick = ()=> body.classList.toggle('show-filters');
-    document.getElementById('btnCloseFilters').onclick  = ()=> body.classList.remove('show-filters');
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape') body.classList.remove('show-filters'); });
-
-    const F = {
-      park:   document.getElementById('f-park'),
-      street: document.getElementById('f-street'),
-      shop:   document.getElementById('f-shop'),
-      cours:  document.getElementById('f-cours'),
-      country:document.getElementById('f-country'),
-      canton: document.getElementById('f-canton'),
-      type:   document.getElementById('f-type'),
-      reset:  document.getElementById('btnReset'),
-      locate: document.getElementById('btnLocate')
-    };
-
-    // filtres visibles par défaut
-    body.classList.add('show-filters');
-
-    function applyFilters(){
-      const show = {
-        park:F.park.checked,
-        street:F.street.checked,
-        shop:F.shop.checked,
-        int:F.cours.checked,
-        ext:F.cours.checked
+      const icons = {
+        park:  mk('#7c3aed','🛹'),
+        street:mk('#f97316','🧱'),
+        shop:  mk('#ef4444','🏪'),
+        int:   mk('#16a34a','🏫'),
+        ext:   mk('#0ea5e9','🛼'),
+        rider: mk('#06b6d4','👤')
       };
-      const cantonSel  = (F.canton.value||'').trim();
-      const countrySel = (F.country.value||'').trim();
-      const txt        = (F.type.value||'').trim().toLowerCase();
 
-      ALL_MARKERS.forEach(o=>{
-        let vis = !!show[o.group] || o.group==='riders';
-        if(vis && countrySel && o.group!=='riders') vis = (o.country||'')===countrySel;
-        if(vis && cantonSel && o.group!=='riders') vis = (o.canton||'')===cantonSel;
-        if(vis && txt && o.group!=='riders') vis = (o.text||'').includes(txt);
+      const layers = {
+        park:   L.layerGroup().addTo(map),
+        street: L.layerGroup().addTo(map),
+        shop:   L.layerGroup().addTo(map),
+        int:    L.layerGroup().addTo(map),
+        ext:    L.layerGroup().addTo(map),
+        riders: L.layerGroup().addTo(map)
+      };
 
-        if(vis){
-          if(!map.hasLayer(o.marker)) o.marker.addTo(layers[o.group]);
-        }else{
-          if(map.hasLayer(o.marker)) layers[o.group].removeLayer(o.marker);
-        }
-      });
-    }
+      const ALL_MARKERS = []; // {marker, group, canton, country, text}
 
-    ['change','input'].forEach(ev=>{
-      [F.park,F.street,F.shop,F.cours,F.country,F.canton,F.type].forEach(el=>{
-        el.addEventListener(ev,applyFilters);
-      });
-    });
+      /* ===== Filtres UI ===== */
+      const body = document.body;
+      document.getElementById('btnToggleFilters').onclick = ()=> body.classList.toggle('show-filters');
+      document.getElementById('btnCloseFilters').onclick  = ()=> body.classList.remove('show-filters');
 
-    F.reset.onclick = ()=>{
-      F.park.checked = F.street.checked = F.shop.checked = F.cours.checked = true;
-      F.country.value = '';
-      F.canton.value  = '';
-      F.type.value    = '';
-      applyFilters();
-    };
+      const F = {
+        park:   document.getElementById('f-park'),
+        street: document.getElementById('f-street'),
+        shop:   document.getElementById('f-shop'),
+        cours:  document.getElementById('f-cours'),
+        country:document.getElementById('f-country'),
+        canton: document.getElementById('f-canton'),
+        type:   document.getElementById('f-type'),
+        reset:  document.getElementById('btnReset'),
+        locate: document.getElementById('btnLocate')
+      };
 
-    F.locate.onclick = ()=>{
-      if(!navigator.geolocation){ alert('Géolocalisation indisponible.'); return; }
-      navigator.geolocation.getCurrentPosition(pos=>{
-        const {latitude,longitude} = pos.coords;
-        L.circleMarker([latitude,longitude],{
-          radius:6,color:'#38bdf8',fillColor:'#38bdf8',fillOpacity:.9,weight:2
-        }).addTo(map);
-        map.setView([latitude,longitude],14);
-      },()=>alert("Impossible d'obtenir ta position."));
-    };
+      body.classList.add('show-filters');
 
-    /* ===== Données Supabase (shops, parks, street, lieux de cours) ===== */
-    (async function loadData(){
-      // shops
-      let { data: shops } = await supa.from('shops').select('*');
-      (shops||[]).forEach(s=>{
-        if(!s.lat||!s.lng) return;
-        const html = `
-          <div class="rsl-pop">
-            <div class="rsl-pop-title">${s.nom||'Shop'}</div>
-            <div class="rsl-pop-loc">${s.ville||''} (${s.canton||''})</div>
-            <div class="rsl-pop-desc">${s.description||''}</div>
-            ${s.site?`<a class="rsl-pop-btn" href="${s.site}" target="_blank" rel="noopener">Site du shop →</a>`:''}
-          </div>`;
-        const m = L.marker([s.lat,s.lng],{icon:icons.shop})
-          .bindPopup(html,{closeButton:true,autoClose:false,closeOnClick:true});
-        ALL_MARKERS.push({
-          marker:m,
-          group:'shop',
-          canton:s.canton||'',
-          country:s.country||'CH',
-          text:`${s.nom||''} ${s.ville||''} ${s.description||''}`.toLowerCase()
+      function applyFilters(){
+        const show = {
+          park:   F.park.checked,
+          street: F.street.checked,
+          shop:   F.shop.checked,
+          int:    F.cours.checked,
+          ext:    F.cours.checked
+        };
+
+        const cantonSel  = (F.canton.value||'').trim();
+        const countrySel = (F.country.value||'').trim();
+        const txt        = (F.type.value||'').trim().toLowerCase();
+
+        ALL_MARKERS.forEach(o=>{
+          let vis = !!show[o.group] || o.group === 'riders';
+
+          if(vis && countrySel && o.group!=='riders') vis = (o.country||'') === countrySel;
+          if(vis && cantonSel && o.group!=='riders')  vis = (o.canton||'') === cantonSel;
+          if(vis && txt && o.group!=='riders')        vis = (o.text||'').includes(txt);
+
+          if(vis){
+            if(!map.hasLayer(o.marker)) o.marker.addTo(layers[o.group]);
+          }else{
+            if(map.hasLayer(o.marker)) layers[o.group].removeLayer(o.marker);
+          }
         });
-        m.addTo(layers.shop);
-      });
+      }
 
-      // parks
-      let { data: parks } = await supa.from('spots').select('*');
-      (parks||[]).forEach(p=>{
-        if(!p.lat||!p.lng) return;
-        const html = `
-          <div class="rsl-pop">
-            <div class="rsl-pop-title">${p.nom||'Spot'}</div>
-            <div class="rsl-pop-loc">${p.ville||''} (${p.canton||''})</div>
-            <div class="rsl-pop-desc">${p.description ? p.description : (p.type||'')}</div>
-            <a class="rsl-pop-btn" href="spot.html?id=${p.id}" onclick="window.location.href='spot.html?id=${p.id}';return false;">Voir le spot →</a>
-          </div>`;
-        const m = L.marker([p.lat,p.lng],{icon:icons.park})
-          .bindPopup(html,{closeButton:true,autoClose:false,closeOnClick:true});
-        const text = `${p.nom||''} ${p.ville||''} ${p.canton||''} ${p.type||''} ${p.description||''}`.toLowerCase();
-        ALL_MARKERS.push({
-          marker:m,
-          group:'park',
-          canton:p.canton||'',
-          country:p.country||'CH',
-          text
+      ['change','input'].forEach(ev=>{
+        [F.park,F.street,F.shop,F.cours,F.country,F.canton,F.type].forEach(el=>{
+          el.addEventListener(ev,applyFilters);
         });
-        m.addTo(layers.park);
       });
 
-      // street (bunny)
-      let { data: streets } = await supa.from('bunny').select('*');
-      (streets||[]).forEach(s=>{
-        if(!s.lat||!s.lng) return;
-        const html = `
-          <div class="rsl-pop">
-            <div class="rsl-pop-title">${s.nom||'Street spot'}</div>
-            <div class="rsl-pop-loc">${s.ville||''} (${s.canton||''})</div>
-            <div class="rsl-pop-desc">${s.description ? s.description : (s.type||'')}</div>
-            <a class="rsl-pop-btn" href="spot.html?id=${s.id}&street=1" onclick="window.location.href='spot.html?id=${s.id}&street=1';return false;">Voir le spot →</a>
-          </div>`;
-        const m = L.marker([s.lat,s.lng],{icon:icons.street})
-          .bindPopup(html,{closeButton:true,autoClose:false,closeOnClick:true});
-        const text = `${s.nom||''} ${s.ville||''} ${s.canton||''} ${s.type||''} ${s.description||''}`.toLowerCase();
-        ALL_MARKERS.push({
-          marker:m,
-          group:'street',
-          canton:s.canton||'',
-          country:s.country||'CH',
-          text
+      F.reset.onclick = ()=>{
+        F.park.checked = F.street.checked = F.shop.checked = F.cours.checked = true;
+        F.country.value = '';
+        F.canton.value  = '';
+        F.type.value    = '';
+        applyFilters();
+      };
+
+      F.locate.onclick = ()=>{
+        if(!navigator.geolocation){ alert('Géolocalisation indisponible.'); return; }
+        navigator.geolocation.getCurrentPosition(pos=>{
+          const {latitude,longitude} = pos.coords;
+          L.circleMarker([latitude,longitude],{
+            radius:6,color:'#38bdf8',fillColor:'#38bdf8',fillOpacity:.9,weight:2
+          }).addTo(map);
+          map.setView([latitude,longitude],14);
+        },()=>alert("Impossible d'obtenir ta position."));
+      };
+
+      /* ===== Data Supabase ===== */
+      async function loadData(){
+        if(!supa){ console.warn("Supabase env manquant"); return; }
+
+        // shops
+        let { data: shops } = await supa.from('shops').select('*');
+        (shops||[]).forEach(s=>{
+          if(!s.lat||!s.lng) return;
+          const html = `
+            <div class="rsl-pop">
+              <div class="rsl-pop-title">${s.nom||'Shop'}</div>
+              <div class="rsl-pop-loc">${s.ville||''} ${s.canton?`(${s.canton})`:''}</div>
+              <div class="rsl-pop-desc">${s.description||''}</div>
+              ${s.site?`<a class="rsl-pop-btn" href="${s.site}" target="_blank" rel="noopener">Site du shop →</a>`:''}
+            </div>`;
+          const m = L.marker([s.lat,s.lng],{icon:icons.shop}).bindPopup(html);
+          ALL_MARKERS.push({
+            marker:m,
+            group:'shop',
+            canton:s.canton||'',
+            country:s.country||'CH',
+            text:`${s.nom||''} ${s.ville||''} ${s.description||''}`.toLowerCase()
+          });
+          m.addTo(layers.shop);
         });
-        m.addTo(layers.street);
-      });
 
-      // lieux de cours (fixes)
-      [
-        {group:'int',  n:'Cours RSL — Montreux (indoor)', lat:46.433, lng:6.910, desc:'Session encadrée en intérieur'},
-        {group:'int',  n:'Cours RSL — Lausanne (La Fièvre)', lat:46.52229897, lng:6.61796801, desc:'Cours en salle / rampes / park'},
-        {group:'ext',  n:'Cours RSL — Vidy', lat:46.523, lng:6.610, desc:'En extérieur, bord du lac'},
-      ].forEach(c=>{
-        const html = `
-          <div class="rsl-pop">
-            <div class="rsl-pop-title">${c.n}</div>
-            <div class="rsl-pop-desc">${c.desc||''}</div>
-            <a class="rsl-pop-btn" href="cours.html">Infos cours →</a>
-          </div>`;
-        const m = L.marker([c.lat,c.lng],{icon:icons[c.group]})
-          .bindPopup(html,{closeButton:true,autoClose:false,closeOnClick:true});
-        ALL_MARKERS.push({
-          marker:m,
-          group:c.group,
-          canton:'',
-          country:'CH',
-          text:(c.n+' '+(c.desc||'')).toLowerCase()
+        // parks (table spots)
+        let { data: parks } = await supa.from('spots').select('*');
+        (parks||[]).forEach(p=>{
+          if(!p.lat||!p.lng) return;
+          const html = `
+            <div class="rsl-pop">
+              <div class="rsl-pop-title">${p.nom||'Spot'}</div>
+              <div class="rsl-pop-loc">${p.ville||''} ${p.canton?`(${p.canton})`:''}</div>
+              <div class="rsl-pop-desc">${p.description ? p.description : (p.type||'')}</div>
+              <a class="rsl-pop-btn" href="spot.html?id=${p.id}" onclick="window.location.href='spot.html?id=${p.id}';return false;">Voir le spot →</a>
+            </div>`;
+          const m = L.marker([p.lat,p.lng],{icon:icons.park}).bindPopup(html);
+          const text = `${p.nom||''} ${p.ville||''} ${p.canton||''} ${p.type||''} ${p.description||''}`.toLowerCase();
+          ALL_MARKERS.push({ marker:m, group:'park', canton:p.canton||'', country:p.country||'CH', text });
+          m.addTo(layers.park);
         });
-        m.addTo(layers[c.group]);
-      });
 
-      // remplir les cantons CH
-      const cantons = new Set();
-      ALL_MARKERS.forEach(o=>{ if(o.country==='CH' && o.canton) cantons.add(o.canton); });
-      document.getElementById('f-canton').innerHTML =
-        '<option value="">Canton (CH)</option>' +
-        Array.from(cantons).sort().map(c=>`<option value="${c}">${c}</option>`).join('');
+        // street (table bunny)
+        let { data: streets } = await supa.from('bunny').select('*');
+        (streets||[]).forEach(s=>{
+          if(!s.lat||!s.lng) return;
+          const html = `
+            <div class="rsl-pop">
+              <div class="rsl-pop-title">${s.nom||'Street spot'}</div>
+              <div class="rsl-pop-loc">${s.ville||''} ${s.canton?`(${s.canton})`:''}</div>
+              <div class="rsl-pop-desc">${s.description ? s.description : (s.type||'')}</div>
+              <a class="rsl-pop-btn" href="spot.html?id=${s.id}&street=1" onclick="window.location.href='spot.html?id=${s.id}&street=1';return false;">Voir le spot →</a>
+            </div>`;
+          const m = L.marker([s.lat,s.lng],{icon:icons.street}).bindPopup(html);
+          const text = `${s.nom||''} ${s.ville||''} ${s.canton||''} ${s.type||''} ${s.description||''}`.toLowerCase();
+          ALL_MARKERS.push({ marker:m, group:'street', canton:s.canton||'', country:s.country||'CH', text });
+          m.addTo(layers.street);
+        });
 
-      applyFilters();
+        // lieux de cours (fixes)
+        [
+          {group:'int',  n:'Cours RSL — Montreux (indoor)', lat:46.433, lng:6.910, desc:'Session encadrée en intérieur'},
+          {group:'int',  n:'Cours RSL — Lausanne (La Fièvre)', lat:46.52229897, lng:6.61796801, desc:'Cours en salle / rampes / park'},
+          {group:'ext',  n:'Cours RSL — Vidy', lat:46.523, lng:6.610, desc:'En extérieur, bord du lac'}
+        ].forEach(c=>{
+          const html = `
+            <div class="rsl-pop">
+              <div class="rsl-pop-title">${c.n}</div>
+              <div class="rsl-pop-desc">${c.desc||''}</div>
+              <a class="rsl-pop-btn" href="cours.html">Infos cours →</a>
+            </div>`;
+          const m = L.marker([c.lat,c.lng],{icon:icons[c.group]}).bindPopup(html);
+          ALL_MARKERS.push({ marker:m, group:c.group, canton:'', country:'CH', text:(c.n+' '+(c.desc||'')).toLowerCase() });
+          m.addTo(layers[c.group]);
+        });
+
+        // cantons CH
+        const cantons = new Set();
+        ALL_MARKERS.forEach(o=>{ if(o.country==='CH' && o.canton) cantons.add(o.canton); });
+        F.canton.innerHTML = '<option value="">Canton (CH)</option>' +
+          Array.from(cantons).sort().map(c=>`<option value="${c}">${c}</option>`).join('');
+
+        applyFilters();
+      }
+
+      /* ===== Riders (affichage uniquement) ===== */
+      let currentUser = null;
+      if(supa){
+        try{
+          const { data:{ user } } = await supa.auth.getUser();
+          currentUser = user || null;
+        }catch(_){}
+      }
+
+      async function loadRiders(){
+        if(!supa) return;
+
+        const { data: rows } = await supa
+          .from('rider_locations_view')
+          .select('*')
+          .gt('expires_at', new Date().toISOString());
+
+        layers.riders.clearLayers();
+
+        (rows||[]).forEach(r=>{
+          if(currentUser && r.user_id===currentUser.id) return;
+          if(!r.lat||!r.lng) return;
+
+          const name = r.full_name || r.username || r.email || 'Rider';
+          const popup = `
+            <div class="rsl-pop">
+              <div class="rsl-pop-title">${name}</div>
+              <div class="rsl-pop-desc">Actif récemment (via l’app)</div>
+            </div>`;
+          L.marker([r.lat,r.lng],{icon:icons.rider}).bindPopup(popup).addTo(layers.riders);
+        });
+      }
+
+      await loadData();
+      loadRiders();
+      setInterval(loadRiders, 20000);
     })();
-
-    /* ===== Riders (affichage uniquement, partage via app) ===== */
-    let currentUser = null;
-
-    (async function(){
-      try{
-        const { data:{ user } } = await supa.auth.getUser();
-        currentUser = user || null;
-      }catch(_){}
-    })();
-
-    async function loadRiders(){
-      const { data: rows } = await supa
-        .from('rider_locations_view')
-        .select('*')
-        .gt('expires_at', new Date().toISOString());
-
-      layers.riders.clearLayers();
-
-      (rows||[]).forEach(r=>{
-        if(currentUser && r.user_id===currentUser.id) return;
-        if(!r.lat||!r.lng) return;
-        const name = r.full_name || r.username || r.email || 'Rider';
-        const popup = `
-          <div class="rsl-pop">
-            <div class="rsl-pop-title">${name}</div>
-            <div class="rsl-pop-desc">Actif récemment (via l’app)</div>
-          </div>`;
-        const m = L.marker([r.lat,r.lng],{icon:icons.rider})
-          .bindPopup(popup,{closeButton:true});
-        m.addTo(layers.riders);
-      });
-    }
-
-    setInterval(loadRiders, 20000);
-    loadRiders();
   </script>
 </body>
 </html>

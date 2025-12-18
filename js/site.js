@@ -1,54 +1,93 @@
-/* ================= MOBILE MENU ================= */
+/* ================= MENU MOBILE ================= */
 (function(){
-  const btn = document.getElementById('menuBtn');
+  const btn   = document.getElementById('menuBtn');
   const sheet = document.getElementById('mobileMenu');
 
-  if(btn && sheet){
+  if (btn && sheet) {
     const close = () => sheet.classList.remove('open');
 
-    btn.addEventListener('click', ()=> sheet.classList.add('open'));
+    btn.addEventListener('click', () => sheet.classList.add('open'));
     sheet.querySelector('.mobile-dim')?.addEventListener('click', close);
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
   }
 })();
 
-/* ================= AVATAR GLOBAL ================= */
-const DEFAULT_AVATAR = "images/default-avatar.png";
+/* ================= AVATAR GLOBAL RSL ================= */
 
-function getAvatarLS(){
-  try{ return localStorage.getItem('rsl_avatar'); }
-  catch{ return null; }
+const RSL_LOCAL_AVATAR_KEY = "rsl_avatar";          // clé unique LS
+const RSL_DEFAULT_AVATAR   = "images/logo_rsl.png"; // image par défaut
+
+function rslGetAvatarLS(){
+  try{
+    return localStorage.getItem(RSL_LOCAL_AVATAR_KEY);
+  }catch(e){
+    console.warn("Impossible de lire avatar LS", e);
+    return null;
+  }
 }
 
-function applyAvatarUI(){
-  const avatar = document.getElementById('navAvatar');
-  if(!avatar) return;
-  avatar.src = getAvatarLS() || DEFAULT_AVATAR;
+/**
+ * user = objet Supabase user ou null
+ * → l’avatar est TOUJOURS le même :
+ *   - si localStorage → photo uploadée
+ *   - sinon → logo RSL
+ */
+function rslApplyAvatarToUI(user){
+  const avatar   = document.getElementById('navAvatar');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnAcc   = document.getElementById('btnAccount');
+
+  if (!avatar) return;
+
+  // Même image partout
+  const src = rslGetAvatarLS() || RSL_DEFAULT_AVATAR;
+  avatar.src = src;
+  avatar.style.display = "inline-block";
+
+  // Gestion des boutons
+  if (user) {
+    if (btnLogin) btnLogin.style.display = "none";
+    if (btnAcc)   btnAcc.style.display   = "inline-flex";
+  } else {
+    if (btnLogin) btnLogin.style.display = "inline-flex";
+    if (btnAcc)   btnAcc.style.display   = "none";
+  }
 }
+
+/* ========= INITIALISATION GLOBALE ========= */
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const navAvatar = document.getElementById('navAvatar');
-  const btnLogin  = document.getElementById('btnLogin');
-  const btnAccount= document.getElementById('btnAccount');
+  // Clique sur le bouton Login → page access.html
+  const btnLogin = document.getElementById('btnLogin');
+  if (btnLogin) {
+    btnLogin.addEventListener('click', () => {
+      window.location.href = "access.html";
+    });
+  }
 
-  if(!window.supabase || !navAvatar) return;
+  // Pas de Supabase / env → avatar invité
+  if (!window.supabase || !window.env || !window.env.SUPABASE_URL || !window.env.SUPABASE_ANON) {
+    console.error("Supabase ou env.js manquant → avatar en mode invité");
+    rslApplyAvatarToUI(null);
+    return;
+  }
 
-  const sb = window.supabase.createClient(
-      "https://jynxifufaauoxwzjapzq.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4"
-  );
+  // Un seul client global
+  if (!window.rslSupabase) {
+    window.rslSupabase = window.supabase.createClient(
+      window.env.SUPABASE_URL,
+      window.env.SUPABASE_ANON
+    );
+  }
+  const sb = window.rslSupabase;
 
-  /* Vérifie connexion user */
-  const { data:{ user } } = await sb.auth.getUser();
-
-  if(user){ // connecté
-    applyAvatarUI();
-    navAvatar.style.display="inline-block";
-    btnLogin && (btnLogin.style.display="none");
-    btnAccount && (btnAccount.style.display="inline-flex");
-  } else {
-    navAvatar.style.display="none";
-    btnLogin && (btnLogin.style.display="inline-block");
-    btnAccount && (btnAccount.style.display="none");
+  try {
+    const { data:{ user } } = await sb.auth.getUser();
+    rslApplyAvatarToUI(user || null);
+  } catch (e) {
+    console.warn("Erreur getUser Supabase", e);
+    rslApplyAvatarToUI(null);
   }
 });

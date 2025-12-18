@@ -60,6 +60,7 @@
       margin-top:10px;
       margin-bottom:8px;
       border-bottom:1px solid rgba(30,41,59,.8);
+      flex-wrap:wrap;
     }
     .tab-btn{
       border:0;
@@ -198,32 +199,117 @@
       font-size:13px;
       min-width:140px;
     }
+
+    /* champs abonnement */
+    .membership-select{
+      width:140px;
+      padding:5px 8px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      font-size:13px;
+    }
+    .membership-date{
+      padding:5px 8px;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      font-size:13px;
+    }
+
+    /* form création cours (onglet 3) */
+    .course-form{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:flex-end;
+      margin-bottom:10px;
+      font-size:13px;
+    }
+    .course-form .field{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .course-form label{
+      font-size:12px;
+      color:#cbd5e1;
+    }
+    .course-form input{
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      font-size:13px;
+    }
+    .course-form button{
+      padding:8px 14px;
+      border-radius:999px;
+      border:0;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      background:#22c55e;
+      color:#062312;
+    }
+    .course-form button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    #adminCoursesList{
+      margin-top:8px;
+      font-size:13px;
+    }
+    #adminCoursesList table th,
+    #adminCoursesList table td{
+      font-size:13px;
+      padding:6px 8px;
+    }
+
+    .btn-delete-course{
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(248,113,113,.8);
+      background:rgba(127,29,29,.9);
+      color:#fee2e2;
+      font-size:11px;
+      cursor:pointer;
+    }
+    .btn-delete-course:hover{
+      background:rgba(153,27,27,1);
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Admin RSL</h1>
     <p class="subtitle">
-      Gestion des coachs, admins et vue sur les inscriptions aux cours.
+      Gestion des coachs, admins, abonnements et vue sur les inscriptions aux cours.
     </p>
     <div id="adminStatus" class="status" style="display:none;"></div>
 
-    <!-- ONGLES -->
+    <!-- ONGLETs -->
     <div class="tabs">
-      <button class="tab-btn active" data-tab="coachs">Utilisateurs / Coachs</button>
+      <button class="tab-btn active" data-tab="coachs">Utilisateurs / Coachs / Abonnements</button>
       <button class="tab-btn" data-tab="courses">Cours & inscriptions</button>
+      <button class="tab-btn" data-tab="course-dates">Dates de cours (table courses)</button>
     </div>
 
-    <!-- ONGLET 1 : COACHS / UTILISATEURS -->
+    <!-- ONGLET 1 : COACHS / UTILISATEURS / ABOS -->
     <section class="block" id="tab-coachs">
       <div class="block-header">
-        <h2>Utilisateurs / Coachs</h2>
+        <h2>Utilisateurs / Coachs / Abonnements</h2>
         <span id="coachStats" class="block-stat"></span>
       </div>
 
       <p style="font-size:13px;color:#9ca3af;margin-bottom:8px;">
-        Coche les utilisateurs qui ont le droit d’accéder à la page <code>coach.html</code> et ceux qui sont <b>admins RSL</b>.<br>
-        Tu peux filtrer par statut coach et par localité.
+        - Coche les utilisateurs qui ont le droit d’accéder à la page <code>coach.html</code> et ceux qui sont <b>admins RSL</b>.<br>
+        - Choisis un <b>abonnement</b> pour chaque utilisateur (Starter, Rider, Progression, Premium, Soutien) et une <b>date d’expiration</b>.<br>
+        L’abonnement est enregistré dans la table <code>rsl_memberships</code> (is_paid = true quand tu le valides ici).
       </p>
 
       <div class="filters-row">
@@ -248,24 +334,61 @@
     <section class="block hidden" id="tab-courses">
       <div class="block-header">
         <h2>Cours & inscriptions</h2>
-        <!-- compteur des cours sélectionnés EN HAUT À DROITE -->
         <span id="courseStats" class="block-stat"></span>
       </div>
 
       <p style="font-size:13px;color:#9ca3af;margin-bottom:8px;">
-        Vue des cours et du nombre de jeunes inscrits.  
-        Clique sur un cours pour afficher le détail des inscriptions.
+        Vue de tous les cours enregistrés via le panier (tous les utilisateurs).  
+        Clique sur un cours pour afficher le détail des inscriptions et les coachs marqués présents.
       </p>
 
       <div class="filters-row">
-        <span>Filtrer par ville :</span>
+        <span>Filtrer par lieu :</span>
         <select id="courseCityFilter">
-          <option value="">Toutes les villes</option>
+          <option value="">Tous les lieux</option>
         </select>
       </div>
 
       <div id="coursesContent">
         <p>Chargement des cours…</p>
+      </div>
+    </section>
+
+    <!-- ONGLET 3 : DATES DE COURS (TABLE COURSES) -->
+    <section class="block hidden" id="tab-course-dates">
+      <div class="block-header">
+        <h2>Dates de cours (table <code>courses</code>)</h2>
+        <span id="courseDatesStats" class="block-stat"></span>
+      </div>
+
+      <p style="font-size:13px;color:#9ca3af;margin-bottom:8px;">
+        Ici tu gères les <b>dates de cours "brutes"</b> dans la table <code>courses</code>.<br>
+        Elles sont utilisées sur la page <code>coach.html</code> pour les disponibilités des coachs.
+      </p>
+
+      <h3 style="font-size:16px;margin:10px 0 6px;">Créer une nouvelle date de cours</h3>
+      <form id="courseCreateForm" class="course-form">
+        <div class="field">
+          <label for="newCourseLocation">Lieu / skatepark</label>
+          <input id="newCourseLocation" type="text" placeholder="Montreux, Aigle, Lausanne..." required/>
+        </div>
+        <div class="field">
+          <label for="newCourseDate">Date</label>
+          <input id="newCourseDate" type="date" required/>
+        </div>
+        <div class="field">
+          <label for="newCourseTime">Heure</label>
+          <input id="newCourseTime" type="time" required/>
+        </div>
+        <div class="field">
+          <label for="newCourseCapacity">Places (optionnel)</label>
+          <input id="newCourseCapacity" type="number" min="0" placeholder="10"/>
+        </div>
+        <button type="submit" id="btnCreateCourse">Créer le cours</button>
+      </form>
+
+      <div id="adminCoursesList">
+        <p>Chargement des dates de cours (table <code>courses</code>)…</p>
       </div>
     </section>
   </div>
@@ -289,9 +412,23 @@
 
     const courseCityFilterEl  = document.getElementById('courseCityFilter');
     const courseStatsEl       = document.getElementById('courseStats');
+    const courseDatesStatsEl  = document.getElementById('courseDatesStats');
 
-    let profilesData = [];
-    let coursesData  = [];
+    // Onglet 3 (dates de cours)
+    const courseCreateForm   = document.getElementById('courseCreateForm');
+    const newCourseLocation  = document.getElementById('newCourseLocation');
+    const newCourseDate      = document.getElementById('newCourseDate');
+    const newCourseTime      = document.getElementById('newCourseTime');
+    const newCourseCapacity  = document.getElementById('newCourseCapacity');
+    const adminCoursesListEl = document.getElementById('adminCoursesList');
+    const btnCreateCourse    = document.getElementById('btnCreateCourse');
+
+    let profilesData        = [];
+    let membershipData      = [];
+    let registrationsData   = [];
+    let groupedCoursesData  = [];
+    let coachAvailabilities = []; // {course_id, coach_id}
+    let coursesData         = []; // from table courses
 
     function showStatus(msg, isError = false){
       statusEl.textContent = msg;
@@ -330,6 +467,148 @@
       return user;
     }
 
+    /* ========== ABONNEMENTS (rsl_memberships) ========== */
+
+    async function loadMemberships(){
+      try{
+        const { data, error } = await supa
+          .from('rsl_memberships')
+          .select('id, user_id, membership_code, is_paid, expires_at, created_at')
+          .order('created_at', { ascending:false });
+
+        if(error){
+          console.warn("Erreur chargement memberships:", error);
+          membershipData = [];
+          return;
+        }
+        membershipData = data || [];
+      }catch(e){
+        console.warn("Erreur memberships:", e);
+        membershipData = [];
+      }
+    }
+
+    // On regarde la DERNIÈRE ligne pour ce user et on décide si un abo est actif
+    function getMembershipForUser(userId){
+      const rows = membershipData.filter(m => m.user_id === userId);
+      if(!rows.length) return null;
+
+      rows.sort((a,b)=>{
+        const da = new Date(a.created_at || 0);
+        const db = new Date(b.created_at || 0);
+        return db - da;
+      });
+
+      const latest = rows[0];
+      const now = new Date();
+
+      if(!latest.membership_code || !latest.is_paid){
+        return null;
+      }
+
+      if(latest.expires_at){
+        const d = new Date(latest.expires_at);
+        if(!isNaN(d.getTime()) && d < now){
+          return null;
+        }
+      }
+
+      return latest;
+    }
+
+    // Helper : récupérer vraiment la dernière ligne (même expirée / non payée)
+    function getLatestMembershipRowForUser(userId){
+      const rows = membershipData.filter(m => m.user_id === userId);
+      if(!rows.length) return null;
+
+      rows.sort((a,b)=>{
+        const da = new Date(a.created_at || 0);
+        const db = new Date(b.created_at || 0);
+        return db - da;
+      });
+
+      return rows[0];
+    }
+
+    // Chaque changement :
+    // - "Aucun" → on expire l'abo actuel (is_paid=false)
+    // - un code → on insère une nouvelle ligne avec ce code
+    async function saveMembership(userId, code, expires){
+      try{
+        const hasCode = !!code;
+
+        // CASE 1 : “Aucun” → désactiver abo actuel
+        if(!hasCode){
+          const latest = getLatestMembershipRowForUser(userId);
+
+          if(latest){
+            const nowIso = new Date().toISOString();
+
+            const { data, error } = await supa
+              .from('rsl_memberships')
+              .update({
+                expires_at: nowIso,
+                is_paid   : false
+              })
+              .eq('id', latest.id)
+              .select('*')
+              .maybeSingle();
+
+            if(error) throw error;
+
+            const idx = membershipData.findIndex(m => m.id === latest.id);
+            if(idx !== -1){
+              membershipData[idx] = data || {
+                ...latest,
+                expires_at: nowIso,
+                is_paid   : false
+              };
+            }
+          }
+
+          showStatus("Abonnement désactivé pour cet utilisateur.");
+          renderUsers();
+          return;
+        }
+
+        // CASE 2 : un abonnement choisi
+        const payload = {
+          user_id        : userId,
+          membership_code: code,
+          is_paid        : true
+        };
+
+        if(expires){
+          payload.expires_at = expires;
+        }
+
+        const { data, error } = await supa
+          .from('rsl_memberships')
+          .insert(payload)
+          .select('*')
+          .maybeSingle();
+
+        if(error) throw error;
+
+        if(data){
+          membershipData.unshift(data);
+        }else{
+          membershipData.unshift({
+            ...payload,
+            id        : (crypto.randomUUID ? crypto.randomUUID() : `temp-${Date.now()}`),
+            created_at: new Date().toISOString()
+          });
+        }
+
+        showStatus("Abonnement mis à jour pour cet utilisateur.");
+        renderUsers();
+
+      }catch(err){
+        console.error(err);
+        showStatus("Erreur mise à jour abonnement : " + (err.message || err.code || ""), true);
+      }
+    }
+
     /* ========== ONGLET COACHS / UTILISATEURS ========== */
 
     async function loadUsers(){
@@ -348,6 +627,8 @@
       }
 
       profilesData = data || [];
+
+      await loadMemberships();
 
       buildCoachCityOptions();
       renderUsers();
@@ -412,6 +693,10 @@
         const cityText = p.city ? p.city : "—";
         const adminTag = p.is_admin ? '<span class="tag admin">Admin</span>' : '';
 
+        const memb = getMembershipForUser(p.id);
+        const code = memb?.membership_code || "";
+        const exp  = memb?.expires_at ? String(memb.expires_at).slice(0,10) : "";
+
         return `
           <tr data-user-id="${p.id}">
             <td>${label}<br>
@@ -428,6 +713,20 @@
             <td class="center">
               <input type="checkbox" data-role="admin-toggle" ${checkedAdmin}>
             </td>
+            <td>
+              <select class="membership-select" data-role="membership-select">
+                <option value="">Aucun</option>
+                <option value="starter" ${code==="starter"?"selected":""}>Starter</option>
+                <option value="rider" ${code==="rider"?"selected":""}>Rider</option>
+                <option value="progression" ${code==="progression"?"selected":""}>Progression</option>
+                <option value="premium" ${code==="premium"?"selected":""}>Premium</option>
+                <option value="support" ${code==="support"?"selected":""}>Soutien</option>
+              </select>
+            </td>
+            <td>
+              <input type="date" class="membership-date" data-role="membership-expiration"
+                     value="${exp}">
+            </td>
           </tr>
         `;
       }).join("");
@@ -441,6 +740,8 @@
               <th>Statuts</th>
               <th class="center">Coach</th>
               <th class="center">Admin</th>
+              <th>Abonnement</th>
+              <th>Expire le</th>
             </tr>
           </thead>
           <tbody>
@@ -490,7 +791,7 @@
       renderUsers();
     }
 
-    /* ========== ONGLET COURS / INSCRIPTIONS ========== */
+    /* ========== ONGLET 3 : TABLE COURSES ========== */
 
     function formatDateFR(d){
       if(!(d instanceof Date) || isNaN(d.getTime())) return "";
@@ -503,16 +804,237 @@
       if(!(d instanceof Date) || isNaN(d.getTime())) return "";
       const hh = String(d.getHours()).padStart(2,'0');
       const mm = String(d.getMinutes()).padStart(2,'0');
-      return hh + "h" + mm;
+      return hh + ":" + mm;
+    }
+
+    async function loadCoursesTable(){
+      if(!adminCoursesListEl) return;
+      adminCoursesListEl.innerHTML = '<p>Chargement des dates de cours (table <code>courses</code>)…</p>';
+
+      try{
+        const { data, error } = await supa
+          .from('courses')
+          .select('id, location, starts_at, capacity')
+          .order('starts_at', { ascending:true });
+
+        if(error){
+          console.error(error);
+          adminCoursesListEl.innerHTML =
+            '<p style="color:#fca5a5;">Erreur chargement des cours (table courses).</p>';
+          return;
+        }
+
+        coursesData = data || [];
+        renderCoursesTable();
+      }catch(e){
+        console.error(e);
+        adminCoursesListEl.innerHTML =
+          '<p style="color:#fca5a5;">Erreur chargement des cours (table courses).</p>';
+      }
+    }
+
+    function renderCoursesTable(){
+      if(!adminCoursesListEl) return;
+
+      if(!coursesData.length){
+        adminCoursesListEl.innerHTML =
+          '<p>Aucune date dans la table <code>courses</code> pour l’instant.</p>';
+        if(courseDatesStatsEl) courseDatesStatsEl.textContent = "0 date";
+        return;
+      }
+
+      if(courseDatesStatsEl){
+        courseDatesStatsEl.textContent = coursesData.length + " date(s) de cours";
+      }
+
+      const rows = coursesData.map(c=>{
+        const d = c.starts_at ? new Date(c.starts_at) : null;
+        const dateTxt = d ? formatDateFR(d) : "—";
+        const timeTxt = d ? formatTimeFR(d) : "—";
+        const cap = (c.capacity != null) ? c.capacity : "—";
+
+        return `
+          <tr>
+            <td>${c.location || "—"}</td>
+            <td>${dateTxt}</td>
+            <td>${timeTxt}</td>
+            <td class="center">${cap}</td>
+            <td style="font-size:11px;color:#9ca3af;">${c.id}</td>
+            <td class="center">
+              <button type="button"
+                      class="btn-delete-course"
+                      data-course-id="${c.id}">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      adminCoursesListEl.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Lieu</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <th class="center">Places</th>
+              <th>ID cours</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function handleCreateCourse(e){
+      e.preventDefault();
+      if(!supa) return;
+
+      const loc = (newCourseLocation?.value || "").trim();
+      const dateVal = newCourseDate?.value || "";
+      const timeVal = newCourseTime?.value || "";
+      const capVal  = newCourseCapacity?.value || "";
+
+      if(!loc || !dateVal || !timeVal){
+        showStatus("Merci de remplir au minimum le lieu, la date et l’heure du cours.", true);
+        return;
+      }
+
+      const dtStr = dateVal + "T" + timeVal + ":00";
+      const d = new Date(dtStr);
+      if(isNaN(d.getTime())){
+        showStatus("Date/heure invalide.", true);
+        return;
+      }
+
+      let cap = null;
+      if(capVal !== ""){
+        const parsed = parseInt(capVal, 10);
+        if(!isNaN(parsed) && parsed >= 0){
+          cap = parsed;
+        }
+      }
+
+      btnCreateCourse.disabled = true;
+      btnCreateCourse.textContent = "Création…";
+
+      try{
+        const payload = {
+          location : loc,
+          starts_at: d.toISOString(),
+          capacity : cap
+        };
+
+        const { data, error } = await supa
+          .from('courses')
+          .insert(payload)
+          .select('id, location, starts_at, capacity')
+          .maybeSingle();
+
+        if(error) throw error;
+
+        if(data){
+          coursesData.push(data);
+          renderCoursesTable();
+        }
+
+        showStatus("Cours créé avec succès.", false);
+
+        if(newCourseLocation) newCourseLocation.value = "";
+        if(newCourseDate)     newCourseDate.value = "";
+        if(newCourseTime)     newCourseTime.value = "";
+        if(newCourseCapacity) newCourseCapacity.value = "";
+
+      }catch(err){
+        console.error(err);
+        showStatus("Erreur lors de la création du cours : " + (err.message || err.code || ""), true);
+      }
+
+      btnCreateCourse.disabled = false;
+      btnCreateCourse.textContent = "Créer le cours";
+    }
+
+    async function handleDeleteCourse(courseId){
+      if(!courseId) return;
+
+      try{
+        const { error } = await supa
+          .from('courses')
+          .delete()
+          .eq('id', courseId);
+
+        if(error) throw error;
+
+        coursesData = coursesData.filter(c => String(c.id) !== String(courseId));
+        renderCoursesTable();
+        showStatus("Cours supprimé avec succès.", false);
+      }catch(err){
+        console.error(err);
+        showStatus("Erreur lors de la suppression du cours : " + (err.message || err.code || ""), true);
+      }
+    }
+
+    /* ========== ONGLET 2 : INSCRIPTIONS + COACHS PRÉSENTS ========== */
+
+    async function loadCoachAvailabilities(){
+      coachAvailabilities = [];
+      try{
+        const { data, error } = await supa
+          .from('rsl_coach_availabilities')
+          .select('course_id, coach_id');
+
+        if(error){
+          console.warn("Erreur chargement coach_avail:", error);
+          coachAvailabilities = [];
+          return;
+        }
+        coachAvailabilities = data || [];
+      }catch(e){
+        console.warn("Erreur coach_avail:", e);
+        coachAvailabilities = [];
+      }
     }
 
     async function loadCoursesWithEnrollments(){
       coursesContent.innerHTML = "<p>Chargement des cours…</p>";
 
       const { data, error } = await supa
-        .from('courses')
-        .select('id, location, starts_at, capacity, enrollments(*)')
-        .order('starts_at', { ascending:true });
+        .from('rsl_course_registrations')
+        .select(`
+          id,
+          user_id,
+          course_id,
+          date,
+          date_label,
+          spot_name,
+          course_spot_name,
+          title,
+          course_title,
+          price_chf,
+          course_price_chf,
+          membership_included,
+          is_paid,
+          course_is_paid,
+          payment_status,
+          created_at,
+          parent_first_name,
+          parent_last_name,
+          parent_phone,
+          parent_email,
+          rider_first_name,
+          rider_last_name,
+          rider_age,
+          medical_note,
+          photo_consent,
+          legal_representative_ok,
+          discharge_ok
+        `)
+        .order('date', { ascending:true })
+        .order('created_at', { ascending:true });
 
       if(error){
         console.error(error);
@@ -521,41 +1043,116 @@
         return;
       }
 
-      coursesData = data || [];
-
+      registrationsData = data || [];
+      groupRegistrationsByCourse();
+      await loadCoachAvailabilities();
       buildCourseCityOptions();
       renderCoursesAdmin();
+    }
+
+    function groupRegistrationsByCourse(){
+      const map = new Map();
+
+      registrationsData.forEach(r => {
+        const spot = r.course_spot_name || r.spot_name || "Lieu inconnu";
+        let dateLabel = r.date_label || "";
+        let dateSort = null;
+
+        if(r.date){
+          const d = new Date(r.date);
+          if(!isNaN(d.getTime())){
+            dateSort = d;
+            if(!dateLabel) dateLabel = formatDateFR(d);
+          }
+        }
+        if(!dateSort && r.created_at){
+          const d2 = new Date(r.created_at);
+          if(!isNaN(d2.getTime())) dateSort = d2;
+        }
+
+        if(!dateLabel) dateLabel = "Date à confirmer";
+
+        const key = spot + "||" + dateLabel;
+
+        if(!map.has(key)){
+          map.set(key, {
+            key,
+            spot,
+            dateLabel,
+            dateSort,
+            registrations: [],
+            courseIds: []
+          });
+        }
+        const group = map.get(key);
+        group.registrations.push(r);
+
+        if(r.course_id){
+          const cid = String(r.course_id);
+          if(!group.courseIds.includes(cid)){
+            group.courseIds.push(cid);
+          }
+        }
+      });
+
+      groupedCoursesData = Array.from(map.values())
+        .sort((a,b)=>{
+          const da = a.dateSort || new Date(0);
+          const db = b.dateSort || new Date(0);
+          return da - db;
+        });
     }
 
     function buildCourseCityOptions(){
       if(!courseCityFilterEl) return;
 
-      const cities = Array.from(new Set(
-        coursesData
-          .map(c => c.location)
-          .filter(c => c && c.trim() !== "")
+      const spots = Array.from(new Set(
+        groupedCoursesData.map(g => g.spot).filter(Boolean)
       )).sort((a,b)=>a.localeCompare(b,'fr'));
 
-      courseCityFilterEl.innerHTML = '<option value="">Toutes les villes</option>' +
-        cities.map(c => `<option value="${c}">${c}</option>`).join('');
+      courseCityFilterEl.innerHTML = '<option value="">Tous les lieux</option>' +
+        spots.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function getCoachesForGroup(group){
+      if(!coachAvailabilities.length || !group.courseIds || !group.courseIds.length) return [];
+      const idsSet = new Set(group.courseIds.map(String));
+      const labels = [];
+
+      coachAvailabilities.forEach(av=>{
+        if(!av.course_id) return;
+        const cid = String(av.course_id);
+        if(!idsSet.has(cid)) return;
+
+        const prof = profilesData.find(p => p.id === av.coach_id) || {};
+        const label =
+          prof.full_name ||
+          prof.username ||
+          ("Coach " + (av.coach_id || "").slice(0,8) + "…");
+
+        if(!labels.includes(label)){
+          labels.push(label);
+        }
+      });
+
+      return labels;
     }
 
     function renderCoursesAdmin(){
-      if(!coursesData.length){
-        coursesContent.innerHTML = "<p>Aucun cours trouvé.</p>";
-        if(courseStatsEl) courseStatsEl.textContent = "0 cours sélectionné(s)";
+      if(!groupedCoursesData.length){
+        coursesContent.innerHTML = "<p>Aucun cours trouvé (aucune inscription enregistrée).</p>";
+        if(courseStatsEl) courseStatsEl.textContent = "0 cours";
         return;
       }
 
       const cityFilter = courseCityFilterEl ? (courseCityFilterEl.value || "") : "";
 
       const coursesToDisplay = cityFilter
-        ? coursesData.filter(c => (c.location || "") === cityFilter)
-        : coursesData.slice();
+        ? groupedCoursesData.filter(c => c.spot === cityFilter)
+        : groupedCoursesData.slice();
 
-      const selectedCount = coursesToDisplay.length;
       if(courseStatsEl){
-        courseStatsEl.textContent = `${selectedCount} cours sélectionné(s)`;
+        courseStatsEl.textContent = `${coursesToDisplay.length} cours (groupés par lieu + date)`;
       }
 
       if(!coursesToDisplay.length){
@@ -563,48 +1160,105 @@
         return;
       }
 
-      const rows = coursesToDisplay.map(c=>{
-        const d = new Date(c.starts_at);
-        const dateTxt = formatDateFR(d);
-        const timeTxt = formatTimeFR(d);
-        const cap   = c.capacity || 0;
-        const inscr = (c.enrollments || []).length;
-        const rest  = cap ? (cap - inscr) : null;
+      const rows = coursesToDisplay.map(group=>{
+        const spot = group.spot;
+        const dateLabel = group.dateLabel;
+        const regs = group.registrations || [];
+        const inscr = regs.length;
 
-        const details = (c.enrollments || []).map(e=>{
-          const label =
-            e.child_name ||
-            e.rider_name ||
-            e.full_name ||
-            e.name ||
-            e.email ||
-            ("Inscription #" + e.id);
+        const details = regs.map(e=>{
+          let riderLabel = "";
+          if(e.rider_first_name || e.rider_last_name){
+            riderLabel = `${e.rider_first_name || ""} ${e.rider_last_name || ""}`.trim();
+          }
+          const prof = profilesData.find(p => p.id === e.user_id) || {};
+          if(!riderLabel){
+            riderLabel =
+              prof.full_name ||
+              prof.username ||
+              ("Utilisateur " + (e.user_id || "").slice(0,8) + "…");
+          }
 
-          const extra = [];
-          if(e.birth_year) extra.push("né " + e.birth_year);
-          if(e.level)      extra.push("niveau: " + e.level);
+          const riderAgeTxt = e.rider_age ? `(${e.rider_age} ans)` : "";
 
-          return `<li>${label}${extra.length ? " — " + extra.join(", ") : ""}</li>`;
+          const parentParts = [];
+          if(e.parent_first_name || e.parent_last_name){
+            parentParts.push(`Parent: ${(e.parent_first_name || "")} ${(e.parent_last_name || "")}`.trim());
+          }
+          if(e.parent_phone){
+            parentParts.push("Tél: " + e.parent_phone);
+          }
+          if(e.parent_email){
+            parentParts.push("Email: " + e.parent_email);
+          }
+          const parentLine = parentParts.join(" · ");
+
+          const flags = [];
+          const paidFlag =
+            e.is_paid === true ||
+            e.course_is_paid === true ||
+            (e.payment_status && e.payment_status.toLowerCase().includes("pay"));
+
+          if(e.membership_included){
+            flags.push("inclus abo");
+          }else if(paidFlag){
+            flags.push("payé");
+          }else{
+            flags.push("à payer");
+          }
+
+          if(e.photo_consent === true){
+            flags.push("photo OK");
+          }else if(e.photo_consent === false){
+            flags.push("photo NON");
+          }
+
+          if(e.legal_representative_ok) flags.push("représentant légal OK");
+          if(e.discharge_ok)            flags.push("décharge OK");
+
+          const price = (e.course_price_chf ?? e.price_chf ?? 0);
+          const priceLabel = price ? `CHF ${price}.–` : "CHF 0.–";
+
+          const noteMedTxt = e.medical_note ? e.medical_note : "";
+
+          return `<li style="margin-bottom:6px;">
+            <strong>${riderLabel}</strong> ${riderAgeTxt}<br>
+            <span style="font-size:12px;color:#9ca3af;">
+              ${parentLine ? parentLine + "<br>" : ""}
+              ${noteMedTxt ? ("Note médicale: " + noteMedTxt + "<br>") : ""}
+              ${priceLabel}${flags.length ? " — " + flags.join(", ") : ""}
+            </span>
+          </li>`;
         }).join("");
 
-        const detailBlock = details
+        const enrollBlock = details
           ? `<ul style="margin:6px 0 0 18px;padding-left:0;list-style:disc;">${details}</ul>`
           : `<em>Aucune inscription pour ce cours.</em>`;
 
+        const coaches = getCoachesForGroup(group);
+        const coachBlock = coaches.length
+          ? `<div style="margin-top:10px;font-size:13px;color:#e5e7eb;">
+               <strong>Coach(s) marqué(s) présent(s) :</strong> ${coaches.join(", ")}
+             </div>`
+          : `<div style="margin-top:10px;font-size:13px;color:#9ca3af;">
+               Aucun coach marqué présent pour l’instant.
+             </div>`;
+
+        const detailBlock = `
+          ${enrollBlock}
+          ${coachBlock}
+        `;
+
         return `
-          <tr class="course-header-row" data-course-id="${c.id}">
-            <td>${c.location || "Lieu ?"}<br>
-              <span style="font-size:11px;color:#9ca3af;">ID: ${c.id}</span>
-            </td>
-            <td>${dateTxt}<br><span style="font-size:12px;color:#9ca3af;">${timeTxt}</span></td>
-            <td class="center">${cap || "-"}</td>
+          <tr class="course-header-row" data-course-key="${group.key}">
+            <td>${spot}</td>
+            <td>${dateLabel}</td>
             <td class="center">
-              <span class="pill">${inscr} inscrit(s)</span>
-              ${rest !== null ? `<span class="pill">${rest} place(s) libre(s)</span>` : ""}
+              <span class="pill">${inscr} inscription(s)</span>
             </td>
           </tr>
-          <tr class="course-enrollments-row" data-course-id="${c.id}">
-            <td colspan="4">
+          <tr class="course-enrollments-row" data-course-key="${group.key}">
+            <td colspan="3">
               ${detailBlock}
             </td>
           </tr>
@@ -615,9 +1269,8 @@
         <table>
           <thead>
             <tr>
-              <th>Cours / Lieu</th>
-              <th>Date & heure</th>
-              <th class="center">Capacité</th>
+              <th>Lieu</th>
+              <th>Date</th>
               <th class="center">Inscriptions</th>
             </tr>
           </thead>
@@ -628,8 +1281,18 @@
       `;
     }
 
-    // Click global : coach toggle + admin toggle + détails cours
+    // Click global
     document.addEventListener('click', (e)=>{
+      // Delete course
+      const delBtn = e.target.closest('.btn-delete-course');
+      if(delBtn){
+        const courseId = delBtn.dataset.courseId;
+        if(courseId && confirm("Supprimer définitivement ce cours dans la table courses ?")){
+          handleDeleteCourse(courseId);
+        }
+        return;
+      }
+
       // Toggle coach
       const coachCheckbox = e.target.closest('[data-role="coach-toggle"]');
       if(coachCheckbox){
@@ -652,23 +1315,54 @@
         return;
       }
 
-      // Toggle ligne d’inscriptions
+      // Toggle détails cours (onglet 2)
       const headerRow = e.target.closest('.course-header-row');
       if(headerRow && headerRow.parentElement.closest('#coursesContent')){
-        const courseId = headerRow.dataset.courseId;
-        if(!courseId) return;
+        const key = headerRow.dataset.courseKey;
+        if(!key) return;
         const detailRow = document.querySelector(
-          `.course-enrollments-row[data-course-id="${courseId}"]`
+          `.course-enrollments-row[data-course-key="${key}"]`
         );
         if(!detailRow) return;
         detailRow.classList.toggle('open');
       }
     });
 
-    // Changement filtres
+    // Change global : abo + expiration
+    document.addEventListener('change', (e)=>{
+      const select = e.target.closest('[data-role="membership-select"]');
+      if(select){
+        const row   = select.closest('tr');
+        const userId= row?.dataset?.userId;
+        const code  = select.value || "";
+        const dateEl= row.querySelector('[data-role="membership-expiration"]');
+        const exp   = dateEl?.value || null;
+        if(userId){
+          saveMembership(userId, code, exp);
+        }
+        return;
+      }
+
+      const dateInput = e.target.closest('[data-role="membership-expiration"]');
+      if(dateInput){
+        const row   = dateInput.closest('tr');
+        const userId= row?.dataset?.userId;
+        const exp   = dateInput.value || null;
+        const select= row.querySelector('[data-role="membership-select"]');
+        const code  = select?.value || "";
+        if(userId){
+          saveMembership(userId, code, exp);
+        }
+      }
+    });
+
+    // Filtres
     coachStatusFilterEl?.addEventListener('change', renderUsers);
     coachCityFilterEl?.addEventListener('change', renderUsers);
     courseCityFilterEl?.addEventListener('change', renderCoursesAdmin);
+
+    // Form création cours
+    courseCreateForm?.addEventListener('submit', handleCreateCourse);
 
     // Changement onglets
     document.addEventListener('click', (e)=>{
@@ -684,13 +1378,20 @@
 
       const coachSection   = document.getElementById('tab-coachs');
       const coursesSection = document.getElementById('tab-courses');
+      const datesSection   = document.getElementById('tab-course-dates');
 
       if(tab === 'coachs'){
         coachSection?.classList.remove('hidden');
         coursesSection?.classList.add('hidden');
+        datesSection?.classList.add('hidden');
       }else if(tab === 'courses'){
         coursesSection?.classList.remove('hidden');
         coachSection?.classList.add('hidden');
+        datesSection?.classList.add('hidden');
+      }else if(tab === 'course-dates'){
+        datesSection?.classList.remove('hidden');
+        coachSection?.classList.add('hidden');
+        coursesSection?.classList.add('hidden');
       }
     });
 
@@ -699,6 +1400,7 @@
         await checkIsAdmin();
         await loadUsers();
         await loadCoursesWithEnrollments();
+        await loadCoursesTable();
       }catch(e){
         console.warn(e);
       }

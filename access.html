@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Connexion — Romandie Scooter League</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green:#22c55e;
+      --green-dark:#16a34a;
+      --panel-bg:rgba(9,13,23,.78);
+      --panel-border:rgba(255,255,255,.12);
+      --txt-main:#fff;
+      --txt-dim:#cdd6ff;
+    }
+    *{box-sizing:border-box;}
+
+    html, body { height:100%; }
+    body{
+      margin:0;
+      background: transparent !important;
+      color:var(--txt-main);
+      font-family:"Outfit",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    }
+
+    /* ===== VIDÉO DE FOND ===== */
+    .site-bg-video{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78));
+    }
+
+    /* ===== MINI HEADER ===== */
+    .mini-header{
+      position:fixed;
+      top:16px;
+      left:16px;
+      z-index:10;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:12px;
+      padding:10px 14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+      backdrop-filter:blur(8px) saturate(140%);
+      user-select:none;
+    }
+    .mini-header img{
+      height:44px;
+      width:auto;
+      border-radius:10px;
+      display:block;
+      filter:brightness(1.1);
+      background:#fff;
+      padding:6px;
+      box-shadow:0 2px 10px rgba(0,0,0,.35);
+    }
+    .mini-header .brand-text{
+      display:flex;
+      flex-direction:column;
+      line-height:1.2;
+    }
+    .mini-header .brand-main{
+      font-size:15px;
+      font-weight:700;
+      color:#fff;
+    }
+    .mini-header .brand-sub{
+      font-size:12px;
+      font-weight:600;
+      color:#22c55e;
+      opacity:.9;
+    }
+
+    /* ===== PAGE WRAP ===== */
+    .page-wrap{
+      max-width:480px;
+      margin:0 auto;
+      padding:120px 20px 80px;
+      color:#fff;
+      position:relative;
+      z-index:10;
+      text-align:center;
+    }
+
+    .logo-wrap{
+      width:84px;
+      height:84px;
+      border-radius:16px;
+      background:#fff;
+      padding:10px;
+      margin:0 auto 16px;
+      box-shadow:0 6px 20px rgba(0,0,0,.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .logo-wrap img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      background:linear-gradient(180deg,var(--green),var(--green-dark));
+      color:#062312;
+      font-weight:800;
+      font-size:12px;
+      line-height:1.2;
+      border-radius:8px;
+      padding:4px 8px;
+      box-shadow:0 10px 24px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+
+    h1.title{
+      margin:16px 0 8px;
+      font-size:clamp(24px,4vw,32px);
+      font-weight:800;
+      color:#fff;
+      line-height:1.2;
+    }
+
+    .subtitle{
+      font-size:15px;
+      font-weight:500;
+      line-height:1.45;
+      color:#fff;
+      opacity:.9;
+      max-width:460px;
+      margin:0 auto;
+    }
+    .subtitle b{
+      color:var(--green);
+      font-weight:700;
+    }
+
+    /* PANNEAU (login/signup + compte) */
+    .panel{
+      background:var(--panel-bg);
+      border:1px solid var(--panel-border);
+      border-radius:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+      padding:20px;
+      margin:24px auto 0;
+      text-align:left;
+      max-width:480px;
+    }
+    .panel h2{
+      margin:0 0 16px;
+      font-size:16px;
+      line-height:1.3;
+      font-weight:700;
+      color:#fff;
+    }
+    .tag-free{
+      font-size:12px;
+      line-height:1.2;
+      font-weight:700;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+      color:#fff;
+      border-radius:6px;
+      padding:3px 6px;
+      margin-left:8px;
+    }
+
+    .field{margin-bottom:14px;}
+    .field label{
+      display:block;
+      font-size:13px;
+      font-weight:600;
+      color:#fff;
+      margin-bottom:6px;
+    }
+    .input{
+      width:100%;
+      background:rgba(0,0,0,.6);
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:10px;
+      color:#fff;
+      font-size:14px;
+      font-weight:600;
+      padding:10px 12px;
+      outline:none;
+    }
+    .input:focus{
+      border-color:var(--green);
+      box-shadow:0 0 0 3px rgba(34,197,94,.25);
+    }
+
+    .checkline{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      font-size:12px;
+      line-height:1.4;
+      font-weight:500;
+      color:#fff;
+      margin-bottom:10px;
+    }
+    .checkline input[type="checkbox"]{
+      width:18px;
+      height:18px;
+      flex:0 0 18px;
+      margin-top:2px;
+    }
+    .checkline span b{
+      color:var(--green);
+      font-weight:700;
+    }
+
+    .btn-main,
+    .btn-alt,
+    .btn-small,
+    .btn-change{
+      width:100%;
+      background:linear-gradient(180deg,var(--green),var(--green-dark));
+      border:0;
+      border-radius:10px;
+      color:#062312;
+      font-weight:800;
+      font-size:15px;
+      line-height:1.2;
+      padding:12px 14px;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+      text-align:center;
+    }
+    .btn-main:disabled,
+    .btn-change:disabled{
+      filter:grayscale(1) brightness(.6);
+      cursor:default;
+    }
+
+    .btn-alt{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      font-size:13px;
+      line-height:1.2;
+      padding:10px 12px;
+      font-weight:700;
+      border:1px solid rgba(255,255,255,.25);
+      box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+    }
+
+    .btn-small{
+      font-size:13px;
+      padding:10px 12px;
+    }
+
+    .msg-err,
+    .msg-ok{
+      display:none;
+      margin-top:10px;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      line-height:1.4;
+      padding:10px 12px;
+    }
+    .msg-err{
+      background:rgba(255,80,80,.12);
+      border:1px solid rgba(255,80,80,.4);
+      color:#ff9f9f;
+    }
+    .msg-ok{
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.4);
+      color:#7cffb0;
+    }
+
+    .switch-link{
+      text-align:center;
+      font-size:13px;
+      font-weight:500;
+      color:#fff;
+      opacity:.9;
+      margin-top:16px;
+      text-align:center;
+    }
+    .switch-link button{
+      background:none;
+      border:0;
+      color:var(--green);
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .footnote{
+      margin-top:24px;
+      font-size:12px;
+      line-height:1.45;
+      color:var(--txt-dim);
+      font-weight:500;
+      max-width:460px;
+      text-align:center;
+      margin-left:auto;
+      margin-right:auto;
+    }
+    .footnote b{
+      color:#fff;
+      font-weight:600;
+    }
+
+    .copy{
+      text-align:center;
+      color:#9aa5b1;
+      font-size:12px;
+      padding:40px 0 30px;
+      margin:0;
+      position:relative;
+      z-index:10;
+    }
+
+    .hide{ display:none; }
+
+    /* === petit bloc pour compte déjà connecté === */
+    .acc-email{
+      font-size:13px;
+      font-weight:500;
+      color:#9aa5b1;
+      margin-bottom:16px;
+    }
+    .acc-email b{
+      color:#fff;
+      font-weight:600;
+    }
+
+    .pw-block-label{
+      font-size:13px;
+      font-weight:600;
+      color:#fff;
+      margin:16px 0 8px;
+    }
+
+    .pw-msg-err,
+    .pw-msg-ok{
+      display:none;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:600;
+      line-height:1.4;
+      padding:10px 12px;
+      margin-top:10px;
+    }
+    .pw-msg-err{
+      background:rgba(255,80,80,.12);
+      border:1px solid rgba(255,80,80,.4);
+      color:#ff9f9f;
+    }
+    .pw-msg-ok{
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.4);
+      color:#7cffb0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VIDÉO DE FOND -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
+
+  <!-- MINI HEADER -->
+  <div class="mini-header">
+    <img src="images/logo_rsl.png" alt="RSL"/>
+    <div class="brand-text">
+      <div class="brand-main">RSL — Romandie Scooter League</div>
+      <div class="brand-sub">Espace membre</div>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <main class="page-wrap">
+
+    <div class="logo-wrap">
+      <img src="images/logo_rsl.png" alt="RSL"/>
+    </div>
+
+    <div class="eyebrow">Compte RSL</div>
+
+    <h1 class="title">Connexion / Création de compte</h1>
+
+    <p class="subtitle">
+      Connecte-toi ou crée un compte pour gérer tes <b>cours</b>, ton <b>adhésion</b> et ton <b>profil RSL</b>.
+    </p>
+
+    <!-- ===== PANEL COMPTE DÉJÀ CONNECTÉ ===== -->
+    <section class="panel hide" id="accountPanel">
+      <h2>Mon compte RSL <span class="tag-free">actif</span></h2>
+
+      <div class="acc-email">
+        Connecté en tant que <b id="accEmail">(email)</b>
+      </div>
+
+      <div class="field">
+        <button class="btn-main" id="goAccountBtn" type="button">Aller à mon compte</button>
+      </div>
+
+      <div class="field">
+        <button class="btn-alt" id="logoutBtn" type="button">Se déconnecter</button>
+      </div>
+
+      <div class="pw-block-label">Changer mon mot de passe</div>
+
+      <div class="field">
+        <label for="oldPass">Ancien mot de passe</label>
+        <input id="oldPass" class="input" type="password" placeholder="Ancien mot de passe"/>
+      </div>
+
+      <div class="field">
+        <label for="newPass1">Nouveau mot de passe</label>
+        <input id="newPass1" class="input" type="password" placeholder="Nouveau mot de passe (min 6 caractères)"/>
+      </div>
+
+      <div class="field">
+        <label for="newPass2">Confirme le nouveau mot de passe</label>
+        <input id="newPass2" class="input" type="password" placeholder="Confirme le nouveau mot de passe"/>
+      </div>
+
+      <div id="pwMsgErr" class="pw-msg-err"></div>
+      <div id="pwMsgOk"  class="pw-msg-ok"></div>
+
+      <div class="field">
+        <button class="btn-change" id="pwChangeBtn" type="button">Mettre à jour mon mot de passe</button>
+      </div>
+    </section>
+
+
+    <!-- ===== PANEL LOGIN ===== -->
+    <form class="panel" id="loginForm" autocomplete="off" novalidate>
+      <h2>Connexion à ton compte</h2>
+
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" class="input" type="email" placeholder="ton.email@example.com" required/>
+      </div>
+
+      <div class="field">
+        <label for="loginPass">Mot de passe</label>
+        <input id="loginPass" class="input" type="password" placeholder="••••••••" required minlength="6"/>
+      </div>
+
+      <div id="loginErr" class="msg-err"></div>
+
+      <button class="btn-main" id="btnLogin" type="submit">Se connecter</button>
+
+      <div class="field" style="margin-top:12px;">
+        <button class="btn-alt btn-small" id="forgotBtn" type="button">J'ai oublié mon mot de passe</button>
+        <div id="forgotOk" class="msg-ok" style="margin-top:8px;">Un lien de réinitialisation a été envoyé (si l'email existe).</div>
+      </div>
+
+      <div class="switch-link">
+        Pas encore inscrit ? <button type="button" id="showSignupBtn">Créer un compte</button>
+      </div>
+    </form>
+
+
+    <!-- ===== PANEL SIGNUP ===== -->
+    <form class="panel hide" id="signupForm" autocomplete="off" novalidate>
+      <h2>
+        Crée ton compte RSL
+        <span class="tag-free">gratuit</span>
+      </h2>
+
+      <div class="field">
+        <label for="signupEmail">Email</label>
+        <input id="signupEmail" class="input" type="email" placeholder="ton.email@example.com" required/>
+      </div>
+
+      <div class="field">
+        <label for="signupPass1">Mot de passe</label>
+        <input id="signupPass1" class="input" type="password" placeholder="••••••••" required minlength="6"/>
+      </div>
+
+      <div class="field">
+        <label for="signupPass2">Confirme le mot de passe</label>
+        <input id="signupPass2" class="input" type="password" placeholder="••••••••" required minlength="6"/>
+      </div>
+
+      <div class="checkline">
+        <input id="okMail" type="checkbox" required/>
+        <span>J'autorise la RSL à me prévenir pour les cours, événements et infos importantes.</span>
+      </div>
+
+      <div class="checkline">
+        <input id="okImage" type="checkbox" required/>
+        <span>J'accepte l'utilisation de photos/vidéos des événements RSL (<b>@rsl_swiss</b> pour toute demande de retrait).</span>
+      </div>
+
+      <div id="signupErr" class="msg-err"></div>
+      <div id="signupOk" class="msg-ok"></div>
+
+      <button class="btn-main" id="btnCreate" type="submit">Créer mon compte</button>
+
+      <div class="switch-link">
+        Déjà un compte ? <button type="button" id="showLoginBtn">Connexion</button>
+      </div>
+    </form>
+
+
+    <div class="footnote">
+      Avec ce compte, tu pourras gérer tes cours, ton profil et ton adhésion RSL.
+    </div>
+
+    <p class="copy">© 2025 — Romandie Scooter League. Tous droits réservés.</p>
+  </main>
+
+  <!-- SUPABASE -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/env.js"></script>
+
+  <script>
+  (function(){
+    // ====== VIDÉO DE FOND SUPABASE (aléatoire) ======
+    window.addEventListener('DOMContentLoaded', () => {
+      const v = document.getElementById('rslBg');
+      if(!v) return;
+
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+
+      const srcEl = document.createElement('source');
+      srcEl.src = pick;
+      srcEl.type = "video/mp4";
+      v.appendChild(srcEl);
+
+      const start = () => {
+        try {
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch){ p.catch(()=>{}); }
+        } catch(e){}
+      };
+      start();
+
+      document.addEventListener('visibilitychange',()=>{
+        if(document.hidden){
+          v.pause();
+        } else {
+          start();
+        }
+      });
+    });
+
+    // refs DOM
+    const accountPanel = document.getElementById('accountPanel');
+    const accEmail     = document.getElementById('accEmail');
+    const goAccountBtn = document.getElementById('goAccountBtn');
+    const logoutBtn    = document.getElementById('logoutBtn');
+
+    const oldPass      = document.getElementById('oldPass');
+    const newPass1     = document.getElementById('newPass1');
+    const newPass2     = document.getElementById('newPass2');
+    const pwChangeBtn  = document.getElementById('pwChangeBtn');
+    const pwMsgErr     = document.getElementById('pwMsgErr');
+    const pwMsgOk      = document.getElementById('pwMsgOk');
+
+    const loginForm    = document.getElementById('loginForm');
+    const loginEmail   = document.getElementById('loginEmail');
+    const loginPass    = document.getElementById('loginPass');
+    const loginBtn     = document.getElementById('btnLogin');
+    const loginErr     = document.getElementById('loginErr');
+
+    const forgotBtn    = document.getElementById('forgotBtn');
+    const forgotOk     = document.getElementById('forgotOk');
+
+    const signupForm   = document.getElementById('signupForm');
+    const signupEmail  = document.getElementById('signupEmail');
+    const signupPass1  = document.getElementById('signupPass1');
+    const signupPass2  = document.getElementById('signupPass2');
+    const okMail       = document.getElementById('okMail');
+    const okImage      = document.getElementById('okImage');
+    const signupBtn    = document.getElementById('btnCreate');
+    const signupErr    = document.getElementById('signupErr');
+    const signupOk     = document.getElementById('signupOk');
+
+    const showSignupBtn= document.getElementById('showSignupBtn');
+    const showLoginBtn = document.getElementById('showLoginBtn');
+
+    function show(el){ if(el) el.classList.remove('hide'); }
+    function hide(el){ if(el) el.classList.add('hide'); }
+
+    function showLoginPanel(){
+      show(loginForm);
+      hide(signupForm);
+    }
+    function showSignupPanel(){
+      show(signupForm);
+      hide(loginForm);
+    }
+    showSignupBtn?.addEventListener('click', showSignupPanel);
+    showLoginBtn?.addEventListener('click', showLoginPanel);
+
+    function showLoginErr(msg){
+      loginErr.textContent = msg;
+      loginErr.style.display='block';
+    }
+    function clearLoginErr(){
+      loginErr.style.display='none';
+    }
+
+    function showSignupErr(msg){
+      signupErr.textContent = msg;
+      signupErr.style.display='block';
+      signupOk.style.display='none';
+    }
+    function showSignupOk(msg){
+      signupErr.style.display='none';
+      signupOk.textContent = msg || "Compte créé. Redirection…";
+      signupOk.style.display='block';
+    }
+
+    function clearPwMsg(){
+      pwMsgErr.style.display='none';
+      pwMsgOk.style.display='none';
+    }
+    function showPwErr(msg){
+      pwMsgErr.textContent=msg;
+      pwMsgErr.style.display='block';
+      pwMsgOk.style.display='none';
+    }
+    function showPwOk(msg){
+      pwMsgOk.textContent=msg;
+      pwMsgOk.style.display='block';
+      pwMsgErr.style.display='none';
+    }
+
+    function hideForgotOk(){
+      forgotOk.style.display='none';
+    }
+    function showForgotOk(){
+      forgotOk.style.display='block';
+    }
+
+    // init supabase
+    let supa=null;
+    try{
+      supa = supabase.createClient(
+        window.env?.SUPABASE_URL || '',
+        window.env?.SUPABASE_ANON || ''
+      );
+    }catch(e){
+      console.warn("Init Supabase fail:",e);
+    }
+
+    // État initial : check session
+    (async function initState(){
+      hide(accountPanel);
+      hideForgotOk();
+
+      // Par défaut: login visible, signup caché
+      show(loginForm);
+      hide(signupForm);
+
+      let sessionOK=false;
+      let emailNow="";
+
+      if(supa){
+        try{
+          const { data:{ user } } = await supa.auth.getUser();
+          if(user){
+            sessionOK=true;
+            emailNow = user.email || "";
+          }
+        }catch(e){ console.warn(e); }
+      }
+
+      if(sessionOK){
+        if(accEmail) accEmail.textContent=emailNow||"(inconnu)";
+        show(accountPanel);
+        hide(loginForm);
+        hide(signupForm);
+
+        try{
+          localStorage.setItem('rsl_pre_email', emailNow);
+        }catch(_){}
+      }
+    })();
+
+    // Aller à mon compte
+    goAccountBtn?.addEventListener('click', ()=>{
+      window.location.href="compte.html";
+    });
+
+    // Logout
+    logoutBtn?.addEventListener('click', async ()=>{
+      try{ await supa.auth.signOut(); }catch(e){}
+      try{
+        localStorage.removeItem('rsl_pre_email');
+      }catch(_){}
+      window.location.reload();
+    });
+
+    // Changer mot de passe
+    pwChangeBtn?.addEventListener('click', async ()=>{
+      clearPwMsg();
+
+      const oldP=(oldPass.value||"").trim();
+      const np1 =(newPass1.value||"").trim();
+      const np2 =(newPass2.value||"").trim();
+
+      if(np1.length<6){
+        showPwErr("Nouveau mot de passe trop court (min 6 caractères).");
+        return;
+      }
+      if(np1!==np2){
+        showPwErr("Le nouveau mot de passe ne correspond pas dans les deux champs.");
+        return;
+      }
+
+      let currentEmail="";
+      try{
+        const { data:{ user } } = await supa.auth.getUser();
+        if(user){ currentEmail=user.email||""; }
+      }catch(e){ console.warn(e); }
+
+      if(!currentEmail){
+        showPwErr("Session expirée. Reconnecte-toi.");
+        return;
+      }
+
+      pwChangeBtn.disabled=true;
+
+      try{
+        const { error:checkErr } = await supa.auth.signInWithPassword({
+          email: currentEmail,
+          password: oldP
+        });
+        if(checkErr){
+          showPwErr("Ancien mot de passe incorrect.");
+          pwChangeBtn.disabled=false;
+          return;
+        }
+
+        const { error:updateErr } = await supa.auth.updateUser({
+          password: np1
+        });
+        if(updateErr){
+          showPwErr("Impossible de modifier le mot de passe.");
+          pwChangeBtn.disabled=false;
+          return;
+        }
+
+        showPwOk("Mot de passe mis à jour ✔");
+        oldPass.value="";
+        newPass1.value="";
+        newPass2.value="";
+        pwChangeBtn.disabled=false;
+
+      }catch(e){
+        console.warn(e);
+        showPwErr("Erreur technique, réessaie.");
+        pwChangeBtn.disabled=false;
+      }
+    });
+
+    // Mot de passe oublié
+    forgotBtn?.addEventListener('click', async ()=>{
+      hideForgotOk();
+      clearLoginErr();
+
+      const em=(loginEmail.value||"").trim();
+      if(!em){
+        showLoginErr("Mets d'abord ton email.");
+        return;
+      }
+
+      try{
+        const redirectUrl = window.location.origin + "/access.html";
+        const { error } = await supa.auth.resetPasswordForEmail(em,{
+          redirectTo: redirectUrl
+        });
+        if(error){
+          showLoginErr("Impossible d'envoyer l'email de récupération.");
+          return;
+        }
+        showForgotOk();
+      }catch(e){
+        console.warn(e);
+        showLoginErr("Erreur envoi email. Réessaie.");
+      }
+    });
+
+    // LOGIN
+    loginForm?.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      clearLoginErr();
+
+      const em=(loginEmail.value||'').trim();
+      const pw=(loginPass.value||'').trim();
+
+      loginBtn.disabled=true;
+      try{
+        if(!supa) throw new Error("Supabase manquant");
+
+        const { data, error } = await supa.auth.signInWithPassword({
+          email:em,
+          password:pw
+        });
+        if(error || !data?.user){
+          showLoginErr("Email ou mot de passe incorrect.");
+          loginBtn.disabled=false;
+          return;
+        }
+
+        localStorage.setItem('rsl_pre_email', em);
+
+        // 🔁 Après login → compte
+        window.location.href="compte.html";
+
+      }catch(ex){
+        console.warn(ex);
+        showLoginErr("Erreur. Réessaie.");
+        loginBtn.disabled=false;
+      }
+    });
+
+    // SIGNUP
+    signupForm?.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      signupErr.style.display='none';
+      signupOk.style.display='none';
+
+      const em=(signupEmail.value||'').trim();
+      const p1=(signupPass1.value||'').trim();
+      const p2=(signupPass2.value||'').trim();
+
+      if(p1!==p2){
+        showSignupErr("Les mots de passe ne correspondent pas.");
+        return;
+      }
+      if(p1.length<6){
+        showSignupErr("Mot de passe trop court (min 6).");
+        return;
+      }
+      if(!okMail.checked || !okImage.checked){
+        showSignupErr("Merci d'accepter les conditions.");
+        return;
+      }
+
+      signupBtn.disabled=true;
+      try{
+        if(!supa) throw new Error("Supabase manquant");
+
+        const { error } = await supa.auth.signUp({
+          email:em,
+          password:p1,
+          options:{
+            data:{
+              rsl_member: true
+            }
+          }
+        });
+        if(error){
+          showSignupErr("Impossible de créer le compte.");
+          signupBtn.disabled=false;
+          return;
+        }
+
+        localStorage.setItem('rsl_pre_email', em);
+
+        showSignupOk("Compte créé ✅ Redirection...");
+
+        setTimeout(()=>{ window.location.href="compte.html"; },1000);
+
+      }catch(ex){
+        console.warn(ex);
+        showSignupErr("Erreur. Réessaie.");
+        signupBtn.disabled=false;
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Montreux Scooter Time Machine</title>
+  <!-- Optimisé pour la réactivité sur TV / Kiosk -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    /* ---------------------------------------------------------------------- */
+    /* FOND & GÉNÉRAL */
+    /* ---------------------------------------------------------------------- */
+    html{
+      margin:0;
+      padding:0;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
+      background:#000;
+    }
+
+    /* Vidéo de fond : couvre tout l'écran, en dessous de tout */
+    #bgVideo{
+      position:fixed;inset:0;width:100vw;height:100vh;object-fit:cover;
+      z-index:-2;opacity:.7;filter:blur(2px) brightness(.85) contrast(1.1);
+    }
+    /* Filtre sombre pour améliorer le contraste du texte */
+    body::before{
+      content:"";position:fixed;inset:0;background:#00000060;z-index:-1;
+    }
+    body{
+      margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;
+      justify-content:center;font-family:Arial,sans-serif;color:#00ff93;text-align:center;
+      padding:2vh 0;box-sizing:border-box;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* HEADER ET TITRES (Styles Néon) */
+    /* ---------------------------------------------------------------------- */
+    .header{margin-bottom:2vh;}
+    h1{
+      margin:0;
+      font-size:4.5vmin;
+      letter-spacing:1.8px;
+      text-shadow:0 0 25px #00ffaf,0 0 8px #00ffaf;
+      white-space: nowrap;
+    }
+    .years-line{
+      margin-top:0.5vh;font-size:2.2vmin;color:#e5fff6;letter-spacing:0.15em;text-transform:uppercase;
+    }
+    .tagline{
+      margin-top:0.5vh;font-size:2vmin;color:#c4ffe8;padding-bottom:0.5vh;position:relative;display:inline-block;
+    }
+    .tagline::after{
+      content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+      background:linear-gradient(90deg,#00ffaf,transparent,#00ffaf);box-shadow:0 0 10px #00ffaf;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* FRAME PRINCIPAL (Le "téléviseur" vert) */
+    /* ---------------------------------------------------------------------- */
+    .frame{
+      width:85vw;max-width:1100px;
+      aspect-ratio:16/9;
+      border-radius:1.5vw;
+      border:4px solid #00ffaf;
+      background:#000;
+      box-shadow:0 0 35px #00ffea,inset 0 0 25px #00ffc3;
+      position:relative;overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .layer{position:absolute;inset:0;display:none;align-items:center;justify-content:center;}
+    .layer.show{display:flex;}
+
+    /* ---------------------------------------------------------------------- */
+    /* LECTEUR VIDÉO */
+    /* ---------------------------------------------------------------------- */
+    #player{
+      width:100%;
+      height:100%;
+    }
+    #player iframe{
+      width:100% !important;
+      height:100% !important;
+      object-fit:cover;
+      border:0;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* PUBLICITÉS (Deux flyers côte à côte) */
+    /* ---------------------------------------------------------------------- */
+    #adsWrapper{gap:2vw;padding:2vw;}
+    .flyer{
+      max-width:48%;
+      max-height:90%;
+      object-fit:contain;
+      border-radius:10px;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* INTRO (Flyer et Texte) */
+    /* ---------------------------------------------------------------------- */
+    #introWrapper{padding:2vh 2vw;}
+    .intro-layout{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between; /* bien séparé gauche / droite */
+      gap:3vw;
+    }
+    .intro-flyer{
+      flex:0 0 35%;             /* colonne gauche fixe */
+      max-width:35%;
+      max-height:90%;
+      object-fit:contain;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0, 255, 175, 0.5);
+    }
+    .intro-text{
+      flex:1;                   /* colonne droite qui prend le reste */
+      max-width:none;
+      height:90%;
+      overflow:hidden;
+      position:relative;
+      text-align:left;
+      font-size:2vmin;
+      line-height:1.5;
+      color:#eafff5;
+    }
+
+    #introContent {
+      position:relative;
+      top:0;left:0;right:0;bottom:0;
+      width:100%;height:100%;
+      transition:none;
+    }
+
+    .intro-slide {
+      position:absolute;
+      inset:0;
+      opacity:0;
+      transition:opacity 1s ease-in-out;
+      padding:10px;
+      text-align:left;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .intro-slide.show-slide {
+      opacity:1;
+    }
+
+    .intro-slide h2 {
+      font-size:2.8vmin;
+      color:#00ffaf;
+      text-shadow:0 0 10px rgba(0, 255, 175, 0.5);
+      margin-bottom:1.5vh;
+    }
+    .intro-slide p {
+      margin-bottom:1vh;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* RESPONSIVITÉ */
+    /* ---------------------------------------------------------------------- */
+    @media(max-width:900px){
+      .frame{width:95vw;max-width:95vw;}
+      h1{font-size:6vmin; white-space: normal;}
+      .years-line{font-size:3vmin;}
+      .intro-text{font-size:2.5vmin;}
+      .intro-slide h2 {font-size:4vmin;}
+
+      .intro-layout{
+        flex-direction:column;
+        gap:1.5vh;
+      }
+      .intro-flyer{
+        flex:0 0 auto;
+        max-width:50%;
+        max-height:auto;
+      }
+      .intro-text{
+        max-width:90%;
+        text-align:center;
+      }
+      .intro-slide{text-align:center;}
+
+      #adsWrapper{flex-direction:column;gap:1.5vh;}
+      .flyer{max-width:90%;max-height:45%;}
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* BOUTON START */
+    /* ---------------------------------------------------------------------- */
+    #startBtn{
+      margin-top:2vh;padding:1.5vh 4vw;font-size:2.5vmin;font-weight:bold;background:#00ffaf;color:#000;
+      border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 24px #00ffaf;
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    #startBtn:hover{transform:scale(1.05);box-shadow:0 0 40px #00ffe1;}
+
+    /* ---------------------------------------------------------------------- */
+    /* SPONSORS */
+    /* ---------------------------------------------------------------------- */
+    .sponsor-bar{
+      margin-top:2vh;width:95vw;max-width:1200px;
+      padding:1.5vh 2vw;border-radius:1.5vw;
+      border:3px solid #00ffaf;
+      background:#EDEDEE;box-shadow:0 0 15px #00ffaf40;
+      display:flex;align-items:center;justify-content:center;
+      gap:2vw;flex-wrap:wrap;
+    }
+    .sponsor-logo{
+      max-height:8vh;
+      max-width:20vw;
+      object-fit:contain;
+      filter:drop-shadow(0 0 4px #00ffaf40);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Vidéo de fond -->
+<video id="bgVideo" autoplay loop muted playsinline>
+  <source src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4">
+</video>
+
+<!-- Header -->
+<div class="header">
+  <h1>Montreux Scooter Time Machine</h1>
+  <div class="years-line">2005 → 2025 · 20 ans de ride</div>
+  <div class="tagline">On remonte le temps</div>
+</div>
+
+<!-- Frame principal -->
+<div class="frame">
+
+  <!-- Vidéos -->
+  <div id="playerWrapper" class="layer"><div id="player"></div></div>
+
+  <!-- PUB au démarrage -->
+  <div id="adsWrapper" class="layer show">
+    <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer" alt="Publicité Flyer 1">
+    <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyers%20RSL/Copie%20de%20Flyer_Montreux_Scooter_Contest_A3.pdf%20(1240%20x%201748%20px).png" class="flyer" alt="Publicité Flyer 2">
+  </div>
+
+  <!-- INTRO : Flyer 2005 à gauche, texte à droite -->
+  <div id="introWrapper" class="layer">
+    <div class="intro-layout">
+      <!-- FLYER (Gauche) -->
+      <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/2005.png" class="intro-flyer" alt="Flyer 2005">
+      <!-- TEXTE (Droite) -->
+      <div class="intro-text" id="introText">
+        <div id="introContent">
+          <!-- SLIDE 1 -->
+          <div class="intro-slide slide-1 show-slide">
+            <h2>L'Origine du Mouvement</h2>
+            <p>🛴 Montreux — là où tout a commencé. Avril 2005 marque le tout premier Scooter Contest connu en Suisse, au bord du lac, dans un skatepark qui allait marquer l'histoire.</p>
+            <p>C'était le point de départ d’une culture mondiale. Un moment historique qui a initié l’aventure du freestyle moderne.</p>
+          </div>
+          <!-- SLIDE 2 -->
+          <div class="intro-slide slide-2">
+            <h2>L'Esprit des Pionniers</h2>
+            <p>Avant YouTube, avant les decks forgés, avant les tricks de folie… il y avait l’essentiel.</p>
+            <p>Pas de caméras 4K, pas de réseaux sociaux. Juste des passionnés, du rap, des riders motivés, des figures improvisées, et une seule certitude : l’énergie était là.</p>
+          </div>
+          <!-- SLIDE 3 -->
+          <div class="intro-slide slide-3">
+            <h2>20 Ans d'Héritage</h2>
+            <p>Aujourd’hui, le scooter freestyle remplit des skateparks partout dans le monde. Les tricks volent plus haut, les riders vont plus loin, mais l’ADN reste le même :</p>
+            <p>Liberté, Créativité, Famille. Montreux – 2005 → 2025. 20 ans de ride. 20 ans d’histoire.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bouton start -->
+<button id="startBtn">▶ Lancer la Time Machine</button>
+
+<!-- SPONSORS -->
+<div class="sponsor-bar">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/1logo_ridly.png" class="sponsor-logo" alt="Logo Sponsor Ridly">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(10).png" class="sponsor-logo" alt="Logo Sponsor 10">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(11).png" class="sponsor-logo" alt="Logo Sponsor 11">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(2).png" class="sponsor-logo" alt="Logo Sponsor 2">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(5).png" class="sponsor-logo" alt="Logo Sponsor 5">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(6).png" class="sponsor-logo" alt="Logo Sponsor 6">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(7).png" class="sponsor-logo" alt="Logo Sponsor 7">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(8).png" class="sponsor-logo" alt="Logo Sponsor 8">
+  <img src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/Flyes%20mtx%20histoire/Design%20sans%20titre%20(9).png" class="sponsor-logo" alt="Logo Sponsor 9">
+</div>
+
+<!-- Script YouTube -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const VIDEO_IDS=[
+  "w5j7cIC7IVk","ByhXJUUjV1U","BWRR-rKD46c","v0D2qziOqjQ","H48vxTdkrNc","V_IrrBfwUR0",
+  "jpnapT5UdrA","zwV63b2DGbM","JNtj5nPOghs","RLwUh3C59LM","xVZcGVUEU3M","v1qPdsOCDRw",
+  "PjrFJI5AZZA","ZiE4_CRrIfA","tSo7db52dDk","P6lj1FyPV3w","5INog8467bM","xF3zFSwHrlI","0z0Ly25eSdY"
+];
+
+let currentVideoIndex = 0;
+let player;
+const PUB_DURATION = 20000;
+const INTRO_DURATION = 30000;
+const SLIDE_DURATION = 10000;
+
+let introText;
+let introContent;
+let adsWrapper;
+let introWrapper;
+let playerWrapper;
+let startBtn;
+
+function onYouTubeIframeAPIReady(){
+  player = new YT.Player("player", {
+    videoId: VIDEO_IDS[0],
+    playerVars:{autoplay:0,controls:1},
+    events:{
+      onStateChange:(e)=>{
+        if(e.data === 0){
+          currentVideoIndex = (currentVideoIndex + 1) % VIDEO_IDS.length;
+          runCycle();
+        }
+      }
+    }
+  });
+}
+
+function startIntroSlides() {
+  const slides = introContent.querySelectorAll('.intro-slide');
+  const totalSlides = slides.length;
+  let slideIndex = 0;
+
+  function showNextSlide() {
+    slides.forEach(slide => slide.classList.remove('show-slide'));
+    if (slides[slideIndex]) {
+      slides[slideIndex].classList.add('show-slide');
+    }
+    slideIndex++;
+    if (slideIndex < totalSlides) {
+      setTimeout(showNextSlide, SLIDE_DURATION);
+    }
+  }
+
+  showNextSlide();
+
+  setTimeout(() => {
+    introWrapper.classList.remove("show");
+    playerWrapper.classList.add("show");
+    if (player && player.loadVideoById) {
+      player.loadVideoById(VIDEO_IDS[currentVideoIndex]);
+    } else {
+      console.error("Le lecteur YouTube n'est pas prêt à charger la vidéo.");
+    }
+  }, INTRO_DURATION);
+}
+
+function runCycle(){
+  playerWrapper.classList.remove("show");
+  introWrapper.classList.remove("show");
+  adsWrapper.classList.add("show");
+
+  setTimeout(() => {
+    adsWrapper.classList.remove("show");
+    introWrapper.classList.add("show");
+    startIntroSlides();
+  }, PUB_DURATION);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  introText = document.getElementById("introText");
+  introContent = document.getElementById("introContent");
+  adsWrapper = document.getElementById("adsWrapper");
+  introWrapper = document.getElementById("introWrapper");
+  playerWrapper = document.getElementById("playerWrapper");
+  startBtn = document.getElementById("startBtn");
+
+  startBtn.addEventListener("click", () => {
+    startBtn.style.display = "none";
+    if (player || (typeof YT !== 'undefined' && YT.Player)) {
+      if (!player) {
+        onYouTubeIframeAPIReady();
+      }
+      runCycle();
+    } else {
+      console.log("API YouTube non prête.");
+      startBtn.style.display = "block";
+    }
+  });
+});
+</script>
+</body>
+</html>

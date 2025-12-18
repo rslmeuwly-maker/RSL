@@ -19,11 +19,13 @@ async function ensureMembershipLoaded() {
   if (membershipCode !== null) return membershipCode;
 
   // fallback localStorage si déjà stocké par une autre page
-  const lsCode = localStorage.getItem("rsl_membership_code");
-  if (lsCode) {
-    membershipCode = lsCode;
-    return membershipCode;
-  }
+  try {
+    const lsCode = localStorage.getItem("rsl_membership_code");
+    if (lsCode) {
+      membershipCode = lsCode;
+      return membershipCode;
+    }
+  } catch (_) {}
 
   if (!supa || !supa.auth) {
     membershipCode = null;
@@ -31,13 +33,13 @@ async function ensureMembershipLoaded() {
   }
 
   try {
-    const { data: { user } } = await supa.auth.getUser();
+    const { data: { user } = {} } = await supa.auth.getUser();
     if (!user) {
       membershipCode = null;
       return null;
     }
 
-    // On tente de lire un abonnement actif (table rsl_memberships si elle existe)
+    // On tente de lire un abonnement actif (table rsl_memberships)
     const { data, error } = await supa
       .from('rsl_memberships')
       .select('membership_code,expires_at,is_active')
@@ -59,7 +61,9 @@ async function ensureMembershipLoaded() {
 
     membershipCode = data.membership_code || null;
     if (membershipCode) {
-      localStorage.setItem("rsl_membership_code", membershipCode);
+      try {
+        localStorage.setItem("rsl_membership_code", membershipCode);
+      } catch (_) {}
     }
     return membershipCode;
   } catch (e) {
@@ -71,11 +75,35 @@ async function ensureMembershipLoaded() {
 
 // ===== Panier helpers =====
 function getPanier() {
-  return JSON.parse(localStorage.getItem("rsl_panier_courses") || "[]");
+  try {
+    const raw = localStorage.getItem("rsl_panier_courses");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    } else {
+      // si ce n'est pas un tableau, on corrige
+      localStorage.setItem("rsl_panier_courses", "[]");
+      return [];
+    }
+  } catch (e) {
+    // en cas de JSON pourri, on reset
+    try {
+      localStorage.setItem("rsl_panier_courses", "[]");
+    } catch (_) {}
+    return [];
+  }
 }
+
 function savePanier(p) {
-  localStorage.setItem("rsl_panier_courses", JSON.stringify(p));
+  try {
+    if (!Array.isArray(p)) p = [];
+    localStorage.setItem("rsl_panier_courses", JSON.stringify(p));
+  } catch (_) {
+    // on ignore les erreurs de stockage
+  }
 }
+
 function updateBasketBar() {
   const bar  = document.getElementById("basketBar");
   const info = document.getElementById("basketInfo");
@@ -96,6 +124,9 @@ function updateBasketBar() {
 function computeCoursePriceForMember(code, panier) {
   // code = membershipCode (starter, rider, progression, premium, support...)
   // panier = cours déjà dans le panier (pour gérer les 15 gratuits progression)
+
+  // sécurité : on s'assure que panier est un tableau
+  if (!Array.isArray(panier)) panier = [];
 
   // Aucun abo -> plein tarif
   if (!code) return 30;
@@ -125,7 +156,7 @@ function computeCoursePriceForMember(code, panier) {
   return 30;
 }
 
-// ===== Chargement + rendu des cours =====
+// ===== Chargement + rendu des cours (avec PLACES DISPO) =====
 async function loadCourses(){
   const list      = document.getElementById('courseList');
   const monthSel  = document.getElementById('filtreMois');
@@ -141,6 +172,8 @@ async function loadCourses(){
 
   try {
     if(!supa) throw new Error('No Supabase client');
+
+    // on charge les cours avec la relation "enrollments" (inscriptions)
     let { data, error } = await supa
       .from('courses')
       .select('id,location,starts_at,capacity,enrollments(id)')
@@ -165,30 +198,43 @@ async function loadCourses(){
     const lieu = lieuSel?.value || 'all';
     const only = !!onlyFree?.checked;
 
+    // remplir le <select> des lieux (tous les lieux dispo)
+    const uniqLieux = [...new Set(data.map(c=>c.location))].sort();
+    if (lieuSel) {
+      const currentValue = lieuSel.value || 'all';
+      lieuSel.innerHTML =
+        '<option value="all">Tous les lieux</option>' +
+        uniqLieux.map(l=>`<option value="${l}" ${l===currentValue?'selected':''}>${l}</option>`).join('');
+    }
+
+    // panier actuel (pour marquer "Ajouté ✅" + calcul prix progression)
+    const panierRaw = getPanier();
+    const panier = Array.isArray(panierRaw) ? panierRaw : [];
+
     // filtre des cours
     const filt = data.filter(c=>{
       const d  = new Date(c.starts_at);
       if (isNaN(d.getTime())) return false;
       const mm = (d.getMonth()+1).toString().padStart(2,'0');
-      const r  = c.capacity - (c.enrollments?.length||0); // places restantes
+
+      // nb d'inscriptions déjà en DB
+      const used = (c.enrollments && Array.isArray(c.enrollments)) ? c.enrollments.length : 0;
+      const cap  = (typeof c.capacity === 'number') ? c.capacity : null;
+      let rest   = null;
+      let full   = false;
+
+      if (cap !== null) {
+        rest = Math.max(cap - used, 0);
+        full = rest === 0;
+      }
+
       return (mois==='all' || mm===mois)
           && (lieu==='all' || c.location===lieu)
-          && (!only || r>0);
+          && (!only || !full); // si "Seulement dispo" → on masque les cours complets
     });
 
-    // remplir le <select> des lieux
-    const uniqLieux = [...new Set(data.map(c=>c.location))].sort();
-    if (lieuSel) {
-      lieuSel.innerHTML =
-        '<option value="all">Tous les lieux</option>' +
-        uniqLieux.map(l=>`<option ${l===lieu?'selected':''}>${l}</option>`).join('');
-    }
-
-    // panier actuel (pour marquer "Ajouté ✅")
-    const panier = getPanier();
-
     // génération HTML pour chaque cours filtré
-    list.innerHTML = filt.map(c=>{
+    const html = filt.map(c=>{
       const d   = new Date(c.starts_at);
 
       // ex: "sam., 03.01."
@@ -207,9 +253,30 @@ async function loadCourses(){
       // date ISO (AAAA-MM-JJ) -> utilisée pour bloquer deux cours le même jour
       const dateISO = d.toISOString().split('T')[0];
 
-      // places restantes
-      const rest = c.capacity - (c.enrollments?.length||0);
-      const full = rest <= 0;
+      // nb d'inscriptions déjà en base
+      const used = (c.enrollments && Array.isArray(c.enrollments)) ? c.enrollments.length : 0;
+      const cap  = (typeof c.capacity === 'number') ? c.capacity : null;
+
+      let rest = null;
+      let full = false;
+      let badgeText = "";
+      let badgeStyle = "";
+
+      if (cap === null) {
+        badgeText  = "Places illimitées";
+        badgeStyle = "background:rgba(34,197,94,.12);color:#22c55e;";
+      } else {
+        rest = Math.max(cap - used, 0);
+        full = rest === 0;
+
+        if (full) {
+          badgeText  = "Complet";
+          badgeStyle = "background:rgba(239,68,68,.15);color:#f87171;";
+        } else {
+          badgeText  = `${rest}/${cap} places`;
+          badgeStyle = "background:rgba(34,197,94,.12);color:#22c55e;";
+        }
+      }
 
       // est-ce que ce cours est déjà dans le panier ?
       const inPanier = panier.some(item => String(item.id) === String(c.id));
@@ -219,13 +286,13 @@ async function loadCourses(){
       let btnDisable = full ? "disabled" : "";
       let btnExtraCl = inPanier ? "selected" : "";
 
-      // prix initial (sera recalculé au moment de l'ajout quand même)
-      const priceInit = 30;
+      // prix affiché (public / membre / progression/premium)
+      const displayPrice = computeCoursePriceForMember(membershipCode, panier);
 
       return `
         <div class="item"
              data-id="${c.id}"
-             data-price="${priceInit}">
+             data-price="${displayPrice}">
           <div>
             <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
               <div>
@@ -238,14 +305,11 @@ async function loadCourses(){
                 </div>
                 <span class="course-place" style="display:none;">${c.location}</span>
                 <div class="course-price" style="color:#a5b4fc;font-size:13px;margin-top:4px;">
-                  ${priceInit}.–
+                  CHF ${displayPrice}.–
                 </div>
               </div>
-              <span class="badge" style="display:inline-block;border-radius:8px;border:1px solid rgba(255,255,255,.12);padding:4px 8px;font-size:12px;line-height:1.2;font-weight:600;
-                ${full
-                  ? "background:rgba(239,68,68,.15);color:#f87171;"
-                  : "background:rgba(34,197,94,.12);color:#22c55e;"}">
-                ${full ? 'Complet' : rest+' places'}
+              <span class="badge" style="display:inline-block;border-radius:8px;border:1px solid rgba(255,255,255,.12);padding:4px 8px;font-size:12px;line-height:1.2;font-weight:600;${badgeStyle}">
+                ${badgeText}
               </span>
             </div>
           </div>
@@ -269,6 +333,8 @@ async function loadCourses(){
         </div>
       `;
     }).join('');
+
+    list.innerHTML = html || '<div class="item">Aucun cours ne correspond à ces filtres.</div>';
 
     // après affichage, mettre à jour la barre panier en bas
     updateBasketBar();
@@ -297,6 +363,7 @@ document.addEventListener("click", (e) => {
 
   // panier actuel
   let panier = getPanier();
+  if (!Array.isArray(panier)) panier = [];
 
   // est-ce qu'on a déjà un cours ce jour-là dans le panier ?
   const sameDay = panier.find(c => c.date === date);
@@ -327,11 +394,11 @@ document.addEventListener("click", (e) => {
     // ajouter dans le panier AVEC le lieu, l'heure et le prix
     panier.push({
       id,
-      date,            // YYYY-MM-DD (technique)
+      date,                 // YYYY-MM-DD (technique)
       dateLabel: labelDate, // ex. "sam., 03.01."
-      time,            // "10h00"
+      time,                 // "10h00"
       location,
-      price            // 0, 20 ou 30 selon abo
+      price                 // 0, 20 ou 30 selon abo
     });
 
     btn.textContent = "Ajouté ✅";
@@ -348,7 +415,7 @@ document.addEventListener("click", (e) => {
 // ===== Reset complet du panier (bouton "Annuler toutes les sélections") =====
 document.getElementById('basketClear')?.addEventListener('click', () => {
   // vider le panier
-  localStorage.setItem("rsl_panier_courses", "[]");
+  savePanier([]);
 
   // barre panier -> vide
   updateBasketBar();

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Disciplines & Règlement — Romandie Scooter League</title>
 
-  <!-- Fonts + Styles globaux -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -18,312 +18,430 @@
   <script defer src="js/site.js"></script>
 
   <style>
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9aa5b1;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.90);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+      --rsl-shadow:0 24px 70px rgba(0,0,0,.55);
+    }
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+      --rsl-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
     html, body{
       height:100%;
       margin:0;
       background:transparent !important;
       display:flex;
       flex-direction:column;
-      color:#fff;
+      color:var(--rsl-fg);
       font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
     }
-    main{ flex:1; }
+    main{ flex:1; position:relative; z-index:10; }
 
-    /* ===== VIDÉO DE FOND ===== */
+    /* ===== VIDEO BG (comme index) ===== */
     .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
+      position:fixed; inset:0;
+      width:100%; height:100%;
       object-fit:cover;
       z-index:-2;
       background:#000;
     }
     .site-bg-dim{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       z-index:-1;
-      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.90));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.92),rgba(15,23,42,.85));
     }
 
-    /* ===== NAVBAR ===== */
+    /* ===== NAVBAR (calibré index) ===== */
     nav.nav{
       background:rgba(0,0,0,.65);
-      backdrop-filter:blur(8px);
-      position:sticky;
-      top:0;
-      z-index:100;
+      backdrop-filter:blur(10px);
+      position:sticky; top:0; z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
     }
-    nav.nav .container{
-      max-width:1320px;
-      margin:0 auto;
-      padding:12px 28px;
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
-    nav.nav .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
+
     .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:#fff;
-      text-decoration:none;
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
     }
     .brand img{
-      height:48px;
-      border-radius:10px;
-      display:block;
+      height:42px; border-radius:10px;
+      display:block; background:#fff; padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
     .brand span{
       font-weight:800;
-      font-size:17px;
       letter-spacing:.2px;
+      font-size:16px;
+      white-space:nowrap;
     }
 
     nav.nav ul{
-      display:flex;
-      align-items:center;
-      gap:26px;
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0; list-style:none;
     }
     nav.nav ul li a{
       font-weight:600;
-      color:#e8f0ea;
-      font-size:17px;
-      text-decoration:none;
-      letter-spacing:.2px;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
+      text-decoration:none;
+      opacity:.9;
       transition:.2s ease;
     }
-    nav.nav ul li a:hover{
-      color:#22c55e;
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
+
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
+    .nav-avatar{
+      width:34px; height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
     }
 
-    .cta{
-      display:flex;
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
       align-items:center;
-      gap:12px;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
     }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+
     #menuBtn{
       display:none;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      padding:10px 12px;
+      padding:7px 10px;
       font-size:18px;
       line-height:1;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
       cursor:pointer;
       transition:.2s ease;
     }
-    #menuBtn:hover{
-      background:rgba(34,197,94,.22);
+    #menuBtn:hover { filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
     }
 
-    /* Avatar nav */
-    .nav-avatar{
-      width:38px;
-      height:38px;
-      border-radius:999px;
-      object-fit:cover;
-      border:2px solid #22c55e;
-      box-shadow:0 0 10px rgba(34,197,94,.5);
-    }
-
-    /* ===== CONTAINER PAGE ===== */
-    .container-page{
-      max-width:1200px;
-      margin:0 auto;
-      padding:0 24px 40px;
-    }
-
-    /* ===== INTRO / HERO TEXTE ===== */
-    .page-intro{
-      color:#fff;
-      padding:32px 0 18px;
-      text-align:left;
-    }
-    .page-intro h1{
-      font-size:clamp(32px,4.5vw,46px);
-      font-weight:800;
-      margin:6px 0 8px;
-    }
-    .page-intro p{
-      margin:0;
-      opacity:.95;
-      font-size:clamp(15px,2.1vw,19px);
-      max-width:720px;
-    }
-
-    /* ===== SECTIONS DISCIPLINES ===== */
-    section.section{
-      margin:10px 0 30px;
-      color:#e5f2ea;
-    }
-    .section h2{
-      font-size:24px;
-      font-weight:700;
-      margin-bottom:14px;
-      color:#22c55e;
-    }
-    .card{
-      background:linear-gradient(180deg,#111827,#0f172a);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:18px;
-      padding:24px 20px;
-      box-shadow:0 8px 24px rgba(0,0,0,.25);
-      text-align:left;
-    }
-    .grid-2{
-      display:grid;
-      gap:24px;
-      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    }
-    .badge{
-      background:#22c55e;
-      color:#062312;
-      font-weight:700;
-      border-radius:6px;
-      padding:3px 8px;
-      font-size:13px;
-      margin:0 6px 6px 0;
-      display:inline-block;
-    }
-    ul.list{
-      list-style:disc;
-      margin-left:20px;
-      line-height:1.6;
-      font-size:15px;
-      color:#d1d5db;
-    }
-
-    /* ===== RÈGLEMENT ===== */
-    .reglement{
-      margin-top:20px;
-      background:rgba(15,23,42,.95);
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.08);
-      padding:26px 20px 26px;
-      text-align:center;
-      box-shadow:0 10px 30px rgba(0,0,0,.4);
-    }
-    .reglement h2{
-      color:#22c55e;
-      margin-bottom:12px;
-      font-size:24px;
-    }
-    .reglement ul{
-      text-align:left;
-      max-width:720px;
-      margin:20px auto 0;
-      color:#d1d5db;
-      font-size:15px;
-      line-height:1.7;
-      padding-left:18px;
-    }
-
-    /* ===== FOOTER ===== */
-    .footer-mini .copy{
-      text-align:center;
-      color:#9aa5b1;
-      font-size:14px;
-      padding:20px 0 24px;
-      margin:0;
-      border-top:1px solid rgba(255,255,255,.1);
-      background:transparent;
-    }
-
-    /* ===== MENU MOBILE ===== */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:120;
-    }
-    .mobile-sheet.open{display:block;}
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.5);
-    }
+    /* ===== Menu mobile (index) ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
     .mobile-panel{
-      position:absolute;
-      top:0;
-      right:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
-      background:#0b1220;
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
       padding:22px 18px;
       display:flex;
       flex-direction:column;
-      gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
-      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
     .mobile-panel a{
-      color:#eaf5ee;
+      color:var(--rsl-fg);
       text-decoration:none;
       font-weight:700;
-      padding:8px 0;
+      padding:6px 0;
+      font-size:14px;
     }
     .mobile-panel hr{
-      border:0;
-      height:1px;
-      background:rgba(255,255,255,.1);
+      border:0; height:1px;
+      background:rgba(148,163,184,.4);
       margin:10px 0;
     }
-    .mobile-panel .coach-link{
-      border-top:1px solid rgba(255,255,255,.12);
-      margin-top:8px;
-      padding-top:12px;
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart, .btn.green{ display:none !important; }
+      #menuBtn{ display:inline-flex; }
+      .coach-fab{ display:none; }
+    }
+
+    /* ===== PAGE ===== */
+    .page{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 16px 40px;
+    }
+
+    .intro{
+      margin:18px 0 14px;
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      border-radius:20px;
+      padding:18px 16px;
+      box-shadow:var(--rsl-shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .intro:before{
+      content:"";
+      position:absolute; inset:-40% -20%;
+      background:
+        radial-gradient(circle at 15% 25%, var(--rsl-accent-soft), transparent 55%),
+        radial-gradient(circle at 85% 10%, rgba(99,102,241,.12), transparent 60%),
+        radial-gradient(circle at 60% 90%, rgba(34,197,94,.10), transparent 60%);
+      pointer-events:none;
+    }
+    .intro > *{ position:relative; z-index:1; }
+    .intro h1{
+      margin:0 0 6px;
+      font-size:clamp(26px,4.2vw,40px);
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+    .intro p{
+      margin:0;
+      color:var(--rsl-muted);
+      font-size:15px;
+      line-height:1.55;
+      max-width:980px;
+    }
+    .intro p b{ color:var(--rsl-accent); }
+
+    /* ====== Sections ====== */
+    .grid{
+      display:grid;
+      gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+      margin-top:12px;
+    }
+
+    .card{
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      border-radius:20px;
+      padding:18px 16px;
+      box-shadow:var(--rsl-shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-55% -30%;
+      background:
+        radial-gradient(circle at 22% 18%, rgba(34,197,94,.12), transparent 52%),
+        radial-gradient(circle at 80% 22%, rgba(99,102,241,.10), transparent 58%);
+      pointer-events:none;
+      z-index:0;
+    }
+    .card > *{ position:relative; z-index:1; }
+
+    .card h2{
+      margin:0 0 6px;
+      color:var(--rsl-accent);
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .card p{
+      margin:0 0 10px;
+      color:var(--rsl-fg);
+      opacity:.92;
+      font-size:14.5px;
+      line-height:1.55;
+    }
+
+    .badges{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 10px; }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.45);
+      background:rgba(15,23,42,.5);
+      color:var(--rsl-fg);
+      font-weight:900;
+      font-size:12px;
+    }
+    body.theme-light .badge{ background:rgba(15,23,42,.06); }
+
+    ul.list{
+      margin:0;
+      padding-left:18px;
+      color:var(--rsl-muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+    ul.list li{ margin:6px 0; }
+
+    /* ===== Règlement ===== */
+    .rules{
+      margin-top:14px;
+      background:var(--rsl-card);
+      border:1px solid var(--rsl-border);
+      border-radius:20px;
+      padding:18px 16px;
+      box-shadow:var(--rsl-shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .rules:before{
+      content:"";
+      position:absolute; inset:-50% -30%;
+      background:
+        radial-gradient(circle at 18% 25%, rgba(34,197,94,.10), transparent 55%),
+        radial-gradient(circle at 90% 20%, rgba(251,191,36,.10), transparent 58%);
+      pointer-events:none;
+      z-index:0;
+    }
+    .rules > *{ position:relative; z-index:1; }
+
+    .rules-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .rules h2{
+      margin:0;
+      color:var(--rsl-accent);
+      font-size:18px;
+      font-weight:900;
+    }
+    .rules-note{
+      color:var(--rsl-muted);
+      font-size:12.5px;
       font-weight:700;
     }
 
-    /* ===== BOUTON COACH FLOTTANT ===== */
-    .coach-fab{
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      z-index:80;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:12px 14px;
-      border-radius:12px;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312;
-      font-weight:800;
-      text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
-      border:0;
+    .rules ul{
+      margin:0;
+      padding-left:18px;
+      color:var(--rsl-muted);
+      font-size:14px;
+      line-height:1.75;
+    }
+    .rules ul li{ margin:6px 0; }
+    .rules b{ color:var(--rsl-fg); }
+
+    /* ===== Footer (comme index) ===== */
+    .footer-mini .copy{
+      text-align:center;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
+      margin:0;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
 
-    @media(max-width:990px){
-      nav.nav ul{display:none !important;}
-      #btnCart,
-      #btnLogin,
-      #btnAccount,
-      .btn.green{
-        display:none !important;
-      }
-      #menuBtn{display:inline-flex;}
-      .coach-fab{display:none;}
+    /* FAB coach (comme index) */
+    .coach-fab{
+      position:fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:800; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
+      border:0;
+      font-size:13px;
+      line-height:1;
     }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+    @media (max-width:990px){ .coach-fab{ display:none; } }
   </style>
 </head>
+
 <body>
 
-  <!-- VIDÉO DE FOND -->
+  <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV -->
+  <!-- NAV (identique index) -->
   <nav class="nav">
     <div class="container">
       <div class="row">
@@ -344,118 +462,167 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <!-- AVATAR -->
-          <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar" style="display:none;">
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
-          <button id="menuBtn">☰</button>
+          <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- MENU MOBILE -->
+  <!-- MENU MOBILE (identique index) -->
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
+      <a href="disciplines.html" aria-current="page">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
-      <a href="disciplines.html" aria-current="page">Disciplines</a>
+      <a href="game.html">Games</a>
       <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
-      <hr/>
-      <a href="membres.html">Devenir membre</a>
       <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
   <!-- CONTENU -->
-  <main>
-    <div class="container-page">
-      <!-- Intro -->
-      <header class="page-intro">
-        <h1>Disciplines & Règlement</h1>
-        <p>
-          Les deux styles majeurs de la trottinette freestyle : <strong>Park</strong> &amp; <strong>Street</strong>.<br/>
-          La RSL encadre les contests officiels avec un règlement clair et adapté à tous les niveaux.
-        </p>
-      </header>
+  <main class="page">
+    <section class="intro">
+      <h1>Disciplines & Règlement</h1>
+      <p>
+        Les deux styles majeurs de la trottinette freestyle : <b>Park</b> & <b>Street</b>.
+        Voici une base claire pour comprendre les formats, et un règlement RSL simple à appliquer.
+      </p>
+    </section>
 
-      <!-- DISCIPLINES -->
-      <section class="section">
-        <div class="grid-2">
-          <article class="card">
-            <h2>Trottinette Freestyle — Park</h2>
-            <p>Skateparks avec bowls, spines et quarters. Amplitude, flow et gros airs.</p>
-            <div style="margin:10px 0;">
-              <span class="badge">Bowls</span>
-              <span class="badge">Spines</span>
-              <span class="badge">Funbox</span>
-              <span class="badge">Quarters</span>
-            </div>
-            <ul class="list">
-              <li>Figures : backflips, tailwhips, bri flips, combos aériens</li>
-              <li>Critères : amplitude, style, propreté</li>
-              <li>Format : runs chronométrés, meilleure note retenue</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h2>Trottinette Freestyle — Street</h2>
-            <p>Rails, ledges, marches. Technique, précision et créativité urbaine.</p>
-            <div style="margin:10px 0;">
-              <span class="badge">Rails</span>
-              <span class="badge">Ledges</span>
-              <span class="badge">Gaps</span>
-              <span class="badge">Curbs</span>
-            </div>
-            <ul class="list">
-              <li>Figures : grinds, slides, manuals, lignes techniques</li>
-              <li>Critères : difficulté, contrôle, originalité</li>
-              <li>Format : best line ou best trick</li>
-            </ul>
-          </article>
+    <section class="grid">
+      <article class="card">
+        <h2>🛹 Park</h2>
+        <p>Skateparks (bowls, quarters, spines). Objectif : amplitude, flow, et combos aériens propres.</p>
+        <div class="badges">
+          <span class="badge">🌀 Bowl</span>
+          <span class="badge">⬜ Funbox</span>
+          <span class="badge">📈 Quarter</span>
+          <span class="badge">🧱 Spine</span>
         </div>
-      </section>
-
-      <!-- RÈGLEMENT -->
-      <section class="reglement">
-        <h2>Règlement Officiel RSL</h2>
-        <ul>
-          <li>⚠️ <b>Casque obligatoire</b> pour tous les riders.</li>
-          <li>Qualifications : 2 runs (45–60s) — le meilleur compte.</li>
-          <li>Finale : 2 runs — le meilleur compte.</li>
-          <li>Grille de 100 points : difficulté (40), exécution (30), style (20), créativité (10).</li>
-          <li>Classement général du tour : 2 meilleurs résultats sur 3 manches.</li>
-          <li>Protections supplémentaires (genouillères, coudières, dorsales) fortement recommandées.</li>
-          <li>Les juges sont choisis pour leur expérience, leur neutralité et leur connaissance de la scène.</li>
+        <ul class="list">
+          <li>Notion clé : <b>lignes</b> + <b>airs</b> + <b>réceptions</b>.</li>
+          <li>Points forts : amplitude, style, enchaînements.</li>
+          <li>Exemples : tailwhip, bri flip, backflip, barspin + combo.</li>
         </ul>
-      </section>
-    </div>
+      </article>
+
+      <article class="card">
+        <h2>🧱 Street</h2>
+        <p>Urbain (rails, ledges, marches). Objectif : technique, contrôle, et créativité.</p>
+        <div class="badges">
+          <span class="badge">🧱 Rail</span>
+          <span class="badge">⬛ Ledge</span>
+          <span class="badge">🕳️ Gap</span>
+          <span class="badge">🧩 Curb</span>
+        </div>
+        <ul class="list">
+          <li>Notion clé : <b>précision</b> + <b>contrôle</b> + <b>originalité</b>.</li>
+          <li>Points forts : grinds/slides, manuals, lignes propres.</li>
+          <li>Exemples : feeble, smith, boardslide, nose manual, combos.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>🏆 Formats de contest</h2>
+        <p>Formats simples à mettre en place, adaptables selon le park et le nombre de riders.</p>
+        <div class="badges">
+          <span class="badge">⏱️ Run</span>
+          <span class="badge">🔥 Best Trick</span>
+          <span class="badge">🧠 Best Line</span>
+          <span class="badge">👥 Jam</span>
+        </div>
+        <ul class="list">
+          <li><b>Run</b> : 45–60s, une ligne complète.</li>
+          <li><b>Best Trick</b> : 5 essais / 2 minutes / ou 1 trick “en banque”.</li>
+          <li><b>Best Line</b> : une seule ligne notée (style street).</li>
+          <li><b>Jam</b> : format fun, utile en catégorie kids.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="rules">
+      <div class="rules-head">
+        <h2>📜 Règlement RSL (base)</h2>
+        <div class="rules-note">Version simple — adaptable selon l’événement</div>
+      </div>
+
+      <ul>
+        <li>🪖 <b>Casque obligatoire</b> pour tous les riders (toutes catégories).</li>
+        <li>🧤 Protections (genoux/coudes) <b>recommandées</b> et imposables selon la catégorie.</li>
+        <li>⏱️ <b>Runs</b> : 2 runs en qualif, 2 runs en finale (le meilleur compte).</li>
+        <li>📊 <b>Notation</b> (sur 100) : difficulté (40), exécution/propreté (30), style/flow (20), créativité (10).</li>
+        <li>🚫 Un trick “sketchy” (réception non contrôlée) peut être compté mais <b>fortement pénalisé</b>.</li>
+        <li>🤝 Respect : aucun comportement dangereux/anti-sportif. Décision du staff possible.</li>
+        <li>🧑‍⚖️ Juges : riders/coach expérimentés, neutralité, consignes identiques pour tous.</li>
+        <li>🧾 En cas d’égalité : priorité au run le plus “propre”, puis au trick le plus difficile.</li>
+      </ul>
+    </section>
   </main>
 
-  <!-- FOOTER -->
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- Bouton coach flottant -->
   <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
-  <!-- SCRIPTS LOCAUX -->
   <script>
-    // Vidéo de fond Supabase aléatoire
+    // Thème (clair / sombre) — identique index
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
+    // Vidéo de fond — identique index
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -481,21 +648,18 @@
       start();
 
       document.addEventListener('visibilitychange', () => {
-        if(document.hidden){
-          v.pause();
-        }else{
-          start();
-        }
+        if(document.hidden) v.pause();
+        else start();
       });
     })();
 
-    // Menu burger
+    // Menu mobile — identique index
     (function(){
-      const menuBtn = document.getElementById('menuBtn');
-      const mobile  = document.getElementById('mobileMenu');
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
       if(!menuBtn || !mobile) return;
 
-      menuBtn.addEventListener('click', e=>{
+      menuBtn.addEventListener('click',e=>{
         e.stopPropagation();
         mobile.classList.add('open');
         mobile.setAttribute('aria-hidden','false');
@@ -504,40 +668,58 @@
         mobile.classList.remove('open');
         mobile.setAttribute('aria-hidden','true');
       });
-      document.addEventListener('keydown', e=>{
-        if(e.key === 'Escape'){
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
           mobile.classList.remove('open');
           mobile.setAttribute('aria-hidden','true');
         }
       });
     })();
 
-    // Login ↔ Compte
+    /* ===== Supabase singleton + Login UI (comme index) ===== */
+    function waitForEnv(timeoutMs=3000){
+      return new Promise((resolve)=>{
+        const start=Date.now();
+        (function tick(){
+          const ok = !!(window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON);
+          if(ok) return resolve(true);
+          if(Date.now()-start>timeoutMs) return resolve(false);
+          setTimeout(tick,30);
+        })();
+      });
+    }
+    function getSupa(){
+      if(window.__rslSupa) return window.__rslSupa;
+      if(!window.env?.SUPABASE_URL || !window.env?.SUPABASE_ANON) return null;
+      window.__rslSupa = supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+      return window.__rslSupa;
+    }
+
     (async function(){
-      if(typeof supabase === 'undefined') return;
+      await waitForEnv(3500);
+      const supa = getSupa();
+      if(!supa) return;
+
       try{
-        const { data:{ user } } = await supabase.auth.getUser();
-        const btnLogin   = document.getElementById('btnLogin');
-        const btnAccount = document.getElementById('btnAccount');
+        const {data:{user}} = await supa.auth.getUser();
+        const btnLogin=document.getElementById('btnLogin');
+        const btnAccount=document.getElementById('btnAccount');
+        const navAvatar=document.getElementById('navAvatar');
 
         function ui(u){
-          if(!btnLogin || !btnAccount) return;
           if(u){
-            btnAccount.style.display = 'inline-flex';
-            btnLogin.style.display   = 'none';
+            btnAccount.style.display='inline-flex';
+            btnLogin.style.display='none';
+            navAvatar.style.display='inline-block';
           }else{
-            btnAccount.style.display = 'none';
-            btnLogin.style.display   = 'inline-flex';
-            btnLogin.textContent     = 'Login';
+            btnAccount.style.display='none';
+            btnLogin.style.display='inline-flex';
+            navAvatar.style.display='none';
           }
         }
-
         ui(user);
-        btnLogin?.addEventListener('click', ()=>location.href='compte.html');
-        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
-      }catch(e){
-        console.error(e);
-      }
+        supa.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
+      }catch(_){}
     })();
   </script>
 </body>

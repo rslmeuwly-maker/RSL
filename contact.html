@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Contact — Romandie Scooter League</title>
 
-  <!-- Fonts + style global -->
+  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -18,20 +18,41 @@
   <script defer src="js/site.js"></script>
 
   <style>
-    :root{--g:#16a34a;}
+    :root{
+      --rsl-bg: #020617;
+      --rsl-fg: #e5e7eb;
+      --rsl-muted: #9ca3af;
+      --rsl-card: rgba(15,23,42,.96);
+      --rsl-card-soft: rgba(15,23,42,.9);
+      --rsl-border: rgba(148,163,184,.45);
+      --rsl-accent: #22c55e;
+      --rsl-accent-soft: rgba(34,197,94,.14);
+    }
 
-    html,body{
+    body.theme-light{
+      --rsl-bg: #f3f4f6;
+      --rsl-fg: #0f172a;
+      --rsl-muted: #6b7280;
+      --rsl-card: #ffffff;
+      --rsl-card-soft: #f9fafb;
+      --rsl-border: rgba(148,163,184,.35);
+      --rsl-accent: #16a34a;
+      --rsl-accent-soft: rgba(22,163,74,.12);
+    }
+
+    html, body {
       height:100%;
       margin:0;
       background: transparent !important;
-      color:#fff;
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       display:flex;
       flex-direction:column;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
     }
-    main{flex:1;z-index:10;position:relative}
+    main { flex:1; }
 
-    /* Vidéo de fond */
+    /* ======= Vidéo de fond ======= */
     .site-bg-video{
       position:fixed;
       inset:0;
@@ -45,160 +66,214 @@
       position:fixed;
       inset:0;
       z-index:-1;
-      background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.7));
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* NAVBAR — identique index */
+    /* ======= NAVBAR ======= */
     nav.nav{
-      background:rgba(0,0,0,.65);
-      backdrop-filter:blur(8px);
-      position:sticky;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(10px);
+      position: sticky;
       top:0;
       z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
     }
-    nav.nav .container{
-      max-width:1320px;
-      margin:0 auto;
-      padding:12px 28px;
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
-    nav.nav .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-    }
+
     .brand{
       display:flex;
       align-items:center;
       gap:10px;
-      color:#fff;
+      color:inherit;
       text-decoration:none;
     }
     .brand img{
-      height:48px;
+      height:42px;
       border-radius:10px;
       display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
     .brand span{
       font-weight:800;
-      font-size:17px;
       letter-spacing:.2px;
+      font-size:16px;
+      white-space:nowrap;
     }
+
     nav.nav ul{
       display:flex;
       align-items:center;
-      gap:26px;
+      gap:20px;
     }
-    nav.nav ul li{
-      list-style:none;
-    }
+    nav.nav ul li{ list-style:none; }
     nav.nav ul li a{
       font-weight:600;
-      color:#e8f0ea;
-      font-size:17px;
-      letter-spacing:.2px;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
       white-space:nowrap;
       text-decoration:none;
+      opacity:.9;
       transition:.2s ease;
     }
-    nav.nav ul li a:hover{color:#22c55e}
+    nav.nav ul li a:hover{
+      color:var(--rsl-accent);
+      opacity:1;
+    }
 
     .cta{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
+    }
+
+    /* Boutons global */
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
+    }
+
+    /* Avatar dans la nav */
+    .nav-avatar{
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+    }
+
+    /* Toggle thème */
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px;
+      height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+    }
+    .theme-toggle:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.08);
+    }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
     }
 
     #menuBtn{
       display:none;
       align-items:center;
       justify-content:center;
-      padding:10px 12px;
+      padding:7px 10px;
       font-size:18px;
       line-height:1;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(34,197,94,.12);
-      color:#22c55e;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
       cursor:pointer;
       transition:.2s ease;
     }
-    #menuBtn:hover{background:rgba(34,197,94,.22)}
-
-    .nav-avatar{
-      width:38px;
-      height:38px;
-      border-radius:999px;
-      object-fit:cover;
-      border:2px solid #22c55e;
-      box-shadow:0 0 10px rgba(34,197,94,.5);
+    #menuBtn:hover { filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
     }
 
-    @media (max-width:990px){
-      nav.nav ul{display:none !important}
-      #btnCart,
-      #btnLogin,
-      #btnAccount,
-      .btn.green{display:none !important}
-      #menuBtn{display:inline-flex}
-      .coach-fab{display:none}
-    }
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
 
-    .account-avatar{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    /* MENU MOBILE — identique index */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:3000;
-    }
-    .mobile-sheet.open{display:block}
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.5);
-    }
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
     .mobile-panel{
-      position:absolute;
-      top:0;
-      right:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
-      background:#0b1220;
+      position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px;
+      background:var(--rsl-card);
       padding:22px 18px;
       display:flex;
       flex-direction:column;
-      gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
-      box-shadow:-12px 0 30px rgba(0,0,0,.35);
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
     .mobile-panel a{
-      color:#eaf5ee;
+      color:var(--rsl-fg);
       text-decoration:none;
       font-weight:700;
-      padding:8px 0;
+      padding:6px 0;
+      font-size:14px;
     }
     .mobile-panel hr{
       border:0;
       height:1px;
-      background:rgba(255,255,255,.1);
+      background:rgba(148,163,184,.4);
       margin:10px 0;
     }
-    .mobile-panel .coach-link{
-      margin-top:8px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,.2);
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart,
+      .btn.green{
+        display:none !important;
+      }
+      #menuBtn{ display:inline-flex; }
+      .coach-fab{ display:none; }
     }
 
-    /* Bandeau titre */
+    /* ======= SPÉCIFIQUE PAGE CONTACT ======= */
+
     .page-mini-hero{
-      color:#fff;
+      color:var(--rsl-fg);
       padding:28px 0 10px;
       text-align:center;
       z-index:10;
@@ -212,103 +287,134 @@
     .page-mini-hero p{
       opacity:.9;
       margin:4px 0 0;
+      font-size:14px;
     }
 
-    /* Contact */
     .contact-section{
       max-width:1000px;
-      margin:40px auto;
-      padding:0 20px;
+      margin:28px auto 40px;
+      padding:0 16px;
       display:grid;
-      gap:40px;
+      gap:20px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
       position:relative;
       z-index:10;
     }
     .contact-card{
-      background:rgba(255,255,255,.05);
-      padding:24px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.08);
+      background:var(--rsl-card-soft);
+      border-radius:18px;
+      border:1px solid var(--rsl-border);
+      padding:18px 18px 20px;
+      box-shadow:0 22px 50px rgba(15,23,42,.85);
+      font-size:14px;
+    }
+    body.theme-light .contact-card{
+      box-shadow:0 20px 50px rgba(15,23,42,.14);
     }
     .contact-card h2{
-      margin-top:0;
-      color:#22c55e;
+      margin:0 0 8px;
+      font-size:18px;
+      font-weight:800;
+      color:var(--rsl-fg);
     }
-    .contact-card p{margin:8px 0}
-    .contact-card a{color:#22c55e;text-decoration:none}
-    .contact-card a:hover{text-decoration:underline}
+    .contact-card p{
+      margin:6px 0;
+      color:var(--rsl-muted);
+    }
+    .contact-card a{
+      color:var(--rsl-accent);
+      text-decoration:none;
+      font-weight:600;
+    }
+    .contact-card a:hover{
+      text-decoration:underline;
+    }
 
     form.contact-form{
       display:flex;
       flex-direction:column;
-      gap:14px;
-      margin-top:10px;
+      gap:10px;
+      margin-top:6px;
     }
     form.contact-form input,
     form.contact-form textarea{
-      padding:12px 14px;
-      font-size:16px;
+      padding:10px 12px;
+      font-size:14px;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.2);
-      background:rgba(0,0,0,.45);
-      color:#fff;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.9);
+      color:var(--rsl-fg);
+      outline:none;
+    }
+    body.theme-light form.contact-form input,
+    body.theme-light form.contact-form textarea{
+      background:#f9fafb;
     }
     form.contact-form textarea{
       resize:vertical;
-      min-height:120px;
+      min-height:110px;
     }
     form.contact-form button{
-      background:#22c55e;
-      color:#fff;
-      font-weight:700;
-      font-size:16px;
-      padding:12px;
+      margin-top:4px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:800;
+      font-size:14px;
+      padding:10px 12px;
       border:0;
-      border-radius:10px;
+      border-radius:999px;
       cursor:pointer;
       transition:.2s ease;
+      box-shadow:0 12px 26px rgba(22,163,74,.5);
     }
-    form.contact-form button:hover{background:#16a34a}
+    form.contact-form button:hover{
+      filter:brightness(1.05);
+      transform:translateY(-1px);
+    }
 
-    /* Footer mini */
+    /* ===== Footer ===== */
     .footer-mini .copy{
-      color:#9aa5b1;
       text-align:center;
-      border-top:1px solid rgba(255,255,255,.1);
-      background:transparent;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
       margin:0;
-      padding:24px 0 28px;
-      font-size:14px;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
 
-    /* Coach FAB */
+    /* FAB coach (desktop) */
     .coach-fab{
-      position:fixed;
-      right:16px;
-      bottom:16px;
-      z-index:80;
-      padding:12px 14px;
-      border-radius:12px;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      color:#062312;
-      font-weight:800;
-      text-decoration:none;
-      box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15);
+      position: fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:800; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
+      border:0;
+      font-size:13px;
     }
     .coach-fab:hover{
       filter:brightness(1.05);
       transform:translateY(-1px);
       transition:.15s ease;
     }
+    @media (max-width:990px){
+      .coach-fab{ display:none; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Vidéo de fond -->
+  <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV -->
+  <!-- NAV (copié de index) -->
   <nav class="nav">
     <div class="container">
       <div class="row">
@@ -325,18 +431,24 @@
           <li><a href="disciplines.html">Disciplines</a></li>
           <li><a href="shop-rsl.html">Shop</a></li>
           <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html" aria-current="page" style="color:#22c55e">Contact</a></li>
+          <li><a href="contact.html" aria-current="page">Contact</a></li>
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none;">Mon compte</a>
+          <!-- Toggle thème -->
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <a href="compte.html" class="account-avatar">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar" style="display:none;">
+          <!-- Login -->
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <!-- AVATAR -->
+          <a href="compte.html">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png"
+                 alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
@@ -344,7 +456,7 @@
     </div>
   </nav>
 
-  <!-- MENU MOBILE -->
+  <!-- MENU MOBILE (copié de index) -->
   <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
@@ -360,6 +472,7 @@
       <a href="comite.html">Comité</a>
       <a href="contact.html" aria-current="page">Contact</a>
       <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
@@ -373,15 +486,15 @@
 
   <!-- Contenu -->
   <main>
-    <div class="contact-section">
-      <div class="contact-card">
+    <section class="contact-section">
+      <article class="contact-card">
         <h2>📞 Coordonnées</h2>
         <p>📩 Email : <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a></p>
         <p>📞 Téléphone : <a href="tel:+41783008043">+41 78 300 80 43</a></p>
         <p>💬 WhatsApp : <a href="https://wa.me/41783008043" target="_blank" rel="noopener">Envoyer un message</a></p>
-      </div>
+      </article>
 
-      <div class="contact-card">
+      <article class="contact-card">
         <h2>💬 Formulaire de contact</h2>
         <form class="contact-form" action="https://formspree.io/f/mdkwpzeg" method="POST">
           <input type="text" name="nom" placeholder="Votre nom" required>
@@ -390,19 +503,53 @@
           <textarea name="message" rows="5" placeholder="Votre message" required></textarea>
           <button type="submit">Envoyer le message</button>
         </form>
-      </div>
-    </div>
+      </article>
+    </section>
   </main>
 
-  <!-- Footer -->
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- Bouton coach -->
   <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
+  <!-- SCRIPTS (copiés de index) -->
   <script>
+    // Thème (clair / sombre)
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      // Thème initial (localStorage ou prefers-color-scheme)
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
     // Vidéo de fond
     (function(){
       const vids = [
@@ -437,7 +584,7 @@
       });
     })();
 
-    // Menu burger mobile
+    // Menu mobile
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -458,34 +605,6 @@
           mobile.setAttribute('aria-hidden','true');
         }
       });
-    })();
-
-    // Login ↔ Mon compte (cta)
-    (async function(){
-      if(typeof supabase==='undefined') return;
-      try{
-        const {data:{user}} = await supabase.auth.getUser();
-        const btnLogin   = document.getElementById('btnLogin');
-        const btnAccount = document.getElementById('btnAccount');
-
-        function ui(u){
-          if(!btnLogin || !btnAccount) return;
-          if(u){
-            btnAccount.style.display = 'inline-flex';
-            btnLogin.style.display   = 'none';
-          } else {
-            btnAccount.style.display = 'none';
-            btnLogin.style.display   = 'inline-flex';
-            btnLogin.textContent     = 'Login';
-          }
-        }
-
-        ui(user);
-        btnLogin?.addEventListener('click',()=>location.href='compte.html');
-        supabase.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
-      }catch(e){
-        console.error(e);
-      }
     })();
   </script>
 </body>

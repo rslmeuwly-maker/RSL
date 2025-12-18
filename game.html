@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -18,6 +18,11 @@
   <script defer src="js/site.js"></script>
 
   <style>
+    :root{
+      --rsl-accent:#22c55e;
+      --rsl-accent-2:#16a34a;
+    }
+
     html, body {
       height:100%;
       margin:0;
@@ -45,6 +50,7 @@
       inset:0;
       z-index:-1;
       background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8));
+      transition:background .25s ease;
     }
 
     /* ======= NAVBAR ======= */
@@ -52,12 +58,16 @@
       background: rgba(0,0,0,.65);
       backdrop-filter: blur(8px);
       position: sticky; top:0; z-index:100;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
     nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+
     .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; display:block; }
-    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; }
+    .brand img{ height:48px; border-radius:10px; display:block; background:#fff; padding:3px; }
+    .brand span{ font-weight:800; letter-spacing:.2px; font-size:17px; white-space:nowrap; }
+
     nav.nav ul{ display:flex; align-items:center; gap:26px; list-style:none; padding:0; margin:0; }
     nav.nav ul li a{
       font-weight:600;
@@ -68,39 +78,58 @@
       text-decoration:none;
       transition:.2s ease;
     }
-    nav.nav ul li a:hover{ color:#22c55e; }
+    nav.nav ul li a:hover{ color:var(--rsl-accent); }
 
     .cta{ display:flex; align-items:center; gap:12px; }
-    .btn.dark{
+
+    .btn{
       border-radius:999px;
       border:1px solid rgba(148,163,184,.7);
       background:rgba(15,23,42,.9);
       color:#e5e7eb;
       padding:8px 14px;
       font-size:14px;
-      font-weight:600;
-      text-decoration:none;
-      cursor:pointer;
-    }
-    .btn.green{
-      border-radius:999px;
-      border:0;
-      background:linear-gradient(135deg,#22c55e,#16a34a);
-      color:#022c16;
-      padding:8px 16px;
-      font-size:14px;
       font-weight:700;
       text-decoration:none;
       cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      transition:.15s ease;
+      line-height:1;
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.06); }
+
+    .btn.green{
+      border:0;
+      background:linear-gradient(135deg,var(--rsl-accent),var(--rsl-accent-2));
+      color:#022c16;
       box-shadow:0 12px 26px rgba(0,0,0,.6);
     }
+
+    .theme-toggle{
+      width:36px;
+      height:36px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      transition:.15s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.06); }
 
     .nav-avatar{
       width:38px;
       height:38px;
       border-radius:999px;
       object-fit:cover;
-      border:2px solid #22c55e;
+      border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
     }
 
@@ -115,7 +144,7 @@
       border-radius:10px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(34,197,94,.12);
-      color:#22c55e;
+      color:var(--rsl-accent);
       cursor:pointer;
       transition:.2s ease;
     }
@@ -132,17 +161,12 @@
       background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
       border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 30px rgba(0,0,0,.35);
     }
-    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
+    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:800; padding:8px 0; }
     .mobile-panel hr{ border:0; height:1px; background:rgba(255,255,255,.1); margin:10px 0; }
 
     @media (max-width:990px){
       nav.nav ul{ display:none !important; }
-      #btnCart,
-      #btnLogin,
-      #btnAccount,
-      .btn.green{
-        display:none !important;
-      }
+      #btnCart, #btnLogin, #btnAccount, .btn.green{ display:none !important; }
       #menuBtn{ display:inline-flex; }
     }
 
@@ -162,6 +186,7 @@
       overflow:hidden;
       max-width:100%;
       box-sizing:border-box;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
     .game-card-inner{ position:relative; z-index:1; }
 
@@ -201,7 +226,7 @@
     .badge-game span{
       width:7px;height:7px;
       border-radius:999px;
-      background:#22c55e;
+      background:var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.9);
     }
 
@@ -222,6 +247,7 @@
       border:1px solid rgba(148,163,184,.55);
       padding:18px 16px 18px;
       box-shadow:0 20px 60px rgba(0,0,0,.7);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
     .generator-label{
       font-size:12px;
@@ -242,6 +268,7 @@
       display:flex;
       flex-direction:column;
       justify-content:center;
+      transition:background .25s ease, box-shadow .25s ease;
     }
     #currentTrick{
       font-size:clamp(20px,4vw,26px);
@@ -266,23 +293,31 @@
       border-radius:12px;
       padding:10px 12px;
       font-size:14px;
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
       text-align:center;
+      transition:.15s ease;
     }
     .btn-main-game{
-      background:linear-gradient(180deg,#22c55e,#16a34a);
+      background:linear-gradient(180deg,var(--rsl-accent),var(--rsl-accent-2));
       color:#062312;
       border:0;
       box-shadow:0 12px 26px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.2);
     }
-    .btn-main-game:hover{ filter:brightness(1.05); }
+    .btn-main-game:hover{ transform:translateY(-1px); filter:brightness(1.05); }
     .btn-ghost-game{
       background:rgba(0,0,0,.4);
       border:1px solid rgba(255,255,255,.25);
       color:#e5e7eb;
     }
-    .btn-ghost-game:hover{ background:rgba(15,23,42,.9); }
+    .btn-ghost-game:hover{ transform:translateY(-1px); background:rgba(15,23,42,.9); }
+
+    .btn-main-game:disabled,
+    .btn-ghost-game:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
 
     .hint-text{
       margin-top:10px;
@@ -297,6 +332,7 @@
       border:1px solid rgba(148,163,184,.55);
       padding:18px 16px 18px;
       box-shadow:0 20px 60px rgba(0,0,0,.7);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
     .side-card h2{
       margin:0 0 6px;
@@ -327,7 +363,7 @@
       outline:none;
     }
     .add-row input:focus{
-      border-color:#22c55e;
+      border-color:var(--rsl-accent);
       box-shadow:0 0 0 2px rgba(34,197,94,.35);
     }
     .add-row button{
@@ -335,14 +371,15 @@
       border:0;
       padding:9px 14px;
       font-size:13px;
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
-      background:#22c55e;
+      background:var(--rsl-accent);
       color:#062312;
       box-shadow:0 8px 20px rgba(0,0,0,.7);
       white-space:nowrap;
+      transition:.15s ease;
     }
-    .add-row button:hover{ filter:brightness(1.05); }
+    .add-row button:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
     .custom-actions{
       display:flex;
@@ -362,7 +399,9 @@
       font-size:11px;
       cursor:pointer;
       white-space:nowrap;
+      transition:.15s ease;
     }
+    .custom-actions button:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
     .trick-list-title{
       font-size:12px;
@@ -387,13 +426,10 @@
       padding:5px 0;
       border-bottom:1px solid rgba(148,163,184,.22);
     }
-    .trick-list li:last-child{
-      border-bottom:none;
-    }
-    .trick-name{
-      flex:1;
-      color:#e5e7eb;
-    }
+    .trick-list li:last-child{ border-bottom:none; }
+
+    .trick-name{ flex:1; color:#e5e7eb; }
+
     .pill{
       font-size:11px;
       padding:2px 8px;
@@ -414,7 +450,9 @@
       font-size:11px;
       cursor:pointer;
       white-space:nowrap;
+      transition:.15s ease;
     }
+    .del-btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
     /* Footer */
     .footer-mini .copy{
@@ -422,6 +460,111 @@
       padding:24px 0 28px; margin:0;
       border-top:1px solid rgba(255,255,255,.1);
       background:transparent;
+    }
+
+    /* ===========================
+       ✅ THEME LIGHT OVERRIDES
+       =========================== */
+    html[data-theme="light"] body{ color:#0f172a; }
+
+    html[data-theme="light"] .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.90),rgba(15,23,42,.72)) !important;
+    }
+
+    html[data-theme="light"] nav.nav{
+      background:rgba(248,250,252,.92) !important;
+      border-bottom:1px solid rgba(148,163,184,.45) !important;
+      box-shadow:0 10px 30px rgba(15,23,42,.08) !important;
+    }
+    html[data-theme="light"] .brand{ color:#0f172a !important; }
+    html[data-theme="light"] nav.nav ul li a{ color:rgba(15,23,42,.88) !important; }
+    html[data-theme="light"] nav.nav ul li a:hover{ color:var(--rsl-accent) !important; }
+
+    html[data-theme="light"] .btn{
+      background:#0f172a !important;
+      color:#f9fafb !important;
+      border-color:#0f172a !important;
+    }
+    html[data-theme="light"] .theme-toggle{
+      background:#ffffff !important;
+      color:#0f172a !important;
+      border-color:rgba(148,163,184,.55) !important;
+    }
+
+    html[data-theme="light"] .mobile-panel{
+      background:rgba(255,255,255,.98) !important;
+      border-left-color:rgba(148,163,184,.35) !important;
+      box-shadow:-12px 0 30px rgba(15,23,42,.16) !important;
+    }
+    html[data-theme="light"] .mobile-panel a{ color:#0f172a !important; }
+
+    html[data-theme="light"] .game-card{
+      background:rgba(255,255,255,.92) !important;
+      border-color:rgba(148,163,184,.45) !important;
+      box-shadow:0 24px 60px rgba(15,23,42,.14) !important;
+    }
+    html[data-theme="light"] .game-title-block p{ color:#475569 !important; }
+
+    html[data-theme="light"] .badge-game{
+      background:#ffffff !important;
+      border-color:rgba(148,163,184,.55) !important;
+      color:#64748b !important;
+    }
+
+    html[data-theme="light"] .generator-card,
+    html[data-theme="light"] .side-card{
+      background:rgba(255,255,255,.96) !important;
+      border-color:rgba(148,163,184,.45) !important;
+      box-shadow:0 18px 46px rgba(15,23,42,.12) !important;
+    }
+
+    html[data-theme="light"] .generator-label,
+    html[data-theme="light"] .hint-text,
+    html[data-theme="light"] .custom-actions,
+    html[data-theme="light"] .trick-list-title{
+      color:#64748b !important;
+    }
+
+    html[data-theme="light"] .current-trick-box{
+      background:radial-gradient(circle at top, #ffffff, #f1f5f9 60%) !important;
+      box-shadow:0 18px 46px rgba(15,23,42,.12) !important;
+    }
+    html[data-theme="light"] #trickMeta{ color:#64748b !important; }
+    html[data-theme="light"] .trick-name{ color:#0f172a !important; }
+    html[data-theme="light"] .trick-list li{ border-bottom-color:rgba(148,163,184,.35) !important; }
+
+    html[data-theme="light"] .btn-ghost-game{
+      background:#ffffff !important;
+      color:#0f172a !important;
+      border-color:rgba(148,163,184,.55) !important;
+    }
+    html[data-theme="light"] .btn-ghost-game:hover{
+      background:#f8fafc !important;
+    }
+
+    html[data-theme="light"] .add-row input{
+      background:#ffffff !important;
+      color:#0f172a !important;
+      border-color:rgba(148,163,184,.55) !important;
+    }
+
+    html[data-theme="light"] .pill{
+      color:#334155 !important;
+      border-color:rgba(148,163,184,.55) !important;
+      background:#ffffff !important;
+    }
+    html[data-theme="light"] .pill-default{
+      border-color:rgba(34,197,94,.45) !important;
+      color:#065f46 !important;
+    }
+    html[data-theme="light"] .pill-custom{
+      border-color:rgba(245,158,11,.55) !important;
+      color:#92400e !important;
+    }
+
+    html[data-theme="light"] .footer-mini .copy{
+      color:#64748b !important;
+      border-top-color:rgba(148,163,184,.35) !important;
     }
   </style>
 </head>
@@ -435,7 +578,7 @@
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html" aria-current="page">
+        <a class="brand" href="index.html">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
@@ -452,16 +595,20 @@
         </ul>
 
         <div class="cta">
-          <button class="btn dark" id="btnLogin">Login</button>
-          <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <!-- ✅ Toggle nuit/jour -->
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <!-- Login / compte -->
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
 
           <!-- AVATAR (géré par auth.js) -->
           <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" 
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png"
                  alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
@@ -470,21 +617,22 @@
   </nav>
 
   <!-- MENU MOBILE -->
-  <div class="mobile-sheet" id="mobileMenu">
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html" aria-current="page">Accueil</a>
+      <a href="index.html">Accueil</a>
       <a href="cours.html">Cours</a>
       <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
       <a href="ou_rider.html">Où rider ?</a>
       <a href="evenements.html">Événements</a>
-      <a href="game.html">Games</a>
+      <a href="game.html" aria-current="page">Games</a>
       <a href="shop-rsl.html">Shop</a>
       <a href="comite.html">Comité</a>
       <a href="contact.html">Contact</a>
       <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
@@ -556,6 +704,32 @@
 
   <!-- SCRIPTS -->
   <script>
+    /* ✅ THEME TOGGLE (NIGHT/DAY) */
+    (function(){
+      const KEY = 'rsl-theme';
+      const root = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+
+      function setTheme(t){
+        root.setAttribute('data-theme', t);
+        if(btn) btn.textContent = (t === 'dark') ? '🌙' : '☀️';
+        try{ localStorage.setItem(KEY, t); }catch(e){}
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(KEY); }catch(e){}
+      if(!saved){
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        saved = prefersDark ? 'dark' : 'light';
+      }
+      setTheme(saved);
+
+      btn?.addEventListener('click', ()=>{
+        const cur = root.getAttribute('data-theme') || 'dark';
+        setTheme(cur === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
     // Vidéo de fond
     (function(){
       const vids = [
@@ -580,13 +754,9 @@
       };
 
       start();
-
       document.addEventListener('visibilitychange', () => {
-        if(document.hidden){
-          v.pause();
-        }else{
-          start();
-        }
+        if(document.hidden) v.pause();
+        else start();
       });
     })();
 
@@ -613,13 +783,7 @@
       });
     })();
 
-    // Login simple → compte
-    document.getElementById('btnLogin')?.addEventListener('click', ()=>{
-      location.href = 'compte.html';
-    });
-
     /* ====== GENERATEUR DE TRICKS ====== */
-
     const defaultTricks = [
       "Bunny hop (jump à plat)",
       "Drop in simple",
@@ -658,15 +822,11 @@
     }
 
     function saveCustomTricks(list){
-      try{
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-      }catch(e){}
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }catch(e){}
     }
 
     let customTricks = loadCustomTricks();
-    function getAllTricks(){
-      return [...defaultTricks, ...customTricks];
-    }
+    function getAllTricks(){ return [...defaultTricks, ...customTricks]; }
 
     const currentTrickEl = document.getElementById("currentTrick");
     const trickMetaEl   = document.getElementById("trickMeta");
@@ -681,10 +841,9 @@
     }
 
     function renderList(){
-      const all = getAllTricks();
       trickListEl.innerHTML = "";
 
-      defaultTricks.forEach((t, idx)=>{
+      defaultTricks.forEach((t)=>{
         const li = document.createElement("li");
         const name = document.createElement("span");
         name.className = "trick-name";
@@ -702,9 +861,11 @@
         const name = document.createElement("span");
         name.className = "trick-name";
         name.textContent = t;
+
         const pill = document.createElement("span");
         pill.className = "pill pill-custom";
         pill.textContent = "Perso";
+
         const del = document.createElement("button");
         del.className = "del-btn";
         del.textContent = "Suppr.";
@@ -714,6 +875,7 @@
           renderList();
           updateMetaCount();
         });
+
         li.appendChild(name);
         li.appendChild(pill);
         li.appendChild(del);
@@ -723,22 +885,14 @@
 
     function updateMetaCount(){
       const n = customTricks.length;
-      if(n === 0){
-        customCountEl.textContent = "0 trick perso enregistré";
-      }else if(n === 1){
-        customCountEl.textContent = "1 trick perso enregistré";
-      }else{
-        customCountEl.textContent = n + " tricks persos enregistrés";
-      }
+      customCountEl.textContent = (n === 0) ? "0 trick perso enregistré" : (n === 1) ? "1 trick perso enregistré" : (n + " tricks persos enregistrés");
       renderMeta();
     }
 
-    // picking
     function pickRandomTrick(){
       const all = getAllTricks();
       if(!all.length) return "Aucun trick (ajoute-en un !)";
-      const idx = Math.floor(Math.random()*all.length);
-      return all[idx];
+      return all[Math.floor(Math.random()*all.length)];
     }
 
     function buildLine(){
@@ -754,9 +908,8 @@
       return { line, total: all.length };
     }
 
-    // ===== Effet "roulette" avant d'afficher le trick =====
+    // Roulette
     let rolling = false;
-
     function startRolling(mode){
       if(rolling) return;
       const all = getAllTricks();
@@ -777,10 +930,8 @@
         currentTrickEl.textContent = all[i % total];
         trickMetaEl.textContent = "Trick roulette…";
         i++;
-      }, 80); // vitesse du défilement
+      }, 80);
 
-      // durée de la roulette (ms)
-      const duration = 1100;
       setTimeout(()=>{
         clearInterval(interval);
 
@@ -797,10 +948,9 @@
         rolling = false;
         btnNewTrick.disabled = false;
         btnNewLine.disabled  = false;
-      }, duration);
+      }, 1100);
     }
 
-    // Boutons
     btnNewTrick?.addEventListener("click", ()=> startRolling("single"));
     btnNewLine?.addEventListener("click", ()=> startRolling("line"));
 
@@ -808,10 +958,12 @@
       const input = document.getElementById("newTrickInput");
       const value = (input.value || "").trim();
       if(!value) return;
+
       if(getAllTricks().some(t => t.toLowerCase() === value.toLowerCase())){
         input.value = "";
         return;
       }
+
       customTricks.push(value);
       saveCustomTricks(customTricks);
       input.value = "";

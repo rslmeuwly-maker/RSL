@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Comité — Romandie Scooter League</title>
+  <title>Contact — Romandie Scooter League</title>
 
   <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,245 +18,821 @@
   <script defer src="js/site.js"></script>
 
   <style>
-    html, body { height:100%; margin:0; background:transparent!important; color:#fff;
-    font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial; display:flex; flex-direction:column; }
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.90);
+      --rsl-border:rgba(148,163,184,.45);
+
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+
+      --rsl-shadow:0 24px 70px rgba(0,0,0,.55);
+      --rsl-shadow-soft:0 18px 44px rgba(15,23,42,.85);
+    }
+
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+
+      --rsl-shadow:0 24px 60px rgba(15,23,42,.16);
+      --rsl-shadow-soft:0 18px 44px rgba(15,23,42,.12);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:transparent!important;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden;
+    }
     main{ flex:1; }
 
-    /* Fond vidéo */
-    .site-bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; background:#000; }
-    .site-bg-dim{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.8)); }
+    /* ===== Fond vidéo ===== */
+    .site-bg-video{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed; inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.90));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.90),rgba(15,23,42,.85));
+    }
 
-    /* NAV – IDENTIQUE INDEX */
+    /* ===== NAV (calibrée index) ===== */
     nav.nav{
       background:rgba(0,0,0,.65);
-      backdrop-filter:blur(8px);
+      backdrop-filter:blur(10px);
       position:sticky; top:0; z-index:100;
+      border-bottom:1px solid rgba(15,23,42,.8);
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:12px 28px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:48px; border-radius:10px; display:block; }
-    .brand span{ font-weight:800; font-size:17px; letter-spacing:.2px; }
-    nav.nav ul{ display:flex; align-items:center; gap:26px; }
-    nav.nav ul li a{ font-weight:600; color:#e8f0ea; font-size:17px; letter-spacing:.2px; text-decoration:none; }
-    nav.nav ul li a:hover{ color:#22c55e; }
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 
-    .cta{ display:flex; align-items:center; gap:12px; }
-    #menuBtn{
-      display:none; padding:10px 12px; border-radius:10px; font-size:18px;
-      background:rgba(34,197,94,.12); border:1px solid rgba(255,255,255,.12); color:#22c55e;
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
     }
-    #menuBtn:hover{ background:rgba(34,197,94,.22); }
+    .brand img{
+      height:42px; border-radius:10px;
+      display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    .brand span{
+      font-weight:800;
+      font-size:16px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+
+    nav.nav ul{
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0;
+      list-style:none;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
+      white-space:nowrap;
+      text-decoration:none;
+      opacity:.9;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
+
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
     .nav-avatar{
-      width:38px; height:38px; border-radius:999px; object-fit:cover;
-      border:2px solid #22c55e; box-shadow:0 0 10px rgba(34,197,94,.5);
+      width:34px; height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
+    }
+
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover{ filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
+    }
+    .mobile-panel a{
+      color:var(--rsl-fg);
+      text-decoration:none;
+      font-weight:700;
+      padding:6px 0;
+      font-size:14px;
     }
 
     @media(max-width:990px){
       nav.nav ul{ display:none!important; }
-      #btnCart, #btnLogin, #btnAccount, .btn.green{ display:none!important; }
+      #btnCart, .btn.green{ display:none!important; }
       #menuBtn{ display:inline-flex; }
       .coach-fab{ display:none; }
     }
 
-    /* MENU MOBILE */
-    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
-    .mobile-sheet.open{ display:block; }
-    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
-    .mobile-panel{
-      position:absolute; right:0; top:0; height:100%; width:82vw; max-width:360px;
-      background:#0b1220; padding:22px 18px; display:flex; flex-direction:column; gap:12px;
-      border-left:1px solid rgba(255,255,255,.08);
+    /* ===== Page layout (recalibrée index) ===== */
+    .hero-wrap{
+      max-width:1200px;
+      margin:32px auto 18px;
+      padding:0 16px;
+      position:relative;
+      z-index:10;
     }
-    .mobile-panel a{ color:#eaf5ee; text-decoration:none; font-weight:700; padding:8px 0; }
 
-    /* CONTENU */
-    .container-page{ max-width:1200px; margin:0 auto; padding:0 24px 40px; }
-    .page-intro h1{ font-size:clamp(32px,4.5vw,46px); font-weight:800; margin:10px 0; }
-    .committee{ display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
-    .member{
-      background:rgba(15,23,42,.9); padding:18px; border-radius:16px;
-      border:1px solid rgba(255,255,255,.08); text-align:center; backdrop-filter:blur(6px);
+    .intro-card{
+      background:var(--rsl-card);
+      border-radius:22px;
+      border:1px solid var(--rsl-border);
+      box-shadow:var(--rsl-shadow);
+      padding:22px 22px 22px;
+      position:relative;
+      overflow:hidden;
     }
-    .member img{ width:120px; height:120px; border-radius:999px; object-fit:cover;
-      border:2px solid rgba(255,255,255,.18); margin-bottom:10px; }
-
-    .vision{
-      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
-      border-radius:16px; padding:22px; margin-top:40px; backdrop-filter:blur(6px);
+    .intro-card:before{
+      content:"";
+      position:absolute; inset:-40% -30%;
+      background:
+        radial-gradient(circle at 20% 25%, var(--rsl-accent-soft), transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(34,197,94,.10), transparent 60%),
+        radial-gradient(circle at 60% 90%, rgba(99,102,241,.10), transparent 62%);
+      pointer-events:none;
+      z-index:0;
     }
-    .vision h2{ margin:0 0 6px; color:#22c55e; font-size:22px; }
-    .vision p{ font-size:15px; line-height:1.7; color:#e5e7eb; margin:14px 0; }
+    .intro-inner{ position:relative; z-index:1; }
 
-    /* FOOTER */
+    .top-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+    .brand-block{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      min-width:min(560px,100%);
+    }
+    .brand-logo-big{
+      width:60px; height:60px;
+      border-radius:18px;
+      background:#fff;
+      padding:7px;
+      box-shadow:0 18px 44px rgba(15,23,42,.75);
+      flex:0 0 auto;
+    }
+    .brand-logo-big img{ width:100%; height:100%; object-fit:contain; display:block; }
+
+    .brand-text-big h1{
+      margin:0;
+      font-size:clamp(24px,4vw,30px);
+      font-weight:800;
+      letter-spacing:.02em;
+      color:var(--rsl-fg);
+    }
+    .brand-text-big p{
+      margin:4px 0 0;
+      font-size:13px;
+      color:var(--rsl-muted);
+      max-width:70ch;
+      line-height:1.55;
+    }
+
+    .badge-launch{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:rgba(15,23,42,.95);
+      border:1px solid rgba(148,163,184,.7);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--rsl-muted);
+      white-space:nowrap;
+    }
+    .badge-launch span{
+      width:7px;height:7px;border-radius:999px;
+      background:var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.9);
+    }
+    body.theme-light .badge-launch{ background:#f9fafb; }
+
+    .intro-main{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+      gap:22px;
+      align-items:stretch;
+    }
+    @media(max-width:900px){ .intro-main{ grid-template-columns:1fr; } }
+
+    .intro-text{
+      font-size:14px;
+      line-height:1.7;
+      color:var(--rsl-fg);
+    }
+    .intro-text p{ margin:0 0 10px; }
+    .intro-text a{ color:var(--rsl-accent); text-decoration:none; font-weight:800; }
+    .intro-text a:hover{ text-decoration:underline; }
+
+    .cta-block{
+      background:var(--rsl-card-soft);
+      border-radius:16px;
+      border:1px solid var(--rsl-border);
+      padding:16px 16px 18px;
+      box-shadow:var(--rsl-shadow-soft);
+      display:flex;
+      flex-direction:column;
+      height:100%;
+    }
+    .cta-title{
+      font-size:15px;
+      font-weight:800;
+      margin:0 0 6px;
+      color:var(--rsl-fg);
+    }
+    .cta-sub{
+      font-size:13px;
+      color:var(--rsl-muted);
+      margin:0 0 12px;
+      line-height:1.55;
+    }
+
+    .btn-main, .btn-ghost{
+      display:block;
+      width:100%;
+      text-align:center;
+      border-radius:12px;
+      font-size:15px;
+      font-weight:800;
+      padding:12px 16px;
+      cursor:pointer;
+      text-decoration:none;
+      margin-bottom:10px;
+      border:0;
+      line-height:1.1;
+    }
+    .btn-main{
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      box-shadow:0 12px 26px rgba(22,163,74,.5);
+    }
+    .btn-main:hover{ filter:brightness(1.05); }
+    .btn-ghost{
+      background:rgba(15,23,42,.85);
+      border:1px solid rgba(148,163,184,.6);
+      color:#e5e7eb;
+    }
+    body.theme-light .btn-ghost{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+    .btn-ghost:hover{ filter:brightness(1.03); }
+
+    /* ===== Cartes contact + formulaire ===== */
+    .wrap{
+      max-width:1200px;
+      margin:0 auto 40px;
+      padding:0 16px 40px;
+      position:relative;
+      z-index:10;
+    }
+    .section-title{
+      margin:18px 0 10px;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      color:var(--rsl-muted);
+    }
+
+    .contact-grid{
+      display:grid;
+      gap:16px;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+    }
+    @media(max-width:980px){ .contact-grid{ grid-template-columns:repeat(8,minmax(0,1fr)); } }
+    @media(max-width:520px){ .contact-grid{ grid-template-columns:repeat(4,minmax(0,1fr)); } }
+
+    .card{ grid-column:span 6; }
+    @media(max-width:980px){ .card{ grid-column:span 8; } }
+    @media(max-width:520px){ .card{ grid-column:span 4; } }
+
+    .card{
+      background:var(--rsl-card-soft);
+      border-radius:18px;
+      border:1px solid var(--rsl-border);
+      padding:18px 18px 20px;
+      box-shadow:var(--rsl-shadow-soft);
+      font-size:14px;
+    }
+    .card h2{
+      margin:0 0 8px;
+      font-size:18px;
+      font-weight:800;
+      color:var(--rsl-fg);
+    }
+    .card p{
+      margin:6px 0;
+      color:var(--rsl-muted);
+      line-height:1.6;
+    }
+    .card a{
+      color:var(--rsl-accent);
+      text-decoration:none;
+      font-weight:800;
+    }
+    .card a:hover{ text-decoration:underline; }
+
+    form.contact-form{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:8px;
+    }
+    form.contact-form input,
+    form.contact-form textarea{
+      padding:10px 12px;
+      font-size:14px;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.9);
+      color:var(--rsl-fg);
+      outline:none;
+    }
+    body.theme-light form.contact-form input,
+    body.theme-light form.contact-form textarea{
+      background:#f9fafb;
+      color:var(--rsl-fg);
+    }
+    form.contact-form textarea{
+      resize:vertical;
+      min-height:120px;
+    }
+    form.contact-form button{
+      margin-top:4px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:900;
+      font-size:14px;
+      padding:10px 12px;
+      border:0;
+      border-radius:999px;
+      cursor:pointer;
+      transition:.2s ease;
+      box-shadow:0 12px 26px rgba(22,163,74,.5);
+    }
+    form.contact-form button:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+
+    /* Footer */
     .footer-mini .copy{
-      text-align:center; color:#9aa5b1; font-size:14px;
-      padding:24px 0; border-top:1px solid rgba(255,255,255,.12);
+      text-align:center;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
+      margin:0;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
     }
 
-    /* FAB COACH */
+    /* FAB coach */
     .coach-fab{
-      position:fixed; right:16px; bottom:16px; padding:12px 14px; border-radius:12px;
-      background:linear-gradient(180deg,#22c55e,#16a34a); color:#062312; font-weight:800;
-      text-decoration:none; box-shadow:0 10px 24px rgba(0,0,0,.35);
+      position:fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:800; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
+      border:0;
+      font-size:13px;
+      line-height:1;
+    }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+    @media(max-width:990px){ .coach-fab{ display:none; } }
+
+    @media(max-width:480px){
+      .hero-wrap{ padding:0 12px; }
+      .intro-card{ padding:18px 14px 18px; border-radius:16px; }
+      .cta-block{ padding:14px 12px 16px; border-radius:14px; }
+      .btn-main,.btn-ghost{ padding:12px 14px; font-size:14px; }
+      .brand-block{ min-width:100%; }
+      .badge-launch{ width:100%; justify-content:center; }
     }
   </style>
 </head>
+
 <body>
 
-<!-- Fond vidéo -->
-<video class="site-bg-video" autoplay muted loop playsinline id="rslBg"></video>
-<div class="site-bg-dim"></div>
+  <!-- Fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="container">
-    <div class="row">
-      <a class="brand" href="index.html">
-        <img src="images/logo_rsl.png" alt="Logo RSL"/>
-        <span>RSL — Romandie Scooter League</span>
-      </a>
-
-      <ul>
-        <li><a href="cours.html">Cours</a></li>
-        <li><a href="formation.html">Formation RSL</a></li>
-        <li><a href="ou_rider.html">Où rider ?</a></li>
-        <li><a href="evenements.html">Événements</a></li>
-        <li><a href="disciplines.html">Disciplines</a></li>
-        <li><a href="shop-rsl.html">Shop</a></li>
-        <li><a href="comite.html">Comité</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-
-      <div class="cta">
-        <button class="btn dark" id="btnLogin">Login</button>
-        <a class="btn dark" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-
-        <a href="compte.html">
-          <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="" style="display:none;">
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
         </a>
 
-        <a class="btn dark" id="btnCart" href="panier/panier.html">Panier</a>
-        <a class="btn green" href="membres.html">Devenir membre</a>
-        <button id="menuBtn">☰</button>
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html" aria-current="page">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
       </div>
     </div>
-  </div>
-</nav>
-
-<!-- MENU MOBILE -->
-<div class="mobile-sheet" id="mobileMenu">
-  <div class="mobile-dim"></div>
-  <nav class="mobile-panel">
-    <a href="index.html">Accueil</a>
-    <a href="cours.html">Cours</a>
-    <a href="membres.html">Devenir membre</a>
-    <a href="formation.html">Formation RSL</a>
-    <a href="disciplines.html">Disciplines</a>
-    <a href="ou_rider.html">Où rider ?</a>
-    <a href="evenements.html">Événements</a>
-    <a href="game.html">Games</a>
-    <a href="shop-rsl.html">Shop</a>
-    <a href="comite.html">Comité</a>
-    <a href="contact.html">Contact</a>
-    <a href="conditions.html">Conditions générales</a>
-    <a href="compte.html">Mon compte</a>
-    <a href="coach.html">👨‍🏫 Je suis coach</a>
   </nav>
-</div>
 
-<!-- CONTENU -->
-<main class="container-page">
-  <div class="page-intro">
-    <h1>Comité</h1>
-    <p>L’équipe qui fait tourner la Romandie Scooter League.</p>
+  <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
+      <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html" aria-current="page">Contact</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html">👨‍🏫 Je suis coach</a>
+    </nav>
   </div>
 
-  <div class="committee">
-    <article class="member">
-      <img src="images/comite_joel.png" alt="">
-      <h3>Joël Meuwly</h3>
-      <p>Président — Coordination — Résultats — Sponsors</p>
-    </article>
+  <main>
 
-    <article class="member">
-      <img src="images/comite_william.png" alt="">
-      <h3>William Maurer</h3>
-      <p>Comptable — Trésorier — Prof RSL</p>
-    </article>
+    <!-- HERO (recalibré comme index) -->
+    <div class="hero-wrap">
+      <section class="intro-card">
+        <div class="intro-inner">
+          <div class="top-row">
+            <div class="brand-block">
+              <div class="brand-logo-big">
+                <img src="images/logo_rsl.png" alt="RSL">
+              </div>
+              <div class="brand-text-big">
+                <h1>Contact RSL</h1>
+                <p>Une question, un partenariat, une inscription ? Écris-nous et on te répond vite.</p>
+              </div>
+            </div>
 
-    <article class="member">
-      <img src="images/comite_florian.png" alt="">
-      <h3>Florian Barbezat</h3>
-      <p>Responsable médias — Prof RSL</p>
-    </article>
+            <div>
+              <div class="badge-launch">
+                <span></span> Réponse rapide • WhatsApp / Email
+              </div>
+            </div>
+          </div>
 
-    <article class="member">
-      <img src="images/comite_louis.png" alt="">
-      <h3>Louis Zanolli</h3>
-      <p>Co-responsable médias — Prof RSL</p>
-    </article>
-  </div>
+          <div class="intro-main">
+            <div class="intro-text">
+              <p>
+                Pour les <b>cours</b>, les <b>stages</b>, un <b>sponsor</b> ou une demande presse :
+                utilise le formulaire ou contacte directement l’équipe.
+              </p>
+              <p>
+                Email : <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a><br>
+                Téléphone : <a href="tel:+41783008043">+41 78 300 80 43</a><br>
+                WhatsApp : <a href="https://wa.me/41783008043" target="_blank" rel="noopener">Envoyer un message</a>
+              </p>
+            </div>
 
-  <div class="vision">
-    <h2>Notre vision</h2>
+            <div class="cta-block">
+              <h2 class="cta-title">Accès rapide</h2>
+              <p class="cta-sub">Tu peux aussi passer par les pages clés :</p>
 
-    <p>L’histoire de la RSL commence avec Ride4Style, construite depuis 2018 pour donner une vraie structure à la trottinette freestyle en Suisse romande.</p>
+              <a href="cours.html" class="btn-main">🎓 Voir les cours</a>
+              <a href="membres.html" class="btn-ghost">⭐ Devenir membre</a>
+              <a href="coach.html" class="btn-ghost">👨‍🏫 Je suis coach</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
-    <p>Des cours, des stages, des contests, une communauté grandissante : coachs, parents, riders. La RSL est la continuité naturelle.</p>
+    <!-- CONTENU -->
+    <section class="wrap">
+      <p class="section-title">Nous écrire</p>
 
-    <p>Objectif : offrir une progression claire, du premier drop aux contests officiels, dans un cadre cohérent et passionné.</p>
+      <div class="contact-grid">
+        <article class="card">
+          <h2>📞 Coordonnées</h2>
+          <p>📩 Email : <a href="mailto:rsl.meuwly@gmail.com">rsl.meuwly@gmail.com</a></p>
+          <p>📞 Téléphone : <a href="tel:+41783008043">+41 78 300 80 43</a></p>
+          <p>💬 WhatsApp : <a href="https://wa.me/41783008043" target="_blank" rel="noopener">Envoyer un message</a></p>
+          <p style="margin-top:10px;color:var(--rsl-muted);font-size:13px;line-height:1.55;">
+            Astuce : si c’est urgent (annulation / arrivée tardive), WhatsApp est le plus rapide.
+          </p>
+        </article>
 
-    <p>Notre but : que les riders puissent dire un jour « j’ai grandi avec la RSL ».</p>
-  </div>
-</main>
+        <article class="card">
+          <h2>💬 Formulaire</h2>
+          <p style="font-size:13px;color:var(--rsl-muted);margin-top:-2px;">
+            Tu reçois une copie par email. Réponse dès que possible.
+          </p>
+          <form class="contact-form" action="https://formspree.io/f/mdkwpzeg" method="POST">
+            <input type="text" name="nom" placeholder="Votre nom" required>
+            <input type="email" name="email" placeholder="Votre email" required>
+            <input type="text" name="sujet" placeholder="Sujet" required>
+            <textarea name="message" placeholder="Votre message" required></textarea>
+            <button type="submit">Envoyer le message</button>
+          </form>
+        </article>
+      </div>
+    </section>
 
-<footer class="footer-mini">
-  <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
-</footer>
+  </main>
 
-<a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
 
-<!-- SCRIPTS -->
-<script>
-  (function(){
-    const vids=[
-      "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
-      "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
-    ];
-    const pick=vids[Math.floor(Math.random()*vids.length)];
-    const v=document.getElementById('rslBg');
-    if(!v) return;
-    const s=document.createElement('source');
-    s.src=pick; s.type='video/mp4';
-    v.appendChild(s);
-    v.playbackRate=0.6;
-  })();
-</script>
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
 
-<script>
-  (function(){
-    const menuBtn=document.getElementById('menuBtn');
-    const mobile=document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click',()=> mobile.classList.add('open'));
-    document.querySelector('.mobile-dim').addEventListener('click',()=> mobile.classList.remove('open'));
-  })();
-</script>
+  <script>
+    // Thème (clair / sombre) — identique index
+    (function(){
+      const STORAGE_KEY='rsl-theme';
+      const body=document.body;
+      const btn=document.getElementById('themeToggle');
 
-<script>
-  (async function(){
-    if(typeof supabase==='undefined') return;
-    const {data:{user}}=await supabase.auth.getUser();
-    const login=document.getElementById('btnLogin');
-    const acc=document.getElementById('btnAccount');
-    function ui(u){
-      if(u){ acc.style.display='inline-flex'; login.style.display='none'; }
-      else{ acc.style.display='none'; login.style.display='inline-flex'; }
+      function applyTheme(theme){
+        if(theme==='light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent='☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent='🌙';
+        }
+      }
+
+      let saved=null;
+      try{ saved=localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight=window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved=prefersLight?'light':'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click',()=>{
+          const current=body.classList.contains('theme-light')?'light':'dark';
+          const next=current==='light'?'dark':'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY,next); }catch(e){}
+        });
+      }
+    })();
+
+    // Vidéo de fond
+    (function(){
+      const vids=[
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick=vids[Math.floor(Math.random()*vids.length)];
+      const v=document.getElementById('rslBg');
+      if(!v) return;
+
+      const s=document.createElement('source');
+      s.src=pick; s.type='video/mp4';
+      v.appendChild(s);
+
+      const start=()=>{
+        try{
+          v.playbackRate=0.6;
+          const p=v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
+      start();
+      document.addEventListener('visibilitychange',()=>{
+        if(document.hidden) v.pause();
+        else start();
+      });
+    })();
+
+    // Menu mobile
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // Login UI (mon compte + avatar) — même logique
+    function waitForEnv(timeoutMs=3500){
+      return new Promise((resolve)=>{
+        const start=Date.now();
+        (function tick(){
+          const ok=!!(window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON);
+          if(ok) return resolve(true);
+          if(Date.now()-start>timeoutMs) return resolve(false);
+          setTimeout(tick,30);
+        })();
+      });
     }
-    ui(user);
-    supabase.auth.onAuthStateChange((_e,s)=> ui(s?.user ?? null));
-  })();
-</script>
+    function getSupa(){
+      if(window.__rslSupa) return window.__rslSupa;
+      if(!window.env?.SUPABASE_URL || !window.env?.SUPABASE_ANON) return null;
+      window.__rslSupa = supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+      return window.__rslSupa;
+    }
 
+    (async function(){
+      await waitForEnv(3500);
+      const supa=getSupa();
+      if(!supa) return;
+
+      try{
+        const {data:{user}} = await supa.auth.getUser();
+        const btnLogin=document.getElementById('btnLogin');
+        const btnAccount=document.getElementById('btnAccount');
+        const navAvatar=document.getElementById('navAvatar');
+
+        function ui(u){
+          if(u){
+            btnAccount.style.display='inline-flex';
+            btnLogin.style.display='none';
+            navAvatar.style.display='inline-block';
+          }else{
+            btnAccount.style.display='none';
+            btnLogin.style.display='inline-flex';
+            navAvatar.style.display='none';
+          }
+        }
+
+        ui(user);
+        supa.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
+      }catch(e){}
+    })();
+  </script>
 </body>
 </html>

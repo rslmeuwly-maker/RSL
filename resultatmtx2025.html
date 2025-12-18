@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Résultats — Montreux Scooter Contest 2025</title>
+
+  <!-- Fonts + styles globaux -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/common.css"/>
+
+  <!-- Supabase + scripts -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/site.js"></script>
+
+  <style>
+    :root{
+      --rsl-bg:#020617;
+      --rsl-fg:#e5e7eb;
+      --rsl-muted:#9ca3af;
+      --rsl-card:rgba(15,23,42,.96);
+      --rsl-card-soft:rgba(15,23,42,.9);
+      --rsl-border:rgba(148,163,184,.45);
+      --rsl-accent:#22c55e;
+      --rsl-accent-soft:rgba(34,197,94,.14);
+    }
+
+    body.theme-light{
+      --rsl-bg:#f3f4f6;
+      --rsl-fg:#0f172a;
+      --rsl-muted:#6b7280;
+      --rsl-card:#ffffff;
+      --rsl-card-soft:#f9fafb;
+      --rsl-border:rgba(148,163,184,.35);
+      --rsl-accent:#16a34a;
+      --rsl-accent-soft:rgba(22,163,74,.12);
+    }
+
+    *,:before,:after{ box-sizing:border-box; }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background:transparent!important;
+      display:flex;
+      flex-direction:column;
+      color:var(--rsl-fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
+    }
+    main{ flex:1; }
+
+    /* ======= Fond vidéo ======= */
+    .site-bg-video{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+    }
+    .site-bg-dim{
+      position:fixed; inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
+      transition:background .25s ease;
+    }
+    body.theme-light .site-bg-dim{
+      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
+    }
+
+    /* ======= NAVBAR ======= */
+    nav.nav{
+      background:rgba(0,0,0,.65);
+      backdrop-filter:blur(10px);
+      position:sticky; top:0; z-index:100;
+      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      border-bottom:1px solid rgba(15,23,42,.8);
+    }
+    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    body.theme-light nav.nav{
+      background:rgba(248,250,252,.96);
+      border-bottom:1px solid rgba(148,163,184,.5);
+      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      color:inherit; text-decoration:none;
+      min-width:fit-content;
+    }
+    .brand img{
+      height:42px; border-radius:10px;
+      display:block;
+      background:#fff;
+      padding:3px;
+      box-shadow:0 10px 28px rgba(0,0,0,.35);
+    }
+    .brand span{
+      font-weight:800;
+      letter-spacing:.2px;
+      font-size:16px;
+      white-space:nowrap;
+    }
+
+    nav.nav ul{
+      display:flex; align-items:center; gap:20px;
+      padding:0; margin:0;
+      list-style:none;
+    }
+    nav.nav ul li a{
+      font-weight:600;
+      color:var(--rsl-fg);
+      font-size:15px;
+      letter-spacing:.02em;
+      white-space:nowrap;
+      text-decoration:none;
+      opacity:.9;
+      transition:.2s ease;
+    }
+    nav.nav ul li a:hover{
+      color:var(--rsl-accent);
+      opacity:1;
+    }
+
+    .cta{ display:flex; align-items:center; gap:10px; }
+
+    .btn{
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(148,163,184,.5);
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(15,23,42,.9);
+      color:#f9fafb;
+      transition:.2s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    body.theme-light .btn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+    .btn.green{
+      background:var(--rsl-accent);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 10px 26px rgba(22,163,74,.45);
+    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
+    .nav-avatar{
+      width:34px; height:34px;
+      border-radius:999px;
+      object-fit:cover;
+      border:2px solid var(--rsl-accent);
+      box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
+    }
+
+    .theme-toggle{
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:34px; height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:17px;
+      cursor:pointer;
+      padding:0;
+      transition:.2s ease;
+      line-height:1;
+    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+    body.theme-light .theme-toggle{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+
+    #menuBtn{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      font-size:18px;
+      line-height:1;
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    #menuBtn:hover { filter:brightness(1.1); }
+    body.theme-light #menuBtn{
+      background:#0f172a;
+      color:#f9fafb;
+      border-color:#0f172a;
+    }
+
+    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
+
+    /* ===== Menu mobile ===== */
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
+    .mobile-sheet.open{ display:block; }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
+    .mobile-panel{
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
+      background:var(--rsl-card);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      border-left:1px solid rgba(15,23,42,.8);
+      box-shadow:-18px 0 50px rgba(0,0,0,.55);
+    }
+    .mobile-panel a{
+      color:var(--rsl-fg);
+      text-decoration:none;
+      font-weight:700;
+      padding:6px 0;
+      font-size:14px;
+    }
+    .mobile-panel hr{
+      border:0;
+      height:1px;
+      background:rgba(148,163,184,.4);
+      margin:10px 0;
+    }
+
+    @media (max-width:990px){
+      nav.nav ul{ display:none !important; }
+      #btnCart, .btn.green{ display:none !important; }
+      #menuBtn{ display:inline-flex; }
+      .coach-fab{ display:none; }
+    }
+
+    /* ===========================
+       PAGE RESULTATS (AJOUT)
+       =========================== */
+    .page{
+      max-width:1200px;
+      margin:0 auto;
+      padding:0 16px 44px;
+    }
+
+    .hero{
+      margin:18px 0 12px;
+      background:var(--rsl-card);
+      border-radius:22px;
+      border:1px solid var(--rsl-border);
+      box-shadow:0 30px 80px rgba(15,23,42,.9);
+      padding:18px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    body.theme-light .hero{
+      box-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-40% -30%;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(34,197,94,.12), transparent 60%),
+        radial-gradient(circle at 60% 90%, rgba(99,102,241,.10), transparent 62%);
+      pointer-events:none;
+      filter:saturate(1.05);
+      z-index:0;
+    }
+    .hero > *{ position:relative; z-index:1; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:rgba(15,23,42,.95);
+      border:1px solid rgba(148,163,184,.7);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      color:var(--rsl-muted);
+      white-space:nowrap;
+    }
+    body.theme-light .pill{ background:#f9fafb; }
+
+    .hero h1{
+      margin:10px 0 6px;
+      font-size:clamp(24px,4vw,32px);
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .hero p{
+      margin:0;
+      color:var(--rsl-muted);
+      font-size:13px;
+      line-height:1.55;
+      max-width:70ch;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:12px 0 0;
+    }
+    .tab-btn{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.85);
+      color:#e5e7eb;
+      font-weight:800;
+      cursor:pointer;
+      transition:.15s ease;
+      line-height:1;
+    }
+    body.theme-light .tab-btn{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+    .tab-btn:hover{ filter:brightness(1.03); transform:translateY(-1px); }
+    .tab-btn.active{
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      border-color:transparent;
+      box-shadow:0 12px 26px rgba(22,163,74,.5);
+    }
+
+    .results-card{
+      margin-top:14px;
+      background:var(--rsl-card);
+      border-radius:22px;
+      border:1px solid var(--rsl-border);
+      box-shadow:0 30px 80px rgba(15,23,42,.9);
+      padding:18px 16px;
+      display:none;
+      position:relative;
+      overflow:hidden;
+    }
+    body.theme-light .results-card{
+      box-shadow:0 24px 60px rgba(15,23,42,.16);
+    }
+    .results-card.active{ display:block; }
+
+    .kicker{
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      font-size:11px;
+      font-weight:800;
+      color:var(--rsl-muted);
+      margin-bottom:6px;
+    }
+    .results-card h2{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      color:var(--rsl-accent);
+    }
+    .muted{
+      margin:6px 0 14px;
+      font-size:13px;
+      color:var(--rsl-muted);
+      line-height:1.5;
+    }
+
+    /* Podium */
+    .podium{
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+      gap:12px;
+      margin:14px 0 16px;
+      flex-wrap:wrap;
+    }
+    .podium .p{
+      width:120px;
+      text-align:center;
+      padding:10px 10px 12px;
+      border-radius:16px;
+      background:var(--rsl-card-soft);
+      border:1px solid rgba(148,163,184,.35);
+      box-shadow:0 16px 50px rgba(15,23,42,.75);
+    }
+    body.theme-light .podium .p{ box-shadow:0 20px 55px rgba(15,23,42,.15); }
+
+    .gold{ border-color:rgba(246,200,0,.55); }
+    .silver{ border-color:rgba(192,192,192,.55); }
+    .bronze{ border-color:rgba(205,127,50,.55); }
+
+    .position{
+      font-size:16px;
+      font-weight:800;
+      color:var(--rsl-accent);
+    }
+    .name{
+      margin-top:6px;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.15;
+      word-break:break-word;
+    }
+    .small{
+      margin-top:4px;
+      font-size:12px;
+      color:var(--rsl-muted);
+      font-weight:800;
+    }
+
+    /* Table */
+    .table-wrap{ overflow:auto; border-radius:16px; border:1px solid rgba(148,163,184,.25); }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+    }
+    th, td{
+      padding:10px;
+      border-bottom:1px solid rgba(148,163,184,.20);
+      text-align:left;
+      vertical-align:middle;
+      font-size:14px;
+      color:var(--rsl-fg);
+    }
+    th{
+      color:var(--rsl-accent);
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      background:rgba(0,0,0,.35);
+      position:sticky;
+      top:0;
+      z-index:1;
+      white-space:nowrap;
+    }
+    body.theme-light th{ background:rgba(15,23,42,.05); }
+
+    td.rang{ width:76px; font-weight:800; }
+    td.score, th.score{ text-align:right; width:140px; font-weight:800; }
+
+    @media (max-width: 720px){
+      .results-card{ padding:14px; }
+      .podium .p{ width:106px; }
+      table{ min-width:0 !important; }
+      .table-wrap{ overflow:visible; border:none; }
+
+      table, thead, tbody, th, td, tr{ display:block; width:100%; }
+      thead{ display:none; }
+
+      tbody tr{
+        background:var(--rsl-card-soft);
+        border:1px solid rgba(148,163,184,.25);
+        border-radius:14px;
+        padding:10px 12px;
+        margin:10px 0;
+        box-shadow:0 16px 50px rgba(15,23,42,.75);
+      }
+      body.theme-light tbody tr{ box-shadow:0 20px 55px rgba(15,23,42,.15); }
+
+      td{
+        border:0 !important;
+        padding:6px 0 !important;
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+      }
+      td::before{
+        content: attr(data-label);
+        font-weight:800;
+        color:var(--rsl-muted);
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        font-size:11px;
+        flex:0 0 44%;
+      }
+      td.score{ justify-content:space-between; }
+    }
+
+    /* Footer (exact index) */
+    .footer-mini .copy{
+      text-align:center;
+      color:var(--rsl-muted);
+      font-size:13px;
+      padding:20px 0 24px;
+      margin:0;
+      border-top:1px solid rgba(15,23,42,.7);
+      background:rgba(15,23,42,.85);
+    }
+    body.theme-light .footer-mini .copy{
+      background:rgba(248,250,252,.96);
+      border-top-color:rgba(148,163,184,.5);
+    }
+
+    /* FAB coach (exact index) */
+    .coach-fab{
+      position:fixed; right:16px; bottom:16px; z-index:80;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 13px; border-radius:999px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16; font-weight:800; text-decoration:none;
+      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
+      border:0;
+      font-size:13px;
+      line-height:1;
+    }
+    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
+    @media (max-width:990px){ .coach-fab{ display:none; } }
+  </style>
+</head>
+<body>
+
+  <!-- Fond vidéo -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html">
+          <img src="images/logo_rsl.png" alt="Logo RSL"/>
+          <span>RSL — Romandie Scooter League</span>
+        </a>
+
+        <ul>
+          <li><a href="cours.html">Cours</a></li>
+          <li><a href="formation.html">Formation RSL</a></li>
+          <li><a href="ou_rider.html">Où rider ?</a></li>
+          <li><a href="evenements.html">Événements</a></li>
+          <li><a href="disciplines.html">Disciplines</a></li>
+          <li><a href="shop-rsl.html">Shop</a></li>
+          <li><a href="comite.html">Comité</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="cta">
+          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
+
+          <a class="btn" id="btnLogin" href="access.html">Login</a>
+          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+
+          <a href="compte.html" aria-label="Mon compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
+          </a>
+
+          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn green" href="membres.html">Devenir membre</a>
+          <button id="menuBtn" aria-label="Menu">☰</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MENU MOBILE -->
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <a href="index.html">Accueil</a>
+      <a href="cours.html">Cours</a>
+      <a href="membres.html">Devenir membre</a>
+      <a href="formation.html">Formation RSL</a>
+      <a href="disciplines.html">Disciplines</a>
+      <a href="ou_rider.html">Où rider ?</a>
+      <a href="evenements.html">Événements</a>
+      <a href="game.html">Games</a>
+      <a href="shop-rsl.html">Shop</a>
+      <a href="comite.html">Comité</a>
+      <a href="contact.html">Contact</a>
+      <a href="conditions.html">Conditions générales</a>
+      <a href="access.html">Se connecter</a>
+      <a href="compte.html">Mon compte</a>
+      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+    </nav>
+  </div>
+
+  <!-- CONTENU -->
+  <main class="page">
+    <section class="hero">
+      <div class="pill"><span></span> Montreux Scooter Contest</div>
+      <h1>Résultats 2025</h1>
+      <p>Classements officiels — <b>U11</b> · <b>U15</b> · <b>U19</b> · <b>OPEN</b></p>
+
+      <div class="tabs" role="tablist" aria-label="Catégories">
+        <button class="tab-btn active" type="button" data-tab="u11" role="tab" aria-selected="true">U11</button>
+        <button class="tab-btn" type="button" data-tab="u15" role="tab" aria-selected="false">U15</button>
+        <button class="tab-btn" type="button" data-tab="u19" role="tab" aria-selected="false">U19</button>
+        <button class="tab-btn" type="button" data-tab="open" role="tab" aria-selected="false">OPEN</button>
+      </div>
+    </section>
+
+    <!-- ================= U11 ================= -->
+    <section class="results-card active" id="u11" role="tabpanel">
+      <div class="kicker">Montreux Scooter Contest</div>
+      <h2>Résultats — U11</h2>
+      <p class="muted">Podium & classement complet</p>
+
+      <div class="podium">
+        <div class="p silver">
+          <div class="position">2ᵉ</div>
+          <div class="name">Dos Santos<br/>Lello</div>
+        </div>
+        <div class="p gold">
+          <div class="position">1ᵉʳ</div>
+          <div class="name">Sandala<br/>Jonathan</div>
+        </div>
+        <div class="p bronze">
+          <div class="position">3ᵉ</div>
+          <div class="name">Woldert<br/>Felix</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:76px;">Rang</th>
+              <th>Rider</th>
+              <th style="width:110px;">Run 1</th>
+              <th style="width:110px;">Run 2</th>
+              <th style="width:150px;">Best Trick (pts)</th>
+              <th style="width:170px;">Best Trick</th>
+              <th class="score">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rang" data-label="Rang">1</td>
+              <td data-label="Rider"><strong>Sandala Jonathan</strong></td>
+              <td data-label="Run 1">65</td>
+              <td data-label="Run 2">59</td>
+              <td data-label="Best Trick (pts)">6</td>
+              <td data-label="Best Trick">Boardslide</td>
+              <td class="score" data-label="Total"><strong>52.83</strong></td>
+            </tr>
+            <tr>
+              <td class="rang" data-label="Rang">2</td>
+              <td data-label="Rider"><strong>Dos Santos Lello</strong></td>
+              <td data-label="Run 1">38</td>
+              <td data-label="Run 2">55</td>
+              <td data-label="Best Trick (pts)">5.5</td>
+              <td data-label="Best Trick">Bri x foot</td>
+              <td class="score" data-label="Total"><strong>50.8</strong></td>
+            </tr>
+            <tr>
+              <td class="rang" data-label="Rang">3</td>
+              <td data-label="Rider"><strong>Woldert Felix</strong></td>
+              <td data-label="Run 1">53</td>
+              <td data-label="Run 2">49</td>
+              <td data-label="Best Trick (pts)">0</td>
+              <td data-label="Best Trick">Flair whip</td>
+              <td class="score" data-label="Total"><strong>47.6</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= U15 ================= -->
+    <section class="results-card" id="u15" role="tabpanel">
+      <div class="kicker">Montreux Scooter Contest</div>
+      <h2>Résultats — U15</h2>
+      <p class="muted">Podium & classement complet</p>
+
+      <div class="podium">
+        <div class="p silver">
+          <div class="position">2ᵉ</div>
+          <div class="name">Burgat<br/>Dimitri</div>
+          <div class="small">74</div>
+        </div>
+        <div class="p gold">
+          <div class="position">1ᵉʳ</div>
+          <div class="name">Rubin<br/>Adin</div>
+          <div class="small">92.5</div>
+        </div>
+        <div class="p bronze">
+          <div class="position">3ᵉ</div>
+          <div class="name">Siegenthaler<br/>Natan</div>
+          <div class="small">68</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:76px;">Rang</th>
+              <th>Rider</th>
+              <th class="score">Résultat</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="rang" data-label="Rang">1</td><td data-label="Rider">Rubin Adin</td><td class="score" data-label="Résultat">92.5</td></tr>
+            <tr><td class="rang" data-label="Rang">2</td><td data-label="Rider">Burgat Dimitri</td><td class="score" data-label="Résultat">74</td></tr>
+            <tr><td class="rang" data-label="Rang">3</td><td data-label="Rider">Siegenthaler Natan</td><td class="score" data-label="Résultat">68</td></tr>
+            <tr><td class="rang" data-label="Rang">4</td><td data-label="Rider">Mayor André</td><td class="score" data-label="Résultat">62.6</td></tr>
+            <tr><td class="rang" data-label="Rang">5</td><td data-label="Rider">Oulevay Liam</td><td class="score" data-label="Résultat">58.3</td></tr>
+            <tr><td class="rang" data-label="Rang">6</td><td data-label="Rider">Eitel Pierre</td><td class="score" data-label="Résultat">50.16</td></tr>
+            <tr><td class="rang" data-label="Rang">7</td><td data-label="Rider">Rod Arthur</td><td class="score" data-label="Résultat">50</td></tr>
+            <tr><td class="rang" data-label="Rang">8</td><td data-label="Rider">Rosenti Matéo</td><td class="score" data-label="Résultat">50</td></tr>
+            <tr><td class="rang" data-label="Rang">9</td><td data-label="Rider">Drittenbass Daniel</td><td class="score" data-label="Résultat">49.3</td></tr>
+            <tr><td class="rang" data-label="Rang">10</td><td data-label="Rider">Genovese Enrico</td><td class="score" data-label="Résultat">26</td></tr>
+            <tr><td class="rang" data-label="Rang">11</td><td data-label="Rider">Esterhuizen Ethan</td><td class="score" data-label="Résultat">25.5</td></tr>
+            <tr><td class="rang" data-label="Rang">12</td><td data-label="Rider">Suquet Timothée</td><td class="score" data-label="Résultat">24.3</td></tr>
+            <tr><td class="rang" data-label="Rang">13</td><td data-label="Rider">Slama Isak</td><td class="score" data-label="Résultat">17.8</td></tr>
+            <tr><td class="rang" data-label="Rang">14</td><td data-label="Rider">Quinto Néo</td><td class="score" data-label="Résultat">11</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= U19 ================= -->
+    <section class="results-card" id="u19" role="tabpanel">
+      <div class="kicker">Montreux Scooter Contest</div>
+      <h2>Résultats — U19</h2>
+      <p class="muted">Podium & classement complet</p>
+
+      <div class="podium">
+        <div class="p silver">
+          <div class="position">2ᵉ</div>
+          <div class="name">Gabriel<br/>Schwarz</div>
+          <div class="small">70.8</div>
+        </div>
+        <div class="p gold">
+          <div class="position">1ᵉʳ</div>
+          <div class="name">Elias<br/>Schmid</div>
+          <div class="small">80.6</div>
+        </div>
+        <div class="p bronze">
+          <div class="position">3ᵉ</div>
+          <div class="name">Milan<br/>Spazzafumo</div>
+          <div class="small">70.6</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:76px;">Rang</th>
+              <th>Rider</th>
+              <th class="score">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="rang" data-label="Rang">1</td><td data-label="Rider">Elias Schmid</td><td class="score" data-label="Score">80.6</td></tr>
+            <tr><td class="rang" data-label="Rang">2</td><td data-label="Rider">Gabriel Schwarz</td><td class="score" data-label="Score">70.8</td></tr>
+            <tr><td class="rang" data-label="Rang">3</td><td data-label="Rider">Milan Spazzafumo</td><td class="score" data-label="Score">70.6</td></tr>
+            <tr><td class="rang" data-label="Rang">4</td><td data-label="Rider">Colin Cavalin</td><td class="score" data-label="Score">66</td></tr>
+            <tr><td class="rang" data-label="Rang">5</td><td data-label="Rider">Robin Barchnicki</td><td class="score" data-label="Score">64.3</td></tr>
+            <tr><td class="rang" data-label="Rang">6</td><td data-label="Rider">Noé Scalti</td><td class="score" data-label="Score">56</td></tr>
+            <tr><td class="rang" data-label="Rang">7</td><td data-label="Rider">Curtis Makas</td><td class="score" data-label="Score">55.3</td></tr>
+            <tr><td class="rang" data-label="Rang">8</td><td data-label="Rider">Colin Carval</td><td class="score" data-label="Score">66</td></tr>
+            <tr><td class="rang" data-label="Rang">9</td><td data-label="Rider">Stanislas Burgat</td><td class="score" data-label="Score">45.5</td></tr>
+            <tr><td class="rang" data-label="Rang">10</td><td data-label="Rider">Josh Vuille</td><td class="score" data-label="Score">42.3</td></tr>
+            <tr><td class="rang" data-label="Rang">11</td><td data-label="Rider">Aurélien Ecoffey</td><td class="score" data-label="Score">46</td></tr>
+            <tr><td class="rang" data-label="Rang">12</td><td data-label="Rider">Matéo Sturny</td><td class="score" data-label="Score">40.6</td></tr>
+            <tr><td class="rang" data-label="Rang">13</td><td data-label="Rider">Joris Bonnardel</td><td class="score" data-label="Score">40</td></tr>
+            <tr><td class="rang" data-label="Rang">14</td><td data-label="Rider">Mathias Guillod</td><td class="score" data-label="Score">34.3</td></tr>
+            <tr><td class="rang" data-label="Rang">15</td><td data-label="Rider">Mathias Silder</td><td class="score" data-label="Score">16.8</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= OPEN ================= -->
+    <section class="results-card" id="open" role="tabpanel">
+      <div class="kicker">Montreux Scooter Contest</div>
+      <h2>Résultats — OPEN</h2>
+      <p class="muted">Podium & classement complet</p>
+
+      <div class="podium">
+        <div class="p silver">
+          <div class="position">2ᵉ</div>
+          <div class="name">Oscar<br/>Larsen</div>
+          <div class="small">87.8</div>
+        </div>
+        <div class="p gold">
+          <div class="position">1ᵉʳ</div>
+          <div class="name">Sanoussi<br/>Diara</div>
+          <div class="small">89.5</div>
+        </div>
+        <div class="p bronze">
+          <div class="position">3ᵉ</div>
+          <div class="name">Gendre<br/>Thomas</div>
+          <div class="small">85.5</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:76px;">Rang</th>
+              <th>Rider</th>
+              <th class="score">Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="rang" data-label="Rang">1</td><td data-label="Rider">Sanoussi Diara</td><td class="score" data-label="Score">89.5</td></tr>
+            <tr><td class="rang" data-label="Rang">2</td><td data-label="Rider">Oscar Larsen</td><td class="score" data-label="Score">87.8</td></tr>
+            <tr><td class="rang" data-label="Rang">3</td><td data-label="Rider">Gendre Thomas</td><td class="score" data-label="Score">85.5</td></tr>
+            <tr><td class="rang" data-label="Rang">4</td><td data-label="Rider">Chambbey Adrien</td><td class="score" data-label="Score">83.16</td></tr>
+            <tr><td class="rang" data-label="Rang">5</td><td data-label="Rider">Hermes Favre</td><td class="score" data-label="Score">69.3</td></tr>
+            <tr><td class="rang" data-label="Rang">6</td><td data-label="Rider">Baumes Hugo</td><td class="score" data-label="Score">67</td></tr>
+            <tr><td class="rang" data-label="Rang">7</td><td data-label="Rider">Frossard Pierrick</td><td class="score" data-label="Score">61</td></tr>
+            <tr><td class="rang" data-label="Rang">8</td><td data-label="Rider">Faves Sacha</td><td class="score" data-label="Score">60.5</td></tr>
+            <tr><td class="rang" data-label="Rang">9</td><td data-label="Rider">Rouge Julien</td><td class="score" data-label="Score">59.3</td></tr>
+            <tr><td class="rang" data-label="Rang">10</td><td data-label="Rider">Montani Yan</td><td class="score" data-label="Score">59</td></tr>
+            <tr><td class="rang" data-label="Rang">11</td><td data-label="Rider">Napoli Eros</td><td class="score" data-label="Score">55.5</td></tr>
+            <tr><td class="rang" data-label="Rang">12</td><td data-label="Rider">Gorantyn Pepin</td><td class="score" data-label="Score">55.3</td></tr>
+            <tr><td class="rang" data-label="Rang">13</td><td data-label="Rider">Froidevaux Killian</td><td class="score" data-label="Score">50.3</td></tr>
+            <tr><td class="rang" data-label="Rang">14</td><td data-label="Rider">Mathias Gardians</td><td class="score" data-label="Score">49.5</td></tr>
+            <tr><td class="rang" data-label="Rang">15</td><td data-label="Rider">Pacaud Deniso</td><td class="score" data-label="Score">46.3</td></tr>
+            <tr><td class="rang" data-label="Rang">16</td><td data-label="Rider">Rayant Ji</td><td class="score" data-label="Score">45</td></tr>
+            <tr><td class="rang" data-label="Rang">17</td><td data-label="Rider">Yerly Alex</td><td class="score" data-label="Score">45</td></tr>
+            <tr><td class="rang" data-label="Rang">18</td><td data-label="Rider">Ruben Victorio</td><td class="score" data-label="Score">43.3</td></tr>
+            <tr><td class="rang" data-label="Rang">19</td><td data-label="Rider">Huck Sébastien</td><td class="score" data-label="Score">40.6</td></tr>
+            <tr><td class="rang" data-label="Rang">20</td><td data-label="Rider">Momoh Djamal</td><td class="score" data-label="Score">39.1</td></tr>
+            <tr><td class="rang" data-label="Rang">21</td><td data-label="Rider">Devrions Diego</td><td class="score" data-label="Score">39</td></tr>
+            <tr><td class="rang" data-label="Rang">22</td><td data-label="Rider">Eduard Shenwo</td><td class="score" data-label="Score">32.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-mini">
+    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
+  </footer>
+
+  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+
+  <script>
+    // Thème (clair / sombre) (EXACT INDEX)
+    (function(){
+      const STORAGE_KEY = 'rsl-theme';
+      const body = document.body;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(theme){
+        if(theme === 'light'){
+          body.classList.add('theme-light');
+          if(btn) btn.textContent = '☀️';
+        }else{
+          body.classList.remove('theme-light');
+          if(btn) btn.textContent = '🌙';
+        }
+      }
+
+      let saved = null;
+      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
+      if(!saved){
+        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        saved = prefersLight ? 'light' : 'dark';
+      }
+      applyTheme(saved);
+
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
+          const next = current === 'light' ? 'dark' : 'light';
+          applyTheme(next);
+          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+        });
+      }
+    })();
+
+    // Vidéo de fond (EXACT INDEX)
+    (function(){
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const pick = vids[Math.floor(Math.random()*vids.length)];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
+
+      const s = document.createElement('source');
+      s.src = pick;
+      s.type = 'video/mp4';
+      v.appendChild(s);
+
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+
+      start();
+
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden) v.pause();
+        else start();
+      });
+    })();
+
+    // Menu mobile (EXACT INDEX)
+    (function(){
+      const menuBtn=document.getElementById('menuBtn');
+      const mobile=document.getElementById('mobileMenu');
+      if(!menuBtn || !mobile) return;
+
+      menuBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        mobile.classList.add('open');
+        mobile.setAttribute('aria-hidden','false');
+      });
+      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
+        mobile.classList.remove('open');
+        mobile.setAttribute('aria-hidden','true');
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape'){
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // Tabs
+    (function(){
+      const tabs = document.querySelectorAll('.tab-btn');
+      const cards = document.querySelectorAll('.results-card');
+
+      function activate(id){
+        tabs.forEach(b=>{
+          const on = b.dataset.tab === id;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        cards.forEach(c=>c.classList.toggle('active', c.id === id));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      tabs.forEach(btn=>{
+        btn.addEventListener('click', ()=> activate(btn.dataset.tab));
+      });
+    })();
+  </script>
+</body>
+</html>
