@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase + scripts (PAREIL QUE COMITÉ) -->
+  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
@@ -61,12 +61,14 @@
       object-fit:cover;
       z-index:-2;
       background:#000;
+      pointer-events:none!important;
     }
     .site-bg-dim{
       position:fixed; inset:0;
       z-index:-1;
       background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.90));
       transition:background .25s ease;
+      pointer-events:none!important;
     }
     body.theme-light .site-bg-dim{
       background:linear-gradient(180deg,rgba(249,250,251,.92),rgba(15,23,42,.85));
@@ -163,6 +165,7 @@
       object-fit:cover;
       border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
+      display:block;
     }
 
     .theme-toggle{
@@ -306,17 +309,61 @@
       box-shadow:0 12px 26px rgba(22,163,74,.45);
     }
 
-    .loading{
+    /* ✅ Bandeau "pas connecté" (mais images visibles) */
+    .login-wall{
       max-width:980px;
       margin:14px auto 0;
-      padding:12px 14px;
-      border-radius:14px;
+      padding:14px 14px;
+      border-radius:16px;
       border:1px solid var(--rsl-border);
-      background:var(--rsl-card-soft);
-      color:var(--rsl-muted);
-      font-size:13px;
+      background:var(--rsl-card);
+      box-shadow:0 18px 44px rgba(15,23,42,.35);
       text-align:center;
-      box-shadow:0 16px 50px rgba(15,23,42,.35);
+      display:none;
+    }
+    .login-wall strong{ color:var(--rsl-accent); }
+    .login-actions{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .btn-main{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:12px;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      font-weight:900;
+      font-size:14px;
+      border:0;
+      text-decoration:none;
+      box-shadow:0 12px 26px rgba(22,163,74,.45);
+      cursor:pointer;
+    }
+    .btn-ghost{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:12px;
+      background:rgba(15,23,42,.85);
+      border:1px solid rgba(148,163,184,.6);
+      color:#e5e7eb;
+      font-weight:900;
+      font-size:14px;
+      text-decoration:none;
+      cursor:pointer;
+    }
+    body.theme-light .btn-ghost{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
     }
 
     .batch-bar{
@@ -395,6 +442,7 @@
     }
 
     .ph-info{ padding:12px; display:flex; flex-direction:column; gap:8px; font-size:14px; }
+
     .dl-btn{
       background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
       color:#052e16;
@@ -409,6 +457,14 @@
       box-shadow:0 12px 26px rgba(22,163,74,.45);
       cursor:pointer;
       border:0;
+    }
+
+    /* ✅ état désactivé */
+    .dl-btn[disabled]{
+      filter:grayscale(1) brightness(.75);
+      opacity:.85;
+      cursor:not-allowed;
+      box-shadow:none;
     }
 
     .copy{
@@ -460,6 +516,12 @@
       min-width:180px;
       border:0;
       box-shadow:0 12px 26px rgba(22,163,74,.45);
+    }
+    .dl-big-btn[disabled]{
+      filter:grayscale(1) brightness(.75);
+      opacity:.85;
+      cursor:not-allowed;
+      box-shadow:none;
     }
     .close-btn{
       background:rgba(255,255,255,.08);
@@ -565,7 +627,17 @@
       </div>
     </section>
 
-    <div class="loading" id="loadingBox">Vérification d’accès…</div>
+    <!-- ✅ Message si pas connecté (mais on laisse les images) -->
+    <section class="login-wall" id="loginWall" aria-live="polite">
+      <div style="font-size:13px;color:var(--rsl-muted);line-height:1.5">
+        Les photos sont visibles ✅<br/>
+        Pour <strong>télécharger</strong> en HD : <strong>connecte-toi</strong>.
+      </div>
+      <div class="login-actions">
+        <a class="btn-main" href="access_photos.html?next=galerie_photos_hd.html">🔐 Se connecter</a>
+        <a class="btn-ghost" href="access_photos.html?next=galerie_photos_hd.html">Créer un compte</a>
+      </div>
+    </section>
 
     <section class="batch-bar" id="batchBar" style="display:none">
       <label for="batchSelect">Afficher :</label>
@@ -678,12 +750,12 @@
       });
     })();
 
-    // Guard + Galerie (NE TOUCHE PAS AU LOGIN/AVATAR => auth.js fait tout)
+    // Galerie: images visibles, download seulement si connecté
     (function(){
-      const loadingBox = document.getElementById('loadingBox');
-      const batchBar   = document.getElementById('batchBar');
-      const grid       = document.getElementById('galleryGrid');
-      const select     = document.getElementById('batchSelect');
+      const loginWall = document.getElementById('loginWall');
+      const batchBar  = document.getElementById('batchBar');
+      const grid      = document.getElementById('galleryGrid');
+      const select    = document.getElementById('batchSelect');
 
       const lightbox            = document.getElementById('lightbox');
       const lightboxImg         = document.getElementById('lightboxImg');
@@ -695,6 +767,7 @@
       const BATCH_SIZE = 40;
 
       let currentFullUrl = "";
+      let isLogged = false;
 
       const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
 
@@ -714,7 +787,7 @@
         return window.__rslSupa;
       }
 
-      async function getSessionSafe(maxMs = 12000){
+      async function getSessionSafe(maxMs = 5000){
         const start = Date.now();
         while(Date.now() - start < maxMs){
           const supa = getSupa();
@@ -735,6 +808,12 @@
         lightboxImg.alt = alt || "RSL Photo";
         lightbox.classList.add('open');
         lightbox.setAttribute('aria-hidden','false');
+
+        // bouton download lightbox
+        if(downloadLightboxBtn){
+          downloadLightboxBtn.disabled = !isLogged;
+          downloadLightboxBtn.textContent = isLogged ? "⬇ Télécharger" : "🔒 Connecte-toi pour télécharger";
+        }
       }
       function closeLightbox(){
         lightbox.classList.remove('open');
@@ -750,6 +829,10 @@
       downloadLightboxBtn?.addEventListener('click', async (e)=>{
         e.preventDefault();
         e.stopPropagation();
+        if(!isLogged){
+          window.location.href = "access_photos.html?next=galerie_photos_hd.html";
+          return;
+        }
         if(currentFullUrl) await forceDownloadSmart(currentFullUrl);
       });
 
@@ -828,10 +911,19 @@
         const btn = document.createElement('button');
         btn.className = 'dl-btn';
         btn.type = "button";
-        btn.textContent = '⬇ Télécharger';
+
+        // ✅ état initial (sera update après check session)
+        btn.disabled = !isLogged;
+        btn.textContent = isLogged ? '⬇ Télécharger' : '🔒 Se connecter';
+
         btn.addEventListener('click', async (e)=>{
           e.preventDefault();
           e.stopPropagation();
+
+          if(!isLogged){
+            window.location.href = "access_photos.html?next=galerie_photos_hd.html";
+            return;
+          }
           if(img.src) await forceDownloadSmart(img.src);
         });
 
@@ -848,48 +940,60 @@
           if(img.complete) show();
         })();
 
+        // expose pour update plus tard
+        article.__dlBtn = btn;
+
         return article;
       }
 
       function renderBatch(batchIndex){
         if(!grid) return;
         grid.innerHTML = "";
-        grid.appendChild(createPhotoCard(0));
+
+        const first = createPhotoCard(0);
+        grid.appendChild(first);
 
         const startPhotoNumber = batchIndex * BATCH_SIZE + 1;
         const endPhotoNumber   = startPhotoNumber + BATCH_SIZE - 1;
 
         for(let num = startPhotoNumber; num <= endPhotoNumber; num++){
-          if(num > 200) break;
+          if(num > MAX_PHOTO) break;
           grid.appendChild(createPhotoCard(num));
         }
+
+        // update boutons selon login
+        updateAllDownloadButtons();
+      }
+
+      function updateAllDownloadButtons(){
+        const cards = grid?.querySelectorAll('.ph-card') || [];
+        cards.forEach(card=>{
+          const btn = card.__dlBtn || card.querySelector('.dl-btn');
+          if(!btn) return;
+          btn.disabled = !isLogged;
+          btn.textContent = isLogged ? '⬇ Télécharger' : '🔒 Se connecter';
+        });
       }
 
       async function start(){
-        const envOk = await waitForEnv(8000);
-        if(!envOk){
-          if(loadingBox) loadingBox.textContent = "Erreur: env.js non chargé.";
-          return;
-        }
+        await waitForEnv(8000);
 
-        // ✅ Anti-boucle + session fiable
-        const session = await getSessionSafe(12000);
-
-        if(!session){
-          // ✅ Anti ping-pong: redirection max 1 fois par onglet
-          if(!sessionStorage.getItem("rsl_photos_redirected")){
-            sessionStorage.setItem("rsl_photos_redirected", "1");
-            window.location.replace("access_photos.html?next=galerie_photos_hd.html");
-          }else{
-            if(loadingBox) loadingBox.textContent = "Connexion requise (merci de te connecter).";
-          }
-          return;
-        }
-
-        if(loadingBox) loadingBox.style.display = "none";
+        // 1) on rend la galerie DIRECT (images visibles)
         if(batchBar) batchBar.style.display = "flex";
-
         renderBatch(0);
+
+        // 2) ensuite on check si user loggué
+        const session = await getSessionSafe(5000);
+        isLogged = !!session;
+
+        // 3) si pas loggué: bandeau + désactivation download
+        if(!isLogged){
+          if(loginWall) loginWall.style.display = "block";
+        }else{
+          if(loginWall) loginWall.style.display = "none";
+        }
+        updateAllDownloadButtons();
+
         select?.addEventListener('change', e=>{
           const batchIndex = parseInt(e.target.value,10);
           renderBatch(Number.isFinite(batchIndex) ? batchIndex : 0);
