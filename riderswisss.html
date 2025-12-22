@@ -57,6 +57,7 @@
       color:var(--rsl-fg);
       font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       overflow-x:hidden;
+      -webkit-tap-highlight-color:transparent;
     }
     main{ flex:1; }
 
@@ -309,6 +310,23 @@
     }
     body.theme-light .badge-live{ background:#f9fafb; }
 
+    /* ✅ Badge TOTAL votes */
+    .total-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:var(--rsl-accent-soft);
+      border:1px solid rgba(34,197,94,.35);
+      color:var(--rsl-accent);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
     .grid{
       display:grid;
       grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);
@@ -342,7 +360,9 @@
       padding:12px 14px;
       border-radius:14px;
       margin-bottom:10px;
+      transition:transform .2s ease;
     }
+    #leaderboardList .row:hover{ transform:translateY(-1px); }
     body.theme-light #leaderboardList .row{
       background:rgba(15,23,42,.04);
       border-color:rgba(148,163,184,.35);
@@ -369,10 +389,10 @@
       font-size:13px;
       box-shadow:0 10px 26px rgba(22,163,74,.35);
       flex:0 0 auto;
+      white-space:nowrap;
     }
 
     .form label{ display:block; margin:10px 0 6px; font-size:13px; color:var(--rsl-muted); font-weight:700; }
-
     .form input,.form select,.form textarea{
       width:100%;
       background:rgba(2,6,23,.55);
@@ -384,6 +404,7 @@
       outline:none;
       font-family:inherit;
     }
+    .form textarea{ min-height:110px; resize:vertical; }
     body.theme-light .form input,
     body.theme-light .form select,
     body.theme-light .form textarea{
@@ -391,29 +412,26 @@
       border-color:rgba(148,163,184,.45);
       color:#0f172a;
     }
-    .form textarea{ resize:vertical; min-height:88px; }
-
     .form input:focus,.form select:focus,.form textarea:focus{
       border-color:rgba(34,197,94,.65);
       box-shadow:0 0 0 4px rgba(34,197,94,.16);
+      background:rgba(2,6,23,.75);
     }
-
-    .grid-2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
+    body.theme-light .form input:focus,
+    body.theme-light .form select:focus,
+    body.theme-light .form textarea:focus{
+      background:#fff;
     }
-    @media(max-width:520px){ .grid-2{ grid-template-columns:1fr; } }
 
     .btn-main{
       display:block; width:100%;
-      border-radius:14px;
-      padding:12px 14px;
+      border-radius:999px;
+      padding:14px 16px;
       margin-top:14px;
       border:0;
       cursor:pointer;
       font-weight:900;
-      font-size:15px;
+      font-size:16px;
       background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
       color:#052e16;
       box-shadow:0 12px 26px rgba(22,163,74,.5);
@@ -422,7 +440,7 @@
 
     .btn-ghost{
       display:block; width:100%;
-      border-radius:14px;
+      border-radius:999px;
       padding:12px 14px;
       margin-top:12px;
       border:1px solid rgba(148,163,184,.6);
@@ -442,6 +460,35 @@
     }
     .success h3{ margin:0 0 6px; color:var(--rsl-accent); font-size:18px; font-weight:900; }
     .success p{ margin:0; color:var(--rsl-muted); }
+
+    /* ✅ Ajout rider (UI) */
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.28);
+      background:rgba(2,6,23,.35);
+      margin-top:10px;
+      user-select:none;
+    }
+    body.theme-light .toggle{
+      background:rgba(15,23,42,.03);
+      border-color:rgba(148,163,184,.45);
+    }
+    .toggle input{
+      margin:0;
+      width:auto;
+      transform:scale(1.15);
+      accent-color: var(--rsl-accent);
+    }
+    .hint{
+      margin:8px 0 0;
+      color:var(--rsl-muted);
+      font-size:12px;
+      line-height:1.35;
+    }
 
     .netstatus{
       position:fixed;
@@ -553,8 +600,13 @@
               </div>
             </div>
 
-            <div class="badge-live" title="Mise à jour en direct">
-              <i aria-hidden="true"></i> Live classement
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <div class="badge-live" title="Mise à jour en direct">
+                <i aria-hidden="true"></i> Live classement
+              </div>
+              <div id="totalVotesDisplay" class="total-badge" style="display:none;">
+                <span id="totalCount">0</span> VOTES AU TOTAL
+              </div>
             </div>
           </div>
 
@@ -567,36 +619,48 @@
             </article>
 
             <aside class="panel">
-              <h2>🗳️ Faire un vote</h2>
+              <h2>🗳️ Voter</h2>
 
               <div id="voteInterface" class="form">
-                <label>Ton rider favori</label>
-                <select id="nomineeSelect"><option value="">Chargement...</option></select>
+                <label>Sélectionne ton Rider</label>
+                <select id="nomineeSelect"><option value="">Chargement de la liste...</option></select>
 
-                <label>Pourquoi votes-tu pour lui ? (optionnel)</label>
-                <textarea id="voterReason" placeholder="C'est le plus stylé, sa dernière vidéo est folle..."></textarea>
+                <!-- ✅ Ajout Rider (manual_name / nominee_id nullable) -->
+                <label class="toggle" for="manualToggle">
+                  <input type="checkbox" id="manualToggle">
+                  <span>Mon rider n’est pas dans la liste</span>
+                </label>
 
-                <div class="grid-2">
+                <div id="manualBox" style="display:none;">
+                  <label>Nom du rider (manuel)</label>
+                  <input type="text" id="manualName" placeholder="Prénom Nom / Pseudo">
+                  <p class="hint">Si tu actives ce mode, ton vote est enregistré même si le rider n’est pas encore dans la liste officielle.</p>
+                </div>
+
+                <label>Pourquoi lui ? (Message de soutien)</label>
+                <textarea id="voterReason" placeholder="Explique pourquoi il mérite de gagner..."></textarea>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
                   <div>
                     <label>Prénom</label>
-                    <input type="text" id="voterFirst" placeholder="Prénom" autocomplete="given-name">
+                    <input type="text" id="voterFirst" placeholder="Ton prénom" autocomplete="given-name">
                   </div>
                   <div>
                     <label>Nom</label>
-                    <input type="text" id="voterLast" placeholder="Nom" autocomplete="family-name">
+                    <input type="text" id="voterLast" placeholder="Ton nom" autocomplete="family-name">
                   </div>
                 </div>
 
-                <label>Ton Email</label>
+                <label>Ton Email (Un seul vote autorisé)</label>
                 <input type="email" id="voterEmail" placeholder="email@exemple.com" autocomplete="email">
 
-                <button class="btn-main" id="btnSubmit">Envoyer mon vote</button>
+                <button class="btn-main" id="btnSubmit">Valider mon vote</button>
               </div>
 
               <div id="successView" style="display:none;">
                 <div class="success">
                   <h3>Vote validé ✅</h3>
-                  <p>Merci pour ton soutien !</p>
+                  <p>Merci pour ton soutien. Le classement a été mis à jour.</p>
                 </div>
                 <button class="btn-ghost" onclick="window.location.reload()">Retour au classement</button>
               </div>
@@ -738,44 +802,80 @@
         .replaceAll("'","&#039;");
     }
 
-    async function refreshLeaderboard() {
+    // ✅ Toggle "ajout rider"
+    (function(){
+      const toggle = document.getElementById("manualToggle");
+      const box = document.getElementById("manualBox");
+      const manualInput = document.getElementById("manualName");
+      const select = document.getElementById("nomineeSelect");
+      if(!toggle || !box || !manualInput || !select) return;
+
+      function apply(){
+        const on = !!toggle.checked;
+        box.style.display = on ? "block" : "none";
+        select.disabled = on;
+        if(!on) manualInput.value = "";
+      }
+      toggle.addEventListener("change", apply);
+      apply();
+    })();
+
+    async function initPage() {
       try {
-        const [resN, resV] = await Promise.all([
+        const [resNominees, resVotes] = await Promise.all([
           sb.from("nominees").select("id, name"),
-          sb.from("votes").select("nominee_id")
+          sb.from("votes").select("nominee_id") // total votes inclut manual (nominee_id null)
         ]);
 
-        if (resN.error) throw resN.error;
+        if (resNominees.error) throw resNominees.error;
+        if (resVotes.error) throw resVotes.error;
 
-        const nominees = resN.data || [];
-        const votes = (resV && resV.data) ? resV.data : [];
+        const nominees = resNominees.data || [];
+        const votes = resVotes.data || [];
 
+        // ✅ total votes badge (inclut votes manuels)
+        const totalWrap = document.getElementById("totalVotesDisplay");
+        const totalCount = document.getElementById("totalCount");
+        if (totalWrap && totalCount){
+          if (votes.length > 0){
+            totalWrap.style.display = "inline-flex";
+            totalCount.textContent = String(votes.length);
+          } else {
+            totalWrap.style.display = "none";
+            totalCount.textContent = "0";
+          }
+        }
+
+        // ✅ classement: on ignore les votes manuels (nominee_id null)
         const voteCounts = {};
-        votes.forEach(v => { voteCounts[v.nominee_id] = (voteCounts[v.nominee_id] || 0) + 1; });
+        votes.forEach(v => {
+          if(v.nominee_id == null) return;
+          voteCounts[v.nominee_id] = (voteCounts[v.nominee_id] || 0) + 1;
+        });
 
-        const sorted = nominees
+        const leaderboardData = nominees
           .map(n => ({ ...n, count: voteCounts[n.id] || 0 }))
-          .sort((a,b) => b.count - a.count);
+          .sort((a, b) => b.count - a.count);
 
         const listEl = document.getElementById("leaderboardList");
-        listEl.innerHTML = sorted.map((n, i) => `
+        listEl.innerHTML = leaderboardData.map((n, index) => `
           <div class="row">
             <div class="row-left">
-              <span class="pill-rank">#${i+1}</span>
+              <span class="pill-rank">#${index + 1}</span>
               <span class="rider-name">${escapeHtml(n.name)}</span>
             </div>
-            <span class="pill-votes">${n.count} ${n.count > 1 ? 'votes' : 'vote'}</span>
+            <span class="pill-votes">${n.count} vote${n.count > 1 ? 's' : ''}</span>
           </div>
         `).join("");
 
         const select = document.getElementById("nomineeSelect");
-        const alpha = [...nominees].sort((a,b) => (a.name || "").localeCompare(b.name || ""));
+        const alphaData = [...nominees].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         select.innerHTML =
           '<option value="">-- Choisir un rider --</option>' +
-          alpha.map(n => `<option value="${n.id}">${escapeHtml(n.name)}</option>`).join("");
+          alphaData.map(n => `<option value="${n.id}">${escapeHtml(n.name)}</option>`).join("");
 
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        console.error(err);
         document.getElementById("leaderboardList").innerHTML =
           `<p style="text-align:center; color:var(--rsl-muted); margin:0;">Erreur de chargement.</p>`;
       }
@@ -784,21 +884,43 @@
     document.getElementById("btnSubmit").onclick = async () => {
       const btn = document.getElementById("btnSubmit");
 
+      const manualOn = !!document.getElementById("manualToggle")?.checked;
       const nidRaw = document.getElementById("nomineeSelect").value;
+
       const reason = document.getElementById("voterReason").value.trim();
       const email  = document.getElementById("voterEmail").value.trim();
       const first  = document.getElementById("voterFirst").value.trim();
       const last   = document.getElementById("voterLast").value.trim();
+      const manualName = document.getElementById("manualName").value.trim();
 
-      if(!nidRaw || !email || !first || !last) return alert("Remplis tous les champs obligatoires !");
-      const nid = parseInt(nidRaw, 10);
-      if(!Number.isFinite(nid)) return alert("Rider invalide.");
+      if(!email || !first || !last){
+        alert("N'oublie pas de remplir tes coordonnées.");
+        return;
+      }
+      if(manualOn){
+        if(!manualName){
+          alert("Écris le nom du rider.");
+          return;
+        }
+      }else{
+        if(!nidRaw){
+          alert("Choisis un rider dans la liste.");
+          return;
+        }
+      }
+
+      const nominee_id = manualOn ? null : parseInt(nidRaw, 10);
+      if(!manualOn && !Number.isFinite(nominee_id)){
+        alert("Rider invalide.");
+        return;
+      }
 
       btn.disabled = true;
-      btn.textContent = "Envoi...";
+      btn.textContent = "Validation...";
 
       const { error } = await sb.from("votes").insert([{
-        nominee_id: nid,
+        nominee_id,
+        manual_name: manualOn ? manualName : null,
         reason: reason || null,
         email,
         first_name: first,
@@ -806,17 +928,20 @@
       }]);
 
       if (error) {
-        alert("Erreur : " + error.message);
+        const msg = (error.message || "");
+        if (msg.toLowerCase().includes("unique")) alert("Tu as déjà voté avec cet email !");
+        else alert("Erreur : " + msg);
         btn.disabled = false;
-        btn.textContent = "Envoyer mon vote";
+        btn.textContent = "Valider mon vote";
       } else {
         document.getElementById("voteInterface").style.display = "none";
         document.getElementById("successView").style.display = "block";
-        refreshLeaderboard();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        initPage();
       }
     };
 
-    refreshLeaderboard();
+    initPage();
   </script>
 </body>
 </html>
