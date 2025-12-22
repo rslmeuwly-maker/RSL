@@ -268,7 +268,6 @@
 
     .award-brand{ display:flex; align-items:center; gap:14px; min-width:min(620px,100%); }
 
-    /* ✅ Logo du HERO (même image que l'entête) */
     .award-logo{
       width:64px; height:64px;
       border-radius:18px;
@@ -373,7 +372,8 @@
     }
 
     .form label{ display:block; margin:10px 0 6px; font-size:13px; color:var(--rsl-muted); font-weight:700; }
-    .form input,.form select{
+
+    .form input,.form select,.form textarea{
       width:100%;
       background:rgba(2,6,23,.55);
       border:1px solid rgba(148,163,184,.28);
@@ -382,16 +382,28 @@
       color:var(--rsl-fg);
       font-size:15px;
       outline:none;
+      font-family:inherit;
     }
-    body.theme-light .form input, body.theme-light .form select{
+    body.theme-light .form input,
+    body.theme-light .form select,
+    body.theme-light .form textarea{
       background:#fff;
       border-color:rgba(148,163,184,.45);
       color:#0f172a;
     }
-    .form input:focus,.form select:focus{
+    .form textarea{ resize:vertical; min-height:88px; }
+
+    .form input:focus,.form select:focus,.form textarea:focus{
       border-color:rgba(34,197,94,.65);
       box-shadow:0 0 0 4px rgba(34,197,94,.16);
     }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media(max-width:520px){ .grid-2{ grid-template-columns:1fr; } }
 
     .btn-main{
       display:block; width:100%;
@@ -471,7 +483,6 @@
     <div class="container">
       <div class="row">
         <a class="brand" href="index.html">
-          <!-- ✅ Logo NAV = même que ton entête -->
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
@@ -534,7 +545,6 @@
           <div class="hero-top">
             <div class="award-brand">
               <div class="award-logo">
-                <!-- ✅ Logo HERO = même que ton entête -->
                 <img src="images/logo_rsl.png" alt="Logo RSL">
               </div>
               <div class="award-title">
@@ -557,30 +567,38 @@
             </article>
 
             <aside class="panel">
-              <h2>🗳️ Voter</h2>
+              <h2>🗳️ Faire un vote</h2>
 
               <div id="voteInterface" class="form">
-                <label>Choisir un participant</label>
+                <label>Ton rider favori</label>
                 <select id="nomineeSelect"><option value="">Chargement...</option></select>
 
-                <label>Prénom</label>
-                <input type="text" id="voterFirst" placeholder="Ton prénom" autocomplete="given-name">
+                <label>Pourquoi votes-tu pour lui ? (optionnel)</label>
+                <textarea id="voterReason" placeholder="C'est le plus stylé, sa dernière vidéo est folle..."></textarea>
 
-                <label>Nom</label>
-                <input type="text" id="voterLast" placeholder="Ton nom" autocomplete="family-name">
+                <div class="grid-2">
+                  <div>
+                    <label>Prénom</label>
+                    <input type="text" id="voterFirst" placeholder="Prénom" autocomplete="given-name">
+                  </div>
+                  <div>
+                    <label>Nom</label>
+                    <input type="text" id="voterLast" placeholder="Nom" autocomplete="family-name">
+                  </div>
+                </div>
 
-                <label>Email</label>
-                <input type="email" id="voterEmail" placeholder="ton@email.com" autocomplete="email">
+                <label>Ton Email</label>
+                <input type="email" id="voterEmail" placeholder="email@exemple.com" autocomplete="email">
 
-                <button class="btn-main" id="btnSubmit">Valider mon vote</button>
+                <button class="btn-main" id="btnSubmit">Envoyer mon vote</button>
               </div>
 
               <div id="successView" style="display:none;">
                 <div class="success">
                   <h3>Vote validé ✅</h3>
-                  <p>Le classement a été mis à jour.</p>
+                  <p>Merci pour ton soutien !</p>
                 </div>
-                <button class="btn-ghost" onclick="window.location.reload()">Retour</button>
+                <button class="btn-ghost" onclick="window.location.reload()">Retour au classement</button>
               </div>
             </aside>
           </div>
@@ -720,30 +738,30 @@
         .replaceAll("'","&#039;");
     }
 
-    async function initPage() {
+    async function refreshLeaderboard() {
       try {
-        const [resNominees, resVotes] = await Promise.all([
+        const [resN, resV] = await Promise.all([
           sb.from("nominees").select("id, name"),
           sb.from("votes").select("nominee_id")
         ]);
 
-        if (resNominees.error) throw resNominees.error;
+        if (resN.error) throw resN.error;
 
-        const nominees = resNominees.data || [];
-        const votes = (resVotes && resVotes.data) ? resVotes.data : [];
+        const nominees = resN.data || [];
+        const votes = (resV && resV.data) ? resV.data : [];
 
         const voteCounts = {};
         votes.forEach(v => { voteCounts[v.nominee_id] = (voteCounts[v.nominee_id] || 0) + 1; });
 
-        const leaderboardData = nominees
+        const sorted = nominees
           .map(n => ({ ...n, count: voteCounts[n.id] || 0 }))
-          .sort((a, b) => b.count - a.count);
+          .sort((a,b) => b.count - a.count);
 
         const listEl = document.getElementById("leaderboardList");
-        listEl.innerHTML = leaderboardData.map((n, index) => `
+        listEl.innerHTML = sorted.map((n, i) => `
           <div class="row">
             <div class="row-left">
-              <span class="pill-rank">#${index + 1}</span>
+              <span class="pill-rank">#${i+1}</span>
               <span class="rider-name">${escapeHtml(n.name)}</span>
             </div>
             <span class="pill-votes">${n.count} ${n.count > 1 ? 'votes' : 'vote'}</span>
@@ -751,13 +769,13 @@
         `).join("");
 
         const select = document.getElementById("nomineeSelect");
-        const alphaData = [...nominees].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+        const alpha = [...nominees].sort((a,b) => (a.name || "").localeCompare(b.name || ""));
         select.innerHTML =
-          '<option value="">-- Sélectionner --</option>' +
-          alphaData.map(n => `<option value="${n.id}">${escapeHtml(n.name)}</option>`).join("");
+          '<option value="">-- Choisir un rider --</option>' +
+          alpha.map(n => `<option value="${n.id}">${escapeHtml(n.name)}</option>`).join("");
 
-      } catch (err) {
-        console.error(err);
+      } catch (e) {
+        console.error(e);
         document.getElementById("leaderboardList").innerHTML =
           `<p style="text-align:center; color:var(--rsl-muted); margin:0;">Erreur de chargement.</p>`;
       }
@@ -765,21 +783,23 @@
 
     document.getElementById("btnSubmit").onclick = async () => {
       const btn = document.getElementById("btnSubmit");
+
       const nidRaw = document.getElementById("nomineeSelect").value;
-      const email = document.getElementById("voterEmail").value.trim();
-      const first = document.getElementById("voterFirst").value.trim();
-      const last  = document.getElementById("voterLast").value.trim();
+      const reason = document.getElementById("voterReason").value.trim();
+      const email  = document.getElementById("voterEmail").value.trim();
+      const first  = document.getElementById("voterFirst").value.trim();
+      const last   = document.getElementById("voterLast").value.trim();
 
-      if(!nidRaw || !email || !first || !last) return alert("Champs incomplets.");
-
+      if(!nidRaw || !email || !first || !last) return alert("Remplis tous les champs obligatoires !");
       const nid = parseInt(nidRaw, 10);
-      if (!Number.isFinite(nid)) return alert("Participant invalide.");
+      if(!Number.isFinite(nid)) return alert("Rider invalide.");
 
       btn.disabled = true;
       btn.textContent = "Envoi...";
 
       const { error } = await sb.from("votes").insert([{
         nominee_id: nid,
+        reason: reason || null,
         email,
         first_name: first,
         last_name: last
@@ -788,15 +808,15 @@
       if (error) {
         alert("Erreur : " + error.message);
         btn.disabled = false;
-        btn.textContent = "Valider mon vote";
+        btn.textContent = "Envoyer mon vote";
       } else {
         document.getElementById("voteInterface").style.display = "none";
         document.getElementById("successView").style.display = "block";
-        initPage();
+        refreshLeaderboard();
       }
     };
 
-    initPage();
+    refreshLeaderboard();
   </script>
 </body>
 </html>
