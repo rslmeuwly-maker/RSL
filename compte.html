@@ -466,20 +466,14 @@
       color:var(--rsl-muted);
       margin-top:4px;
     }
-    .profile-status.ok{
-      color:#bbf7d0;
-    }
-    .profile-status.err{
-      color:#fecaca;
-    }
+    .profile-status.ok{ color:#bbf7d0; }
+    .profile-status.err{ color:#fecaca; }
 
     .membership-main{
       font-size:13px;
       color:var(--rsl-fg);
     }
-    .membership-main div{
-      margin-bottom:2px;
-    }
+    .membership-main div{ margin-bottom:2px; }
 
     .courses-grid{
       display:grid;
@@ -487,14 +481,10 @@
       gap:18px;
     }
     @media(max-width:1100px){
-      .courses-grid{
-        grid-template-columns:repeat(2, minmax(0,1fr));
-      }
+      .courses-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); }
     }
     @media(max-width:780px){
-      .courses-grid{
-        grid-template-columns:1fr;
-      }
+      .courses-grid{ grid-template-columns:1fr; }
     }
 
     .course-list{
@@ -511,9 +501,7 @@
       font-size:12px;
       background:rgba(15,23,42,1);
     }
-    body.theme-light .course-item{
-      background:#ffffff;
-    }
+    body.theme-light .course-item{ background:#ffffff; }
     .course-item-header{
       display:flex;
       justify-content:space-between;
@@ -521,19 +509,13 @@
       gap:6px;
       margin-bottom:3px;
     }
-    .course-spot{
-      font-weight:700;
-      font-size:13px;
-    }
+    .course-spot{ font-weight:700; font-size:13px; }
     .course-date{
       font-size:11px;
       color:var(--rsl-muted);
       white-space:nowrap;
     }
-    .course-title{
-      font-size:12px;
-      margin-bottom:3px;
-    }
+    .course-title{ font-size:12px; margin-bottom:3px; }
     .course-foot{
       display:flex;
       justify-content:space-between;
@@ -541,24 +523,17 @@
       gap:6px;
       margin-top:3px;
     }
-    .course-price{
-      font-weight:600;
-      font-size:12px;
-    }
-    .text-muted{
-      color:var(--rsl-muted);
-      font-size:12px;
-    }
+    .course-price{ font-weight:600; font-size:12px; }
+    .text-muted{ color:var(--rsl-muted); font-size:12px; }
   </style>
 </head>
 
 <body>
-
   <!-- VIDÉO DE FOND -->
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV (comme index, avec logout en plus) -->
+  <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
@@ -579,18 +554,14 @@
         </ul>
 
         <div class="cta">
-          <!-- Toggle thème -->
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <!-- Login / compte / logout -->
           <a class="btn" id="btnLogin" href="access.html">Login</a>
           <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
           <button class="btn" id="btnLogout" style="display:none;">Déconnexion</button>
 
-          <!-- AVATAR -->
           <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png"
-                 alt="Avatar" style="display:none;">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
           <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
@@ -619,9 +590,7 @@
       <a href="conditions.html">Conditions générales</a>
       <a href="compte.html" aria-current="page">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
-      <a id="mobileLogout" style="display:none; color:#f87171; font-weight:700; cursor:pointer;">
-        Déconnexion
-      </a>
+      <a id="mobileLogout" style="display:none; color:#f87171; font-weight:700; cursor:pointer;">Déconnexion</a>
     </nav>
   </div>
 
@@ -650,7 +619,6 @@
                 ⚠️ Connecte-toi pour voir et modifier ton profil
               </span>
 
-              <!-- Formulaire d'édition -->
               <form id="profileForm" class="profile-form">
                 <label>
                   Pseudo / Rider name
@@ -670,12 +638,8 @@
                 </label>
 
                 <div class="profile-actions">
-                  <button type="button" id="btnSaveProfile" class="profile-btn primary">
-                    Enregistrer mes infos
-                  </button>
-                  <button type="button" id="btnChangeAvatar" class="profile-btn">
-                    Changer la photo de profil
-                  </button>
+                  <button type="button" id="btnSaveProfile" class="profile-btn primary">Enregistrer mes infos</button>
+                  <button type="button" id="btnChangeAvatar" class="profile-btn">Changer la photo de profil</button>
                   <input type="file" id="avatarInput" accept="image/*" style="display:none;">
                 </div>
 
@@ -689,9 +653,7 @@
         <section class="card">
           <h2>Mon abonnement RSL</h2>
           <p class="small">Abo en cours et cours inclus automatiquement.</p>
-          <div id="membershipBox" class="membership-main text-muted">
-            Chargement de l’abonnement...
-          </div>
+          <div id="membershipBox" class="membership-main text-muted">Chargement de l’abonnement...</div>
         </section>
       </div>
 
@@ -701,28 +663,19 @@
         <p class="small">Tous les cours enregistrés via le panier s’affichent ici automatiquement.</p>
 
         <div class="courses-grid">
-          <!-- Inclus abo -->
           <div>
             <div class="pill green">✅ Inclus dans ton abonnement</div>
-            <div id="membershipCourses" class="course-list text-muted">
-              Chargement...
-            </div>
+            <div id="membershipCourses" class="course-list text-muted">Chargement...</div>
           </div>
 
-          <!-- Réservés & payés -->
           <div>
             <div class="pill">💳 Réservés et payés</div>
-            <div id="paidCourses" class="course-list text-muted">
-              Chargement...
-            </div>
+            <div id="paidCourses" class="course-list text-muted">Chargement...</div>
           </div>
 
-          <!-- En attente de paiement -->
           <div>
             <div class="pill red">⏳ Réservés, en attente de paiement</div>
-            <div id="pendingCourses" class="course-list text-muted">
-              Chargement...
-            </div>
+            <div id="pendingCourses" class="course-list text-muted">Chargement...</div>
           </div>
         </div>
       </section>
@@ -816,23 +769,29 @@
       });
     })();
 
-    // ==== Supabase ====
-    const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
-
-    // Nom EXACT du bucket Storage
+    // ==== Supabase / mappings profils (ADAPTÉ À TA TABLE) ====
     const AVATAR_BUCKET = "avatars";
-
-    // Table profils Supabase
     const PROFILE_TABLE = "profiles";
-
-    // Table avatars dédiée
     const AVATAR_TABLE  = "rsl_avatars";
 
+    // ✅ Ta table profiles utilise "id" (uuid) = auth.uid()
+    const PROFILE_PK = "id";
+    const COL_PSEUDO = "pseudo";
+    const COL_FULLNAME = "full_name";
+    const COL_RIDERNAME = "rider_name";
+    const COL_PHONE = "phone";
+
+    // ✅ Un seul client (env.js doit définir window.supabaseClient idéalement)
     let sb = null;
     if (window.supabaseClient) {
       sb = window.supabaseClient;
+    } else if (window.supabase && window.supabase.createClient && window.env?.SUPABASE_URL && window.env?.SUPABASE_ANON) {
+      sb = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
+      window.supabaseClient = sb;
     } else if (window.supabase && window.supabase.createClient) {
+      // fallback (au cas où env.js n'est pas prêt)
+      const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       window.supabaseClient = sb;
     }
@@ -845,42 +804,30 @@
     const profileAvatar = document.getElementById('profileAvatar');
 
     function getAvatarLS(){
-      try{
-        return localStorage.getItem('rsl_avatar') || null;
-      }catch(e){
-        return null;
-      }
+      try{ return localStorage.getItem('rsl_avatar') || null; }catch(e){ return null; }
     }
     function setAvatarLS(url){
       try{
-        if(url){
-          localStorage.setItem('rsl_avatar', url);
-        }else{
-          localStorage.removeItem('rsl_avatar');
-        }
+        if(url) localStorage.setItem('rsl_avatar', url);
+        else localStorage.removeItem('rsl_avatar');
       }catch(e){}
     }
     function applyAvatar(){
       const stored = getAvatarLS();
-      const src = stored || "images/logo_rsl.png"; // fallback sûr
+      const src = stored || "images/logo_rsl.png";
       if(navAvatar){
         navAvatar.src = src;
-        if(stored) navAvatar.style.display = "inline-block";
+        navAvatar.style.display = stored ? "inline-block" : "none";
       }
-      if(profileAvatar){
-        profileAvatar.src = src;
-      }
+      if(profileAvatar) profileAvatar.src = src;
     }
 
     function getProfileLS(){
-      try{
-        return JSON.parse(localStorage.getItem('rsl_profile')||'{}');
-      }catch(e){ return {}; }
+      try{ return JSON.parse(localStorage.getItem('rsl_profile')||'{}'); }
+      catch(e){ return {}; }
     }
     function setProfileLS(p){
-      try{
-        localStorage.setItem('rsl_profile', JSON.stringify(p || {}));
-      }catch(e){}
+      try{ localStorage.setItem('rsl_profile', JSON.stringify(p || {})); }catch(e){}
     }
 
     // ==== DOM profil / abo / cours ====
@@ -908,7 +855,7 @@
     const mobileLogout = document.getElementById("mobileLogout");
     const btnLoginEl = document.getElementById("btnLogin");
 
-    // ==== Abonnement ====
+    // ==== Abonnement (inchangé) ====
     async function fetchMembership(sbClient, userId){
       if(!sbClient || !sbClient.from || !userId) return null;
       try{
@@ -925,9 +872,7 @@
 
         if(data.expires_at){
           const d = new Date(data.expires_at);
-          if(!isNaN(d.getTime()) && d < new Date()){
-            return null;
-          }
+          if(!isNaN(d.getTime()) && d < new Date()) return null;
         }
         return data;
       }catch(e){
@@ -976,7 +921,7 @@
       `;
     }
 
-    // ==== Charger les cours depuis rsl_course_registrations ====
+    // ==== Charger les cours (inchangé) ====
     async function loadCourses(){
       if(!currentUser || !sb || !sb.from){
         membershipCoursesEl.textContent = "Connecte-toi pour voir tes cours.";
@@ -1010,7 +955,6 @@
         }
 
         const rows = data || [];
-
         const membershipCourses = [];
         const paidCourses = [];
         const pendingCourses = [];
@@ -1027,26 +971,11 @@
           const price = (r.course_price_chf ?? r.price_chf ?? 0);
           const dateLabel = r.date_label || (r.date ? formatDate(r.date) : "Date à confirmer");
 
-          const item = {
-            id: r.id,
-            spot,
-            title,
-            price,
-            membership_included: isIncluded,
-            isPaid: isPaidFlag,
-            payment_status: r.payment_status || "",
-            dateLabel
-          };
+          const item = { id:r.id, spot, title, price, membership_included:isIncluded, isPaid:isPaidFlag, payment_status:r.payment_status||"", dateLabel };
 
-          if(isIncluded){
-            membershipCourses.push(item);
-          }
-          if(!isIncluded && isPaidFlag){
-            paidCourses.push(item);
-          }
-          if(!isIncluded && !isPaidFlag){
-            pendingCourses.push(item);
-          }
+          if(isIncluded) membershipCourses.push(item);
+          if(!isIncluded && isPaidFlag) paidCourses.push(item);
+          if(!isIncluded && !isPaidFlag) pendingCourses.push(item);
         });
 
         function renderList(targetEl, list, emptyText){
@@ -1084,21 +1013,9 @@
           }).join("");
         }
 
-        renderList(
-          membershipCoursesEl,
-          membershipCourses,
-          "Aucun cours inclus dans ton abonnement pour l’instant."
-        );
-        renderList(
-          paidCoursesEl,
-          paidCourses,
-          "Aucun cours payant enregistré pour l’instant."
-        );
-        renderList(
-          pendingCoursesEl,
-          pendingCourses,
-          "Aucun cours en attente de paiement pour l’instant."
-        );
+        renderList(membershipCoursesEl, membershipCourses, "Aucun cours inclus dans ton abonnement pour l’instant.");
+        renderList(paidCoursesEl, paidCourses, "Aucun cours payant enregistré pour l’instant.");
+        renderList(pendingCoursesEl, pendingCourses, "Aucun cours en attente de paiement pour l’instant.");
       }catch(e){
         console.warn("Exception loadCourses:", e);
         membershipCoursesEl.textContent = "Erreur lors du chargement des cours.";
@@ -1107,7 +1024,7 @@
       }
     }
 
-    // ==== Gestion profil (Supabase) ====
+    // ==== Gestion profil (ADAPTÉ) ====
     function setProfileStatus(msg, type){
       if(!profileSaveStatus) return;
       profileSaveStatus.textContent = msg || "";
@@ -1118,34 +1035,43 @@
     function hydrateProfileFormFromObj(p){
       if(!p) return;
       if(fieldPseudo) fieldPseudo.value = p.pseudo || "";
-      if(fieldRiderFirst) fieldRiderFirst.value = p.riderFirst || p.rider_first || "";
-      if(fieldRiderLast) fieldRiderLast.value = p.riderLast || p.rider_last || "";
-      if(fieldParentPhone) fieldParentPhone.value = p.parentPhone || p.parent_phone || "";
+      if(fieldRiderFirst) fieldRiderFirst.value = p.riderFirst || "";
+      if(fieldRiderLast) fieldRiderLast.value = p.riderLast || "";
+      if(fieldParentPhone) fieldParentPhone.value = p.parentPhone || "";
     }
 
     function updateProfileTextsFromObj(p){
-      const pseudo = p.pseudo || "";
-      const first = p.riderFirst || p.rider_first || "";
-      const last = p.riderLast || p.rider_last || "";
-      const phone = p.parentPhone || p.parent_phone || "";
+      const pseudo = (p?.pseudo || "").trim();
+      const first  = (p?.riderFirst || "").trim();   // ← full_name
+      const last   = (p?.riderLast  || "").trim();   // ← rider_name
+      const phone  = (p?.parentPhone || "").trim();  // ← phone
 
-      const displayName = pseudo || `${first} ${last}`.trim();
-      if(displayName && profileName){
-        profileName.textContent = displayName;
+      let displayName = pseudo || `${first} ${last}`.trim();
+
+      if(!displayName && currentUser){
+        displayName =
+          (currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || "").trim()
+          || (currentUser.email || "").trim()
+          || "Connecté";
       }
-      if(phone && profilePhone){
-        profilePhone.textContent = "Téléphone : " + phone;
+
+      if(profileName) profileName.textContent = displayName || "Connecté";
+      if(profileEmail && currentUser?.email) profileEmail.textContent = currentUser.email;
+
+      if(profilePhone){
+        profilePhone.textContent = "Téléphone : " + (phone || "—");
       }
     }
 
+    // ✅ LOAD: profiles.id = auth.uid()
     async function loadProfileFromSupabase(userId){
       if(!sb || !sb.from || !userId) return;
 
       try{
         const { data, error } = await sb
           .from(PROFILE_TABLE)
-          .select("pseudo, rider_first, rider_last, parent_phone")
-          .eq("user_id", userId)
+          .select(`${COL_PSEUDO}, ${COL_FULLNAME}, ${COL_RIDERNAME}, ${COL_PHONE}`)
+          .eq(PROFILE_PK, userId)
           .maybeSingle();
 
         if(error){
@@ -1154,11 +1080,11 @@
 
         const local = getProfileLS();
 
-        let merged = {
-          pseudo: data?.pseudo ?? local.pseudo,
-          riderFirst: data?.rider_first ?? local.riderFirst,
-          riderLast: data?.rider_last ?? local.riderLast,
-          parentPhone: data?.parent_phone ?? local.parentPhone
+        const merged = {
+          pseudo: data?.[COL_PSEUDO] ?? local.pseudo,
+          riderFirst: data?.[COL_FULLNAME] ?? local.riderFirst,
+          riderLast: data?.[COL_RIDERNAME] ?? local.riderLast,
+          parentPhone: data?.[COL_PHONE] ?? local.parentPhone
         };
 
         hydrateProfileFormFromObj(merged);
@@ -1168,11 +1094,10 @@
         applyAvatar();
       }catch(e){
         console.warn("Exception load profile:", e);
-        hydrateProfileFormFromObj(getProfileLS());
       }
     }
 
-    // ==== Avatar depuis rsl_avatars ====
+    // ==== Avatar depuis rsl_avatars (inchangé) ====
     async function loadAvatarFromDb(userId){
       if(!sb || !sb.from || !userId) return;
       try{
@@ -1192,9 +1117,7 @@
             navAvatar.src = url;
             navAvatar.style.display = "inline-block";
           }
-          if(profileAvatar){
-            profileAvatar.src = url;
-          }
+          if(profileAvatar) profileAvatar.src = url;
           setAvatarLS(url);
         }
       }catch(e){
@@ -1202,33 +1125,33 @@
       }
     }
 
+    // ✅ SAVE: upsert sur profiles.id + colonnes existantes (pseudo/full_name/rider_name/phone)
     async function saveProfileToSupabase(){
       if(!currentUser || !sb || !sb.from){
         setProfileStatus("Tu dois être connecté pour modifier ton profil.", "err");
         return;
       }
+
       const pseudo = fieldPseudo?.value.trim() || "";
       const riderFirst = fieldRiderFirst?.value.trim() || "";
       const riderLast = fieldRiderLast?.value.trim() || "";
       const parentPhone = fieldParentPhone?.value.trim() || "";
 
       const payload = {
-        user_id: currentUser.id,
-        pseudo,
-        rider_first: riderFirst,
-        rider_last: riderLast,
-        parent_phone: parentPhone,
+        [PROFILE_PK]: currentUser.id,    // ✅ IMPORTANT
+        [COL_PSEUDO]: pseudo,
+        [COL_FULLNAME]: riderFirst,
+        [COL_RIDERNAME]: riderLast,
+        [COL_PHONE]: parentPhone,
         updated_at: new Date().toISOString()
       };
 
       setProfileStatus("Enregistrement en cours...", null);
 
       try{
-        const { data, error } = await sb
+        const { error } = await sb
           .from(PROFILE_TABLE)
-          .upsert(payload, { onConflict: "user_id" })
-          .select()
-          .maybeSingle();
+          .upsert(payload, { onConflict: PROFILE_PK });
 
         if(error){
           console.warn("Erreur save profile:", error);
@@ -1236,12 +1159,7 @@
           return;
         }
 
-        const stored = {
-          pseudo,
-          riderFirst,
-          riderLast,
-          parentPhone
-        };
+        const stored = { pseudo, riderFirst, riderLast, parentPhone };
         setProfileLS(stored);
         updateProfileTextsFromObj(stored);
         setProfileStatus("Profil mis à jour ✅", "ok");
@@ -1256,9 +1174,8 @@
         setProfileStatus("Tu dois être connecté pour changer ta photo.", "err");
         return;
       }
-      if(!file){
-        return;
-      }
+      if(!file) return;
+
       setProfileStatus("Upload de la photo en cours...", null);
 
       const fileExt = file.name.split(".").pop();
@@ -1306,9 +1223,8 @@
           navAvatar.src = publicUrl;
           navAvatar.style.display = "inline-block";
         }
-        if(profileAvatar){
-          profileAvatar.src = publicUrl;
-        }
+        if(profileAvatar) profileAvatar.src = publicUrl;
+
         setAvatarLS(publicUrl);
         setProfileStatus("Photo de profil mise à jour ✅", "ok");
       }catch(e){
@@ -1319,13 +1235,7 @@
 
     // ==== Logout ====
     async function logout(){
-      try{
-        if(sb && sb.auth){
-          await sb.auth.signOut();
-        }
-      }catch(e){
-        console.warn("Erreur logout:", e);
-      }
+      try{ if(sb && sb.auth) await sb.auth.signOut(); }catch(e){ console.warn("Erreur logout:", e); }
       localStorage.removeItem("rsl_profile");
       localStorage.removeItem("rsl_avatar");
       window.location.href = "index.html";
@@ -1334,9 +1244,7 @@
     mobileLogout?.addEventListener("click", logout);
 
     // ==== Events profil ====
-    btnSaveProfile?.addEventListener("click", ()=>{
-      saveProfileToSupabase();
-    });
+    btnSaveProfile?.addEventListener("click", saveProfileToSupabase);
 
     btnChangeAvatar?.addEventListener("click", ()=>{
       if(!currentUser){
@@ -1348,9 +1256,7 @@
 
     avatarInput?.addEventListener("change", (e)=>{
       const file = e.target.files?.[0];
-      if(file){
-        uploadAvatar(file);
-      }
+      if(file) uploadAvatar(file);
     });
 
     // ==== Init ====
@@ -1359,6 +1265,7 @@
 
       const profLS = getProfileLS();
       hydrateProfileFormFromObj(profLS);
+      // pas d'affichage "Non connecté" par défaut : on attend getUser()
       updateProfileTextsFromObj(profLS);
 
       if(!sb || !sb.auth){
@@ -1371,7 +1278,9 @@
         currentUser = user || null;
 
         if(!user){
-          profileEmail.textContent = "—";
+          if(profileName) profileName.textContent = "Non connecté";
+          if(profileEmail) profileEmail.textContent = "—";
+          if(profilePhone) profilePhone.textContent = "Téléphone : —";
           if(loginHint) loginHint.style.display = "inline-flex";
 
           if(btnLoginEl) btnLoginEl.style.display = "inline-flex";
@@ -1387,19 +1296,20 @@
           return;
         }
 
-        if(user.email){
-          profileEmail.textContent = user.email;
-        }
-        if(loginHint) loginHint.style.display = "none";
-
         if(btnLoginEl) btnLoginEl.style.display = "none";
         if(btnAccount) btnAccount.style.display = "inline-flex";
         if(btnLogout) btnLogout.style.display = "inline-flex";
         if(mobileLogout) mobileLogout.style.display = "block";
+        if(loginHint) loginHint.style.display = "none";
 
-        if(navAvatar && getAvatarLS()){
-          navAvatar.style.display = "inline-block";
+        // Avatar visible si on a un avatar LS (sinon se montrera quand DB le donne)
+        if(navAvatar){
+          const av = getAvatarLS();
+          navAvatar.style.display = av ? "inline-block" : "none";
         }
+
+        // email direct
+        if(profileEmail) profileEmail.textContent = user.email || "—";
 
         await loadProfileFromSupabase(user.id);
         await loadAvatarFromDb(user.id);
@@ -1409,7 +1319,6 @@
         renderMembershipBox(membership);
 
         await loadCourses();
-
       }catch(e){
         console.warn("Erreur init compte:", e);
         membershipBox.textContent = "Erreur lors du chargement de ton compte.";
