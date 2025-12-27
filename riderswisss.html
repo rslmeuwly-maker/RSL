@@ -310,7 +310,7 @@
     }
     body.theme-light .badge-live{ background:#f9fafb; }
 
-    /* ✅ Badge TOTAL votes */
+    /* ✅ Badge TOTAL en % */
     .total-badge{
       display:inline-flex;
       align-items:center;
@@ -604,8 +604,10 @@
               <div class="badge-live" title="Mise à jour en direct">
                 <i aria-hidden="true"></i> Live classement
               </div>
+
+              <!-- ✅ TOTAL en % -->
               <div id="totalVotesDisplay" class="total-badge" style="display:none;">
-                <span id="totalCount">0</span> VOTES AU TOTAL
+                <span id="totalCount">0%</span> DU TOTAL
               </div>
             </div>
           </div>
@@ -820,6 +822,13 @@
       apply();
     })();
 
+    function formatPct(x){
+      // 1 décimale max, sans ".0"
+      const v = Math.round((x + Number.EPSILON) * 10) / 10;
+      const s = v.toFixed(1);
+      return s.endsWith(".0") ? String(Math.round(v)) : s;
+    }
+
     async function initPage() {
       try {
         const [resNominees, resVotes] = await Promise.all([
@@ -831,30 +840,38 @@
         if (resVotes.error) throw resVotes.error;
 
         const nominees = resNominees.data || [];
-        const votes = resVotes.data || [];
+        const votesAll = resVotes.data || [];
 
-        // ✅ total votes badge (inclut votes manuels)
+        // ✅ votes "classement" (on ignore les votes manuels)
+        const votes = votesAll.filter(v => v.nominee_id != null);
+        const total = votes.length;
+
+        // ✅ badge total en %
         const totalWrap = document.getElementById("totalVotesDisplay");
         const totalCount = document.getElementById("totalCount");
         if (totalWrap && totalCount){
-          if (votes.length > 0){
+          if (total > 0){
             totalWrap.style.display = "inline-flex";
-            totalCount.textContent = String(votes.length);
+            totalCount.textContent = "100%";
           } else {
             totalWrap.style.display = "none";
-            totalCount.textContent = "0";
+            totalCount.textContent = "0%";
           }
         }
 
-        // ✅ classement: on ignore les votes manuels (nominee_id null)
+        // ✅ comptage votes par rider
         const voteCounts = {};
         votes.forEach(v => {
-          if(v.nominee_id == null) return;
-          voteCounts[v.nominee_id] = (voteCounts[v.nominee_id] || 0) + 1;
+          const id = v.nominee_id;
+          voteCounts[id] = (voteCounts[id] || 0) + 1;
         });
 
         const leaderboardData = nominees
-          .map(n => ({ ...n, count: voteCounts[n.id] || 0 }))
+          .map(n => {
+            const count = voteCounts[n.id] || 0;
+            const pct = total > 0 ? (count / total) * 100 : 0;
+            return { ...n, count, pct };
+          })
           .sort((a, b) => b.count - a.count);
 
         const listEl = document.getElementById("leaderboardList");
@@ -864,10 +881,11 @@
               <span class="pill-rank">#${index + 1}</span>
               <span class="rider-name">${escapeHtml(n.name)}</span>
             </div>
-            <span class="pill-votes">${n.count} vote${n.count > 1 ? 's' : ''}</span>
+            <span class="pill-votes">${formatPct(n.pct)}%</span>
           </div>
         `).join("");
 
+        // ✅ select riders (alpha)
         const select = document.getElementById("nomineeSelect");
         const alphaData = [...nominees].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         select.innerHTML =
