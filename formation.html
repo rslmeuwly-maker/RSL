@@ -247,7 +247,7 @@
       .coach-fab{ display:none; }
     }
 
-    /* ===== PAGE (inchangé) ===== */
+    /* ===== PAGE ===== */
     .page{
       max-width:1200px;
       margin:0 auto;
@@ -491,7 +491,7 @@
       padding-right:46px;
       background-image:
         linear-gradient(45deg,transparent 50%,var(--rsl-accent) 50%),
-        linear-gradient(135deg,var(--rsl-accent) 50%,transparent 50%);
+        linear-gradient(135deg,var(--r-accent) 50%,transparent 50%);
       background-position:calc(100% - 24px) center,calc(100% - 18px) center;
       background-size:7px 7px,7px 7px;
       background-repeat:no-repeat;
@@ -556,67 +556,67 @@
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV (IDENTIQUE INDEX) -->
+  <!-- NAV (routes clean) -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class="brand" href="/">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
         <ul>
-          <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html" aria-current="page">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="shop-rsl.html">Shop</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="/cours">Cours</a></li>
+          <li><a href="/formation" aria-current="page">Formation RSL</a></li>
+          <li><a href="/ou_rider">Où rider ?</a></li>
+          <li><a href="/evenements">Événements</a></li>
+          <li><a href="/disciplines">Disciplines</a></li>
+          <li><a href="/shop-rsl">Shop</a></li>
+          <li><a href="/comite">Comité</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
 
         <div class="cta">
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <a class="btn" id="btnLogin" href="access.html">Login</a>
-          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <a class="btn" id="btnLogin" href="/access">Login</a>
+          <a class="btn" id="btnAccount" href="/compte" style="display:none">Mon compte</a>
 
-          <a href="compte.html" aria-label="Mon compte">
+          <a href="/compte" aria-label="Mon compte">
             <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
+          <a class="btn" id="btnCart" href="/panier/panier">Panier</a>
+          <a class="btn green" href="/membres">Devenir membre</a>
           <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- MENU MOBILE (IDENTIQUE INDEX) -->
+  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
-      <a href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
-      <a href="formation.html" aria-current="page">Formation RSL</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html">Événements</a>
-      <a href="game.html">Games</a>
-      <a href="shop-rsl.html">Shop</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="access.html">Se connecter</a>
-      <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+      <a href="/">Accueil</a>
+      <a href="/cours">Cours</a>
+      <a href="/membres">Devenir membre</a>
+      <a href="/formation" aria-current="page">Formation RSL</a>
+      <a href="/disciplines">Disciplines</a>
+      <a href="/ou_rider">Où rider ?</a>
+      <a href="/evenements">Événements</a>
+      <a href="/game">Games</a>
+      <a href="/shop-rsl">Shop</a>
+      <a href="/comite">Comité</a>
+      <a href="/contact">Contact</a>
+      <a href="/conditions">Conditions générales</a>
+      <a href="/access">Se connecter</a>
+      <a href="/compte">Mon compte</a>
+      <a class="coach-link" href="/coach">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <!-- CONTENU (inchangé) -->
+  <!-- CONTENU -->
   <main class="page">
     <section class="hero">
       <div class="hero-top">
@@ -631,8 +631,8 @@
 
           <h1>Deviens moniteur RSL</h1>
           <p>
-            Une journée complète (6–7h) avec une <b>éducatrice spécialisée</b> + module <b>Samaritains</b> :
-            pédagogie, sécurité, pratique en skatepark, examen final et <b>certificats officiels RSL</b>.
+            Une journée complète (6–7h) avec une <b>éducatrice spécialisée</b> + module <b>Samaritains (BLS-AED)</b> :
+            pédagogie, encadrement, sécurité en skatepark, validation finale et <b>certificats officiels RSL</b>.
           </p>
 
           <div class="hero-bottom">
@@ -642,7 +642,7 @@
                 📄 Télécharger l’horaire (.pdf)
               </a>
             </div>
-            <div>1re session : <b>2026</b> • Places limitées</div>
+            <div>Sessions : <b>2026</b> • Places limitées</div>
           </div>
         </div>
 
@@ -665,18 +665,25 @@
       <article class="card">
         <h3>Programme</h3>
         <div class="title">Exemple de déroulement (6–7h)</div>
-        <p>Objectif : bases solides en pédagogie, sécurité et gestion d’un groupe en skatepark.</p>
+        <p>Le matin avec l’éducatrice spécialisée, l’après-midi avec le module Samaritains (BLS-AED), puis terrain + validation.</p>
 
         <div class="slots">
+          <!-- Matin (Éducatrice) -->
           <div class="slot"><div class="time">09:00–09:15</div><div class="desc"><b>Accueil & présentation</b><small>Objectifs, attentes, cadre RSL.</small></div></div>
           <div class="slot"><div class="time">09:15–10:00</div><div class="desc"><b>Rôle du moniteur</b><small>Responsabilité, posture, relation parents.</small></div></div>
           <div class="slot"><div class="time">10:00–10:45</div><div class="desc"><b>Pédagogie & progression</b><small>Structure d’un cours, niveaux, motivation.</small></div></div>
-          <div class="slot"><div class="time">11:00–12:30</div><div class="desc"><b>Module Samaritains</b><small>144, sécurisation, blessures fréquentes.</small></div></div>
-          <div class="slot"><div class="time">12:30–13:15</div><div class="desc"><b>Pause midi</b><small>Questions / échanges.</small></div></div>
-          <div class="slot"><div class="time">13:15–14:15</div><div class="desc"><b>Sécurité & risques</b><small>Lecture du park, zones, météo, matériel.</small></div></div>
-          <div class="slot"><div class="time">14:15–15:15</div><div class="desc"><b>Communication</b><small>Cadrer sans casser l’envie, gérer un groupe.</small></div></div>
-          <div class="slot"><div class="time">15:30–16:30</div><div class="desc"><b>Mise en pratique</b><small>Mini-cours + feedback direct.</small></div></div>
-          <div class="slot"><div class="time">16:30–17:00</div><div class="desc"><b>Validation & certificats</b><small>Retour individuel, remise des certificats.</small></div></div>
+          <div class="slot"><div class="time">11:00–12:00</div><div class="desc"><b>Communication & encadrement</b><small>Cadrer sans casser l’envie, gérer un groupe.</small></div></div>
+
+          <!-- Pause -->
+          <div class="slot"><div class="time">12:00–13:00</div><div class="desc"><b>Pause midi</b><small>Questions / échanges.</small></div></div>
+
+          <!-- Après-midi (Samaritains) -->
+          <div class="slot"><div class="time">13:00–15:00</div><div class="desc"><b>Module Samaritains (BLS-AED)</b><small>144, sécurisation, traumatologie, blessures fréquentes en skatepark.</small></div></div>
+
+          <!-- Fin (Terrain + validation) -->
+          <div class="slot"><div class="time">15:00–16:00</div><div class="desc"><b>Sécurité & risques</b><small>Lecture du park, zones, météo, matériel.</small></div></div>
+          <div class="slot"><div class="time">16:00–16:45</div><div class="desc"><b>Mise en pratique</b><small>Mini-cours + feedback direct.</small></div></div>
+          <div class="slot"><div class="time">16:45–17:00</div><div class="desc"><b>Validation & certificats</b><small>Retour individuel, remise des certificats.</small></div></div>
         </div>
       </article>
 
@@ -688,14 +695,13 @@
           <span class="cap">20 places / session</span>
         </div>
         <p>
-          Formations le <b>1er samedi du mois</b>. Après inscription, tu reçois un mail avec les infos + paiement (30.–).
+          Formations le <b>1er samedi du mois</b>. Après inscription, tu reçois un mail avec les infos + paiement (<b>99.–</b>).
         </p>
 
         <div class="form-row">
           <label class="label" for="dateSelect">Date souhaitée</label>
           <select id="dateSelect" class="select">
             <option value="">— Sélectionne une date —</option>
-          
             <option value="2026-03-07">Samedi 7 mars 2026</option>
           </select>
         </div>
@@ -728,10 +734,10 @@
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+  <a class="coach-fab" href="/coach">👨‍🏫 Je suis coach</a>
 
   <script>
-    // Thème (clair / sombre) — identique index
+    // Thème (clair / sombre)
     (function(){
       const STORAGE_KEY = 'rsl-theme';
       const body = document.body;
@@ -765,7 +771,7 @@
       }
     })();
 
-    // Vidéo de fond — identique index
+    // Vidéo de fond
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -796,7 +802,7 @@
       });
     })();
 
-    // Menu mobile — identique index
+    // Menu mobile
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -818,8 +824,6 @@
         }
       });
     })();
-
-    /* ===== le reste de ton JS (inchangé) ===== */
 
     /* ===== Supabase singleton + UI login (safe) ===== */
     function waitForEnv(timeoutMs=3500){
