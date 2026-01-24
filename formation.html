@@ -466,7 +466,7 @@
     .form-row{ display:flex; flex-direction:column; gap:6px; margin:10px 0; }
     .label{ font-weight:900; font-size:13px; color:var(--rsl-fg); }
 
-    .input,.select{
+    .input,.select,.textarea{
       width:100%;
       padding:13px 14px;
       border-radius:14px;
@@ -477,10 +477,11 @@
       font-size:14px;
       transition:.2s ease;
     }
-    body.theme-light .input, body.theme-light .select{
+    body.theme-light .input, body.theme-light .select, body.theme-light .textarea{
       background:#fff;
+      color:#0f172a;
     }
-    .input:focus,.select:focus{
+    .input:focus,.select:focus,.textarea:focus{
       outline:none;
       border-color:var(--rsl-accent);
       box-shadow:0 0 0 3px rgba(34,197,94,.22);
@@ -491,7 +492,7 @@
       padding-right:46px;
       background-image:
         linear-gradient(45deg,transparent 50%,var(--rsl-accent) 50%),
-        linear-gradient(135deg,var(--r-accent) 50%,transparent 50%);
+        linear-gradient(135deg,var(--rsl-accent) 50%,transparent 50%);
       background-position:calc(100% - 24px) center,calc(100% - 18px) center;
       background-size:7px 7px,7px 7px;
       background-repeat:no-repeat;
@@ -519,6 +520,20 @@
 
     .hint{ margin:8px 0 0; color:var(--rsl-muted); font-size:13px; line-height:1.55; }
     .sub-hint{ margin:6px 0 0; color:var(--rsl-muted); font-size:12px; opacity:.95; }
+
+    .checkrow{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.35);
+      background:rgba(15,23,42,.45);
+    }
+    body.theme-light .checkrow{ background:rgba(15,23,42,.04); }
+    .checkrow input{ margin-top:3px; transform:scale(1.1); }
+    .checkrow b{ color:var(--rsl-fg); }
+    .checkrow small{ display:block; color:var(--rsl-muted); margin-top:2px; }
 
     /* Footer mini */
     .footer-mini .copy{
@@ -638,9 +653,6 @@
           <div class="hero-bottom">
             <div style="display:flex; gap:10px; flex-wrap:wrap">
               <a class="link-pill" href="#" onclick="return false;">Certificat RSL moniteur</a>
-              <a class="link-pill" href="docs/horaire-formation.pdf" target="_blank" rel="noopener">
-                📄 Télécharger l’horaire (.pdf)
-              </a>
             </div>
             <div>Sessions : <b>2026</b> • Places limitées</div>
           </div>
@@ -668,26 +680,19 @@
         <p>Le matin avec l’éducatrice spécialisée, l’après-midi avec le module Samaritains (BLS-AED), puis terrain + validation.</p>
 
         <div class="slots">
-          <!-- Matin (Éducatrice) -->
           <div class="slot"><div class="time">09:00–09:15</div><div class="desc"><b>Accueil & présentation</b><small>Objectifs, attentes, cadre RSL.</small></div></div>
           <div class="slot"><div class="time">09:15–10:00</div><div class="desc"><b>Rôle du moniteur</b><small>Responsabilité, posture, relation parents.</small></div></div>
           <div class="slot"><div class="time">10:00–10:45</div><div class="desc"><b>Pédagogie & progression</b><small>Structure d’un cours, niveaux, motivation.</small></div></div>
           <div class="slot"><div class="time">11:00–12:00</div><div class="desc"><b>Communication & encadrement</b><small>Cadrer sans casser l’envie, gérer un groupe.</small></div></div>
-
-          <!-- Pause -->
           <div class="slot"><div class="time">12:00–13:00</div><div class="desc"><b>Pause midi</b><small>Questions / échanges.</small></div></div>
-
-          <!-- Après-midi (Samaritains) -->
           <div class="slot"><div class="time">13:00–15:00</div><div class="desc"><b>Module Samaritains (BLS-AED)</b><small>144, sécurisation, traumatologie, blessures fréquentes en skatepark.</small></div></div>
-
-          <!-- Fin (Terrain + validation) -->
           <div class="slot"><div class="time">15:00–16:00</div><div class="desc"><b>Sécurité & risques</b><small>Lecture du park, zones, météo, matériel.</small></div></div>
           <div class="slot"><div class="time">16:00–16:45</div><div class="desc"><b>Mise en pratique</b><small>Mini-cours + feedback direct.</small></div></div>
           <div class="slot"><div class="time">16:45–17:00</div><div class="desc"><b>Validation & certificats</b><small>Retour individuel, remise des certificats.</small></div></div>
         </div>
       </article>
 
-      <!-- Inscription -->
+      <!-- Inscription (FORM + FORMSPREE) -->
       <aside class="card inscription">
         <h3>Inscription</h3>
         <div class="title" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
@@ -698,34 +703,104 @@
           Formations le <b>1er samedi du mois</b>. Après inscription, tu reçois un mail avec les infos + paiement (<b>99.–</b>).
         </p>
 
-        <div class="form-row">
-          <label class="label" for="dateSelect">Date souhaitée</label>
-          <select id="dateSelect" class="select">
-            <option value="">— Sélectionne une date —</option>
-            <option value="2026-03-07">Samedi 7 mars 2026</option>
-          </select>
-        </div>
+        <form action="https://formspree.io/f/xrbylkqk" method="POST">
+          <!-- anti-spam -->
+          <input type="text" name="_gotcha" style="display:none">
+          <input type="hidden" name="_subject" value="Nouvelle inscription — Formation Moniteur RSL">
 
-        <div class="form-row">
-          <label class="label" for="nom">Nom et prénom</label>
-          <input id="nom" class="input" type="text" placeholder="Nom et prénom complet">
-        </div>
+          <div class="form-row">
+            <label class="label" for="dateSelect">Date souhaitée</label>
+            <select id="dateSelect" name="date" class="select" required>
+              <option value="">— Sélectionne une date —</option>
+              <option value="2026-03-07">Samedi 7 mars 2026</option>
+            </select>
+          </div>
 
-        <div class="form-row">
-          <label class="label" for="email">Email</label>
-          <input id="email" class="input" type="email" placeholder="ton@email.ch">
-        </div>
+          <div class="form-row">
+            <label class="label" for="nom">Nom et prénom</label>
+            <input id="nom" name="nom_prenom" class="input" type="text" placeholder="Nom et prénom complet" required>
+          </div>
 
-        <div class="form-row">
-          <label class="label" for="dob">Date de naissance</label>
-          <input id="dob" class="input" type="text" inputmode="numeric" placeholder="jj.mm.aaaa">
-        </div>
+          <div class="form-row">
+            <label class="label" for="email">Email</label>
+            <input id="email" name="email" class="input" type="email" placeholder="ton@email.ch" required>
+          </div>
 
-        <div class="form-row">
-          <button class="btn-primary" id="btnFormInscrire" type="button">Je m’inscris à la formation</button>
-          <p class="hint">Après validation, tu recevras un e-mail de confirmation avec toutes les infos pratiques.</p>
-          <p class="sub-hint">Si rien sous 48h, vérifie le spam ou contacte la RSL.</p>
-        </div>
+          <div class="form-row">
+            <label class="label" for="tel">Téléphone</label>
+            <input id="tel" name="telephone" class="input" type="tel" placeholder="+41 ..." required>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="dob">Date de naissance</label>
+            <input id="dob" name="date_naissance" class="input" type="text" inputmode="numeric" placeholder="jj.mm.aaaa" required>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="ville">Ville / Canton</label>
+            <input id="ville" name="ville_canton" class="input" type="text" placeholder="Ex: Montreux, VD" required>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="niveau">Niveau trottinette</label>
+            <select id="niveau" name="niveau" class="select" required>
+              <option value="">— Choisir —</option>
+              <option>Débutant</option>
+              <option>Intermédiaire</option>
+              <option>Avancé</option>
+              <option>Expert</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="parks">Skateparks fréquentés</label>
+            <input id="parks" name="skateparks" class="input" type="text" placeholder="Ex: Montreux, Vidy, Bulle..." required>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="exp">Expérience encadrement</label>
+            <select id="exp" name="experience_encadrement" class="select" required>
+              <option value="">— Choisir —</option>
+              <option>Aucune</option>
+              <option>Aide sur des cours</option>
+              <option>Coach régulier</option>
+              <option>Pro / éducateur / moniteur</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="bls">BLS-AED déjà fait ?</label>
+            <select id="bls" name="bls_aed" class="select" required>
+              <option value="">— Choisir —</option>
+              <option>Non</option>
+              <option>Oui (valide)</option>
+              <option>Oui (expiré)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="rem">Remarques</label>
+            <textarea id="rem" name="remarques" class="textarea" rows="3" placeholder="Contraintes, infos utiles..."></textarea>
+          </div>
+
+          <!-- ✅ Contact urgence supprimé (nom + téléphone) -->
+
+          <div class="form-row">
+            <label class="checkrow">
+              <input type="checkbox" name="not_a_robot" required>
+              <span>
+                <b>Je suis pas un robot</b>
+                <small>Validation obligatoire pour envoyer le formulaire.</small>
+              </span>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <button class="btn-primary" id="btnFormInscrire" type="submit">Je m’inscris à la formation</button>
+            <p class="hint">Après envoi, tu recevras un e-mail (parfois ça prend quelques minutes).</p>
+            <p class="sub-hint">Si rien sous 48h, vérifie le spam ou contacte la RSL.</p>
+          </div>
+        </form>
       </aside>
     </section>
   </main>
@@ -870,26 +945,6 @@
         supa.auth.onAuthStateChange((_e,s)=>ui(s?.user ?? null));
       }catch(_){}
     })();
-
-    /* ===== Inscription (local) ===== */
-    document.getElementById('btnFormInscrire')?.addEventListener('click', ()=>{
-      const dateSelect = document.getElementById('dateSelect');
-      const nom  = (document.getElementById('nom')?.value || '').trim();
-      const mail = (document.getElementById('email')?.value || '').trim();
-      const dob  = (document.getElementById('dob')?.value || '').trim();
-
-      if(!dateSelect.value){ alert("Merci de choisir une date de formation."); return; }
-      if(!nom || !mail){ alert("Merci de remplir au minimum ton nom et ton e-mail."); return; }
-
-      alert(
-        "Merci pour ton inscription !\n\n" +
-        "Date : " + dateSelect.options[dateSelect.selectedIndex].text + "\n" +
-        "Nom : " + nom + "\n" +
-        "Email : " + mail + "\n" +
-        "Date de naissance : " + (dob || "non renseignée") + "\n\n" +
-        "Tu recevras un e-mail de confirmation avec toutes les infos pratiques."
-      );
-    });
   </script>
 </body>
 </html>
