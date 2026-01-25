@@ -173,11 +173,12 @@ async function loadCourses(){
   try {
     if(!supa) throw new Error('No Supabase client');
 
-    // on charge les cours avec la relation "enrollments" (inscriptions)
+    // ✅ on charge UNIQUEMENT les cours à venir (cours passés masqués)
     let { data, error } = await supa
       .from('courses')
       .select('id,location,starts_at,capacity,enrollments(id)')
-      .order('starts_at');
+      .gte('starts_at', new Date().toISOString())
+      .order('starts_at', { ascending: true });
 
     if(error) throw error;
 
@@ -198,13 +199,28 @@ async function loadCourses(){
     const lieu = lieuSel?.value || 'all';
     const only = !!onlyFree?.checked;
 
-    // remplir le <select> des lieux (tous les lieux dispo)
-    const uniqLieux = [...new Set(data.map(c=>c.location))].sort();
+    // ✅ remplir le <select> des lieux (version ROBUSTE, pas de template-string cassable)
+    const uniqLieux = [...new Set((data||[]).map(c => c.location).filter(Boolean))].sort();
     if (lieuSel) {
       const currentValue = lieuSel.value || 'all';
-      lieuSel.innerHTML =
-        '<option value="all">Tous les lieux</option>' +
-        uniqLieux.map(l=>`<option value="${l}" ${l===currentValue?'selected':''}>${l}</option>`).join('');
+
+      // reset
+      lieuSel.innerHTML = '';
+
+      // option all
+      const optAll = document.createElement('option');
+      optAll.value = 'all';
+      optAll.textContent = 'Tous les lieux';
+      lieuSel.appendChild(optAll);
+
+      // options lieux
+      uniqLieux.forEach((l) => {
+        const opt = document.createElement('option');
+        opt.value = l;
+        opt.textContent = l;
+        if (l === currentValue) opt.selected = true;
+        lieuSel.appendChild(opt);
+      });
     }
 
     // panier actuel (pour marquer "Ajouté ✅" + calcul prix progression)
@@ -212,7 +228,7 @@ async function loadCourses(){
     const panier = Array.isArray(panierRaw) ? panierRaw : [];
 
     // filtre des cours
-    const filt = data.filter(c=>{
+    const filt = (data||[]).filter(c=>{
       const d  = new Date(c.starts_at);
       if (isNaN(d.getTime())) return false;
       const mm = (d.getMonth()+1).toString().padStart(2,'0');
@@ -220,11 +236,10 @@ async function loadCourses(){
       // nb d'inscriptions déjà en DB
       const used = (c.enrollments && Array.isArray(c.enrollments)) ? c.enrollments.length : 0;
       const cap  = (typeof c.capacity === 'number') ? c.capacity : null;
-      let rest   = null;
       let full   = false;
 
       if (cap !== null) {
-        rest = Math.max(cap - used, 0);
+        const rest = Math.max(cap - used, 0);
         full = rest === 0;
       }
 
@@ -257,7 +272,6 @@ async function loadCourses(){
       const used = (c.enrollments && Array.isArray(c.enrollments)) ? c.enrollments.length : 0;
       const cap  = (typeof c.capacity === 'number') ? c.capacity : null;
 
-      let rest = null;
       let full = false;
       let badgeText = "";
       let badgeStyle = "";
@@ -266,7 +280,7 @@ async function loadCourses(){
         badgeText  = "Places illimitées";
         badgeStyle = "background:rgba(34,197,94,.12);color:#22c55e;";
       } else {
-        rest = Math.max(cap - used, 0);
+        const rest = Math.max(cap - used, 0);
         full = rest === 0;
 
         if (full) {
