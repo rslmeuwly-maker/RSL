@@ -4,19 +4,16 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Mon compte — Romandie Scooter League</title>
-
   <!-- Fonts + Styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
-
   <!-- Supabase + scripts du site -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
-
   <style>
     :root{
       --rsl-bg: #020617;
@@ -28,7 +25,6 @@
       --rsl-accent: #22c55e;
       --rsl-accent-soft: rgba(34,197,94,.14);
     }
-
     body.theme-light{
       --rsl-bg: #f3f4f6;
       --rsl-fg: #0f172a;
@@ -39,7 +35,6 @@
       --rsl-accent: #16a34a;
       --rsl-accent-soft: rgba(22,163,74,.12);
     }
-
     html, body{
       height:100%;
       margin:0;
@@ -55,7 +50,6 @@
       position:relative;
       z-index:10;
     }
-
     /* ======= Vidéo de fond ======= */
     .site-bg-video{
       position:fixed;
@@ -76,7 +70,6 @@
     body.theme-light .site-bg-dim{
       background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
-
     /* ======= NAVBAR (copie index) ======= */
     nav.nav{
       background: rgba(0,0,0,.65);
@@ -89,13 +82,11 @@
     }
     nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
     nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-
     body.theme-light nav.nav{
       background:rgba(248,250,252,.96);
       border-bottom:1px solid rgba(148,163,184,.5);
       box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
-
     .brand{
       display:flex;
       align-items:center;
@@ -117,7 +108,6 @@
       font-size:16px;
       white-space:nowrap;
     }
-
     nav.nav ul{
       display:flex;
       align-items:center;
@@ -138,13 +128,11 @@
       color:var(--rsl-accent);
       opacity:1;
     }
-
     .cta{
       display:flex;
       align-items:center;
       gap:10px;
     }
-
     .btn{
       border-radius:999px;
       padding:8px 14px;
@@ -175,7 +163,6 @@
       transform:translateY(-1px);
       filter:brightness(1.05);
     }
-
     /* Avatar dans la navbar */
     .nav-avatar{
       width:34px;
@@ -185,7 +172,6 @@
       border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
     }
-
     /* Toggle thème */
     .theme-toggle{
       border-radius:999px;
@@ -211,7 +197,6 @@
       color:#0f172a;
       border-color:rgba(148,163,184,.7);
     }
-
     #menuBtn{
       display:none;
       align-items:center;
@@ -232,9 +217,7 @@
       color:#f9fafb;
       border-color:#0f172a;
     }
-
     .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
-
     /* MENU MOBILE */
     .mobile-sheet{
       position:fixed;
@@ -270,7 +253,6 @@
       padding:6px 0;
       font-size:14px;
     }
-
     /* FOOTER */
     .footer-mini .copy{
       text-align:center;
@@ -285,7 +267,6 @@
       background:rgba(248,250,252,.96);
       border-top-color:rgba(148,163,184,.5);
     }
-
     @media (max-width:990px){
       nav.nav ul{ display:none !important; }
       #btnCart,
@@ -294,7 +275,6 @@
       }
       #menuBtn{ display:inline-flex; }
     }
-
     /* ======= CONTENU COMPTE ======= */
     .wrap{
       max-width:1120px;
@@ -310,7 +290,6 @@
         padding:20px 14px 50px;
       }
     }
-
     h1{
       font-size:28px;
       font-weight:800;
@@ -323,7 +302,6 @@
       margin:0 0 20px;
       font-size:14px;
     }
-
     .top-grid{
       display:grid;
       grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
@@ -334,7 +312,6 @@
         grid-template-columns:1fr;
       }
     }
-
     .card{
       background:var(--rsl-card);
       border:1px solid var(--rsl-border);
@@ -356,7 +333,6 @@
       font-size:13px;
       margin:0 0 8px;
     }
-
     .profile-row{
       display:flex;
       align-items:flex-start;
@@ -400,7 +376,6 @@
       color:#fef3c7;
       background:rgba(146,64,14,.7);
     }
-
     /* Formulaire profil */
     .profile-form{
       margin-top:14px;
@@ -468,13 +443,11 @@
     }
     .profile-status.ok{ color:#bbf7d0; }
     .profile-status.err{ color:#fecaca; }
-
     .membership-main{
       font-size:13px;
       color:var(--rsl-fg);
     }
     .membership-main div{ margin-bottom:2px; }
-
     .courses-grid{
       display:grid;
       grid-template-columns:repeat(3, minmax(0,1fr));
@@ -486,7 +459,6 @@
     @media(max-width:780px){
       .courses-grid{ grid-template-columns:1fr; }
     }
-
     .course-list{
       margin-top:10px;
       max-height:420px;
@@ -527,7 +499,6 @@
     .text-muted{ color:var(--rsl-muted); font-size:12px; }
   </style>
 </head>
-
 <body>
   <!-- VIDÉO DE FOND -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg"></video>
@@ -537,35 +508,30 @@
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class='brand' href='/'>
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
-
         <ul>
-          <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="shop-rsl.html">Shop</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href='/cours.html'>Cours</a></li>
+          <li><a href='/formation.html'>Formation RSL</a></li>
+          <li><a href='/ou_rider.html'>Où rider ?</a></li>
+          <li><a href='/evenements.html'>Événements</a></li>
+          <li><a href='/disciplines.html'>Disciplines</a></li>
+          <li><a href='/shop-rsl.html'>Shop</a></li>
+          <li><a href='/comite.html'>Comité</a></li>
+          <li><a href='/contact.html'>Contact</a></li>
         </ul>
-
         <div class="cta">
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
-
-          <a class="btn" id="btnLogin" href="access.html">Login</a>
-          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <a class='btn' href='/access.html' id='btnLogin'>Login</a>
+          <a class='btn' href='/compte.html' id='btnAccount' style='display:none'>Mon compte</a>
           <button class="btn" id="btnLogout" style="display:none;">Déconnexion</button>
-
-          <a href="compte.html">
+          <a href='/compte.html'>
             <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
-
-          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
+          <a class='btn' href='/panier/panier.html' id='btnCart'>Panier</a>
+          <a class='btn green' href='/membres.html'>Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
       </div>
@@ -576,20 +542,20 @@
   <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
-      <a href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
-      <a href="formation.html">Formation RSL</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html">Événements</a>
-      <a href="game.html">Games</a>
-      <a href="shop-rsl.html">Shop</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="compte.html" aria-current="page">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+      <a href='/'>Accueil</a>
+      <a href='/cours.html'>Cours</a>
+      <a href='/membres.html'>Devenir membre</a>
+      <a href='/formation.html'>Formation RSL</a>
+      <a href='/disciplines.html'>Disciplines</a>
+      <a href='/ou_rider.html'>Où rider ?</a>
+      <a href='/evenements.html'>Événements</a>
+      <a href='/game.html'>Games</a>
+      <a href='/shop-rsl.html'>Shop</a>
+      <a href='/comite.html'>Comité</a>
+      <a href='/contact.html'>Contact</a>
+      <a href='/conditions.html'>Conditions générales</a>
+      <a aria-current='page' href='/compte.html'>Mon compte</a>
+      <a class='coach-link' href='/coach.html'>👨‍🏫 Je suis coach</a>
       <a id="mobileLogout" style="display:none; color:#f87171; font-weight:700; cursor:pointer;">Déconnexion</a>
     </nav>
   </div>
@@ -601,16 +567,13 @@
         <h1>Mon compte</h1>
         <p class="sub">Retrouve ton profil, ton abonnement et tous tes cours enregistrés (réservés, payés ou inclus dans ton abo).</p>
       </header>
-
       <div class="top-grid">
         <!-- Infos profil -->
         <section class="card">
           <h2>Mes infos</h2>
           <p class="small">Renseignements de base liés à ton compte RSL.</p>
-
           <div class="profile-row">
             <img id="profileAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar">
-
             <div class="profile-infos">
               <div id="profileName">Non connecté</div>
               <div id="profileEmail" class="text-muted">—</div>
@@ -618,7 +581,6 @@
               <span id="loginHint" class="pill orange" style="display:none;">
                 ⚠️ Connecte-toi pour voir et modifier ton profil
               </span>
-
               <form id="profileForm" class="profile-form">
                 <label>
                   Pseudo / Rider name
@@ -636,19 +598,16 @@
                   Téléphone du parent
                   <input id="fieldParentPhone" type="tel" placeholder="+41 ...">
                 </label>
-
                 <div class="profile-actions">
                   <button type="button" id="btnSaveProfile" class="profile-btn primary">Enregistrer mes infos</button>
                   <button type="button" id="btnChangeAvatar" class="profile-btn">Changer la photo de profil</button>
                   <input type="file" id="avatarInput" accept="image/*" style="display:none;">
                 </div>
-
                 <div id="profileSaveStatus" class="profile-status"></div>
               </form>
             </div>
           </div>
         </section>
-
         <!-- Abonnement -->
         <section class="card">
           <h2>Mon abonnement RSL</h2>
@@ -656,23 +615,19 @@
           <div id="membershipBox" class="membership-main text-muted">Chargement de l’abonnement...</div>
         </section>
       </div>
-
       <!-- Cours -->
       <section class="card">
         <h2>Mes cours</h2>
         <p class="small">Tous les cours enregistrés via le panier s’affichent ici automatiquement.</p>
-
         <div class="courses-grid">
           <div>
             <div class="pill green">✅ Inclus dans ton abonnement</div>
             <div id="membershipCourses" class="course-list text-muted">Chargement...</div>
           </div>
-
           <div>
             <div class="pill">💳 Réservés et payés</div>
             <div id="paidCourses" class="course-list text-muted">Chargement...</div>
           </div>
-
           <div>
             <div class="pill red">⏳ Réservés, en attente de paiement</div>
             <div id="pendingCourses" class="course-list text-muted">Chargement...</div>
@@ -692,7 +647,6 @@
       const STORAGE_KEY = 'rsl-theme';
       const body = document.body;
       const btn = document.getElementById('themeToggle');
-
       function applyTheme(theme){
         if(theme === 'light'){
           body.classList.add('theme-light');
@@ -702,7 +656,6 @@
           if(btn) btn.textContent = '🌙';
         }
       }
-
       let saved = null;
       try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
       if(!saved){
@@ -710,7 +663,6 @@
         saved = prefersLight ? 'light' : 'dark';
       }
       applyTheme(saved);
-
       if(btn){
         btn.addEventListener('click', ()=>{
           const current = body.classList.contains('theme-light') ? 'light' : 'dark';
@@ -772,16 +724,13 @@
     // ==== Supabase / mappings profils (ADAPTÉ À TA TABLE) ====
     const AVATAR_BUCKET = "avatars";
     const PROFILE_TABLE = "profiles";
-    const AVATAR_TABLE  = "rsl_avatars";
-
-    // ✅ Ta table profiles utilise "id" (uuid) = auth.uid()
+    const AVATAR_TABLE = "rsl_avatars";
     const PROFILE_PK = "id";
     const COL_PSEUDO = "pseudo";
     const COL_FULLNAME = "full_name";
     const COL_RIDERNAME = "rider_name";
     const COL_PHONE = "phone";
 
-    // ✅ Un seul client (env.js doit définir window.supabaseClient idéalement)
     let sb = null;
     if (window.supabaseClient) {
       sb = window.supabaseClient;
@@ -789,7 +738,6 @@
       sb = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
       window.supabaseClient = sb;
     } else if (window.supabase && window.supabase.createClient) {
-      // fallback (au cas où env.js n'est pas prêt)
       const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -806,12 +754,14 @@
     function getAvatarLS(){
       try{ return localStorage.getItem('rsl_avatar') || null; }catch(e){ return null; }
     }
+
     function setAvatarLS(url){
       try{
         if(url) localStorage.setItem('rsl_avatar', url);
         else localStorage.removeItem('rsl_avatar');
       }catch(e){}
     }
+
     function applyAvatar(){
       const stored = getAvatarLS();
       const src = stored || "images/logo_rsl.png";
@@ -826,6 +776,7 @@
       try{ return JSON.parse(localStorage.getItem('rsl_profile')||'{}'); }
       catch(e){ return {}; }
     }
+
     function setProfileLS(p){
       try{ localStorage.setItem('rsl_profile', JSON.stringify(p || {})); }catch(e){}
     }
@@ -835,7 +786,6 @@
     const profileEmail = document.getElementById("profileEmail");
     const profilePhone = document.getElementById("profilePhone");
     const loginHint = document.getElementById("loginHint");
-
     const fieldPseudo = document.getElementById("fieldPseudo");
     const fieldRiderFirst = document.getElementById("fieldRiderFirst");
     const fieldRiderLast = document.getElementById("fieldRiderLast");
@@ -844,37 +794,64 @@
     const btnChangeAvatar = document.getElementById("btnChangeAvatar");
     const avatarInput = document.getElementById("avatarInput");
     const profileSaveStatus = document.getElementById("profileSaveStatus");
-
     const membershipBox = document.getElementById("membershipBox");
     const membershipCoursesEl = document.getElementById("membershipCourses");
     const paidCoursesEl = document.getElementById("paidCourses");
     const pendingCoursesEl = document.getElementById("pendingCourses");
-
     const btnLogout = document.getElementById("btnLogout");
     const btnAccount = document.getElementById("btnAccount");
     const mobileLogout = document.getElementById("mobileLogout");
     const btnLoginEl = document.getElementById("btnLogin");
 
-    // ==== Abonnement (inchangé) ====
+    // ==== Abonnement (CORRIGÉ POUR PREMIUM À 0.–) ====
     async function fetchMembership(sbClient, userId){
       if(!sbClient || !sbClient.from || !userId) return null;
       try{
-        const { data, error } = await sbClient
-          .from('rsl_memberships')
-          .select('membership_code, expires_at, is_paid, created_at')
-          .eq('user_id', userId)
-          .eq('is_paid', true)
-          .order('created_at', { ascending:false })
-          .limit(1)
+        const { data: profile, error: profErr } = await sbClient
+          .from('profiles')
+          .select('membership_code')
+          .eq('id', userId)
           .maybeSingle();
-
-        if(error || !data) return null;
-
-        if(data.expires_at){
-          const d = new Date(data.expires_at);
-          if(!isNaN(d.getTime()) && d < new Date()) return null;
+        if (profErr) {
+          console.warn("Erreur lecture profiles:", profErr);
+          return null;
         }
-        return data;
+        const code = profile?.membership_code?.trim() || 'aucun';
+
+        const { data: rules, error: rulesErr } = await sbClient
+          .from('rsl_membership_types')
+          .select('code, course_price_chf, free_courses_quota, is_unlimited')
+          .eq('code', code)
+          .maybeSingle();
+        if (rulesErr) {
+          console.warn("Erreur lecture rsl_membership_types:", rulesErr);
+          return null;
+        }
+        const finalRules = rules || {
+          code: 'aucun',
+          course_price_chf: 30,
+          free_courses_quota: 0,
+          is_unlimited: false
+        };
+
+        let remaining = 0;
+        if (finalRules.code.toLowerCase() === 'progression' && finalRules.free_courses_quota > 0) {
+          const { count } = await sbClient
+            .from('rsl_course_registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', userId)
+            .eq('membership_included', true);
+          remaining = Math.max(0, finalRules.free_courses_quota - (count || 0));
+        }
+
+        return {
+          membership_code: finalRules.code,
+          expires_at: null,
+          course_price_chf: Number(finalRules.course_price_chf || 30),
+          free_courses_quota: Number(finalRules.free_courses_quota || 0),
+          is_unlimited: !!finalRules.is_unlimited,
+          remaining_quota: remaining
+        };
       }catch(e){
         console.warn("Erreur fetch abo:", e);
         return null;
@@ -895,28 +872,32 @@
       if(!m){
         membershipBox.innerHTML = `
           <div>Pas d’abonnement actif actuellement.</div>
-          <div class="text-muted" style="margin-top:4px;">Tu peux prendre un abonnement directement sur la page <a href="membres.html" style="color:#a5b4fc; text-decoration:underline;">Devenir membre</a>.</div>
+          <div class="text-muted" style="margin-top:4px;">Tu peux prendre un abonnement directement sur la page <a href="/membres.html" style="color:#a5b4fc; text-decoration:underline;">Devenir membre</a>.</div>
         `;
         return;
       }
-
-      const code = (m.membership_code || "").toUpperCase();
-      const exp  = m.expires_at ? formatDate(m.expires_at) : "—";
-      const start = m.created_at ? formatDate(m.created_at) : "—";
-
+      const code = (m.membership_code || "aucun").toUpperCase();
+      const isPremiumOrUnlimited = code === "PREMIUM" || m.is_unlimited === true;
+      const displayedPrice = isPremiumOrUnlimited ? 0 : (m.course_price_chf || 30);
+      const quota = m.free_courses_quota || 0;
+      const remaining = m.remaining_quota || 0;
       let infoTxt = "";
-      if(code.toLowerCase() === "premium"){
-        infoTxt = "Cours RSL illimités sur la période de ton abonnement.";
-      }else if(code.toLowerCase() === "progression"){
-        infoTxt = "15 cours de progression inclus puis tarifs réduits sur les suivants.";
-      }else{
-        infoTxt = "Tarif réduit sur les cours RSL pendant la durée de ton abonnement.";
+      let quotaTxt = "";
+      if (isPremiumOrUnlimited) {
+        infoTxt = "Cours RSL illimités et gratuits sur la période de ton abonnement.";
+      } else if (code === "PROGRESSION") {
+        infoTxt = `Tarif réduit à CHF ${displayedPrice}.– après épuisement du quota.`;
+        quotaTxt = remaining > 0
+          ? `Il te reste ${remaining} cours gratuit${remaining > 1 ? 's' : ''} sur ${quota}.`
+          : "Quota épuisé – tarif réduit appliqué.";
+      } else {
+        infoTxt = `Tarif membre : CHF ${displayedPrice}.– par cours.`;
       }
-
       membershipBox.innerHTML = `
         <div><strong>Type :</strong> ${code}</div>
-        <div><strong>Début :</strong> ${start}</div>
-        <div><strong>Valide jusqu’au :</strong> ${exp}</div>
+        <div><strong>Tarif cours :</strong> CHF ${displayedPrice}.–</div>
+        ${quota > 0 ? `<div><strong>Quota gratuit :</strong> ${quota} cours</div>` : ''}
+        ${quotaTxt ? `<div class="text-muted" style="margin-top:4px;">${quotaTxt}</div>` : ''}
         <div class="text-muted" style="margin-top:6px;">${infoTxt}</div>
       `;
     }
@@ -929,11 +910,9 @@
         pendingCoursesEl.textContent = "Connecte-toi pour voir tes cours.";
         return;
       }
-
       membershipCoursesEl.textContent = "Chargement...";
       paidCoursesEl.textContent = "Chargement...";
       pendingCoursesEl.textContent = "Chargement...";
-
       try{
         const { data, error } = await sb
           .from("rsl_course_registrations")
@@ -945,7 +924,6 @@
           `)
           .eq("user_id", currentUser.id)
           .order("date", { ascending:true });
-
         if(error){
           console.warn("Erreur fetch cours:", error);
           membershipCoursesEl.textContent = "Impossible de charger les cours.";
@@ -953,31 +931,25 @@
           pendingCoursesEl.textContent = "Impossible de charger les cours.";
           return;
         }
-
         const rows = data || [];
         const membershipCourses = [];
         const paidCourses = [];
         const pendingCourses = [];
-
         rows.forEach(r=>{
           const isIncluded = r.membership_included === true;
           const isPaidFlag =
             r.is_paid === true ||
             r.course_is_paid === true ||
             (r.payment_status && r.payment_status.toLowerCase().includes("pay"));
-
           const spot = r.course_spot_name || r.spot_name || "Lieu inconnu";
           const title = r.course_title || r.title || "";
           const price = (r.course_price_chf ?? r.price_chf ?? 0);
           const dateLabel = r.date_label || (r.date ? formatDate(r.date) : "Date à confirmer");
-
           const item = { id:r.id, spot, title, price, membership_included:isIncluded, isPaid:isPaidFlag, payment_status:r.payment_status||"", dateLabel };
-
           if(isIncluded) membershipCourses.push(item);
           if(!isIncluded && isPaidFlag) paidCourses.push(item);
           if(!isIncluded && !isPaidFlag) pendingCourses.push(item);
         });
-
         function renderList(targetEl, list, emptyText){
           if(!list.length){
             targetEl.innerHTML = `<p class="text-muted">${emptyText}</p>`;
@@ -994,9 +966,7 @@
             }else{
               statusText = "À payer (Stripe / caisse)";
             }
-
             const priceLabel = c.price ? `CHF ${c.price}.–` : "CHF 0.–";
-
             return `
               <div class="course-item">
                 <div class="course-item-header">
@@ -1012,7 +982,6 @@
             `;
           }).join("");
         }
-
         renderList(membershipCoursesEl, membershipCourses, "Aucun cours inclus dans ton abonnement pour l’instant.");
         renderList(paidCoursesEl, paidCourses, "Aucun cours payant enregistré pour l’instant.");
         renderList(pendingCoursesEl, pendingCourses, "Aucun cours en attente de paiement pour l’instant.");
@@ -1024,7 +993,7 @@
       }
     }
 
-    // ==== Gestion profil (ADAPTÉ) ====
+    // ==== Gestion profil (inchangé) ====
     function setProfileStatus(msg, type){
       if(!profileSaveStatus) return;
       profileSaveStatus.textContent = msg || "";
@@ -1042,62 +1011,50 @@
 
     function updateProfileTextsFromObj(p){
       const pseudo = (p?.pseudo || "").trim();
-      const first  = (p?.riderFirst || "").trim();   // ← full_name
-      const last   = (p?.riderLast  || "").trim();   // ← rider_name
-      const phone  = (p?.parentPhone || "").trim();  // ← phone
-
+      const first = (p?.riderFirst || "").trim();
+      const last = (p?.riderLast || "").trim();
+      const phone = (p?.parentPhone || "").trim();
       let displayName = pseudo || `${first} ${last}`.trim();
-
       if(!displayName && currentUser){
         displayName =
           (currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || "").trim()
           || (currentUser.email || "").trim()
           || "Connecté";
       }
-
       if(profileName) profileName.textContent = displayName || "Connecté";
       if(profileEmail && currentUser?.email) profileEmail.textContent = currentUser.email;
-
       if(profilePhone){
         profilePhone.textContent = "Téléphone : " + (phone || "—");
       }
     }
 
-    // ✅ LOAD: profiles.id = auth.uid()
     async function loadProfileFromSupabase(userId){
       if(!sb || !sb.from || !userId) return;
-
       try{
         const { data, error } = await sb
           .from(PROFILE_TABLE)
           .select(`${COL_PSEUDO}, ${COL_FULLNAME}, ${COL_RIDERNAME}, ${COL_PHONE}`)
           .eq(PROFILE_PK, userId)
           .maybeSingle();
-
         if(error){
           console.warn("Erreur load profile:", error);
         }
-
         const local = getProfileLS();
-
         const merged = {
           pseudo: data?.[COL_PSEUDO] ?? local.pseudo,
           riderFirst: data?.[COL_FULLNAME] ?? local.riderFirst,
           riderLast: data?.[COL_RIDERNAME] ?? local.riderLast,
           parentPhone: data?.[COL_PHONE] ?? local.parentPhone
         };
-
         hydrateProfileFormFromObj(merged);
         updateProfileTextsFromObj(merged);
         setProfileLS(merged);
-
         applyAvatar();
       }catch(e){
         console.warn("Exception load profile:", e);
       }
     }
 
-    // ==== Avatar depuis rsl_avatars (inchangé) ====
     async function loadAvatarFromDb(userId){
       if(!sb || !sb.from || !userId) return;
       try{
@@ -1106,7 +1063,6 @@
           .select("avatar_url")
           .eq("user_id", userId)
           .maybeSingle();
-
         if(error){
           console.warn("Erreur load avatar (rsl_avatars):", error);
           return;
@@ -1125,40 +1081,33 @@
       }
     }
 
-    // ✅ SAVE: upsert sur profiles.id + colonnes existantes (pseudo/full_name/rider_name/phone)
     async function saveProfileToSupabase(){
       if(!currentUser || !sb || !sb.from){
         setProfileStatus("Tu dois être connecté pour modifier ton profil.", "err");
         return;
       }
-
       const pseudo = fieldPseudo?.value.trim() || "";
       const riderFirst = fieldRiderFirst?.value.trim() || "";
       const riderLast = fieldRiderLast?.value.trim() || "";
       const parentPhone = fieldParentPhone?.value.trim() || "";
-
       const payload = {
-        [PROFILE_PK]: currentUser.id,    // ✅ IMPORTANT
+        [PROFILE_PK]: currentUser.id,
         [COL_PSEUDO]: pseudo,
         [COL_FULLNAME]: riderFirst,
         [COL_RIDERNAME]: riderLast,
         [COL_PHONE]: parentPhone,
         updated_at: new Date().toISOString()
       };
-
       setProfileStatus("Enregistrement en cours...", null);
-
       try{
         const { error } = await sb
           .from(PROFILE_TABLE)
           .upsert(payload, { onConflict: PROFILE_PK });
-
         if(error){
           console.warn("Erreur save profile:", error);
           setProfileStatus("Erreur lors de l’enregistrement du profil.", "err");
           return;
         }
-
         const stored = { pseudo, riderFirst, riderLast, parentPhone };
         setProfileLS(stored);
         updateProfileTextsFromObj(stored);
@@ -1175,36 +1124,29 @@
         return;
       }
       if(!file) return;
-
       setProfileStatus("Upload de la photo en cours...", null);
-
       const fileExt = file.name.split(".").pop();
       const fileName = `avatar_${Date.now()}.${fileExt}`;
       const filePath = `${currentUser.id}/${fileName}`;
-
       try{
         const { error: uploadError } = await sb
           .storage
           .from(AVATAR_BUCKET)
           .upload(filePath, file, { upsert: true });
-
         if(uploadError){
           console.warn("Erreur upload avatar:", uploadError);
           setProfileStatus("Erreur lors de l’upload de la photo.", "err");
           return;
         }
-
         const { data: publicData } = sb
           .storage
           .from(AVATAR_BUCKET)
           .getPublicUrl(filePath);
-
         const publicUrl = publicData?.publicUrl;
         if(!publicUrl){
           setProfileStatus("Impossible de récupérer l’URL de la photo.", "err");
           return;
         }
-
         const { error: upsertError } = await sb
           .from(AVATAR_TABLE)
           .upsert({
@@ -1212,19 +1154,16 @@
             avatar_url: publicUrl,
             updated_at: new Date().toISOString()
           }, { onConflict: "user_id" });
-
         if(upsertError){
           console.warn("Erreur upsert avatar table:", upsertError);
           setProfileStatus("Erreur lors de l’enregistrement de la photo.", "err");
           return;
         }
-
         if(navAvatar){
           navAvatar.src = publicUrl;
           navAvatar.style.display = "inline-block";
         }
         if(profileAvatar) profileAvatar.src = publicUrl;
-
         setAvatarLS(publicUrl);
         setProfileStatus("Photo de profil mise à jour ✅", "ok");
       }catch(e){
@@ -1238,14 +1177,14 @@
       try{ if(sb && sb.auth) await sb.auth.signOut(); }catch(e){ console.warn("Erreur logout:", e); }
       localStorage.removeItem("rsl_profile");
       localStorage.removeItem("rsl_avatar");
-      window.location.href = "index.html";
+      window.location.href = "/index.html";
     }
+
     btnLogout?.addEventListener("click", logout);
     mobileLogout?.addEventListener("click", logout);
 
     // ==== Events profil ====
     btnSaveProfile?.addEventListener("click", saveProfileToSupabase);
-
     btnChangeAvatar?.addEventListener("click", ()=>{
       if(!currentUser){
         setProfileStatus("Connecte-toi avant de changer la photo.", "err");
@@ -1262,62 +1201,47 @@
     // ==== Init ====
     (async ()=>{
       applyAvatar();
-
       const profLS = getProfileLS();
       hydrateProfileFormFromObj(profLS);
-      // pas d'affichage "Non connecté" par défaut : on attend getUser()
       updateProfileTextsFromObj(profLS);
-
       if(!sb || !sb.auth){
         if(loginHint) loginHint.style.display = "inline-flex";
         return;
       }
-
       try{
         const { data:{ user } } = await sb.auth.getUser();
         currentUser = user || null;
-
         if(!user){
           if(profileName) profileName.textContent = "Non connecté";
           if(profileEmail) profileEmail.textContent = "—";
           if(profilePhone) profilePhone.textContent = "Téléphone : —";
           if(loginHint) loginHint.style.display = "inline-flex";
-
           if(btnLoginEl) btnLoginEl.style.display = "inline-flex";
           if(btnAccount) btnAccount.style.display = "none";
           if(btnLogout) btnLogout.style.display = "none";
           if(mobileLogout) mobileLogout.style.display = "none";
           if(navAvatar) navAvatar.style.display = "none";
-
           membershipBox.textContent = "Connecte-toi pour voir ton abonnement.";
           membershipCoursesEl.textContent = "Connecte-toi pour voir tes cours.";
           paidCoursesEl.textContent = "Connecte-toi pour voir tes cours.";
           pendingCoursesEl.textContent = "Connecte-toi pour voir tes cours.";
           return;
         }
-
         if(btnLoginEl) btnLoginEl.style.display = "none";
         if(btnAccount) btnAccount.style.display = "inline-flex";
         if(btnLogout) btnLogout.style.display = "inline-flex";
         if(mobileLogout) mobileLogout.style.display = "block";
         if(loginHint) loginHint.style.display = "none";
-
-        // Avatar visible si on a un avatar LS (sinon se montrera quand DB le donne)
         if(navAvatar){
           const av = getAvatarLS();
           navAvatar.style.display = av ? "inline-block" : "none";
         }
-
-        // email direct
         if(profileEmail) profileEmail.textContent = user.email || "—";
-
         await loadProfileFromSupabase(user.id);
         await loadAvatarFromDb(user.id);
-
         const membership = await fetchMembership(sb, user.id);
         currentMembership = membership;
         renderMembershipBox(membership);
-
         await loadCourses();
       }catch(e){
         console.warn("Erreur init compte:", e);

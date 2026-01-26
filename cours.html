@@ -9,10 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase + scripts -->
+  <!-- Supabase (CDN) -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- tes scripts -->
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
@@ -28,7 +31,6 @@
       --rsl-accent:#22c55e;
       --rsl-accent-soft:rgba(34,197,94,.14);
     }
-
     body.theme-light{
       --rsl-bg:#f3f4f6;
       --rsl-fg:#0f172a;
@@ -39,9 +41,7 @@
       --rsl-accent:#16a34a;
       --rsl-accent-soft:rgba(22,163,74,.12);
     }
-
     *,:before,:after{ box-sizing:border-box; }
-
     html,body{
       height:100%;
       margin:0;
@@ -54,7 +54,6 @@
     }
     main{ flex:1; position:relative; z-index:10; }
 
-    /* ======= Fond vidéo ======= */
     .site-bg-video{
       position:fixed; inset:0;
       width:100%; height:100%;
@@ -74,7 +73,6 @@
       background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ======= NAVBAR ======= */
     nav.nav{
       background:rgba(0,0,0,.65);
       backdrop-filter:blur(10px);
@@ -84,7 +82,6 @@
     }
     nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
     nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-
     body.theme-light nav.nav{
       background:rgba(248,250,252,.96);
       border-bottom:1px solid rgba(148,163,184,.5);
@@ -125,13 +122,9 @@
       opacity:.9;
       transition:.2s ease;
     }
-    nav.nav ul li a:hover{
-      color:var(--rsl-accent);
-      opacity:1;
-    }
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
 
     .cta{ display:flex; align-items:center; gap:10px; }
-
     .btn{
       border-radius:999px;
       padding:8px 14px;
@@ -149,11 +142,7 @@
       line-height:1;
       white-space:nowrap;
     }
-    body.theme-light .btn{
-      background:#0f172a;
-      color:#f9fafb;
-      border-color:#0f172a;
-    }
+    body.theme-light .btn{ background:#0f172a; color:#f9fafb; border-color:#0f172a; }
     .btn.green{
       background:var(--rsl-accent);
       color:#052e16;
@@ -193,7 +182,6 @@
       border-color:rgba(148,163,184,.7);
     }
 
-    /* ✅ MENU MOBILE SIMPLE NOIR */
     #menuBtn{
       display:none;
       width:40px;
@@ -210,15 +198,10 @@
       justify-content:center;
       -webkit-tap-highlight-color: transparent;
     }
-    body.theme-light #menuBtn{
-      border-color:#0b0f19;
-      background:#0b0f19;
-      color:#fff;
-    }
+    body.theme-light #menuBtn{ border-color:#0b0f19; background:#0b0f19; color:#fff; }
 
     .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
 
-    /* ===== Menu mobile ===== */
     .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
     .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
@@ -248,13 +231,8 @@
       .coach-fab{ display:none; }
     }
 
-    /* ===== INTRO ===== */
-    .page-intro{
-      color:#fff;
-      padding:22px 0 10px;
-    }
+    .page-intro{ color:#fff; padding:22px 0 10px; }
     body.theme-light .page-intro{ color:#0f172a !important; }
-
     .page-intro h1{
       margin:10px 0 6px;
       font-size:clamp(28px,4.2vw,42px);
@@ -270,14 +248,12 @@
     }
     body.theme-light .page-intro p{ color:#334155 !important; opacity:1; }
 
-    /* ===== FILTRES ===== */
     .filters{
       display:flex;
       flex-wrap:wrap;
       gap:12px;
       margin:10px 0 14px;
       align-items:flex-end;
-
       background:rgba(15,23,42,.72);
       border:1px solid rgba(148,163,184,.35);
       border-radius:16px;
@@ -289,7 +265,6 @@
       border-color:rgba(148,163,184,.35);
       box-shadow:0 16px 40px rgba(15,23,42,.10);
     }
-
     .filter-field{
       display:flex;
       flex-direction:column;
@@ -297,11 +272,7 @@
       flex:1 1 180px;
       min-width:160px;
     }
-    .filter-label{
-      font-size:13px;
-      font-weight:800;
-      opacity:.95;
-    }
+    .filter-label{ font-size:13px; font-weight:800; opacity:.95; }
     body.theme-light .filter-label{ color:#0f172a; opacity:1; }
 
     .check-label{
@@ -313,13 +284,8 @@
       user-select:none;
     }
     body.theme-light .check-label{ color:#0f172a; }
-    .check-label input{
-      width:16px;
-      height:16px;
-      accent-color:#22c55e;
-    }
+    .check-label input{ width:16px; height:16px; accent-color:#22c55e; }
 
-    /* ===== CUSTOM SELECT ===== */
     .select-shell{ position:relative; }
     .select-display{
       width:100%;
@@ -355,8 +321,7 @@
     .select-panel{
       position:absolute;
       top:calc(100% + 6px);
-      left:0;
-      right:0;
+      left:0; right:0;
       background:#020617;
       border-radius:14px;
       border:1px solid rgba(148,163,184,.6);
@@ -368,7 +333,6 @@
     }
     body.theme-light .select-panel{ background:#ffffff; }
     .select-shell.open .select-panel{ display:block; }
-
     .select-option{
       padding:10px 14px;
       font-size:14px;
@@ -384,7 +348,6 @@
       color:#bbf7d0;
     }
     body.theme-light .select-option.is-selected{ color:#052e16; }
-
     .select-native{
       position:absolute;
       left:-9999px;
@@ -393,7 +356,6 @@
       opacity:0;
     }
 
-    /* ===== LISTE COURS ===== */
     .list{ margin:12px 0 140px; }
 
     .item{
@@ -410,21 +372,7 @@
       position:relative;
       z-index:10;
     }
-
-    .item-top{
-      display:flex;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:flex-start;
-    }
-    .course-title{
-      font-weight:1000;
-      font-size:16px;
-      letter-spacing:.1px;
-    }
-
-    /* ✅ TOUTES LES BULLES EN VERT */
+    .course-title{ font-weight:1000; font-size:16px; letter-spacing:.1px; }
     .course-meta{
       display:flex;
       flex-wrap:wrap;
@@ -435,31 +383,35 @@
       font-weight:900;
     }
     .course-meta span{
-      margin-right:0;
       display:inline-flex;
       align-items:center;
       gap:6px;
       padding:6px 10px;
       border-radius:999px;
-
-      /* vert partout */
       background:linear-gradient(180deg, var(--rsl-accent), #16a34a);
       border:1px solid rgba(255,255,255,.10);
       color:#052e16;
       box-shadow:0 10px 22px rgba(22,163,74,.28), inset 0 1px 0 rgba(255,255,255,.18);
       white-space:nowrap;
     }
-    /* icônes / petits éléments en vert foncé aussi */
     .course-meta span *{ color:inherit; }
 
+    /* ✅ PRIX (DARK = vert clair, LIGHT = BLANC lisible) */
     .course-price{
       font-size:15px;
       font-weight:1000;
       color:#bbf7d0;
     }
-    body.theme-light .course-price{ color:#052e16; }
+    body.theme-light .course-price{
+      color:#ffffff !important;
+      text-shadow: 0 2px 10px rgba(0,0,0,.55) !important;
+      background: rgba(0,0,0,.55) !important;
+      padding: 6px 10px !important;
+      border-radius: 999px !important;
+      display:inline-flex !important;
+      align-items:center !important;
+    }
 
-    /* ✅ bouton inscrire (par cours) */
     .inscrire-btn{
       display:block;
       width:100%;
@@ -476,17 +428,11 @@
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
     }
-    .inscrire-btn.selected{
-      filter:brightness(1.05);
-      background:#16a34a;
-    }
+    .inscrire-btn.selected{ filter:brightness(1.05); background:#16a34a; }
 
-    /* ===== BAR PANIER ===== */
     .basket-bar{
       position:fixed;
-      bottom:0;
-      left:0;
-      right:0;
+      bottom:0; left:0; right:0;
       background:rgba(0,0,0,.93);
       padding:12px 16px;
       border-top:1px solid rgba(255,255,255,.15);
@@ -541,7 +487,6 @@
       border-color:rgba(148,163,184,.65);
     }
 
-    /* Footer */
     .footer-mini .copy{
       text-align:center;
       color:var(--rsl-muted);
@@ -556,24 +501,15 @@
       border-top-color:rgba(148,163,184,.5);
     }
 
-    /* ✅ Mobile: filtres en grille propre */
     @media (max-width:640px){
       .filters{
         display:grid !important;
         grid-template-columns:1fr 1fr;
         align-items:end;
       }
-      .filters .filter-field{
-        min-width:0 !important;
-        flex:unset !important;
-      }
-      .filters .check-label{
-        grid-column:1 / -1;
-        padding-top:2px;
-      }
+      .filters .filter-field{ min-width:0 !important; flex:unset !important; }
+      .filters .check-label{ grid-column:1 / -1; padding-top:2px; }
     }
-
-    /* ✅ MODE PC : grille cours */
     @media (min-width: 900px){
       #courseList{
         display:grid;
@@ -583,7 +519,6 @@
       .item{ margin-bottom:0; height:100%; }
     }
 
-    /* ✅ BOUTON MOBILE FIXE */
     #mobileInscrireBtn{
       display:block !important;
       position:fixed !important;
@@ -604,14 +539,9 @@
       -webkit-tap-highlight-color:transparent !important;
       touch-action:manipulation !important;
     }
-    @media (min-width: 991px){
-      #mobileInscrireBtn{ display:none !important; }
-    }
-    @media (max-width: 990px){
-      main.container{ padding-bottom:170px !important; }
-    }
+    @media (min-width: 991px){ #mobileInscrireBtn{ display:none !important; } }
+    @media (max-width: 990px){ main.container{ padding-bottom:170px !important; } }
 
-    /* FAB coach */
     .coach-fab{
       position:fixed; right:16px; bottom:16px; z-index:80;
       display:inline-flex; align-items:center; gap:8px;
@@ -629,12 +559,9 @@
 </head>
 
 <body>
-
-  <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV -->
   <nav class="nav">
     <div class="container">
       <div class="row">
@@ -644,7 +571,7 @@
         </a>
 
         <ul>
-          <li><a href="cours.html" aria-current="page">Cours</a></li>
+          <li><a aria-current="page" href="cours.html">Cours</a></li>
           <li><a href="formation.html">Formation RSL</a></li>
           <li><a href="ou_rider.html">Où rider ?</a></li>
           <li><a href="evenements.html">Événements</a></li>
@@ -657,14 +584,14 @@
         <div class="cta">
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <a class="btn" id="btnLogin" href="access.html">Login</a>
-          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <a class="btn" href="access.html" id="btnLogin">Login</a>
+          <a class="btn" href="compte.html" id="btnAccount" style="display:none">Mon compte</a>
 
-          <a href="compte.html" aria-label="Mon compte">
+          <a aria-label="Mon compte" href="compte.html">
             <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
+          <a class="btn" href="panier/panier.html" id="btnCart">Panier</a>
           <a class="btn green" href="membres.html">Devenir membre</a>
           <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
@@ -672,12 +599,11 @@
     </div>
   </nav>
 
-  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
       <a href="index.html">Accueil</a>
-      <a href="cours.html" aria-current="page">Cours</a>
+      <a aria-current="page" href="cours.html">Cours</a>
       <a href="membres.html">Devenir membre</a>
       <a href="formation.html">Formation RSL</a>
       <a href="disciplines.html">Disciplines</a>
@@ -690,11 +616,10 @@
       <a href="conditions.html">Conditions générales</a>
       <a href="access.html">Se connecter</a>
       <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+      <a class="coach-link" href="coach.html">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <!-- CONTENU -->
   <main class="container">
     <div class="page-intro">
       <h1>Inscriptions aux cours</h1>
@@ -744,17 +669,33 @@
     </div>
   </div>
 
-  <!-- ✅ Bouton mobile fixe -->
   <button id="mobileInscrireBtn" type="button">S’inscrire</button>
 
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <a href="coach.html" class="coach-fab">👨‍🏫 Je suis coach</a>
+  <a class="coach-fab" href="coach.html">👨‍🏫 Je suis coach</a>
 
   <script>
-    // Thème (clair / sombre)
+    /* =========================================================
+      ✅ FIX GLOBAL : base URL + helpers
+    ========================================================= */
+    const RSL_BASE = (() => {
+      const p = window.location.pathname;
+      return p.includes("/") ? p.split("/").slice(0,-1).join("/") + "/" : "/";
+    })();
+
+    function rslHref(path){
+      if(!path) return path;
+      if(path.startsWith("http")) return path;
+      if(path.startsWith("/")) return path;
+      return RSL_BASE + path;
+    }
+
+    /* =========================================================
+      Thème
+    ========================================================= */
     (function(){
       const STORAGE_KEY = 'rsl-theme';
       const body = document.body;
@@ -788,16 +729,17 @@
       }
     })();
 
-    // Vidéo de fond
+    /* =========================================================
+      Vidéo de fond
+    ========================================================= */
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
       ];
-      const pick = vids[Math.floor(Math.random()*vids.length)];
       const v = document.getElementById('rslBg');
       if(!v) return;
-
+      const pick = vids[Math.floor(Math.random()*vids.length)];
       const s = document.createElement('source');
       s.src = pick;
       s.type = 'video/mp4';
@@ -810,16 +752,16 @@
           if(p && p.catch) p.catch(()=>{});
         }catch(e){}
       };
-
       start();
 
       document.addEventListener('visibilitychange', () => {
-        if(document.hidden) v.pause();
-        else start();
+        if(document.hidden) v.pause(); else start();
       });
     })();
 
-    // Menu mobile
+    /* =========================================================
+      Menu mobile
+    ========================================================= */
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -842,7 +784,9 @@
       });
     })();
 
-    // Selects custom
+    /* =========================================================
+      Selects custom
+    ========================================================= */
     function setupSelect(id){
       const native=document.getElementById(id);
       const shell=document.querySelector('[data-select-id="'+id+'"]');
@@ -886,7 +830,9 @@
       sync();
     }
 
-    // Panier
+    /* =========================================================
+      Panier UI
+    ========================================================= */
     function collectSelectedCourses(){
       const res=[];
       document.querySelectorAll(".inscrire-btn.selected").forEach(btn=>{
@@ -926,7 +872,7 @@
         localStorage.setItem("rsl_panier_cours", JSON.stringify(items));
         localStorage.setItem("rsl_panier_courses", JSON.stringify(items));
       }catch(_){}
-      window.location.href="panier/panier.html";
+      window.location.href = rslHref("panier/panier.html");
     }
 
     document.addEventListener("click",(e)=>{
@@ -964,8 +910,29 @@
         obs.observe(list,{childList:true,subtree:true});
       }
     });
+
+    /* =========================================================
+      Supabase fallback
+    ========================================================= */
+    (function initSupabaseFallback(){
+      try{
+        if(window.supabaseClient) return;
+
+        const url  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
+        const anon = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+        if(window.supabase?.createClient){
+          window.supabaseClient = window.supabase.createClient(url, anon);
+        }else{
+          console.warn("Supabase CDN pas chargé.");
+        }
+      }catch(e){
+        console.warn("initSupabaseFallback error:", e);
+      }
+    })();
   </script>
 
+  <!-- ton script principal -->
   <script src="js/cours.js" defer></script>
 </body>
 </html>
