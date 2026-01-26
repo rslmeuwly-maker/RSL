@@ -270,7 +270,7 @@
       box-shadow:0 24px 60px rgba(15,23,42,.16);
     }
 
-    /* Glow subtil (évite le gros “bloc vide”) */
+    /* Glow subtil */
     .intro-card:before{
       content:"";
       position:absolute; inset:-40% -30%;
@@ -538,6 +538,205 @@
       .brand-block{ min-width:100%; }
       .badge-launch{ width:100%; justify-content:center; }
     }
+
+    /* ===== Sponsor / Partenaire card (homepage) ===== */
+    .overview-card.sponsor{
+      border-color:rgba(34,197,94,.55);
+      box-shadow:0 24px 70px rgba(34,197,94,.14);
+      position:relative;
+      overflow:hidden;
+    }
+    .overview-card.sponsor:before{
+      content:"";
+      position:absolute;
+      inset:-40% -30%;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(99,102,241,.10), transparent 60%);
+      pointer-events:none;
+    }
+    .overview-card.sponsor > *{ position:relative; z-index:1; }
+
+    .overview-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .overview-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13px;
+      font-weight:900;
+      text-decoration:none;
+      cursor:pointer;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.85);
+      color:#e5e7eb;
+      line-height:1;
+    }
+    body.theme-light .overview-btn{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.7);
+    }
+    .overview-btn.primary{
+      border:0;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      box-shadow:0 12px 26px rgba(22,163,74,.45);
+    }
+    .overview-btn:hover{ transform:translateY(-1px); filter:brightness(1.05); transition:.15s ease; }
+
+    /* ===== POPUP QUICK LINKS (AJOUT) ===== */
+    .rsl-popup{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:none;
+    }
+    .rsl-popup.open{ display:block; }
+    .rsl-popup-dim{
+      position:absolute; inset:0;
+      background:rgba(0,0,0,.62);
+      backdrop-filter: blur(6px);
+    }
+    .rsl-popup-card{
+      position:absolute;
+      left:50%; top:50%;
+      transform:translate(-50%,-50%);
+      width:min(560px, calc(100vw - 28px));
+      background:var(--rsl-card);
+      border:1px solid rgba(148,163,184,.55);
+      border-radius:18px;
+      box-shadow:0 30px 90px rgba(2,6,23,.9);
+      overflow:hidden;
+    }
+    body.theme-light .rsl-popup-card{
+      box-shadow:0 24px 70px rgba(15,23,42,.18);
+    }
+    .rsl-popup-head{
+      padding:14px 14px 10px;
+      background:rgba(15,23,42,.92);
+      border-bottom:1px solid rgba(148,163,184,.25);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    body.theme-light .rsl-popup-head{ background:rgba(248,250,252,.96); }
+    .rsl-popup-title{
+      margin:0;
+      font-size:16px;
+      font-weight:900;
+      color:var(--rsl-fg);
+      letter-spacing:.01em;
+    }
+    .rsl-popup-sub{
+      margin:4px 0 0;
+      font-size:13px;
+      color:var(--rsl-muted);
+      line-height:1.45;
+    }
+    .rsl-popup-close{
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.85);
+      color:var(--rsl-fg);
+      width:36px;height:36px;
+      border-radius:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      line-height:1;
+      transition:.15s ease;
+    }
+    body.theme-light .rsl-popup-close{ background:#ffffff; }
+    .rsl-popup-close:hover{ transform:translateY(-1px); filter:brightness(1.08); }
+
+    .rsl-popup-body{
+      padding:14px;
+    }
+    .rsl-popup-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .rsl-popup-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(148,163,184,.45);
+      background:rgba(15,23,42,.8);
+      text-decoration:none;
+      color:var(--rsl-fg);
+      transition:.15s ease;
+    }
+    body.theme-light .rsl-popup-link{ background:#ffffff; }
+    .rsl-popup-link:hover{
+      transform:translateY(-1px);
+      border-color:rgba(34,197,94,.55);
+      box-shadow:0 16px 40px rgba(22,163,74,.15);
+    }
+    .rsl-popup-link strong{
+      font-size:14px;
+      font-weight:900;
+      color:var(--rsl-fg);
+      display:block;
+      margin-bottom:2px;
+    }
+    .rsl-popup-link span{
+      font-size:13px;
+      color:var(--rsl-muted);
+      display:block;
+      line-height:1.35;
+    }
+    .rsl-popup-link .arrow{
+      font-weight:900;
+      color:var(--rsl-accent);
+      font-size:18px;
+      flex:0 0 auto;
+    }
+
+    .rsl-popup-foot{
+      padding:12px 14px 14px;
+      border-top:1px solid rgba(148,163,184,.25);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .rsl-popup-check{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:var(--rsl-muted);
+      user-select:none;
+    }
+    .rsl-popup-check input{ transform:scale(1.05); }
+    .rsl-popup-ok{
+      border:0;
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:900;
+      cursor:pointer;
+      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
+      color:#052e16;
+      box-shadow:0 12px 26px rgba(22,163,74,.45);
+    }
+    .rsl-popup-ok:hover{ transform:translateY(-1px); filter:brightness(1.04); }
+
   </style>
 </head>
 <body>
@@ -604,6 +803,58 @@
       <a href="compte.html">Mon compte</a>
       <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
     </nav>
+  </div>
+
+  <!-- POPUP QUICK LINKS (AJOUT) -->
+  <div class="rsl-popup" id="quickPopup" aria-hidden="true">
+    <div class="rsl-popup-dim" data-close="1"></div>
+
+    <div class="rsl-popup-card" role="dialog" aria-modal="true" aria-labelledby="quickPopupTitle">
+      <div class="rsl-popup-head">
+        <div>
+          <div class="rsl-popup-title" id="quickPopupTitle">Bienvenue sur la RSL 👋</div>
+          <div class="rsl-popup-sub">Choisis un accès rapide :</div>
+        </div>
+        <button class="rsl-popup-close" type="button" aria-label="Fermer" data-close="1">✕</button>
+      </div>
+
+      <div class="rsl-popup-body">
+        <div class="rsl-popup-grid">
+          <a class="rsl-popup-link" href="cours.html">
+            <div>
+              <strong>🎓 Cours</strong>
+              <span>Voir les cours, horaires et inscriptions.</span>
+            </div>
+            <div class="arrow">→</div>
+          </a>
+
+          <a class="rsl-popup-link" href="devenirsponsors.html">
+            <div>
+              <strong>⭐ Devenir partenaire (Sponsor)</strong>
+              <span>Soutenir la scène + visibilité.</span>
+            </div>
+            <div class="arrow">→</div>
+          </a>
+
+          <a class="rsl-popup-link" href="formation.html">
+            <div>
+              <strong>🧑‍🏫 Formation</strong>
+              <span>Infos sur la formation RSL / encadrement.</span>
+            </div>
+            <div class="arrow">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="rsl-popup-foot">
+        <label class="rsl-popup-check">
+          <input type="checkbox" id="quickPopupDontShow">
+          Ne plus afficher
+        </label>
+
+        <button class="rsl-popup-ok" type="button" data-close="1">OK</button>
+      </div>
+    </div>
   </div>
 
   <!-- CONTENU -->
@@ -689,6 +940,20 @@
           <p>La RSL est portée par l’association Ride4Style Montreux, reconnue dans la scène depuis des années.</p>
           <a href="membres.html" class="overview-link">Devenir membre</a>
         </article>
+
+        <article class="overview-card sponsor">
+          <h3>⭐ Sponsors & partenaires</h3>
+          <p>
+            Tu veux soutenir la scène et la RSL ? Visibilité sur le site, les events, les posts, et surtout : tu aides
+            les riders à progresser.
+          </p>
+
+          <div class="overview-actions">
+            <a href="sponsors.html" class="overview-btn">Voir les sponsors</a>
+            <a href="devenirsponsors.html" class="overview-btn primary">Devenir partenaire</a>
+          </div>
+        </article>
+
       </div>
     </section>
   </main>
@@ -784,6 +1049,52 @@
         if(e.key==='Escape'){
           mobile.classList.remove('open');
           mobile.setAttribute('aria-hidden','true');
+        }
+      });
+    })();
+
+    // ===== POPUP QUICK LINKS (AJOUT) =====
+    (function(){
+      const KEY = "rsl-quick-popup-hide-v1";
+      const popup = document.getElementById('quickPopup');
+      const dontShow = document.getElementById('quickPopupDontShow');
+      if(!popup) return;
+
+      function open(){
+        popup.classList.add('open');
+        popup.setAttribute('aria-hidden','false');
+        // focus sur le bouton fermer pour accessibilité
+        const closeBtn = popup.querySelector('[data-close="1"]');
+        closeBtn?.focus?.();
+      }
+      function close(){
+        popup.classList.remove('open');
+        popup.setAttribute('aria-hidden','true');
+        if(dontShow?.checked){
+          try{ localStorage.setItem(KEY, "1"); }catch(e){}
+        }
+      }
+
+      // ouvre au chargement (sauf si “ne plus afficher”)
+      let hidden = false;
+      try{ hidden = localStorage.getItem(KEY) === "1"; }catch(e){}
+      if(!hidden){
+        // petit délai pour éviter un flash avant le rendu
+        setTimeout(open, 450);
+      }
+
+      // clic sur dim / bouton close / bouton ok
+      popup.addEventListener('click', (e)=>{
+        const t = e.target;
+        if(t && t.getAttribute && t.getAttribute('data-close') === "1"){
+          close();
+        }
+      });
+
+      // ESC
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === "Escape" && popup.classList.contains('open')){
+          close();
         }
       });
     })();
