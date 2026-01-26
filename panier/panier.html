@@ -73,7 +73,7 @@
       background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ======= NAVBAR (même style que l’accueil) ======= */
+    /* ======= NAVBAR ======= */
     nav.nav{
       background:rgba(0,0,0,.65);
       backdrop-filter:blur(10px);
@@ -247,7 +247,7 @@
       #menuBtn{ display:inline-flex; }
     }
 
-    /* ======= CONTENU PANIER (même esprit que hero cards) ======= */
+    /* ======= CONTENU PANIER ======= */
     .wrap{
       max-width:1120px;
       margin:26px auto 54px;
@@ -288,6 +288,28 @@
     }
     p.sub{ margin:0 0 14px; color:var(--rsl-muted); font-size:14px; }
 
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.35);
+      background:rgba(15,23,42,.65);
+      color:var(--rsl-fg);
+      font-weight:900;
+      font-size:12px;
+      margin:0 0 10px;
+      width:fit-content;
+    }
+    body.theme-light .pill{
+      background:#ffffff;
+      color:#0f172a;
+      border-color:rgba(148,163,184,.45);
+    }
+    .pill b{ color:var(--rsl-accent); }
+    .pill .muted{ color:var(--rsl-muted); font-weight:800; }
+
     .chosen-header{
       display:flex;
       justify-content:space-between;
@@ -317,7 +339,6 @@
     details summary::marker,
     details summary::-webkit-details-marker{ display:none; }
 
-    /* ✅ MODE PC: plusieurs sessions sur la même ligne */
     @media (min-width: 990px){
       #chosenSessions{
         display:grid;
@@ -345,6 +366,7 @@
     .session-meta div{ margin-bottom:2px; }
     .session-meta b{ font-size:14px; }
     .session-price{ font-size:12px; color:var(--rsl-muted); }
+    .session-price s{ opacity:.7; margin-right:6px; }
 
     .remove-btn{
       border-radius:999px;
@@ -483,7 +505,7 @@
     }
     .confirm-btn[disabled]{ opacity:.4; cursor:not-allowed; box-shadow:none; }
 
-    /* Footer (même style) */
+    /* Footer */
     .footer-mini .copy{
       text-align:center;
       color:var(--rsl-muted);
@@ -578,6 +600,8 @@
         <div class="card-inner">
           <h1>Récapitulatif de tes cours</h1>
           <p class="sub">Vérifie les dates et lieux. Tu peux retirer un cours avant la validation.</p>
+
+          <div class="pill" id="membershipPill" style="display:none;"></div>
 
           <div class="chosen-header">
             <h2>Mes cours sélectionnés</h2>
@@ -691,7 +715,7 @@
   </footer>
 
   <script>
-    // === Thème (identique à l'accueil) ===
+    // === Thème ===
     (function(){
       const STORAGE_KEY = 'rsl-theme';
       const body = document.body;
@@ -725,7 +749,7 @@
       }
     })();
 
-    // ==== Supabase client (comme ton panier actuel) ====
+    // ==== Supabase client ====
     const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
     let sb = null;
@@ -733,7 +757,7 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    // ==== Vidéo de fond (identique) ====
+    // ==== Vidéo de fond ====
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -759,7 +783,7 @@
       });
     })();
 
-    // ==== Menu mobile (identique) ====
+    // ==== Menu mobile ====
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -813,6 +837,7 @@
     const totalEst=document.getElementById("totalEst");
     const totalRight=document.getElementById("totalRight");
     const confirmBtn=document.getElementById("confirmBtn");
+    const membershipPill=document.getElementById("membershipPill");
 
     const payFirst=document.getElementById("payFirst");
     const payLast=document.getElementById("payLast");
@@ -851,25 +876,199 @@
       localStorage.setItem("rsl_panier_cours", json);
     }
 
-    function computeTotals(data){
-      let total = 0;
-      let count20 = 0;
-      let count30 = 0;
-      data.forEach(c=>{
-        let p = Number(c.price);
-        if(!Number.isFinite(p) || p <= 0) p = 30;
-        total += p;
-        if(p === 20) count20++;
-        else if(p === 30) count30++;
-      });
-      return { total, count20, count30 };
+    // ==== Parsing prix robuste (supporte "CHF 30.–", "30", 30, "0.00") ====
+    function parsePriceAny(val, fallback=30){
+      if(typeof val === "number" && Number.isFinite(val)) return val;
+      if(typeof val === "string"){
+        const m = val.replace(",",".").match(/-?\d+(\.\d+)?/);
+        const n = m ? Number(m[0]) : NaN;
+        if(Number.isFinite(n)) return n;
+      }
+      return fallback;
     }
 
-    function render(){
-      const data = getPanier();
-      chosenCount.textContent = data.length+" cours sélectionné(s)";
+    // ==== État membership (chargé depuis Supabase) ====
+    let membershipState = {
+      loaded: false,
+      user: null,
+      isActive: false,
+      planCode: null,
+      planLabel: null,
+      coursePrice: null,       // ex 20
+      freeLeft: 0,             // ex 15 - used
+      isUnlimited: false,
+      endsAt: null,
+      raw: null
+    };
 
-      if(!data.length){
+    function isMembershipActiveNow(cm){
+      if(!cm) return false;
+      const okStatus = ["active","paid","trialing"].includes((cm.status||"").toLowerCase());
+      if(!okStatus) return false;
+      if(!cm.ends_at) return true;
+      const ends = new Date(cm.ends_at);
+      return ends.getTime() > Date.now();
+    }
+
+    async function loadMembership(){
+      membershipState.loaded = false;
+
+      try{
+        if(!sb || !sb.auth) return;
+
+        const { data:{ user } = {} } = await sb.auth.getUser();
+        membershipState.user = user || null;
+
+        if(!user){
+          membershipState.loaded = true;
+          return;
+        }
+
+        // 1) current_membership (source de vérité)
+        const { data: cm, error: cmErr } = await sb
+          .from("current_membership")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if(cmErr){
+          console.warn("Erreur current_membership:", cmErr);
+          membershipState.loaded = true;
+          return;
+        }
+
+        // 2) type (règles)
+        let mt = null;
+        if(cm?.plan){
+          const { data: mtData, error: mtErr } = await sb
+            .from("rsl_membership_types")
+            .select("*")
+            .eq("code", cm.plan)
+            .maybeSingle();
+          if(mtErr) console.warn("Erreur rsl_membership_types:", mtErr);
+          mt = mtData || null;
+        }
+
+        const active = isMembershipActiveNow(cm);
+        const quotaTotal = Number(cm?.quota_total ?? 0);
+        const quotaUsed  = Number(cm?.quota_used ?? 0);
+        const typeFreeQuota = Number(mt?.free_courses_quota ?? 0);
+
+        // freeLeft : priorité au type (free_courses_quota). Si current_membership quota_total est rempli, on le respecte.
+        const baseQuota = quotaTotal > 0 ? quotaTotal : typeFreeQuota;
+        const freeLeft = active ? Math.max(baseQuota - (Number.isFinite(quotaUsed) ? quotaUsed : 0), 0) : 0;
+
+        membershipState = {
+          loaded: true,
+          user,
+          isActive: active,
+          planCode: cm?.plan || null,
+          planLabel: mt?.label || cm?.plan || null,
+          coursePrice: mt ? Number(mt.course_price_chf) : null,
+          freeLeft,
+          isUnlimited: !!(mt && mt.is_unlimited),
+          endsAt: cm?.ends_at || null,
+          raw: { cm, mt }
+        };
+
+      }catch(e){
+        console.warn("Erreur loadMembership:", e);
+        membershipState.loaded = true;
+      }
+    }
+
+    // ==== Calcul des prix appliqués au panier ====
+    function applyPricingToCart(cart){
+      // basePrice = prix normal cours (depuis cours.html). Chez toi c'était un text "CHF 30.–"
+      const items = (cart || []).map(c => {
+        const base = parsePriceAny(c.base_price ?? c.basePrice ?? c.price, 30);
+        return { ...c, _basePrice: base, _effectivePrice: base, _pricingReason: "base" };
+      });
+
+      // Si pas connecté / pas abo actif => prix normal
+      if(!membershipState.user || !membershipState.isActive){
+        return items;
+      }
+
+      // Premium: unlimited => 0
+      const coursePrice = Number(membershipState.coursePrice);
+      if(membershipState.isUnlimited || (Number.isFinite(coursePrice) && coursePrice === 0)){
+        return items.map(it => ({ ...it, _effectivePrice: 0, _pricingReason: "unlimited" }));
+      }
+
+      // Sinon: prix abo (ex 20) + éventuellement quota gratuit (progression)
+      const effectivePaidPrice = Number.isFinite(coursePrice) ? coursePrice : null;
+      let freeLeft = Number(membershipState.freeLeft || 0);
+
+      return items.map(it => {
+        // priorité: quota gratuit (si dispo) => 0
+        if(freeLeft > 0){
+          freeLeft -= 1;
+          return { ...it, _effectivePrice: 0, _pricingReason: "quota_free" };
+        }
+        // sinon prix abo si défini, sinon base
+        if(Number.isFinite(effectivePaidPrice)){
+          return { ...it, _effectivePrice: effectivePaidPrice, _pricingReason: "member_price" };
+        }
+        return it;
+      });
+    }
+
+    function computeTotalsPriced(items){
+      let total = 0;
+      let paidCount = 0;
+      let unitPrices = new Set();
+      items.forEach(it => {
+        const p = Number(it._effectivePrice || 0);
+        total += p;
+        if(p > 0){
+          paidCount++;
+          unitPrices.add(String(p));
+        }
+      });
+      return { total, paidCount, unitPrices };
+    }
+
+    // ==== UI pill membership ====
+    function renderMembershipPill(){
+      if(!membershipPill) return;
+
+      if(!membershipState.user){
+        membershipPill.style.display = "inline-flex";
+        membershipPill.innerHTML = `Abo : <b>non connecté</b> <span class="muted">→ tarif normal</span>`;
+        return;
+      }
+
+      if(!membershipState.isActive){
+        membershipPill.style.display = "inline-flex";
+        membershipPill.innerHTML = `Abo : <b>inactif</b> <span class="muted">→ tarif normal</span>`;
+        return;
+      }
+
+      const label = membershipState.planLabel || membershipState.planCode || "membre";
+      const cp = Number(membershipState.coursePrice);
+      const free = Number(membershipState.freeLeft || 0);
+
+      let right = "";
+      if(membershipState.isUnlimited || (Number.isFinite(cp) && cp === 0)){
+        right = `→ cours à <b>0.–</b>`;
+      }else{
+        right = `→ cours à <b>${Number.isFinite(cp) ? cp : "?"}.–</b>`;
+        if(free > 0) right += ` <span class="muted">(gratuit restant: ${free})</span>`;
+      }
+
+      membershipPill.style.display = "inline-flex";
+      membershipPill.innerHTML = `Abo : <b>${label}</b> <span class="muted">${right}</span>`;
+    }
+
+    // ==== Rendu ====
+    function render(){
+      const cart = getPanier();
+      const priced = applyPricingToCart(cart);
+
+      chosenCount.textContent = priced.length+" cours sélectionné(s)";
+
+      if(!priced.length){
         chosenSessions.innerHTML="<p style='color:var(--rsl-muted);margin:6px 0 0;'>Aucun cours sélectionné.</p>";
         totalEst.textContent = "CHF 0.–";
         totalRight.textContent = "CHF 0.–";
@@ -877,24 +1076,30 @@
         return;
       }
 
-      const { total } = computeTotals(data);
+      const { total } = computeTotalsPriced(priced);
       totalEst.textContent = "CHF "+total+".–";
       totalRight.textContent = "CHF "+total+".–";
 
-      chosenSessions.innerHTML = data.map((c, idx)=>{
+      chosenSessions.innerHTML = priced.map((c, idx)=>{
         const dateTxt = c.dateLabel || c.date || "";
         const time = c.time || "";
         const place = c.place || c.location || "Lieu inconnu";
         const title = c.title || "";
-        let p = Number(c.price);
-        if(!Number.isFinite(p) || p <= 0) p = 30;
+
+        const base = parsePriceAny(c._basePrice, 30);
+        const eff  = Number(c._effectivePrice || 0);
+
+        const showOld = (eff !== base);
+        const priceHtml = showOld
+          ? `<div class="session-price"><s>CHF ${base}.–</s> CHF ${eff}.–</div>`
+          : `<div class="session-price">CHF ${eff}.–</div>`;
 
         return `<div class="session-card">
           <div class="session-meta">
             <div><b>${place}</b></div>
             <div>${dateTxt} ${time}</div>
             ${title ? `<div>${title}</div>` : ""}
-            <div class="session-price">CHF ${p}.–</div>
+            ${priceHtml}
           </div>
           <button class="remove-btn" type="button" onclick="removeSession(${idx})">Retirer</button>
         </div>`;
@@ -920,7 +1125,7 @@
     function checkValid(){
       const data = getPanier();
       if(!data.length){ confirmBtn.disabled = true; return; }
-      const filled = requiredInputs.every(el => el.value.trim() !== "");
+      const filled = requiredInputs.every(el => (el.value || "").trim() !== "");
       const ok = filled && repLegal.checked && discharge.checked;
       confirmBtn.disabled = !ok;
     }
@@ -974,8 +1179,8 @@
     const stripe20 = {1:"https://buy.stripe.com/bJeaEQ1C97IK9QOek8eUU09",2:"https://buy.stripe.com/aFa14g4Ol7IKe741xmeUU0k",3:"https://buy.stripe.com/5kQ6oA2Gd1km0ge4JyeUU0l",4:"https://buy.stripe.com/4gM00ca8FaUWbYW3FueUU0m",5:"https://buy.stripe.com/eVq28k0y52oqbYWek8eUU0n",6:"https://buy.stripe.com/7sY28kfsZ7IK3sqgsgeUU0o",7:"https://buy.stripe.com/dRm8wI6Wt6EGe74b7WeUU0p",8:"https://buy.stripe.com/4gMaEQ5Spe78aUSek8eUU0q",9:"https://buy.stripe.com/3cIeV65Sp0gid303FueUU0r",10:"https://buy.stripe.com/6oUaEQ4OlbZ01kigsgeUU0s"};
 
     function handleConfirm(){
-      const data = getPanier();
-      if(!data.length){ alert("Ton panier est vide."); return; }
+      const cart = getPanier();
+      if(!cart.length){ alert("Ton panier est vide."); return; }
 
       const missing = [];
       if(!payFirst.value.trim()) missing.push("Prénom du payeur");
@@ -1003,7 +1208,9 @@
         noteMed    : noteMed.value.trim()
       });
 
-      const { total, count20, count30 } = computeTotals(data);
+      // Recalcul avec pricing membership
+      const priced = applyPricingToCart(cart);
+      const { total, paidCount, unitPrices } = computeTotalsPriced(priced);
 
       if(total === 0){
         alert("Inscription enregistrée ✅\n(0.– à payer pour ces cours).");
@@ -1013,14 +1220,17 @@
         return;
       }
 
-      if(count20 > 0 && count30 > 0){
-        alert("Erreur: ton panier mélange des cours à 20.– et 30.–.\nContacte la RSL pour régler ça avant le paiement.");
+      // Un seul prix unitaire pour les cours payants
+      if(unitPrices.size > 1){
+        alert("Erreur: ton panier mélange plusieurs tarifs payants.\nContacte la RSL pour régler ça avant le paiement.");
         return;
       }
 
+      const unit = Number([...unitPrices][0]); // ex 20 ou 30
       let url = null;
-      if(count30 > 0) url = stripe30[count30] || null;
-      else if(count20 > 0) url = stripe20[count20] || null;
+
+      if(unit === 30) url = stripe30[paidCount] || null;
+      else if(unit === 20) url = stripe20[paidCount] || null;
 
       if(!url){
         alert("Le paiement en ligne est dispo pour 1 à 10 cours payants.\nContacte la RSL si tu veux valider plus de cours d’un coup.");
@@ -1044,9 +1254,13 @@
       if(p.noteMed)     noteMed.value    = p.noteMed;
     })();
 
-    // Premier rendu
-    render();
-    checkValid();
+    // ==== BOOT ====
+    (async ()=>{
+      await loadMembership();
+      renderMembershipPill();
+      render();
+      checkValid();
+    })();
   </script>
 </body>
 </html>
