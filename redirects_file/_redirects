@@ -1,2 +1,8 @@
-http://*                      https://:splat                  301!
-https://www.rsl-swiss.ch/*    https://rsl-swiss.ch/:splat     301!
+# --- Autoriser les Netlify Functions ---
+/.netlify/functions/*  /.netlify/functions/:splat  200
+
+# --- Forcer HTTPS ---
+http://*  https://:splat  301!
+
+# --- Forcer www -> non-www ---
+https://www.rsl-swiss.ch/*  https://rsl-swiss.ch/:splat  301!
