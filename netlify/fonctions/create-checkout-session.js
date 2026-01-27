@@ -1,6 +1,7 @@
-export async function handler(event) {
+exports.handler = async (event) => {
   return {
     statusCode: 200,
-    body: JSON.stringify({ ok: true, message: "Function is alive 🚀" })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ok: true, message: "Function is alive 🚀" }),
   };
-}
+};
