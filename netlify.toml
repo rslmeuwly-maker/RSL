@@ -1,9 +1,13 @@
-[[redirects]]
-  from = "/login"
-  to = "/auth/index.html"
-  status = 200
+[build]
+  functions = "netlify/functions"
 
 [[redirects]]
-  from = "/membre"
-  to = "/auth/membre.html"
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# (optionnel) ta redirection SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
