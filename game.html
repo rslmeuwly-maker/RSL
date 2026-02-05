@@ -462,114 +462,148 @@
       background:transparent;
     }
 
-    /* ===========================
-       ✅ THEME LIGHT OVERRIDES
-       =========================== */
-    html[data-theme="light"] body{ color:#0f172a; }
+    /* Petit status debug (sauvegarde supa) */
+    .save-status{
+      position:fixed;
+      left:14px;
+      bottom:14px;
+      z-index:9999;
+      background:rgba(2,6,23,.75);
+      border:1px solid rgba(148,163,184,.35);
+      color:#e5e7eb;
+      padding:8px 10px;
+      border-radius:12px;
+      font-size:12px;
+      backdrop-filter: blur(8px);
+      box-shadow:0 12px 30px rgba(0,0,0,.55);
+      max-width:min(520px, calc(100vw - 28px));
+      line-height:1.25;
+    }
+    .save-status b{ color:#bbf7d0; }
+    .save-status .warn{ color:#fde68a; }
+    .save-status .err{ color:#fecaca; }
+
+    /* =========================
+       ✅ MODE JOUR (data-theme="light")
+       ========================= */
+    html[data-theme="light"], 
+    html[data-theme="light"] body{
+      color:#0b1220 !important;
+    }
 
     html[data-theme="light"] .site-bg-dim{
-      background:linear-gradient(180deg,rgba(249,250,251,.90),rgba(15,23,42,.72)) !important;
+      background:linear-gradient(180deg,rgba(255,255,255,.60),rgba(255,255,255,.92));
     }
 
     html[data-theme="light"] nav.nav{
-      background:rgba(248,250,252,.92) !important;
-      border-bottom:1px solid rgba(148,163,184,.45) !important;
-      box-shadow:0 10px 30px rgba(15,23,42,.08) !important;
+      background:rgba(255,255,255,.72);
+      border-bottom:1px solid rgba(2,6,23,.10);
     }
-    html[data-theme="light"] .brand{ color:#0f172a !important; }
-    html[data-theme="light"] nav.nav ul li a{ color:rgba(15,23,42,.88) !important; }
-    html[data-theme="light"] nav.nav ul li a:hover{ color:var(--rsl-accent) !important; }
 
-    html[data-theme="light"] .btn{
-      background:#0f172a !important;
-      color:#f9fafb !important;
-      border-color:#0f172a !important;
+    html[data-theme="light"] nav.nav ul li a{
+      color:#0b1220;
     }
+    html[data-theme="light"] nav.nav ul li a:hover{
+      color:var(--rsl-accent-2);
+    }
+
+    html[data-theme="light"] .btn,
     html[data-theme="light"] .theme-toggle{
-      background:#ffffff !important;
-      color:#0f172a !important;
-      border-color:rgba(148,163,184,.55) !important;
+      background:rgba(255,255,255,.85);
+      color:#0b1220;
+      border:1px solid rgba(2,6,23,.18);
     }
 
-    html[data-theme="light"] .mobile-panel{
-      background:rgba(255,255,255,.98) !important;
-      border-left-color:rgba(148,163,184,.35) !important;
-      box-shadow:-12px 0 30px rgba(15,23,42,.16) !important;
+    html[data-theme="light"] .btn.green{
+      color:#052e16;
     }
-    html[data-theme="light"] .mobile-panel a{ color:#0f172a !important; }
 
     html[data-theme="light"] .game-card{
-      background:rgba(255,255,255,.92) !important;
-      border-color:rgba(148,163,184,.45) !important;
-      box-shadow:0 24px 60px rgba(15,23,42,.14) !important;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(2,6,23,.12);
+      box-shadow:0 30px 80px rgba(0,0,0,.20),0 0 60px rgba(34,197,94,.10);
     }
-    html[data-theme="light"] .game-title-block p{ color:#475569 !important; }
+
+    html[data-theme="light"] .game-title-block p{
+      color:rgba(2,6,23,.70);
+    }
 
     html[data-theme="light"] .badge-game{
-      background:#ffffff !important;
-      border-color:rgba(148,163,184,.55) !important;
-      color:#64748b !important;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(2,6,23,.15);
+      color:rgba(2,6,23,.65);
     }
 
     html[data-theme="light"] .generator-card,
     html[data-theme="light"] .side-card{
-      background:rgba(255,255,255,.96) !important;
-      border-color:rgba(148,163,184,.45) !important;
-      box-shadow:0 18px 46px rgba(15,23,42,.12) !important;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(2,6,23,.14);
+      box-shadow:0 20px 60px rgba(0,0,0,.12);
     }
 
     html[data-theme="light"] .generator-label,
-    html[data-theme="light"] .hint-text,
-    html[data-theme="light"] .custom-actions,
-    html[data-theme="light"] .trick-list-title{
-      color:#64748b !important;
+    html[data-theme="light"] .trick-list-title,
+    html[data-theme="light"] .custom-actions{
+      color:rgba(2,6,23,.55);
     }
 
     html[data-theme="light"] .current-trick-box{
-      background:radial-gradient(circle at top, #ffffff, #f1f5f9 60%) !important;
-      box-shadow:0 18px 46px rgba(15,23,42,.12) !important;
+      background:radial-gradient(circle at top,#ffffff,#f1f5f9 65%);
+      border:1px solid rgba(34,197,94,.35);
+      box-shadow:0 20px 60px rgba(0,0,0,.12);
     }
-    html[data-theme="light"] #trickMeta{ color:#64748b !important; }
-    html[data-theme="light"] .trick-name{ color:#0f172a !important; }
-    html[data-theme="light"] .trick-list li{ border-bottom-color:rgba(148,163,184,.35) !important; }
 
-    html[data-theme="light"] .btn-ghost-game{
-      background:#ffffff !important;
-      color:#0f172a !important;
-      border-color:rgba(148,163,184,.55) !important;
+    html[data-theme="light"] #trickMeta{
+      color:rgba(2,6,23,.55);
     }
-    html[data-theme="light"] .btn-ghost-game:hover{
-      background:#f8fafc !important;
+
+    html[data-theme="light"] .hint-text{
+      color:rgba(2,6,23,.60);
     }
 
     html[data-theme="light"] .add-row input{
-      background:#ffffff !important;
-      color:#0f172a !important;
-      border-color:rgba(148,163,184,.55) !important;
+      background:#ffffff;
+      color:#0b1220;
+      border:1px solid rgba(2,6,23,.20);
+    }
+
+    html[data-theme="light"] .trick-name{
+      color:#0b1220;
+    }
+
+    html[data-theme="light"] .trick-list li{
+      border-bottom:1px solid rgba(2,6,23,.10);
     }
 
     html[data-theme="light"] .pill{
-      color:#334155 !important;
-      border-color:rgba(148,163,184,.55) !important;
-      background:#ffffff !important;
+      border:1px solid rgba(2,6,23,.18);
+      color:rgba(2,6,23,.70);
     }
+
     html[data-theme="light"] .pill-default{
-      border-color:rgba(34,197,94,.45) !important;
-      color:#065f46 !important;
+      border-color:rgba(34,197,94,.55);
+      color:#166534;
     }
+
     html[data-theme="light"] .pill-custom{
-      border-color:rgba(245,158,11,.55) !important;
-      color:#92400e !important;
+      border-color:rgba(234,179,8,.65);
+      color:#854d0e;
+    }
+
+    html[data-theme="light"] .save-status{
+      background:rgba(255,255,255,.85);
+      color:#0b1220;
+      border:1px solid rgba(2,6,23,.15);
     }
 
     html[data-theme="light"] .footer-mini .copy{
-      color:#64748b !important;
-      border-top-color:rgba(148,163,184,.35) !important;
+      color:rgba(2,6,23,.60);
+      border-top:1px solid rgba(2,6,23,.10);
     }
   </style>
 </head>
-<body>
 
+<body>
   <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
@@ -578,38 +612,34 @@
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class='brand' href='/'>
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
         <ul>
-          <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="shop-rsl.html">Shop</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href='/cours'>Cours</a></li>
+          <li><a href='/formation'>Formation RSL</a></li>
+          <li><a href='/ou_rider'>Où rider ?</a></li>
+          <li><a href='/evenements'>Événements</a></li>
+          <li><a href='/disciplines'>Disciplines</a></li>
+          <li><a href='/shop-rsl'>Shop</a></li>
+          <li><a href='/comite'>Comité</a></li>
+          <li><a href='/contact'>Contact</a></li>
         </ul>
 
         <div class="cta">
-          <!-- ✅ Toggle nuit/jour -->
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <!-- Login / compte -->
-          <a class="btn" id="btnLogin" href="access.html">Login</a>
-          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <a class='btn' href='/access' id='btnLogin'>Login</a>
+          <a class='btn' href='/compte' id='btnAccount' style='display:none'>Mon compte</a>
 
-          <!-- AVATAR (géré par auth.js) -->
-          <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png"
-                 alt="Avatar" style="display:none;">
+          <a href='/compte'>
+            <img id="navAvatar" class="nav-avatar" src="images/default-avatar.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
+          <a class='btn' href='/panier/panier' id='btnCart'>Panier</a>
+          <a class='btn green' href='/membres'>Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
       </div>
@@ -620,21 +650,21 @@
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
-      <a href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
-      <a href="formation.html">Formation RSL</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html">Événements</a>
-      <a href="game.html" aria-current="page">Games</a>
-      <a href="shop-rsl.html">Shop</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="access.html">Se connecter</a>
-      <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+      <a href='/'>Accueil</a>
+      <a href='/cours'>Cours</a>
+      <a href='/membres'>Devenir membre</a>
+      <a href='/formation'>Formation RSL</a>
+      <a href='/disciplines'>Disciplines</a>
+      <a href='/ou_rider'>Où rider ?</a>
+      <a href='/evenements'>Événements</a>
+      <a aria-current='page' href='/game'>Games</a>
+      <a href='/shop-rsl'>Shop</a>
+      <a href='/comite'>Comité</a>
+      <a href='/contact'>Contact</a>
+      <a href='/conditions'>Conditions générales</a>
+      <a href='/access'>Se connecter</a>
+      <a href='/compte'>Mon compte</a>
+      <a class='coach-link' href='/coach'>👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
@@ -702,9 +732,12 @@
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <!-- SCRIPTS -->
+  <!-- Status save -->
+  <div class="save-status" id="saveStatus">Status: …</div>
+
+  <!-- ✅ UN SEUL SCRIPT -->
   <script>
-    /* ✅ THEME TOGGLE (NIGHT/DAY) */
+    /* ✅ THEME TOGGLE */
     (function(){
       const KEY = 'rsl-theme';
       const root = document.documentElement;
@@ -730,7 +763,7 @@
       });
     })();
 
-    // Vidéo de fond
+    /* ✅ Vidéo de fond */
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -760,7 +793,7 @@
       });
     })();
 
-    // Menu mobile
+    /* ✅ Menu mobile */
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
@@ -783,7 +816,7 @@
       });
     })();
 
-    /* ====== GENERATEUR DE TRICKS ====== */
+    /* ====== TRICKS + SUPABASE SAVE (rsl_game_tricklists) ====== */
     const defaultTricks = [
       "Bunny hop (jump à plat)",
       "Drop in simple",
@@ -807,182 +840,304 @@
       "Footjam (bloquer la roue avant avec le pied)"
     ];
 
-    const STORAGE_KEY = "rsl_game_tricks_custom_v1";
+    const STORAGE_KEY_BASE = "rsl_trickgame_custom_v1";
+    const SUPA_TABLE = "rsl_game_tricklists";
 
-    function loadCustomTricks(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return [];
-        const parsed = JSON.parse(raw);
-        if(Array.isArray(parsed)) return parsed.filter(t => typeof t === "string" && t.trim().length>0);
-        return [];
-      }catch(e){
-        return [];
-      }
+    // DOM
+    const elCurrent = document.getElementById("currentTrick");
+    const elMeta = document.getElementById("trickMeta");
+    const elList = document.getElementById("trickList");
+    const elInput = document.getElementById("newTrickInput");
+    const btnAdd = document.getElementById("btnAddTrick");
+    const btnClear = document.getElementById("btnClearCustom");
+    const btnNew = document.getElementById("btnNewTrick");
+    const btnLine = document.getElementById("btnNewLine");
+    const elCount = document.getElementById("customCountText");
+    const elStatus = document.getElementById("saveStatus");
+
+    // State
+    let customTricks = [];
+    let lastPick = null;
+    let supa = null;
+    let userId = null;
+
+    // Helpers
+    const uniq = (arr) => Array.from(new Set(arr.map(s => (s||"").trim()).filter(Boolean)));
+    const safeJson = (s, fallback) => { try{ return JSON.parse(s); }catch(e){ return fallback; } };
+    const nowTime = () => new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const norm = (v) => (v || "").trim().replace(/\s+/g, " ");
+
+    function setStatus(type, msg){
+      if(!elStatus) return;
+      const icon =
+        type === "ok" ? "<b>OK</b>" :
+        type === "warn" ? "<span class='warn'>WARN</span>" :
+        type === "err" ? "<span class='err'>ERR</span>" : "…";
+      elStatus.innerHTML = `Status: ${icon} — ${msg} <span style="opacity:.7">(${nowTime()})</span>`;
     }
 
-    function saveCustomTricks(list){
-      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }catch(e){}
-    }
+    function mergedPool(){ return [...defaultTricks, ...customTricks]; }
 
-    let customTricks = loadCustomTricks();
-    function getAllTricks(){ return [...defaultTricks, ...customTricks]; }
-
-    const currentTrickEl = document.getElementById("currentTrick");
-    const trickMetaEl   = document.getElementById("trickMeta");
-    const trickListEl   = document.getElementById("trickList");
-    const customCountEl = document.getElementById("customCountText");
-    const btnNewTrick   = document.getElementById("btnNewTrick");
-    const btnNewLine    = document.getElementById("btnNewLine");
-
-    function renderMeta(){
-      const total = getAllTricks().length;
-      trickMetaEl.textContent = total > 0 ? "1 trick tiré au hasard parmi " + total : "0 / 0 trick possibles";
+    function updateMeta(extra=""){
+      const total = mergedPool().length;
+      const base = `${customTricks.length} / ${total} trick possibles`;
+      elMeta.textContent = extra ? `${base} — ${extra}` : base;
+      elCount.textContent = `${customTricks.length} trick perso enregistré${customTricks.length>1?'s':''}`;
+      btnClear.disabled = customTricks.length === 0;
+      btnNew.disabled = total === 0;
+      btnLine.disabled = total < 3;
     }
 
     function renderList(){
-      trickListEl.innerHTML = "";
+      if(!elList) return;
+      elList.innerHTML = "";
 
-      defaultTricks.forEach((t)=>{
-        const li = document.createElement("li");
-        const name = document.createElement("span");
-        name.className = "trick-name";
-        name.textContent = t;
-        const pill = document.createElement("span");
-        pill.className = "pill pill-default";
-        pill.textContent = "Base";
-        li.appendChild(name);
-        li.appendChild(pill);
-        trickListEl.appendChild(li);
-      });
+      const items = [
+        ...defaultTricks.map(t => ({t, type:"default"})),
+        ...customTricks.map(t => ({t, type:"custom"}))
+      ];
 
-      customTricks.forEach((t, idx)=>{
+      items.forEach((it) => {
         const li = document.createElement("li");
-        const name = document.createElement("span");
+
+        const name = document.createElement("div");
         name.className = "trick-name";
-        name.textContent = t;
+        name.textContent = it.t;
 
         const pill = document.createElement("span");
-        pill.className = "pill pill-custom";
-        pill.textContent = "Perso";
-
-        const del = document.createElement("button");
-        del.className = "del-btn";
-        del.textContent = "Suppr.";
-        del.addEventListener("click", ()=>{
-          customTricks.splice(idx,1);
-          saveCustomTricks(customTricks);
-          renderList();
-          updateMetaCount();
-        });
+        pill.className = "pill " + (it.type === "default" ? "pill-default" : "pill-custom");
+        pill.textContent = (it.type === "default" ? "RSL" : "PERSO");
 
         li.appendChild(name);
         li.appendChild(pill);
-        li.appendChild(del);
-        trickListEl.appendChild(li);
-      });
-    }
 
-    function updateMetaCount(){
-      const n = customTricks.length;
-      customCountEl.textContent = (n === 0) ? "0 trick perso enregistré" : (n === 1) ? "1 trick perso enregistré" : (n + " tricks persos enregistrés");
-      renderMeta();
-    }
-
-    function pickRandomTrick(){
-      const all = getAllTricks();
-      if(!all.length) return "Aucun trick (ajoute-en un !)";
-      return all[Math.floor(Math.random()*all.length)];
-    }
-
-    function buildLine(){
-      const all = getAllTricks();
-      if(all.length === 0) return { line: ["Aucun trick (ajoute-en un !)"], total: 0 };
-      const copy = [...all];
-      const line = [];
-      for(let i=0;i<3 && copy.length>0;i++){
-        const idx = Math.floor(Math.random()*copy.length);
-        line.push(copy[idx]);
-        copy.splice(idx,1);
-      }
-      return { line, total: all.length };
-    }
-
-    // Roulette
-    let rolling = false;
-    function startRolling(mode){
-      if(rolling) return;
-      const all = getAllTricks();
-      if(!all.length){
-        currentTrickEl.textContent = "Aucun trick (ajoute-en un !)";
-        trickMetaEl.textContent = "0 / 0";
-        return;
-      }
-
-      rolling = true;
-      btnNewTrick.disabled = true;
-      btnNewLine.disabled  = true;
-
-      let i = 0;
-      const total = all.length;
-
-      const interval = setInterval(()=>{
-        currentTrickEl.textContent = all[i % total];
-        trickMetaEl.textContent = "Trick roulette…";
-        i++;
-      }, 80);
-
-      setTimeout(()=>{
-        clearInterval(interval);
-
-        if(mode === "single"){
-          const t = pickRandomTrick();
-          currentTrickEl.textContent = t;
-          trickMetaEl.textContent = "1 trick sur " + total + " possible(s)";
-        }else{
-          const { line, total: tTotal } = buildLine();
-          currentTrickEl.innerHTML = line.map((t,i)=> (i+1)+". "+t).join("<br>");
-          trickMetaEl.textContent = line.length + " tricks sur " + tTotal + " possible(s)";
+        if(it.type === "custom"){
+          const del = document.createElement("button");
+          del.className = "del-btn";
+          del.type = "button";
+          del.textContent = "Suppr";
+          del.addEventListener("click", async () => {
+            customTricks = customTricks.filter(x => x !== it.t);
+            await persistCustom();
+            renderList();
+            updateMeta("supprimé");
+          });
+          li.appendChild(del);
         }
 
-        rolling = false;
-        btnNewTrick.disabled = false;
-        btnNewLine.disabled  = false;
-      }, 1100);
+        elList.appendChild(li);
+      });
+
+      updateMeta();
     }
 
-    btnNewTrick?.addEventListener("click", ()=> startRolling("single"));
-    btnNewLine?.addEventListener("click", ()=> startRolling("line"));
+    function pickRandom(exclude=null){
+      const pool = mergedPool();
+      if(pool.length === 0) return null;
+      if(pool.length === 1) return pool[0];
 
-    document.getElementById("btnAddTrick")?.addEventListener("click", ()=>{
-      const input = document.getElementById("newTrickInput");
-      const value = (input.value || "").trim();
-      if(!value) return;
+      let t=null, tries=0;
+      do{
+        t = pool[Math.floor(Math.random()*pool.length)];
+        tries++;
+      }while(exclude && t===exclude && tries<20);
+      return t;
+    }
 
-      if(getAllTricks().some(t => t.toLowerCase() === value.toLowerCase())){
-        input.value = "";
+    function pickLine3(){
+      const pool = mergedPool();
+      if(pool.length < 3) return [];
+      const copy = pool.slice();
+      for(let i=copy.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0,3);
+    }
+
+    function getStorageKey(){
+      return userId ? `${STORAGE_KEY_BASE}_${userId}` : STORAGE_KEY_BASE;
+    }
+
+    function loadLocal(){
+      const raw = localStorage.getItem(getStorageKey());
+      const parsed = safeJson(raw, []);
+      customTricks = uniq(Array.isArray(parsed) ? parsed : []);
+    }
+
+    function saveLocal(){
+      localStorage.setItem(getStorageKey(), JSON.stringify(customTricks));
+    }
+
+    // --- SUPABASE INIT (env.js)
+    function getSupaEnv(){
+      const e = window.__ENV || window.ENV || {};
+      const url = e.SUPABASE_URL || e.supabaseUrl || window.SUPABASE_URL;
+      const key = e.SUPABASE_ANON_KEY || e.supabaseAnonKey || window.SUPABASE_ANON_KEY;
+      return { url, key };
+    }
+
+    async function initSupabase(){
+      try{
+        if(!window.supabase) return null;
+        const { url, key } = getSupaEnv();
+        if(!url || !key) return null;
+        return window.supabase.createClient(url, key);
+      }catch(e){
+        return null;
+      }
+    }
+
+    async function fetchUserId(){
+      try{
+        if(window.__USER?.id) return window.__USER.id;
+      }catch(e){}
+      try{
+        if(supa){
+          const { data } = await supa.auth.getUser();
+          return data?.user?.id || null;
+        }
+      }catch(e){}
+      return null;
+    }
+
+    async function loadFromSupabase(){
+      if(!supa || !userId) return false;
+      try{
+        const { data, error } = await supa
+          .from(SUPA_TABLE)
+          .select("tricks")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if(error) throw error;
+
+        const tricks = data?.tricks;
+        if(Array.isArray(tricks)){
+          customTricks = uniq(tricks);
+          return true;
+        }
+        return false;
+      }catch(e){
+        return false;
+      }
+    }
+
+    async function saveToSupabase(){
+      if(!supa || !userId) return false;
+      try{
+        const payload = {
+          user_id: userId,
+          tricks: customTricks,
+          updated_at: new Date().toISOString()
+        };
+
+        const { error } = await supa
+          .from(SUPA_TABLE)
+          .upsert(payload, { onConflict: "user_id" });
+
+        if(error) throw error;
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
+
+    async function persistCustom(){
+      customTricks = uniq(customTricks);
+      try{
+        saveLocal();
+      }catch(e){
+        setStatus("err", "Impossible d'écrire en localStorage");
+        return;
+      }
+      const ok = await saveToSupabase();
+      setStatus(ok ? "ok" : "warn", ok ? "Sauvegarde Supabase + local" : "Supa KO → local OK");
+    }
+
+    // Events
+    btnNew?.addEventListener("click", () => {
+      const t = pickRandom(lastPick);
+      if(!t) return;
+      lastPick = t;
+      elCurrent.textContent = t;
+      updateMeta("1 trick");
+    });
+
+    btnLine?.addEventListener("click", () => {
+      const line = pickLine3();
+      if(line.length < 3) return;
+      lastPick = line[line.length-1];
+      elCurrent.innerHTML = line.map((x,i)=>`<span style="display:block">${i+1}. ${x}</span>`).join("");
+      updateMeta("ligne x3");
+    });
+
+    async function addTrickFromInput(){
+      const v = norm(elInput?.value);
+      if(!v) return;
+
+      const lower = v.toLowerCase();
+      const exists =
+        defaultTricks.some(t => t.toLowerCase() === lower) ||
+        customTricks.some(t => t.toLowerCase() === lower);
+
+      if(exists){
+        setStatus("warn", "Déjà dans la liste");
+        elInput.value = "";
         return;
       }
 
-      customTricks.push(value);
-      saveCustomTricks(customTricks);
-      input.value = "";
+      customTricks.push(v);
+      elInput.value = "";
+      await persistCustom();
       renderList();
-      updateMetaCount();
+      updateMeta("ajouté");
+    }
+
+    btnAdd?.addEventListener("click", addTrickFromInput);
+    elInput?.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        e.preventDefault();
+        addTrickFromInput();
+      }
     });
 
-    document.getElementById("btnClearCustom")?.addEventListener("click", ()=>{
-      if(!customTricks.length) return;
+    btnClear?.addEventListener("click", async () => {
+      if(customTricks.length === 0) return;
       if(!confirm("Effacer tous tes tricks persos ?")) return;
       customTricks = [];
-      saveCustomTricks(customTricks);
+      await persistCustom();
       renderList();
-      updateMetaCount();
+      elCurrent.textContent = "Clique sur “Nouveau trick”";
+      updateMeta("reset");
     });
 
     // Init
-    renderList();
-    updateMetaCount();
+    (async function init(){
+      setStatus("ok", "Init…");
+
+      supa = await initSupabase();
+      userId = await fetchUserId();
+
+      // local d'abord
+      try{ loadLocal(); }catch(e){ customTricks = []; }
+
+      // si connecté -> supa
+      if(supa && userId){
+        const ok = await loadFromSupabase();
+        if(ok){
+          try{ saveLocal(); }catch(e){}
+          setStatus("ok", `Sync Supabase → ${customTricks.length} persos`);
+        }else{
+          setStatus("ok", `Local (aucune donnée Supa)`);
+        }
+      }else{
+        setStatus("ok", userId ? "Local (Supa absent)" : "Local (non connecté)");
+      }
+
+      renderList();
+      updateMeta();
+    })();
   </script>
 </body>
 </html>
