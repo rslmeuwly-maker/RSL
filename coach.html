@@ -28,7 +28,6 @@
       --rsl-accent: #22c55e;
       --rsl-accent-soft: rgba(34,197,94,.14);
     }
-
     body.theme-light{
       --rsl-bg: #f3f4f6;
       --rsl-fg: #0f172a;
@@ -39,11 +38,7 @@
       --rsl-accent: #16a34a;
       --rsl-accent-soft: rgba(22,163,74,.12);
     }
-
-    html, body {
-      height:100%;
-      margin:0;
-    }
+    html, body { height:100%; margin:0; }
     body{
       background: transparent !important;
       color:var(--rsl-fg);
@@ -54,20 +49,9 @@
     }
     main{flex:1;position:relative;z-index:10;}
 
-    /* ===== VIDÉO DE FOND ===== */
-    .site-bg-video{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      z-index:-2;
-      background:#000;
-    }
+    .site-bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; background:#000; }
     .site-bg-dim{
-      position:fixed;
-      inset:0;
-      z-index:-1;
+      position:fixed; inset:0; z-index:-1;
       background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.9));
       transition:background .25s ease;
     }
@@ -75,13 +59,10 @@
       background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ===== NAVBAR (alignée sur index) ===== */
-    nav.nav {
+    nav.nav{
       background: rgba(0,0,0,.65);
       backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
       border-bottom:1px solid rgba(15,23,42,.8);
       transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
@@ -90,69 +71,32 @@
       border-bottom:1px solid rgba(148,163,184,.5);
       box-shadow:0 10px 30px rgba(15,23,42,.06);
     }
-    nav.nav .container {
-      max-width:1320px;
-      margin:0 auto;
-      padding:10px 18px;
-    }
-    nav.nav .row {
+    nav.nav .container { max-width:1320px; margin:0 auto; padding:10px 18px; }
+    nav.nav .row{
       display:flex;
       align-items:center;
       justify-content:space-between;
       flex-wrap:wrap;
       gap:12px;
     }
-
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:inherit;
-      text-decoration:none;
-    }
-    .brand img {
-      height:42px;
-      border-radius:10px;
-      display:block;
-      background:#fff;
-      padding:3px;
+    .brand{ display:flex; align-items:center; gap:10px; color:inherit; text-decoration:none; }
+    .brand img{
+      height:42px; border-radius:10px; display:block;
+      background:#fff; padding:3px;
       box-shadow:0 10px 28px rgba(0,0,0,.35);
     }
-    .brand span {
-      font-weight:800;
-      letter-spacing:.2px;
-      font-size:16px;
-      white-space:nowrap;
-    }
-
-    nav.nav ul {
-      display:flex;
-      align-items:center;
-      gap:20px;
-    }
+    .brand span{ font-weight:800; letter-spacing:.2px; font-size:16px; white-space:nowrap; }
+    nav.nav ul{ display:flex; align-items:center; gap:20px; }
     nav.nav ul li { list-style:none; }
-    nav.nav ul li a {
-      font-weight:600;
-      color:var(--rsl-fg);
-      transition:.2s ease;
-      font-size:15px;
-      letter-spacing:.02em;
-      white-space:nowrap;
-      text-decoration:none;
-      opacity:.9;
+    nav.nav ul li a{
+      font-weight:600; color:var(--rsl-fg);
+      transition:.2s ease; font-size:15px; letter-spacing:.02em;
+      white-space:nowrap; text-decoration:none; opacity:.9;
     }
-    nav.nav ul li a:hover {
-      color:var(--rsl-accent);
-      opacity:1;
-    }
+    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
 
-    .cta {
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+    .cta{ display:flex; align-items:center; gap:10px; }
 
-    /* Boutons globaux (comme index) */
     .btn{
       border-radius:999px;
       padding:8px 14px;
@@ -169,9 +113,7 @@
       transition:.2s ease;
     }
     body.theme-light .btn{
-      background:#0f172a;
-      color:#f9fafb;
-      border-color:#0f172a;
+      background:#0f172a; color:#f9fafb; border-color:#0f172a;
     }
     .btn.green{
       background:var(--rsl-accent);
@@ -179,28 +121,21 @@
       border-color:transparent;
       box-shadow:0 10px 26px rgba(22,163,74,.45);
     }
-    .btn:hover{
-      transform:translateY(-1px);
-      filter:brightness(1.05);
-    }
+    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
     .nav-avatar{
-      width:34px;
-      height:34px;
-      border-radius:999px;
+      width:34px; height:34px; border-radius:999px;
       object-fit:cover;
       border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
     }
 
-    /* Toggle thème */
     .theme-toggle{
       border-radius:999px;
       border:1px solid rgba(148,163,184,.6);
       background:rgba(15,23,42,.9);
       color:#e5e7eb;
-      width:34px;
-      height:34px;
+      width:34px; height:34px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -209,14 +144,9 @@
       padding:0;
       transition:.2s ease;
     }
-    .theme-toggle:hover{
-      transform:translateY(-1px);
-      filter:brightness(1.08);
-    }
+    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
     body.theme-light .theme-toggle{
-      background:#ffffff;
-      color:#0f172a;
-      border-color:rgba(148,163,184,.7);
+      background:#ffffff; color:#0f172a; border-color:rgba(148,163,184,.7);
     }
 
     #menuBtn{
@@ -234,13 +164,9 @@
       cursor:pointer;
       transition:.2s ease;
     }
-    #menuBtn:hover{
-      filter:brightness(1.1);
-    }
+    #menuBtn:hover{ filter:brightness(1.1); }
     body.theme-light #menuBtn{
-      background:#0f172a;
-      color:#f9fafb;
-      border-color:#0f172a;
+      background:#0f172a; color:#f9fafb; border-color:#0f172a;
     }
 
     .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
@@ -248,32 +174,15 @@
     @media (max-width:990px){
       #menuBtn{ display:inline-flex; }
       nav.nav ul{ display:none !important; }
-      #btnCart,
-      .btn.green{
-        display:none !important;
-      }
+      #btnCart, .btn.green{ display:none !important; }
     }
 
-    /* ===== MENU MOBILE SLIDE ===== */
-    .mobile-sheet{
-      position:fixed;
-      inset:0;
-      display:none;
-      z-index:120;
-    }
+    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
-    .mobile-dim{
-      position:absolute;
-      inset:0;
-      background:rgba(0,0,0,.5);
-    }
+    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
     .mobile-panel{
-      position:absolute;
-      top:0;
-      right:0;
-      height:100%;
-      width:82vw;
-      max-width:360px;
+      position:absolute; top:0; right:0; height:100%;
+      width:82vw; max-width:360px;
       background:var(--rsl-card);
       padding:22px 18px;
       display:flex;
@@ -290,7 +199,7 @@
       border-bottom:1px solid rgba(255,255,255,.1);
       font-size:14px;
     }
-    .mobile-panel a:last-child{border-bottom:0;}
+    .mobile-panel a:last-child{ border-bottom:0; }
     .mobile-panel .coach-link{
       border-top:1px solid rgba(255,255,255,.12);
       margin-top:8px;
@@ -298,40 +207,13 @@
       font-weight:700;
     }
 
-    /* ===== CONTENU COACH ===== */
-    .container-main{
-      max-width:1200px;
-      margin:0 auto;
-      padding:0 24px 40px;
-      box-sizing:border-box;
-    }
+    .container-main{ max-width:1200px; margin:0 auto; padding:0 24px 40px; box-sizing:border-box; }
 
-    .page-intro{
-      color:var(--rsl-fg);
-      text-align:left;
-      padding:28px 0 8px;
-    }
-    .page-intro h1{
-      margin:10px 0 6px;
-      font-size:clamp(28px,4.2vw,42px);
-      font-weight:800;
-    }
-    .page-intro p{
-      margin:0;
-      opacity:.95;
-      font-size:clamp(15px,2.2vw,18px);
-    }
-    .coach-welcome{
-      margin-top:6px;
-      font-size:14px;
-      color:var(--rsl-muted);
-    }
-
-    .coach-info{
-      margin-top:10px;
-      font-size:14px;
-      color:var(--rsl-muted);
-    }
+    .page-intro{ color:var(--rsl-fg); text-align:left; padding:28px 0 8px; }
+    .page-intro h1{ margin:10px 0 6px; font-size:clamp(28px,4.2vw,42px); font-weight:800; }
+    .page-intro p{ margin:0; opacity:.95; font-size:clamp(15px,2.2vw,18px); }
+    .coach-welcome{ margin-top:6px; font-size:14px; color:var(--rsl-muted); }
+    .coach-info{ margin-top:10px; font-size:14px; color:var(--rsl-muted); }
 
     .coach-status{
       margin-top:10px;
@@ -354,11 +236,7 @@
       grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
       gap:22px;
     }
-    @media(max-width:900px){
-      .coach-grid{
-        grid-template-columns:1fr;
-      }
-    }
+    @media(max-width:900px){ .coach-grid{ grid-template-columns:1fr; } }
 
     .coach-card{
       background:var(--rsl-card);
@@ -367,27 +245,12 @@
       padding:18px 16px;
       box-shadow:0 10px 26px rgba(0,0,0,.45);
     }
-    .coach-card h2{
-      margin:0 0 6px;
-      font-size:20px;
-      color:var(--rsl-accent);
-    }
-    .coach-card p{
-      margin:4px 0;
-      font-size:14px;
-      color:var(--rsl-fg);
-    }
-    .coach-card ul{
-      margin:6px 0 0;
-      padding-left:18px;
-      font-size:14px;
-      color:#cbd5f5;
-    }
+    .coach-card h2{ margin:0 0 6px; font-size:20px; color:var(--rsl-accent); }
+    .coach-card p{ margin:4px 0; font-size:14px; color:var(--rsl-fg); }
+    .coach-card ul{ margin:6px 0 0; padding-left:18px; font-size:14px; color:#cbd5f5; }
 
-    /* Liste des cours pour coach */
-    #coachCourses{
-      margin-top:8px;
-    }
+    #coachCourses{ margin-top:8px; }
+
     .course-item{
       background:rgba(15,23,42,.95);
       border-radius:12px;
@@ -397,28 +260,13 @@
       font-size:14px;
       color:#e5e7eb;
     }
-    body.theme-light .course-item{
-      background:#ffffff;
-      color:#0f172a;
-    }
-    .course-header{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      align-items:flex-start;
-    }
-    .course-title{
-      font-weight:700;
-      font-size:15px;
-      margin:0 0 3px;
-    }
-    .course-meta{
-      font-size:13px;
-      color:#cbd5e1;
-    }
-    body.theme-light .course-meta{
-      color:#6b7280;
-    }
+    body.theme-light .course-item{ background:#ffffff; color:#0f172a; }
+
+    .course-header{ display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
+    .course-title{ font-weight:700; font-size:15px; margin:0 0 3px; }
+    .course-meta{ font-size:13px; color:#cbd5e1; }
+    body.theme-light .course-meta{ color:#6b7280; }
+
     .course-badge{
       display:inline-block;
       border-radius:999px;
@@ -461,25 +309,16 @@
       gap:6px;
       box-shadow:0 8px 22px rgba(0,0,0,.4);
     }
-    .coach-btn.primary{
-      background:#22c55e;
-      color:#062312;
-    }
+    .coach-btn.primary{ background:#22c55e; color:#062312; }
     .coach-btn.outline{
       background:rgba(15,23,42,.9);
       color:#e5e7eb;
       border:1px solid rgba(148,163,184,.7);
       box-shadow:none;
     }
-    .coach-btn[disabled]{
-      opacity:.6;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
-    .coach-note{
-      font-size:12px;
-      color:#94a3b8;
-    }
+    .coach-btn[disabled]{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+
+    .coach-note{ font-size:12px; color:#94a3b8; }
 
     .course-enrollments{
       margin-top:10px;
@@ -488,12 +327,8 @@
       border-top:1px dashed rgba(148,163,184,.5);
       padding-top:6px;
     }
-    .course-enrollments ul{
-      margin:4px 0 0;
-      padding-left:18px;
-    }
+    .course-enrollments ul{ margin:4px 0 0; padding-left:18px; }
 
-    /* FOOTER */
     .footer-mini .copy{
       text-align:center;
       color:var(--rsl-muted);
@@ -508,7 +343,6 @@
       border-top-color:rgba(148,163,184,.5);
     }
 
-    /* ===== MODAL RESTRICTION COACH ===== */
     .coach-modal-backdrop{
       position:fixed;
       inset:0;
@@ -518,9 +352,7 @@
       justify-content:center;
       z-index:200;
     }
-    .coach-modal-backdrop.open{
-      display:flex;
-    }
+    .coach-modal-backdrop.open{ display:flex; }
     .coach-modal{
       background:rgba(15,23,42,1);
       border-radius:16px;
@@ -531,16 +363,8 @@
       box-shadow:0 20px 40px rgba(0,0,0,.6);
       text-align:center;
     }
-    .coach-modal h3{
-      margin:0 0 8px;
-      font-size:18px;
-      color:#f9fafb;
-    }
-    .coach-modal p{
-      margin:0 0 14px;
-      font-size:14px;
-      color:#e5e7eb;
-    }
+    .coach-modal h3{ margin:0 0 8px; font-size:18px; color:#f9fafb; }
+    .coach-modal p{ margin:0 0 14px; font-size:14px; color:#e5e7eb; }
     .coach-modal .coach-modal-actions{
       display:flex;
       justify-content:center;
@@ -548,8 +372,7 @@
       flex-wrap:wrap;
       margin-top:8px;
     }
-    .coach-modal a,
-    .coach-modal button{
+    .coach-modal a, .coach-modal button{
       border-radius:10px;
       border:1px solid rgba(148,163,184,.7);
       padding:7px 14px;
@@ -569,74 +392,66 @@
 </head>
 <body>
 
-  <!-- VIDÉO DE FOND -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV (comme index) -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class="brand" href="/">
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
         <ul>
-          <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="shop-rsl.html">Shop</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="/cours">Cours</a></li>
+          <li><a href="/formation">Formation RSL</a></li>
+          <li><a href="/ou_rider">Où rider ?</a></li>
+          <li><a href="/evenements">Événements</a></li>
+          <li><a href="/disciplines">Disciplines</a></li>
+          <li><a href="/shop-rsl">Shop</a></li>
+          <li><a href="/comite">Comité</a></li>
+          <li><a href="/contact">Contact</a></li>
         </ul>
 
         <div class="cta">
-          <!-- Toggle thème -->
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <!-- Login / compte -->
-          <a class="btn" id="btnLogin" href="access.html">Login</a>
-          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
+          <a class="btn" href="/access" id="btnLogin">Login</a>
+          <a class="btn" href="/compte" id="btnAccount" style="display:none">Mon compte</a>
 
-          <!-- AVATAR NAV -->
-          <a href="compte.html">
-            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png"
-                 alt="Avatar" style="display:none;">
+          <a href="/compte">
+            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
+          <a class="btn" href="/panier/panier" id="btnCart">Panier</a>
+          <a class="btn green" href="/membres">Devenir membre</a>
           <button id="menuBtn">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- MENU MOBILE -->
   <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html" aria-current="page">Accueil</a>
-      <a href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
-      <a href="formation.html">Formation RSL</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html">Événements</a>
-      <a href="game.html">Games</a>
-      <a href="shop-rsl.html">Shop</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+      <a aria-current="page" href="/">Accueil</a>
+      <a href="/cours">Cours</a>
+      <a href="/membres">Devenir membre</a>
+      <a href="/formation">Formation RSL</a>
+      <a href="/disciplines">Disciplines</a>
+      <a href="/ou_rider">Où rider ?</a>
+      <a href="/evenements">Événements</a>
+      <a href="/game">Games</a>
+      <a href="/shop-rsl">Shop</a>
+      <a href="/comite">Comité</a>
+      <a href="/contact">Contact</a>
+      <a href="/conditions">Conditions générales</a>
+      <a href="/compte">Mon compte</a>
+      <a class="coach-link" href="/coach">👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <!-- CONTENU -->
   <main>
     <div class="container-main">
       <section class="page-intro">
@@ -665,8 +480,7 @@
           <h2>Résumé</h2>
           <p id="coachSummary">Chargement de tes disponibilités…</p>
           <p class="coach-info">
-            Tu peux cocher / décocher autant que tu veux. Les cours passés ou complets
-            restent visibles pour l’historique, mais tu ne peux plus te marquer dispo dessus.
+            Tu peux cocher / décocher autant que tu veux. Les cours passés ou complets restent visibles pour l’historique, mais tu ne peux plus te marquer dispo dessus.
           </p>
         </article>
       </section>
@@ -677,7 +491,6 @@
           Les cours ci-dessous sont chargés directement depuis Supabase (table <code>courses</code> et <code>rsl_course_registrations</code>).
         </p>
 
-        <!-- MENU DÉROULANT POUR TRIER / FILTRER PAR VILLE -->
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
           <label for="cityFilter" style="font-size:14px;color:#cbd5e1;">Filtrer par ville :</label>
           <select
@@ -687,33 +500,25 @@
           </select>
         </div>
 
-        <div id="coachCourses">
-          <!-- Liste des cours générée en JS -->
-        </div>
+        <div id="coachCourses"></div>
       </section>
     </div>
   </main>
 
-  <!-- MODAL RESTRICTION COACH -->
   <div id="coachModalBackdrop" class="coach-modal-backdrop">
     <div class="coach-modal">
       <h3 id="coachModalTitle">Accès réservé</h3>
-      <p id="coachModalText">
-        Cette page est réservée aux coachs RSL.
-      </p>
-      <div class="coach-modal-actions" id="coachModalActions">
-        <!-- Boutons injectés en JS -->
-      </div>
+      <p id="coachModalText">Cette page est réservée aux coachs RSL.</p>
+      <div class="coach-modal-actions" id="coachModalActions"></div>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
   <script>
-    // ===== Thème (comme index) =====
+    // ===== Thème =====
     (function(){
       const STORAGE_KEY = 'rsl-theme';
       const body = document.body;
@@ -771,13 +576,9 @@
       };
 
       start();
-
       document.addEventListener('visibilitychange', () => {
-        if(document.hidden){
-          v.pause();
-        }else{
-          start();
-        }
+        if(document.hidden) v.pause();
+        else start();
       });
     })();
 
@@ -800,13 +601,9 @@
       }
     });
 
-    // ===== Avatar nav depuis localStorage (même logique que compte) =====
+    // ===== Avatar nav =====
     const navAvatar = document.getElementById('navAvatar');
-    function getAvatarLS(){
-      try{
-        return localStorage.getItem('rsl_avatar') || null;
-      }catch(e){ return null; }
-    }
+    function getAvatarLS(){ try{ return localStorage.getItem('rsl_avatar') || null; }catch(e){ return null; } }
     function applyAvatar(){
       const stored = getAvatarLS();
       const src = stored || "images/logo_rsl.png";
@@ -817,7 +614,7 @@
     }
     applyAvatar();
 
-    // ===== Supabase init (réutilise le client global) =====
+    // ===== Supabase init =====
     const SUPABASE_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
 
@@ -831,11 +628,14 @@
 
     let currentUser      = null;
     let isCoachProfile   = false;
-    let coachAvail       = [];        // course_id (UUID) pour ce coach
-    let courses          = [];        // liste des cours
-    let cityFilter       = "";        // filtre par ville
-    let reservedByOthers = new Set(); // course_id réservés par un autre coach
-    let registrationsByCourse = {};   // course_id -> [inscriptions]
+    let coachAvail       = [];
+    let courses          = [];
+    let cityFilter       = "";
+    let reservedByOthers = new Set();
+    let registrationsByCourse = {};
+
+    // ✅ NEW
+    let coachNameByCourse = {}; // course_id -> coach_name
 
     const coachStatusEl   = document.getElementById('coachStatus');
     const coachSummaryEl  = document.getElementById('coachSummary');
@@ -843,7 +643,6 @@
     const coachWelcomeEl  = document.getElementById('coachWelcome');
     const cityFilterEl    = document.getElementById('cityFilter');
 
-    // Modal
     const coachModalBackdrop = document.getElementById('coachModalBackdrop');
     const coachModalTitle    = document.getElementById('coachModalTitle');
     const coachModalText     = document.getElementById('coachModalText');
@@ -858,11 +657,8 @@
 
     function formatDateFR(d){
       if(!(d instanceof Date) || isNaN(d.getTime())) return "";
-      return d.toLocaleDateString('fr-CH', {
-        weekday:'short', day:'2-digit', month:'2-digit'
-      });
+      return d.toLocaleDateString('fr-CH', { weekday:'short', day:'2-digit', month:'2-digit' });
     }
-
     function formatTimeFR(d){
       if(!(d instanceof Date) || isNaN(d.getTime())) return "";
       const hh = String(d.getHours()).padStart(2,'0');
@@ -872,10 +668,7 @@
 
     function updateWelcome(profile){
       if(!coachWelcomeEl) return;
-      if(!currentUser){
-        coachWelcomeEl.textContent = "";
-        return;
-      }
+      if(!currentUser){ coachWelcomeEl.textContent = ""; return; }
       const name =
         profile?.full_name ||
         currentUser.user_metadata?.full_name ||
@@ -887,44 +680,24 @@
 
     function updateSummary(){
       if(!coachSummaryEl) return;
-
-      if(!currentUser){
-        coachSummaryEl.textContent = "Connecte-toi pour voir et gérer tes disponibilités.";
-        return;
-      }
-
-      if(!isCoachProfile){
-        coachSummaryEl.textContent = "Accès réservé aux coachs RSL.";
-        return;
-      }
+      if(!currentUser){ coachSummaryEl.textContent = "Connecte-toi pour voir et gérer tes disponibilités."; return; }
+      if(!isCoachProfile){ coachSummaryEl.textContent = "Accès réservé aux coachs RSL."; return; }
 
       const count = coachAvail.length;
-
-      if(!count){
-        coachSummaryEl.textContent = "Tu n’es marqué dispo sur aucun cours pour l’instant.";
-        return;
-      }
+      if(!count){ coachSummaryEl.textContent = "Tu n’es marqué dispo sur aucun cours pour l’instant."; return; }
 
       const dispoCourses = courses.filter(c => coachAvail.includes(String(c.id)));
-
-      if(!dispoCourses.length){
-        coachSummaryEl.textContent = "Tu es marqué dispo sur " + count + " cours.";
-        return;
-      }
+      if(!dispoCourses.length){ coachSummaryEl.textContent = "Tu es marqué dispo sur " + count + " cours."; return; }
 
       let html = "Tu es marqué dispo sur " + count + " cours :<br><ul style=\"margin-top:6px;padding-left:18px;\">";
       dispoCourses.forEach(c=>{
         const d = new Date(c.starts_at);
-        const dateTxt = formatDateFR(d);
-        const timeTxt = formatTimeFR(d);
-        html += "<li>" + (c.location || "Lieu ?") + " — " + dateTxt + " " + timeTxt + "</li>";
+        html += "<li>" + (c.location || "Lieu ?") + " — " + formatDateFR(d) + " " + formatTimeFR(d) + "</li>";
       });
       html += "</ul>";
-
       coachSummaryEl.innerHTML = html;
     }
 
-    // ===== Modal helper =====
     function openRestrictionModal({ title, text, actions }){
       if(!coachModalBackdrop || !coachModalTitle || !coachModalText || !coachModalActions) return;
       coachModalTitle.textContent = title;
@@ -942,23 +715,17 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.textContent = a.label || 'Fermer';
-          btn.addEventListener('click', ()=>{
-            coachModalBackdrop.classList.remove('open');
-          });
+          btn.addEventListener('click', ()=> coachModalBackdrop.classList.remove('open'));
           coachModalActions.appendChild(btn);
         }
       });
 
       coachModalBackdrop.classList.add('open');
     }
-
     coachModalBackdrop?.addEventListener('click', e=>{
-      if(e.target === coachModalBackdrop){
-        coachModalBackdrop.classList.remove('open');
-      }
+      if(e.target === coachModalBackdrop) coachModalBackdrop.classList.remove('open');
     });
 
-    // ===== Restriction : seuls les coachs ont accès fonctionnel =====
     async function loadUser(){
       if(!sb || !sb.auth){
         showStatus("Impossible de contacter Supabase (clé ou URL manquante).", true);
@@ -968,27 +735,23 @@
         const { data:{ user } } = await sb.auth.getUser();
         currentUser = user || null;
 
-        // 1) PAS CONNECTÉ
         if(!user){
           showStatus("Tu dois être connecté pour accéder à cette page coach.", true);
           if(coachCoursesEl){
             coachCoursesEl.innerHTML = '<p style="color:#fca5a5">Connecte-toi pour accéder à cette page coach.</p>';
           }
-
           openRestrictionModal({
             title: "Tu n’es pas connecté",
             text:  "Cette page est réservée aux coachs RSL connectés. Connecte-toi avec ton compte RSL.",
             actions:[
-              { type:'link', label:'Me connecter', href:'compte.html', primary:true },
+              { type:'link', label:'Me connecter', href:'/compte', primary:true },
               { type:'button', label:'Fermer' }
             ]
           });
-
           updateSummary();
           return false;
         }
 
-        // 2) CONNECTÉ → check profile
         const { data: profile } = await sb
           .from('profiles')
           .select('is_coach, full_name')
@@ -1001,24 +764,20 @@
         if(!isCoachProfile){
           showStatus("Accès réservé aux coachs RSL. Contacte l’équipe pour être ajouté comme coach.", true);
           if(coachCoursesEl){
-            coachCoursesEl.innerHTML =
-              '<p style="color:#fca5a5">Accès réservé aux coachs RSL.</p>';
+            coachCoursesEl.innerHTML = '<p style="color:#fca5a5">Accès réservé aux coachs RSL.</p>';
           }
-
           openRestrictionModal({
             title: "Tu n’es pas encore coach",
             text:  "Cette page est réservée aux coachs RSL. Si tu veux devenir coach, contacte-nous.",
             actions:[
-              { type:'link', label:'Nous contacter', href:'contact.html#coach', primary:true },
+              { type:'link', label:'Nous contacter', href:'/contact#coach', primary:true },
               { type:'button', label:'Fermer' }
             ]
           });
-
           updateSummary();
           return false;
         }
 
-        // 3) OK → coach
         showStatus("Connecté en tant que coach : " + (user.email || "coach"), false);
         updateSummary();
         return true;
@@ -1057,7 +816,6 @@
             reservedByOthers.add(cid);
           }
         });
-
       }catch(e){
         console.error(e);
         showStatus("Erreur chargement disponibilités : " + (e.message || ""), true);
@@ -1066,23 +824,36 @@
       updateSummary();
     }
 
+    // ✅ NEW: RPC safe (bypass RLS) + fallback name
+    async function loadCoachNames(){
+      coachNameByCourse = {};
+      if(!sb) return;
+
+      try{
+        const { data, error } = await sb.rpc('get_course_coach_public');
+        if(error){
+          console.error("Erreur RPC get_course_coach_public:", error);
+          return;
+        }
+        (data || []).forEach(r=>{
+          const name = (r.coach_name || "").trim();
+          coachNameByCourse[String(r.course_id)] = name ? name : "Coach";
+        });
+      }catch(e){
+        console.error("Erreur loadCoachNames:", e);
+      }
+    }
+
     function buildCityOptions(){
       if(!cityFilterEl) return;
-      const locations = Array.from(
-        new Set(
-          (courses || [])
-            .map(c => c.location)
-            .filter(Boolean)
-        )
-      ).sort((a,b)=>a.localeCompare(b,'fr'));
-
+      const locations = Array.from(new Set((courses || []).map(c => c.location).filter(Boolean)))
+        .sort((a,b)=>a.localeCompare(b,'fr'));
       cityFilterEl.innerHTML = '<option value="">Toutes les villes</option>' +
         locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
     }
 
     async function loadRegistrations(){
       registrationsByCourse = {};
-
       if(!sb || !courses.length) return;
 
       const courseIds = courses.map(c => c.id);
@@ -1127,12 +898,10 @@
 
     async function loadCourses(){
       if(!sb){
-        coachCoursesEl.innerHTML =
-          '<p style="color:#fca5a5">Supabase non configuré.</p>';
+        coachCoursesEl.innerHTML = '<p style="color:#fca5a5">Supabase non configuré.</p>';
         return;
       }
-      coachCoursesEl.innerHTML =
-        '<p style="color:#e5e7eb">Chargement des cours…</p>';
+      coachCoursesEl.innerHTML = '<p style="color:#e5e7eb">Chargement des cours…</p>';
 
       try{
         const { data, error } = await sb
@@ -1141,7 +910,6 @@
           .order('starts_at', { ascending:true });
 
         if(error) throw error;
-
         courses = data || [];
       }catch(e){
         console.error(e);
@@ -1151,7 +919,6 @@
       }
 
       await loadRegistrations();
-
       buildCityOptions();
       renderCourses();
       updateSummary();
@@ -1159,8 +926,7 @@
 
     function renderCourses(){
       if(!courses.length){
-        coachCoursesEl.innerHTML =
-          '<p style="color:#e5e7eb">Aucun cours prévu pour l’instant.</p>';
+        coachCoursesEl.innerHTML = '<p style="color:#e5e7eb">Aucun cours prévu pour l’instant.</p>';
         return;
       }
 
@@ -1172,8 +938,7 @@
         : courses;
 
       if(!filteredCourses.length){
-        coachCoursesEl.innerHTML =
-          '<p style="color:#e5e7eb">Aucun cours ne correspond à ce filtre.</p>';
+        coachCoursesEl.innerHTML = '<p style="color:#e5e7eb">Aucun cours ne correspond à ce filtre.</p>';
         return;
       }
 
@@ -1189,11 +954,10 @@
         const cap   = c.capacity || 0;
         const rest  = cap ? (cap - taken) : null;
         const isFull= rest !== null && rest <= 0;
-        const inPast= d.getTime() + 2*60*60*1000 < now.getTime(); // 2h après début
+        const inPast= d.getTime() + 2*60*60*1000 < now.getTime();
 
-        const idStr          = cid;
-        const isAvailable    = coachAvail.includes(idStr);
-        const hasOtherCoach  = reservedByOthers.has(idStr);
+        const isAvailable   = coachAvail.includes(cid);
+        const hasOtherCoach = reservedByOthers.has(cid);
 
         const badgeTxt =
           isFull ? 'Complet' :
@@ -1204,9 +968,11 @@
 
         let coachBadge = "";
         if(isAvailable){
-          coachBadge = '<span class="course-badge coach">Tu es coach sur ce cours</span>';
+          const nm = coachNameByCourse[cid] || "toi";
+          coachBadge = `<span class="course-badge coach">Coach : ${nm}</span>`;
         }else if(hasOtherCoach){
-          coachBadge = '<span class="course-badge coach">Coach déjà réservé</span>';
+          const nm = coachNameByCourse[cid] || "un coach";
+          coachBadge = `<span class="course-badge coach">Cours déjà pris par ${nm}</span>`;
         }
 
         let btnLabel, btnDisabled = false;
@@ -1217,7 +983,8 @@
           btnLabel = "Cours passé";
           btnDisabled = true;
         } else if (hasOtherCoach && !isAvailable){
-          btnLabel = "Déjà réservé";
+          const nm = coachNameByCourse[cid] || "un coach";
+          btnLabel = "Déjà pris (" + nm + ")";
           btnDisabled = true;
         } else {
           btnLabel = isAvailable ? "Je ne suis plus dispo" : "Je suis dispo";
@@ -1243,7 +1010,6 @@
             else if(paid) paidFlag = "payé";
 
             const phoneTxt = r.parent_phone ? ` — Tél parent: ${r.parent_phone}` : "";
-
             return `<li>${riderName}${ageTxt} — ${paidFlag}${phoneTxt}</li>`;
           }).join("");
 
@@ -1266,14 +1032,10 @@
             <div class="course-header">
               <div>
                 <p class="course-title">${c.location}</p>
-                <p class="course-meta">
-                  ${dateTxt} — ${timeTxt}
-                </p>
+                <p class="course-meta">${dateTxt} — ${timeTxt}</p>
               </div>
               <div>
-                <span class="${badgeClass}">
-                  ${badgeTxt}
-                </span>
+                <span class="${badgeClass}">${badgeTxt}</span>
                 ${coachBadge}
               </div>
             </div>
@@ -1285,9 +1047,7 @@
                 ${btnDisabled ? 'disabled' : ''}>
                 ${btnLabel}
               </button>
-              <span class="coach-note">
-                ID cours: ${c.id}
-              </span>
+              <span class="coach-note">ID cours: ${c.id}</span>
             </div>
             ${enrollHtml}
           </div>
@@ -1297,7 +1057,6 @@
       coachCoursesEl.innerHTML = html;
     }
 
-    // ===== Garde l'UUID tel quel + règles de blocage =====
     async function toggleAvailability(courseId, btn){
       if(!currentUser || !isCoachProfile){
         showStatus("Accès réservé aux coachs RSL.", true);
@@ -1316,7 +1075,8 @@
       const hasOtherCoach= reservedByOthers.has(cid);
 
       if(!isAvailable && hasOtherCoach){
-        showStatus("Ce cours a déjà un coach réservé.", true);
+        const nm = coachNameByCourse[cid] || "un coach";
+        showStatus("Cours déjà pris par " + nm + ".", true);
         return;
       }
 
@@ -1352,23 +1112,30 @@
         }else{
           const { data, error } = await sb
             .from('rsl_coach_availabilities')
-            .insert({
-              coach_id: currentUser.id,
-              course_id: cid
-            })
+            .insert({ coach_id: currentUser.id, course_id: cid })
             .select('course_id')
             .maybeSingle();
 
           if(error) throw error;
 
           const newCid = data?.course_id ? String(data.course_id) : cid;
-          if(!coachAvail.includes(newCid)){
-            coachAvail.push(newCid);
-          }
+          if(!coachAvail.includes(newCid)) coachAvail.push(newCid);
           showStatus("Tu es marqué dispo sur ce cours.");
         }
       }catch(e){
         console.error("Erreur insert/dispo coach:", e);
+
+        // ✅ reload pour savoir qui l'a pris (race condition)
+        await loadCoachAvail();
+        await loadCoachNames();
+        renderCourses();
+
+        if(reservedByOthers.has(cid) && !coachAvail.includes(cid)){
+          const nm = coachNameByCourse[cid] || "un coach";
+          showStatus("Cours déjà pris par " + nm + ".", true);
+          return;
+        }
+
         const msg = (e && (e.message || e.code)) ? ` ${e.code || ''} ${e.message || ''}` : "";
         showStatus("Impossible d’enregistrer ta dispo pour ce cours." + msg, true);
       }
@@ -1377,7 +1144,6 @@
       renderCourses();
     }
 
-    // ===== Login / Account basique (nav) =====
     (async function initAuthButtons(){
       if(!sb || !sb.auth) return;
       const btnLogin   = document.getElementById('btnLogin');
@@ -1397,22 +1163,25 @@
           }
         }
         ui(user);
-        btnLogin?.addEventListener('click',()=>location.href='access.html');
-        sb.auth.onAuthStateChange((_e,s)=>{
-          currentUser = s?.user ?? null;
-        });
+        btnLogin?.addEventListener('click',()=>location.href='/access');
+        sb.auth.onAuthStateChange((_e,s)=>{ currentUser = s?.user ?? null; });
       }catch(e){
         console.error(e);
       }
     })();
 
-    // ===== Init globale =====
     document.addEventListener('DOMContentLoaded', async ()=>{
-      const ok = await loadUser();  // true seulement si coach connecté
+      const ok = await loadUser();
       if(!ok) return;
 
       await loadCourses();
       await loadCoachAvail();
+      await loadCoachNames();
+
+      // debug:
+      console.log("coachNameByCourse =", coachNameByCourse);
+
+      renderCourses();
 
       if(cityFilterEl){
         cityFilterEl.addEventListener('change', ()=>{
@@ -1422,7 +1191,6 @@
       }
     });
 
-    // Click global pour les boutons "Je suis dispo"
     document.addEventListener('click',(e)=>{
       const btn = e.target.closest('[data-role="toggle-availability"]');
       if(!btn) return;
