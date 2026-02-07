@@ -628,14 +628,14 @@
 
     let currentUser      = null;
     let isCoachProfile   = false;
-    let coachAvail       = [];
+
+    let coachAvail       = [];          // cours où JE suis dispo
+    let reservedByOthers = new Set();   // cours pris par un autre coach
+    let coachNameByCourse = {};         // course_id -> coach_name
+
     let courses          = [];
     let cityFilter       = "";
-    let reservedByOthers = new Set();
     let registrationsByCourse = {};
-
-    // ✅ NEW
-    let coachNameByCourse = {}; // course_id -> coach_name
 
     const coachStatusEl   = document.getElementById('coachStatus');
     const coachSummaryEl  = document.getElementById('coachSummary');
@@ -788,60 +788,32 @@
       }
     }
 
-    async function loadCoachAvail(){
+    // ✅ ONE RPC = dispo global + noms coach
+    async function loadCoachAvailabilityPublic(){
       coachAvail = [];
       reservedByOthers = new Set();
+      coachNameByCourse = {};
 
-      if(!sb || !currentUser || !isCoachProfile){
-        updateSummary();
+      if(!sb || !currentUser || !isCoachProfile) return;
+
+      const { data, error } = await sb.rpc('get_course_coach_public');
+      if(error){
+        console.error(error);
+        showStatus("Erreur RPC coachs: " + (error.message || ""), true);
         return;
       }
 
-      try{
-        const { data, error } = await sb
-          .from('rsl_coach_availabilities')
-          .select('course_id,coach_id');
+      (data || []).forEach(r=>{
+        const cid = String(r.course_id);
+        const nm = (r.coach_name || "Coach").trim() || "Coach";
+        coachNameByCourse[cid] = nm;
 
-        if(error){
-          console.error(error);
-          showStatus("Erreur chargement disponibilités : " + (error.message || error.code || ""), true);
-          return;
+        if(r.coach_id === currentUser.id){
+          if(!coachAvail.includes(cid)) coachAvail.push(cid);
+        } else {
+          reservedByOthers.add(cid);
         }
-
-        (data || []).forEach(row=>{
-          const cid = String(row.course_id);
-          if(row.coach_id === currentUser.id){
-            if(!coachAvail.includes(cid)) coachAvail.push(cid);
-          }else{
-            reservedByOthers.add(cid);
-          }
-        });
-      }catch(e){
-        console.error(e);
-        showStatus("Erreur chargement disponibilités : " + (e.message || ""), true);
-      }
-
-      updateSummary();
-    }
-
-    // ✅ NEW: RPC safe (bypass RLS) + fallback name
-    async function loadCoachNames(){
-      coachNameByCourse = {};
-      if(!sb) return;
-
-      try{
-        const { data, error } = await sb.rpc('get_course_coach_public');
-        if(error){
-          console.error("Erreur RPC get_course_coach_public:", error);
-          return;
-        }
-        (data || []).forEach(r=>{
-          const name = (r.coach_name || "").trim();
-          coachNameByCourse[String(r.course_id)] = name ? name : "Coach";
-        });
-      }catch(e){
-        console.error("Erreur loadCoachNames:", e);
-      }
+      });
     }
 
     function buildCityOptions(){
@@ -920,8 +892,6 @@
 
       await loadRegistrations();
       buildCityOptions();
-      renderCourses();
-      updateSummary();
     }
 
     function renderCourses(){
@@ -1125,9 +1095,8 @@
       }catch(e){
         console.error("Erreur insert/dispo coach:", e);
 
-        // ✅ reload pour savoir qui l'a pris (race condition)
-        await loadCoachAvail();
-        await loadCoachNames();
+        // reload RPC -> qui a pris ?
+        await loadCoachAvailabilityPublic();
         renderCourses();
 
         if(reservedByOthers.has(cid) && !coachAvail.includes(cid)){
@@ -1175,20 +1144,14 @@
       if(!ok) return;
 
       await loadCourses();
-      await loadCoachAvail();
-      await loadCoachNames();
-
-      // debug:
-      console.log("coachNameByCourse =", coachNameByCourse);
-
+      await loadCoachAvailabilityPublic();
       renderCourses();
+      updateSummary();
 
-      if(cityFilterEl){
-        cityFilterEl.addEventListener('change', ()=>{
-          cityFilter = cityFilterEl.value || "";
-          renderCourses();
-        });
-      }
+      cityFilterEl?.addEventListener('change', ()=>{
+        cityFilter = cityFilterEl.value || "";
+        renderCourses();
+      });
     });
 
     document.addEventListener('click',(e)=>{
