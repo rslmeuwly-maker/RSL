@@ -27,6 +27,8 @@
       --rsl-border: rgba(148,163,184,.45);
       --rsl-accent: #22c55e;
       --rsl-accent-soft: rgba(34,197,94,.14);
+      --danger: #f87171;
+      --warn: #fbbf24;
     }
     body.theme-light{
       --rsl-bg: #f3f4f6;
@@ -71,7 +73,7 @@
       background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ======= NAVBAR (copie index) ======= */
+    /* ======= NAVBAR ======= */
     nav.nav{
       background: rgba(0,0,0,.65);
       backdrop-filter: blur(10px);
@@ -155,7 +157,6 @@
     }
     .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
 
-    /* Avatar dans la navbar */
     .nav-avatar{
       width:34px;
       height:34px;
@@ -164,8 +165,6 @@
       border:2px solid var(--rsl-accent);
       box-shadow:0 0 10px rgba(34,197,94,.5);
     }
-
-    /* Toggle thème */
     .theme-toggle{
       border-radius:999px;
       border:1px solid rgba(148,163,184,.6);
@@ -266,7 +265,7 @@
       padding:28px 18px 60px;
       display:flex;
       flex-direction:column;
-      gap:24px;
+      gap:18px;
       box-sizing:border-box;
     }
     @media(max-width:990px){ .wrap{ padding:20px 14px 50px; } }
@@ -321,6 +320,11 @@
       border-color:rgba(34,197,94,.9);
       color:#bbf7d0;
       background:rgba(22,163,74,.16);
+    }
+    .pill.warn{
+      border-color:rgba(251,191,36,.9);
+      color:#fde68a;
+      background:rgba(251,191,36,.12);
     }
 
     .profile-btn{
@@ -384,6 +388,7 @@
       flex-wrap:wrap;
     }
     .course-price{ font-weight:800; font-size:12px; }
+
     .search-row{
       display:flex;
       gap:10px;
@@ -410,12 +415,68 @@
       border-color:var(--rsl-accent);
       box-shadow:0 0 0 1px rgba(34,197,94,.55);
     }
+
     .admin-controls{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
       margin-top:8px;
     }
+
+    /* ===== Admin: ajouter admin user ===== */
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    @media(max-width: 980px){ .grid-2{ grid-template-columns: 1fr; } }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      margin-bottom:10px;
+    }
+    .field label{ font-size:12px; color:var(--rsl-muted); }
+    .field input{
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      padding:9px 10px;
+      font-size:13px;
+      outline:none;
+    }
+    body.theme-light .field input{ background:#ffffff; color:#0f172a; }
+    .field input:focus{
+      border-color:var(--rsl-accent);
+      box-shadow:0 0 0 1px rgba(34,197,94,.55);
+    }
+
+    .result-box{
+      border:1px solid rgba(148,163,184,.35);
+      background:rgba(2,6,23,.35);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .res-item{
+      padding:10px 10px;
+      border-top:1px solid rgba(148,163,184,.18);
+      cursor:pointer;
+    }
+    .res-item:first-child{ border-top:none; }
+    .res-item:hover{ background:rgba(34,197,94,.12); }
+    .res-title{ font-weight:900; font-size:13px; }
+    .res-sub{ font-size:12px; color:var(--rsl-muted); margin-top:2px; }
+
+    .status-line{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--rsl-muted);
+      white-space:pre-wrap;
+    }
+    .status-line.err{ color:#fecaca; }
   </style>
 </head>
 
@@ -486,21 +547,76 @@
     <div class="wrap">
       <header>
         <h1>Suivi cours (shop)</h1>
-        <p class="sub">Recherche rapide par nom du rider. Les admins peuvent ajouter / retirer des cours directement.</p>
+        <p class="sub">Recherche par <b>nom / prénom</b> + maintenant aussi <b>email</b> ou <b>ID (uuid)</b>. Les admins peuvent modifier les packs + donner le rôle admin.</p>
         <span id="adminPill" class="pill green" style="display:none;">✅ Mode admin activé</span>
+        <span id="adminNote" class="pill warn" style="display:none;">⚠️ Admin: certaines actions demandent la RPC / RLS</span>
       </header>
 
       <section class="card">
         <h2>Recherche</h2>
-        <p class="small">Tape le prénom ou le nom (ou les deux) puis valide.</p>
+        <p class="small">Tape un nom <i>ou</i> un email <i>ou</i> un UUID puis valide.</p>
 
         <div class="search-row">
-          <input id="shopSearch" class="search-input" type="text" placeholder="Ex: Maylone / Meuwly / Jo..." />
+          <input id="shopSearch" class="search-input" type="text" placeholder="Ex: Maylone / Meuwly / parent@email.ch / 36a0... (uuid)" />
           <button id="shopBtnSearch" class="profile-btn primary" type="button">Rechercher</button>
         </div>
 
         <div id="shopResults" class="course-list">
-          <p class="text-muted">Entre un nom puis clique sur Rechercher.</p>
+          <p class="text-muted">Entre un nom / email / ID puis clique sur Rechercher.</p>
+        </div>
+
+        <div class="status-line" id="searchHint" style="display:none;"></div>
+      </section>
+
+      <!-- ADMIN: ajouter une personne en admin (nom prénom lieu email) -->
+      <section class="card" id="adminAddCard" style="display:none;">
+        <h2>Admin — Ajouter / mettre à jour une personne (et la passer admin)</h2>
+        <p class="small">
+          Fonctionne si la personne a déjà un compte (user_id existant). On la cherche par email/nom via <code>admin_search_users</code>, puis on met à jour <code>profiles</code>.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <div class="field">
+              <label>Recherche (email / nom / id)</label>
+              <input id="adminUserSearchQ" type="text" placeholder="email@... / Meuwly / uuid...">
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button id="btnAdminUserSearch" class="profile-btn primary" type="button">Trouver</button>
+              <button id="btnAdminUseTypedId" class="profile-btn" type="button">Utiliser l’ID tapé</button>
+            </div>
+
+            <div id="adminUserResults" class="result-box" style="margin-top:10px; display:none;"></div>
+
+            <div class="status-line" id="adminPickedUser" style="display:none;"></div>
+          </div>
+
+          <div>
+            <div class="field">
+              <label>Prénom</label>
+              <input id="adminFirstName" type="text" placeholder="Prénom">
+            </div>
+            <div class="field">
+              <label>Nom</label>
+              <input id="adminLastName" type="text" placeholder="Nom">
+            </div>
+            <div class="field">
+              <label>Lieu de cours (ville / spot) — stocké dans <code>profiles.city</code></label>
+              <input id="adminCity" type="text" placeholder="Montreux / Aigle / Lausanne...">
+            </div>
+            <div class="field">
+              <label>Email (info) — non modifiable si géré par Auth</label>
+              <input id="adminEmail" type="email" placeholder="email@...">
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button id="btnMakeAdmin" class="profile-btn primary" type="button">✅ Passer Admin</button>
+              <button id="btnRemoveAdmin" class="profile-btn" style="border-color:rgba(248,113,113,.8);" type="button">⛔ Retirer Admin</button>
+            </div>
+
+            <div class="status-line" id="adminActionStatus" style="margin-top:10px;"></div>
+          </div>
         </div>
       </section>
     </div>
@@ -590,7 +706,7 @@
       });
     })();
 
-    // ==== Supabase client (même logique que ta page) ====
+    // ==== Supabase client ====
     let sb = null;
     if (window.supabaseClient) {
       sb = window.supabaseClient;
@@ -604,7 +720,7 @@
       window.supabaseClient = sb;
     }
 
-    // ==== Avatar/nav + auth buttons (simple) ====
+    // ==== Avatar/nav + auth buttons ====
     const navAvatar = document.getElementById('navAvatar');
     const btnLogout = document.getElementById('btnLogout');
     const btnAccount = document.getElementById('btnAccount');
@@ -630,15 +746,42 @@
     btnLogout?.addEventListener("click", logout);
     mobileLogout?.addEventListener("click", logout);
 
+    // ==== Utils ====
+    function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    function isUuidLike(s){
+      const v = String(s||'').trim();
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+    }
+    function isEmailLike(s){
+      const v = String(s||'').trim();
+      return /@/.test(v) && /\./.test(v);
+    }
+
     // ==== Shop UI ====
     const elQ = document.getElementById('shopSearch');
     const elBtn = document.getElementById('shopBtnSearch');
     const elRes = document.getElementById('shopResults');
     const adminPill = document.getElementById('adminPill');
+    const adminNote = document.getElementById('adminNote');
+    const searchHint = document.getElementById('searchHint');
 
-    function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    // Admin add card
+    const adminAddCard = document.getElementById('adminAddCard');
+    const adminUserSearchQ = document.getElementById('adminUserSearchQ');
+    const btnAdminUserSearch = document.getElementById('btnAdminUserSearch');
+    const btnAdminUseTypedId = document.getElementById('btnAdminUseTypedId');
+    const adminUserResults = document.getElementById('adminUserResults');
+    const adminPickedUser = document.getElementById('adminPickedUser');
+    const adminFirstName = document.getElementById('adminFirstName');
+    const adminLastName = document.getElementById('adminLastName');
+    const adminCity = document.getElementById('adminCity');
+    const adminEmail = document.getElementById('adminEmail');
+    const btnMakeAdmin = document.getElementById('btnMakeAdmin');
+    const btnRemoveAdmin = document.getElementById('btnRemoveAdmin');
+    const adminActionStatus = document.getElementById('adminActionStatus');
 
     let isAdmin = false;
+    let picked = null; // { user_id, label, email }
 
     async function detectAdmin(){
       try{
@@ -688,14 +831,20 @@
     }
 
     async function doSearch(){
-      const q = (elQ.value || '').trim();
-      if(!q){
-        elRes.innerHTML = `<p class="text-muted">Entre un nom (prénom ou nom) ✍️</p>`;
+      const qRaw = (elQ.value || '').trim();
+      if(!qRaw){
+        elRes.innerHTML = `<p class="text-muted">Entre un nom / email / ID ✍️</p>`;
+        searchHint.style.display = "none";
         return;
       }
-      elRes.innerHTML = `<p class="text-muted">Recherche...</p>`;
 
-      const { data, error } = await sb.rpc('public_lookup_rider_credit', { q });
+      elRes.innerHTML = `<p class="text-muted">Recherche...</p>`;
+      searchHint.style.display = "none";
+
+      // IMPORTANT:
+      // - Ici on envoie juste "q" à ta RPC existante.
+      // - Pour que ça marche sur email/id : ta fonction SQL "public_lookup_rider_credit" doit chercher aussi dans profiles.email et profiles.id::text.
+      const { data, error } = await sb.rpc('public_lookup_rider_credit', { q: qRaw });
 
       if(error){
         console.warn(error);
@@ -706,6 +855,14 @@
       const rows = data || [];
       if(!rows.length){
         elRes.innerHTML = `<p class="text-muted">Aucun rider trouvé.</p>`;
+
+        if(isEmailLike(qRaw) || isUuidLike(qRaw)){
+          searchHint.style.display = "block";
+          searchHint.textContent =
+            "Astuce: pour trouver par email/ID, la fonction SQL public_lookup_rider_credit doit aussi filtrer sur profiles.email et profiles.id::text.";
+        }else{
+          searchHint.style.display = "none";
+        }
         return;
       }
 
@@ -724,7 +881,7 @@
       `).join('');
     }
 
-    // Délégation clic admin
+    // Délégation clic admin (credits)
     elRes.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button[data-id][data-delta]');
       if(!btn) return;
@@ -748,6 +905,132 @@
 
     elBtn.addEventListener('click', doSearch);
     elQ.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
+
+    // ===== Admin: recherche user + set admin =====
+    function setAdminStatus(msg, isErr=false){
+      adminActionStatus.textContent = msg || "";
+      adminActionStatus.classList.toggle('err', !!isErr);
+    }
+
+    function setPicked(u){
+      picked = u;
+      adminPickedUser.style.display = "block";
+      adminPickedUser.textContent = `Sélection: ${u.label || '—'}\nEmail: ${u.email || '—'}\nuser_id: ${u.user_id}`;
+      adminEmail.value = u.email || "";
+
+      // Pré-fill prénom/nom depuis label si possible (best effort)
+      if(u.label){
+        const parts = String(u.label).trim().split(/\s+/).filter(Boolean);
+        if(parts.length >= 2){
+          adminFirstName.value = adminFirstName.value || parts[0];
+          adminLastName.value = adminLastName.value || parts.slice(1).join(" ");
+        }
+      }
+    }
+
+    async function adminFindUsers(){
+      const q = String(adminUserSearchQ.value || "").trim();
+      if(!q){
+        adminUserResults.style.display = "none";
+        return;
+      }
+
+      adminUserResults.style.display = "block";
+      adminUserResults.innerHTML = `<div class="res-item"><div class="res-title">Recherche…</div><div class="res-sub">admin_search_users(${esc(q)})</div></div>`;
+
+      try{
+        const { data, error } = await sb.rpc('admin_search_users', { q });
+        if(error) throw error;
+
+        const rows = (data || []).slice(0,25);
+        if(!rows.length){
+          adminUserResults.innerHTML = `<div class="res-item"><div class="res-title">Aucun résultat</div><div class="res-sub">Essaye email / nom / username</div></div>`;
+          return;
+        }
+
+        adminUserResults.innerHTML = rows.map(u=>`
+          <div class="res-item" data-act="pick-user"
+               data-user-id="${esc(u.user_id)}"
+               data-user-label="${esc(u.label)}"
+               data-user-email="${esc(u.email||'')}">
+            <div class="res-title">${esc(u.label)}</div>
+            <div class="res-sub">${esc(u.email||'—')} · ${esc(u.user_id)}</div>
+          </div>
+        `).join("");
+      }catch(err){
+        console.warn(err);
+        adminUserResults.innerHTML = `<div class="res-item"><div class="res-title" style="color:#fca5a5;">Erreur</div><div class="res-sub">${esc(err.message || err.code || err)}</div></div>`;
+      }
+    }
+
+    async function updateAdminFlag(makeAdmin){
+      if(!picked?.user_id){
+        setAdminStatus("Choisis d’abord une personne (à gauche).", true);
+        return;
+      }
+
+      const first = String(adminFirstName.value || "").trim();
+      const last  = String(adminLastName.value || "").trim();
+      const city  = String(adminCity.value || "").trim();
+
+      // full_name = "Prénom Nom"
+      const fullName = [first, last].filter(Boolean).join(" ").trim();
+
+      setAdminStatus("Mise à jour…");
+
+      try{
+        // NOTE:
+        // - Ça marche si tes RLS autorisent un admin à update profiles.
+        // - Sinon il faut une RPC SECURITY DEFINER (ex: admin_set_profile_flags).
+        const { error } = await sb
+          .from('profiles')
+          .update({
+            is_admin: !!makeAdmin,
+            full_name: fullName || null,
+            city: city || null
+          })
+          .eq('id', picked.user_id);
+
+        if(error) throw error;
+
+        setAdminStatus(makeAdmin ? "✅ La personne est maintenant admin." : "✅ Admin retiré.", false);
+      }catch(err){
+        console.warn(err);
+        setAdminStatus(
+          "Erreur (probablement RLS): " + (err.message || err.code || err) +
+          "\n➡️ Si ça bloque, crée une RPC SECURITY DEFINER qui fait l'update du profile (admin_set_user_admin).",
+          true
+        );
+        adminNote.style.display = "inline-flex";
+      }
+    }
+
+    // Clics admin user pick
+    document.addEventListener('click', (e)=>{
+      const it = e.target.closest('[data-act="pick-user"][data-user-id]');
+      if(!it) return;
+      setPicked({
+        user_id: it.dataset.userId,
+        label: it.dataset.userLabel,
+        email: it.dataset.userEmail
+      });
+    });
+
+    btnAdminUserSearch?.addEventListener('click', adminFindUsers);
+    adminUserSearchQ?.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') adminFindUsers(); });
+
+    btnAdminUseTypedId?.addEventListener('click', ()=>{
+      const q = String(adminUserSearchQ.value || "").trim();
+      if(!isUuidLike(q)){
+        setAdminStatus("Tape un user_id (uuid) valide pour utiliser ce bouton.", true);
+        return;
+      }
+      setPicked({ user_id: q, label: "Utilisateur " + q.slice(0,8) + "…", email: "" });
+      setAdminStatus("");
+    });
+
+    btnMakeAdmin?.addEventListener('click', ()=> updateAdminFlag(true));
+    btnRemoveAdmin?.addEventListener('click', ()=> updateAdminFlag(false));
 
     // Init (auth + admin)
     (async ()=>{
@@ -775,7 +1058,10 @@
       }
 
       isAdmin = await detectAdmin();
-      if(isAdmin && adminPill) adminPill.style.display = "inline-flex";
+      if(isAdmin){
+        if(adminPill) adminPill.style.display = "inline-flex";
+        if(adminAddCard) adminAddCard.style.display = "block";
+      }
     })();
   </script>
 </body>
