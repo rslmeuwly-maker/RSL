@@ -27,6 +27,9 @@
       --rsl-border: rgba(148,163,184,.45);
       --rsl-accent: #22c55e;
       --rsl-accent-soft: rgba(34,197,94,.14);
+      --rsl-danger: #f87171;
+      --rsl-warn: #fbbf24;
+      --rsl-blue: #60a5fa;
     }
     body.theme-light{
       --rsl-bg: #f3f4f6;
@@ -322,6 +325,11 @@
       color:#bbf7d0;
       background:rgba(22,163,74,.16);
     }
+    .pill.blue{
+      border-color:rgba(96,165,250,.9);
+      color:#dbeafe;
+      background:rgba(59,130,246,.18);
+    }
 
     .profile-btn{
       border-radius:999px;
@@ -344,6 +352,22 @@
       color:#022c22;
       box-shadow:0 8px 20px rgba(22,163,74,.6);
     }
+    .profile-btn.danger{
+      border-color:rgba(248,113,113,.75);
+      background:rgba(127,29,29,.9);
+      color:#fee2e2;
+    }
+    .profile-btn.warn{
+      border-color:rgba(251,191,36,.8);
+      background:rgba(120,53,15,.6);
+      color:#fffbeb;
+    }
+    .profile-btn.blue{
+      border-color:rgba(96,165,250,.85);
+      background:rgba(30,58,138,.55);
+      color:#dbeafe;
+    }
+    .profile-btn:disabled{ opacity:.6; cursor:not-allowed; }
 
     .text-muted{ color:var(--rsl-muted); font-size:12px; }
 
@@ -384,6 +408,7 @@
       flex-wrap:wrap;
     }
     .course-price{ font-weight:800; font-size:12px; }
+
     .search-row{
       display:flex;
       gap:10px;
@@ -410,17 +435,81 @@
       border-color:var(--rsl-accent);
       box-shadow:0 0 0 1px rgba(34,197,94,.55);
     }
+
     .admin-controls{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
       margin-top:8px;
     }
-    /* box création participant */
-    .divider{
-      height:1px;
-      background:rgba(148,163,184,.35);
-      margin:14px 0 10px;
+
+    /* Ajout participant */
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media(max-width:900px){ .grid-2{ grid-template-columns:1fr; } }
+
+    .form-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      margin-top:10px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:180px;
+      flex:1;
+    }
+    .field label{
+      font-size:12px;
+      color:var(--rsl-muted);
+      font-weight:600;
+    }
+    .field input{
+      border-radius:10px;
+      border:1px solid rgba(148,163,184,.6);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      padding:9px 10px;
+      font-size:13px;
+      outline:none;
+    }
+    body.theme-light .field input{
+      background:#ffffff;
+      color:#0f172a;
+    }
+    .hint{
+      font-size:12px;
+      color:var(--rsl-muted);
+      margin-top:8px;
+      line-height:1.35;
+    }
+
+    .toast{
+      margin-top:10px;
+      display:none;
+      padding:9px 10px;
+      border-radius:12px;
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(15,23,42,.92);
+      color:#e5e7eb;
+      font-size:13px;
+    }
+    .toast.show{ display:block; }
+    .toast.ok{
+      border-color:rgba(34,197,94,.75);
+      background:rgba(22,163,74,.14);
+      color:#bbf7d0;
+    }
+    .toast.err{
+      border-color:rgba(248,113,113,.75);
+      background:rgba(127,29,29,.35);
+      color:#fecaca;
     }
   </style>
 </head>
@@ -492,47 +581,78 @@
     <div class="wrap">
       <header>
         <h1>Suivi cours (shop)</h1>
-        <p class="sub">Recherche par nom / email / ID. Les admins peuvent ajouter / retirer des cours + créer un participant shop.</p>
+        <p class="sub">
+          Recherche par <b>nom</b>, <b>email</b> ou <b>UUID</b>.
+          Les admins peuvent <b>ajouter un participant</b> puis gérer ses crédits.
+        </p>
         <span id="adminPill" class="pill green" style="display:none;">✅ Mode admin activé</span>
       </header>
 
-      <section class="card">
-        <h2>Recherche</h2>
-        <p class="small">Tape le prénom, le nom, l’email, ou colle un UUID (ou “ID: …”), puis valide.</p>
-
-        <div class="search-row">
-          <input id="shopSearch" class="search-input" type="text" placeholder="Ex: Maylone / Meuwly / mail@... / 36a00c9e-..." />
-          <button id="shopBtnSearch" class="profile-btn primary" type="button">Rechercher</button>
-        </div>
-
-        <div id="shopResults" class="course-list">
-          <p class="text-muted">Entre un nom puis clique sur Rechercher.</p>
-        </div>
-
-        <!-- ADMIN: création participant -->
-        <div id="adminCreateBox" style="display:none; margin-top:14px;">
-          <div class="divider"></div>
-          <h2>Créer un participant (shop)</h2>
-          <p class="small">Ajoute un rider/client dans le système (même sans compte). Ensuite tu peux lui mettre des packs/cours.</p>
+      <div class="grid-2">
+        <!-- Recherche -->
+        <section class="card">
+          <h2>Recherche</h2>
+          <p class="small">Tape un nom, un email ou un UUID (ex: 36a00c9e-...)</p>
 
           <div class="search-row">
-            <input id="newFirst" class="search-input" type="text" placeholder="Prénom" style="min-width:160px; flex:1;">
-            <input id="newLast"  class="search-input" type="text" placeholder="Nom" style="min-width:160px; flex:1;">
+            <input id="shopSearch" class="search-input" type="text"
+                   placeholder="Ex: Maylone / Meuwly / test@mail.com / 36a00c9e-..." />
+            <button id="shopBtnSearch" class="profile-btn primary" type="button">Rechercher</button>
           </div>
 
-          <div class="search-row">
-            <input id="newEmail" class="search-input" type="email" placeholder="Email (optionnel)" style="min-width:240px; flex:2;">
-            <input id="newCity"  class="search-input" type="text" placeholder="Ville (optionnel)" style="min-width:180px; flex:1;">
+          <div id="shopResults" class="course-list">
+            <p class="text-muted">Entre une recherche puis clique sur Rechercher.</p>
           </div>
+        </section>
 
-          <div class="search-row">
-            <input id="newCredits" class="search-input" type="number" placeholder="Crédits init (ex: 10)" value="0" style="max-width:220px;">
-            <button id="btnCreateParticipant" class="profile-btn primary" type="button">Créer</button>
-          </div>
+        <!-- Ajout participant (admin) -->
+        <section class="card" id="adminCreateCard" style="display:none;">
+          <h2>Ajouter un participant (magasin)</h2>
+          <p class="small">
+            Crée (ou retrouve) un participant via email. Ensuite tu peux gérer ses crédits.
+          </p>
 
-          <p class="text-muted" id="createMsg" style="margin-top:8px;"></p>
-        </div>
-      </section>
+          <form id="createParticipantForm">
+            <div class="form-row">
+              <div class="field">
+                <label for="pFirst">Prénom</label>
+                <input id="pFirst" type="text" placeholder="Ex: Joël" autocomplete="given-name"/>
+              </div>
+              <div class="field">
+                <label for="pLast">Nom</label>
+                <input id="pLast" type="text" placeholder="Ex: Meuwly" autocomplete="family-name"/>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="pEmail">Email (recommandé)</label>
+                <input id="pEmail" type="email" placeholder="client@email.com" autocomplete="email"/>
+              </div>
+              <div class="field">
+                <label for="pPhone">Téléphone (optionnel)</label>
+                <input id="pPhone" type="tel" placeholder="+41 ..." autocomplete="tel"/>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <button id="btnCreateParticipant" class="profile-btn primary" type="submit">
+                Ajouter / Retrouver
+              </button>
+              <button id="btnFillSearch" class="profile-btn blue" type="button">
+                Mettre dans la recherche
+              </button>
+            </div>
+
+            <div class="hint">
+              ⚠️ Cette fonction nécessite la RPC SQL côté Supabase : <code>admin_create_participant</code>
+              (UPSERT par email pour éviter l’erreur 409).
+            </div>
+
+            <div id="toast" class="toast"></div>
+          </form>
+        </section>
+      </div>
     </div>
   </main>
 
@@ -620,19 +740,22 @@
       });
     })();
 
-    // ==== Supabase client (même logique que ta page) ====
-    let sb = null;
-    if (window.supabaseClient) {
-      sb = window.supabaseClient;
-    } else if (window.supabase && window.supabase.createClient && window.env?.SUPABASE_URL && window.env?.SUPABASE_ANON) {
-      sb = window.supabase.createClient(window.env.SUPABASE_URL, window.env.SUPABASE_ANON);
-      window.supabaseClient = sb;
-    } else if (window.supabase && window.supabase.createClient) {
-      const SUPABASE_URL = "https://jynxifufaauoxwzjapzq.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      window.supabaseClient = sb;
-    }
+    // ==== Supabase client (✅ 1 seul client) ====
+    (function(){
+      if(window.supabaseClient) return;
+
+      const SUPABASE_URL  = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+      const SUPABASE_ANON = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
+    })();
+    const sb = window.supabaseClient;
 
     // ==== Avatar/nav + auth buttons (simple) ====
     const navAvatar = document.getElementById('navAvatar');
@@ -660,36 +783,33 @@
     btnLogout?.addEventListener("click", logout);
     mobileLogout?.addEventListener("click", logout);
 
-    // ==== Shop UI ====
+    // ==== UI ====
     const elQ = document.getElementById('shopSearch');
     const elBtn = document.getElementById('shopBtnSearch');
     const elRes = document.getElementById('shopResults');
     const adminPill = document.getElementById('adminPill');
 
-    // Admin create participant UI
-    const adminCreateBox = document.getElementById('adminCreateBox');
-    const newFirst = document.getElementById('newFirst');
-    const newLast = document.getElementById('newLast');
-    const newEmail = document.getElementById('newEmail');
-    const newCity = document.getElementById('newCity');
-    const newCredits = document.getElementById('newCredits');
+    const adminCreateCard = document.getElementById('adminCreateCard');
+    const createForm = document.getElementById('createParticipantForm');
+    const pFirst = document.getElementById('pFirst');
+    const pLast  = document.getElementById('pLast');
+    const pEmail = document.getElementById('pEmail');
+    const pPhone = document.getElementById('pPhone');
     const btnCreateParticipant = document.getElementById('btnCreateParticipant');
-    const createMsg = document.getElementById('createMsg');
+    const btnFillSearch = document.getElementById('btnFillSearch');
+    const toast = document.getElementById('toast');
 
     function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-
-    // Normalise : accepte "ID: xxxx", uuid, email, etc.
-    function normalizeQuery(raw){
-      let q = String(raw || '').trim();
-      if(!q) return '';
-      q = q.replace(/^id\s*:\s*/i, '').trim(); // "ID: ..."
-      q = q.replace(/\s+/g, ' ').trim();
-      return q;
+    function isUuid(str){
+      const s = String(str||'').trim();
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
     }
-
-    function isUuidLike(s){
-      const v = String(s||'').trim();
-      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+    function showToast(msg, ok=true){
+      if(!toast) return;
+      toast.textContent = msg;
+      toast.classList.remove('ok','err','show');
+      toast.classList.add('show', ok ? 'ok' : 'err');
+      setTimeout(()=>toast.classList.remove('show'), 4500);
     }
 
     let isAdmin = false;
@@ -712,6 +832,7 @@
       }
     }
 
+    // ==== Credits (déjà chez toi) ====
     async function adjustCredits(userId, delta){
       const reason = delta > 0 ? `Ajout pack shop (+${delta})` : `Présence / décompte (${delta})`;
       const { error } = await sb.rpc('admin_adjust_course_credits', {
@@ -734,27 +855,29 @@
           <button class="profile-btn primary" data-act="add" data-id="${esc(userId)}" data-delta="10">+10</button>
           <button class="profile-btn" data-act="add" data-id="${esc(userId)}" data-delta="5">+5</button>
           <button class="profile-btn" data-act="add" data-id="${esc(userId)}" data-delta="1">+1</button>
-          <button class="profile-btn" style="border-color:rgba(248,113,113,.7);" data-act="sub" data-id="${esc(userId)}" data-delta="-1">-1</button>
-          <button class="profile-btn" style="border-color:rgba(251,191,36,.8);" data-act="set" data-id="${esc(userId)}" data-delta="0">Reset à 0</button>
+          <button class="profile-btn danger" data-act="sub" data-id="${esc(userId)}" data-delta="-1">-1</button>
+          <button class="profile-btn warn" data-act="set" data-id="${esc(userId)}" data-delta="0">Reset à 0</button>
         </div>
         <div class="text-muted" style="margin-top:6px;">Admin: changements visibles pour les coachs ✅</div>
       `;
     }
 
+    // ==== Recherche (nom/email/uuid) ====
     async function doSearch(){
-      const qRaw = (elQ.value || '');
-      const q = normalizeQuery(qRaw);
-
-      if(!q){
-        elRes.innerHTML = `<p class="text-muted">Entre un nom / email / ID ✍️</p>`;
+      const qRaw = (elQ.value || '').trim();
+      if(!qRaw){
+        elRes.innerHTML = `<p class="text-muted">Entre un nom, email ou UUID ✍️</p>`;
         return;
       }
 
       elRes.innerHTML = `<p class="text-muted">Recherche...</p>`;
 
-      // RPC existante : doit supporter nom + email + id::text côté SQL
-      // Si ta RPC ne supporte pas l'UUID, ajoute dans SQL:
-      // OR p.id::text ILIKE '%'||q||'%' OR p.email ILIKE '%'||q||'%'
+      // 🔥 IMPORTANT:
+      // - si tu as déjà une RPC public_lookup_rider_credit qui accepte UUID, c’est OK
+      // - sinon, on gère ici: si UUID => appeler une RPC dédiée (public_lookup_rider_credit_by_id)
+      // Pour garder compatible avec ton existant, on tente d’abord ta RPC actuelle.
+      const q = qRaw;
+
       const { data, error } = await sb.rpc('public_lookup_rider_credit', { q });
 
       if(error){
@@ -765,10 +888,12 @@
 
       const rows = data || [];
       if(!rows.length){
-        const hint = isUuidLike(q)
-          ? `<br><span class="text-muted">Astuce: si tu colles un UUID et que ça ne trouve pas, ajoute dans ta RPC SQL: <code>p.id::text ilike '%'||q||'%'</code>.</span>`
-          : '';
-        elRes.innerHTML = `<p class="text-muted">Aucun rider trouvé.${hint}</p>`;
+        elRes.innerHTML = `
+          <p class="text-muted">Aucun rider trouvé.</p>
+          <p class="text-muted" style="margin-top:6px;">
+            Astuce: colle un UUID complet (36a00c9e-...) ou un email.
+          </p>
+        `;
         return;
       }
 
@@ -776,7 +901,7 @@
         <div class="course-item" data-user="${esc(r.user_id)}">
           <div class="course-item-header">
             <div class="course-spot">${esc(r.rider_first_name)} ${esc(r.rider_last_name)}</div>
-            <div class="course-date">ID: ${esc(r.user_id).slice(0,8)}…</div>
+            <div class="course-date">ID: ${esc(r.user_id)}</div>
           </div>
           <div class="course-foot">
             <div class="course-price"><strong>Cours restants :</strong> <span class="credits">${Number(r.credits_remaining||0)}</span></div>
@@ -787,55 +912,80 @@
       `).join('');
     }
 
-    async function createParticipant(){
-      if(!isAdmin) return;
-
-      const first = (newFirst?.value || '').trim();
-      const last  = (newLast?.value || '').trim();
-      const email = (newEmail?.value || '').trim();
-      const city  = (newCity?.value || '').trim();
-      const credits = Number(newCredits?.value || 0);
-
-      if(!first && !last){
-        if(createMsg) createMsg.textContent = "Merci de mettre au minimum un prénom ou un nom.";
+    // ==== Admin: ajouter / retrouver participant (RPC: admin_create_participant) ====
+    async function handleCreateParticipant(e){
+      e.preventDefault();
+      if(!isAdmin){
+        showToast("Accès admin requis.", false);
         return;
       }
 
-      if(btnCreateParticipant) btnCreateParticipant.disabled = true;
-      if(createMsg) createMsg.textContent = "Création...";
+      const first = (pFirst?.value || "").trim();
+      const last  = (pLast?.value || "").trim();
+      const email = (pEmail?.value || "").trim();
+      const phone = (pPhone?.value || "").trim();
 
-      const { data, error } = await sb.rpc('admin_create_participant', {
-        p_first_name: first,
-        p_last_name: last,
-        p_email: email || null,
-        p_city: city || null,
-        p_initial_credits: isNaN(credits) ? 0 : credits
-      });
-
-      if(btnCreateParticipant) btnCreateParticipant.disabled = false;
-
-      if(error){
-        console.warn(error);
-        if(createMsg) createMsg.textContent = "Erreur: " + (error.message || "création impossible");
+      if(!first && !last && !email){
+        showToast("Mets au moins prénom/nom ou email.", false);
         return;
       }
 
-      const row = Array.isArray(data) ? data[0] : data;
-      const newId = row?.user_id;
+      btnCreateParticipant.disabled = true;
+      btnCreateParticipant.textContent = "En cours…";
 
-      if(createMsg) createMsg.textContent = "✅ Participant créé: " + (row?.label || "") + " (" + (newId || "") + ")";
+      try{
+        // ⚠️ RPC attendue côté Supabase:
+        // public.admin_create_participant(p_first_name text, p_last_name text, p_email text, p_phone text default null)
+        const payload = {
+          p_first_name: first || null,
+          p_last_name: last || null,
+          p_email: email || null,
+          p_phone: phone || null
+        };
 
-      if(newFirst) newFirst.value = "";
-      if(newLast) newLast.value = "";
-      if(newEmail) newEmail.value = "";
-      if(newCity) newCity.value = "";
-      if(newCredits) newCredits.value = "0";
+        const { data, error } = await sb.rpc('admin_create_participant', payload);
+        console.log("create_participant data:", data);
+        console.log("create_participant error:", error);
 
-      if(newId){
-        elQ.value = newId;
-        await doSearch();
+        if(error){
+          // 409 = conflit côté serveur (doublon/contrainte)
+          showToast("Erreur création: " + (error.message || "conflit"), false);
+          return;
+        }
+
+        // data peut être array ou single selon ta RPC
+        const row = Array.isArray(data) ? data[0] : data;
+        if(!row){
+          showToast("Participant créé mais retour vide.", true);
+        }else{
+          const label = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || row.email || row.rider_id;
+          showToast("OK: " + label + " (ID: " + row.rider_id + ")", true);
+
+          // option: remplir la recherche avec UUID
+          if(elQ) elQ.value = row.rider_id;
+          await doSearch();
+        }
+
+        // reset form
+        if(pFirst) pFirst.value = "";
+        if(pLast)  pLast.value = "";
+        if(pEmail) pEmail.value = "";
+        if(pPhone) pPhone.value = "";
+
+      }finally{
+        btnCreateParticipant.disabled = false;
+        btnCreateParticipant.textContent = "Ajouter / Retrouver";
       }
     }
+
+    btnFillSearch?.addEventListener('click', ()=>{
+      const email = (pEmail?.value || "").trim();
+      const name = [(pFirst?.value||"").trim(), (pLast?.value||"").trim()].filter(Boolean).join(" ").trim();
+      if(email) elQ.value = email;
+      else if(name) elQ.value = name;
+      else elQ.value = "";
+      doSearch();
+    });
 
     // Délégation clic admin (crédits)
     elRes.addEventListener('click', async (e)=>{
@@ -861,7 +1011,6 @@
 
     elBtn.addEventListener('click', doSearch);
     elQ.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
-    btnCreateParticipant?.addEventListener('click', createParticipant);
 
     // Init (auth + admin)
     (async ()=>{
@@ -890,7 +1039,10 @@
 
       isAdmin = await detectAdmin();
       if(isAdmin && adminPill) adminPill.style.display = "inline-flex";
-      if(isAdmin && adminCreateBox) adminCreateBox.style.display = "block";
+      if(isAdmin && adminCreateCard) adminCreateCard.style.display = "block";
+
+      // bind form après admin init
+      createForm?.addEventListener('submit', handleCreateParticipant);
     })();
   </script>
 </body>
