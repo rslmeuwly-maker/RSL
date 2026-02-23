@@ -443,7 +443,7 @@
       margin-top:8px;
     }
 
-    /* Ajout participant */
+    /* Ajout participant + SQL generator */
     .grid-2{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -470,7 +470,7 @@
       color:var(--rsl-muted);
       font-weight:600;
     }
-    .field input{
+    .field input, .field textarea{
       border-radius:10px;
       border:1px solid rgba(148,163,184,.6);
       background:rgba(15,23,42,.9);
@@ -479,7 +479,7 @@
       font-size:13px;
       outline:none;
     }
-    body.theme-light .field input{
+    body.theme-light .field input, body.theme-light .field textarea{
       background:#ffffff;
       color:#0f172a;
     }
@@ -510,6 +510,18 @@
       border-color:rgba(248,113,113,.75);
       background:rgba(127,29,29,.35);
       color:#fecaca;
+    }
+
+    pre.sql-out{
+      margin-top:10px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      background:rgba(2,6,23,.85);
+      border:1px solid rgba(148,163,184,.35);
+      border-radius:14px;
+      padding:12px;
+      font-size:12px;
+      color:#e5e7eb;
     }
   </style>
 </head>
@@ -583,7 +595,7 @@
         <h1>Suivi cours (shop)</h1>
         <p class="sub">
           Recherche par <b>nom</b>, <b>email</b> ou <b>UUID</b>.
-          Les admins peuvent <b>ajouter un participant</b> puis gérer ses crédits.
+          Les admins peuvent <b>ajouter un participant</b> + générer le SQL d'UPSERT.
         </p>
         <span id="adminPill" class="pill green" style="display:none;">✅ Mode admin activé</span>
       </header>
@@ -605,14 +617,25 @@
           </div>
         </section>
 
-        <!-- Ajout participant (admin) -->
+        <!-- Admin: Ajout participant + SQL -->
         <section class="card" id="adminCreateCard" style="display:none;">
           <h2>Ajouter un participant (magasin)</h2>
           <p class="small">
-            Crée (ou retrouve) un participant via email. Ensuite tu peux gérer ses crédits.
+            Tu peux soit <b>générer un SQL</b> (copier/coller dans Supabase), soit utiliser ta RPC (si elle existe).
           </p>
 
           <form id="createParticipantForm">
+            <div class="form-row">
+              <div class="field">
+                <label for="pEmail">Email (obligatoire pour l’UPSERT)</label>
+                <input id="pEmail" type="email" placeholder="client@email.com" autocomplete="email" required/>
+              </div>
+              <div class="field">
+                <label for="pCredits">Crédits init (pack)</label>
+                <input id="pCredits" type="number" min="0" value="0"/>
+              </div>
+            </div>
+
             <div class="form-row">
               <div class="field">
                 <label for="pFirst">Prénom</label>
@@ -626,8 +649,8 @@
 
             <div class="form-row">
               <div class="field">
-                <label for="pEmail">Email (recommandé)</label>
-                <input id="pEmail" type="email" placeholder="client@email.com" autocomplete="email"/>
+                <label for="pCity">Ville</label>
+                <input id="pCity" type="text" placeholder="Montreux"/>
               </div>
               <div class="field">
                 <label for="pPhone">Téléphone (optionnel)</label>
@@ -636,20 +659,28 @@
             </div>
 
             <div class="form-row">
+              <div class="field" style="flex:1;min-width:260px">
+                <label for="pNotes">Notes (optionnel)</label>
+                <textarea id="pNotes" rows="3" placeholder="Ex: payé cash, pack 10, enfant 9 ans..."></textarea>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <button id="btnGenSQL" class="profile-btn blue" type="button">Générer SQL (UPSERT)</button>
+              <button id="btnCopySQL" class="profile-btn" type="button" disabled>Copier SQL</button>
+              <button id="btnFillSearch" class="profile-btn" type="button">Mettre email dans la recherche</button>
               <button id="btnCreateParticipant" class="profile-btn primary" type="submit">
-                Ajouter / Retrouver
-              </button>
-              <button id="btnFillSearch" class="profile-btn blue" type="button">
-                Mettre dans la recherche
+                Créer via RPC (si dispo)
               </button>
             </div>
 
             <div class="hint">
-              ⚠️ Cette fonction nécessite la RPC SQL côté Supabase : <code>admin_create_participant</code>
-              (UPSERT par email pour éviter l’erreur 409).
+              ✅ <b>SQL UPSERT</b> = zéro erreur 409, zéro FK profiles.<br>
+              ⚠️ Le bouton “Créer via RPC” appelle <code>admin_create_participant</code> (optionnel).
             </div>
 
             <div id="toast" class="toast"></div>
+            <pre id="sqlOut" class="sql-out">-- Clique “Générer SQL (UPSERT)”</pre>
           </form>
         </section>
       </div>
@@ -791,13 +822,22 @@
 
     const adminCreateCard = document.getElementById('adminCreateCard');
     const createForm = document.getElementById('createParticipantForm');
+
+    const pEmail = document.getElementById('pEmail');
+    const pCredits = document.getElementById('pCredits');
     const pFirst = document.getElementById('pFirst');
     const pLast  = document.getElementById('pLast');
-    const pEmail = document.getElementById('pEmail');
+    const pCity  = document.getElementById('pCity');
     const pPhone = document.getElementById('pPhone');
-    const btnCreateParticipant = document.getElementById('btnCreateParticipant');
+    const pNotes = document.getElementById('pNotes');
+
+    const btnGenSQL = document.getElementById('btnGenSQL');
+    const btnCopySQL = document.getElementById('btnCopySQL');
     const btnFillSearch = document.getElementById('btnFillSearch');
+    const btnCreateParticipant = document.getElementById('btnCreateParticipant');
+
     const toast = document.getElementById('toast');
+    const sqlOut = document.getElementById('sqlOut');
 
     function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
     function isUuid(str){
@@ -810,6 +850,52 @@
       toast.classList.remove('ok','err','show');
       toast.classList.add('show', ok ? 'ok' : 'err');
       setTimeout(()=>toast.classList.remove('show'), 4500);
+    }
+
+    // === SQL generator helpers ===
+    function sqlEscape(v){
+      if(v === null || v === undefined) return 'null';
+      const s = String(v).trim();
+      if(!s) return 'null';
+      return "'" + s.replace(/'/g, "''") + "'";
+    }
+    function numOrZero(v){
+      const n = Number(v);
+      return Number.isFinite(n) && n >= 0 ? String(Math.floor(n)) : "0";
+    }
+    function buildUpsertSQL(){
+      const email = (pEmail?.value || '').trim();
+      if(!email) return { ok:false, sql:'', msg:'Email obligatoire.' };
+
+      const first = (pFirst?.value || '');
+      const last  = (pLast?.value || '');
+      const city  = (pCity?.value || '');
+      const phone = (pPhone?.value || '');
+      const credits = numOrZero(pCredits?.value || 0);
+      const notes = (pNotes?.value || '');
+
+      // Table = public.participants (comme ton générateur)
+      const sql = `insert into public.participants (email, first_name, last_name, city, phone, initial_credits, notes)
+values (
+  ${sqlEscape(email)},
+  ${sqlEscape(first)},
+  ${sqlEscape(last)},
+  ${sqlEscape(city)},
+  ${sqlEscape(phone)},
+  ${credits},
+  ${sqlEscape(notes)}
+)
+on conflict (email) do update set
+  first_name = excluded.first_name,
+  last_name  = excluded.last_name,
+  city       = excluded.city,
+  phone      = excluded.phone,
+  initial_credits = excluded.initial_credits,
+  notes      = excluded.notes,
+  updated_at = now()
+returning id, email, first_name, last_name, initial_credits, created_at, updated_at;`;
+
+      return { ok:true, sql, msg:'SQL généré.' };
     }
 
     let isAdmin = false;
@@ -869,16 +955,10 @@
         elRes.innerHTML = `<p class="text-muted">Entre un nom, email ou UUID ✍️</p>`;
         return;
       }
-
       elRes.innerHTML = `<p class="text-muted">Recherche...</p>`;
 
-      // 🔥 IMPORTANT:
-      // - si tu as déjà une RPC public_lookup_rider_credit qui accepte UUID, c’est OK
-      // - sinon, on gère ici: si UUID => appeler une RPC dédiée (public_lookup_rider_credit_by_id)
-      // Pour garder compatible avec ton existant, on tente d’abord ta RPC actuelle.
-      const q = qRaw;
-
-      const { data, error } = await sb.rpc('public_lookup_rider_credit', { q });
+      // On utilise ta RPC existante
+      const { data, error } = await sb.rpc('public_lookup_rider_credit', { q: qRaw });
 
       if(error){
         console.warn(error);
@@ -912,21 +992,17 @@
       `).join('');
     }
 
-    // ==== Admin: ajouter / retrouver participant (RPC: admin_create_participant) ====
-    async function handleCreateParticipant(e){
+    // ==== Admin: créer via RPC (optionnel) ====
+    async function handleCreateParticipantRPC(e){
       e.preventDefault();
       if(!isAdmin){
         showToast("Accès admin requis.", false);
         return;
       }
 
-      const first = (pFirst?.value || "").trim();
-      const last  = (pLast?.value || "").trim();
       const email = (pEmail?.value || "").trim();
-      const phone = (pPhone?.value || "").trim();
-
-      if(!first && !last && !email){
-        showToast("Mets au moins prénom/nom ou email.", false);
+      if(!email){
+        showToast("Email obligatoire.", false);
         return;
       }
 
@@ -934,56 +1010,60 @@
       btnCreateParticipant.textContent = "En cours…";
 
       try{
-        // ⚠️ RPC attendue côté Supabase:
-        // public.admin_create_participant(p_first_name text, p_last_name text, p_email text, p_phone text default null)
+        // RPC optionnelle : admin_create_participant
         const payload = {
-          p_first_name: first || null,
-          p_last_name: last || null,
-          p_email: email || null,
-          p_phone: phone || null
+          p_first_name: (pFirst?.value || "").trim() || null,
+          p_last_name : (pLast?.value || "").trim() || null,
+          p_email     : email,
+          p_city      : (pCity?.value || "").trim() || null,
+          p_phone     : (pPhone?.value || "").trim() || null,
+          p_initial_credits: Number(pCredits?.value || 0) || 0,
+          p_notes     : (pNotes?.value || "").trim() || null
         };
 
         const { data, error } = await sb.rpc('admin_create_participant', payload);
-        console.log("create_participant data:", data);
-        console.log("create_participant error:", error);
 
         if(error){
-          // 409 = conflit côté serveur (doublon/contrainte)
-          showToast("Erreur création: " + (error.message || "conflit"), false);
+          showToast("RPC erreur: " + (error.message || "impossible"), false);
           return;
         }
 
-        // data peut être array ou single selon ta RPC
         const row = Array.isArray(data) ? data[0] : data;
-        if(!row){
-          showToast("Participant créé mais retour vide.", true);
-        }else{
-          const label = [row.first_name, row.last_name].filter(Boolean).join(" ").trim() || row.email || row.rider_id;
-          showToast("OK: " + label + " (ID: " + row.rider_id + ")", true);
+        showToast("OK (RPC).", true);
 
-          // option: remplir la recherche avec UUID
-          if(elQ) elQ.value = row.rider_id;
-          await doSearch();
-        }
+        // Remplir la recherche avec email (ou id si retourné)
+        if(row?.rider_id) elQ.value = row.rider_id;
+        else elQ.value = email;
 
-        // reset form
-        if(pFirst) pFirst.value = "";
-        if(pLast)  pLast.value = "";
-        if(pEmail) pEmail.value = "";
-        if(pPhone) pPhone.value = "";
+        await doSearch();
 
       }finally{
         btnCreateParticipant.disabled = false;
-        btnCreateParticipant.textContent = "Ajouter / Retrouver";
+        btnCreateParticipant.textContent = "Créer via RPC (si dispo)";
       }
     }
 
+    // ==== Actions SQL generator ====
+    btnGenSQL?.addEventListener('click', ()=>{
+      const r = buildUpsertSQL();
+      sqlOut.textContent = r.ok ? r.sql : ('-- ' + r.msg);
+      btnCopySQL.disabled = !r.ok;
+      showToast(r.ok ? "SQL prêt à copier ✅" : r.msg, r.ok);
+    });
+
+    btnCopySQL?.addEventListener('click', async ()=>{
+      const txt = sqlOut?.textContent || '';
+      try{
+        await navigator.clipboard.writeText(txt);
+        showToast("Copié ✅", true);
+      }catch(e){
+        showToast("Copie impossible. Sélectionne et copie à la main.", false);
+      }
+    });
+
     btnFillSearch?.addEventListener('click', ()=>{
       const email = (pEmail?.value || "").trim();
-      const name = [(pFirst?.value||"").trim(), (pLast?.value||"").trim()].filter(Boolean).join(" ").trim();
       if(email) elQ.value = email;
-      else if(name) elQ.value = name;
-      else elQ.value = "";
       doSearch();
     });
 
@@ -1041,8 +1121,8 @@
       if(isAdmin && adminPill) adminPill.style.display = "inline-flex";
       if(isAdmin && adminCreateCard) adminCreateCard.style.display = "block";
 
-      // bind form après admin init
-      createForm?.addEventListener('submit', handleCreateParticipant);
+      // bind form RPC (optionnel)
+      createForm?.addEventListener('submit', handleCreateParticipantRPC);
     })();
   </script>
 </body>
