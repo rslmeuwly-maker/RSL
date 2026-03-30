@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carte membre — RSL</title>
+
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0b1120" />
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Carte RSL" />
+  <link rel="apple-touch-icon" href="/icons/rsl-card-192.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+
+  <style>
+    body{
+      margin:0;
+      background:#020617;
+      color:#fff;
+      font-family:"Outfit",sans-serif;
+    }
+
+    .wrap{
+      max-width:700px;
+      margin:auto;
+      padding:20px;
+    }
+
+    h1{text-align:center;}
+
+    input,button{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:none;
+      font-weight:800;
+      margin-top:10px;
+    }
+
+    input{background:#111827;color:white;}
+
+    button{
+      background:#22c55e;
+      cursor:pointer;
+    }
+
+    /* ===== GROS BOUTON INSTALL ===== */
+    #installBtn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      margin-top:18px;
+      padding:22px;
+      border-radius:20px;
+      font-size:22px;
+      font-weight:900;
+      text-transform:uppercase;
+      background:linear-gradient(135deg,#38bdf8,#2563eb);
+      color:white;
+      box-shadow:0 20px 40px rgba(37,99,235,.4);
+    }
+
+    #installHint{
+      text-align:center;
+      margin-top:10px;
+      font-weight:700;
+      color:#94a3b8;
+    }
+
+    .member-card{
+      display:none;
+      margin-top:20px;
+      padding:20px;
+      border-radius:20px;
+      background:#0f172a;
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <h1>Carte membre RSL</h1>
+
+  <input id="codeInput" placeholder="Code membre" />
+  <button onclick="loadMemberCard()">Afficher ma carte</button>
+
+  <button id="installBtn">📲 Installer la carte RSL</button>
+  <div id="installHint"></div>
+
+  <div id="memberCard" class="member-card">
+    <h2 id="memberName"></h2>
+    <p id="memberTier"></p>
+  </div>
+
+</div>
+
+<script>
+let deferredPrompt = null;
+
+function isIos(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isStandalone(){
+  return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+}
+
+window.addEventListener("beforeinstallprompt", (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installHint").textContent = "Clique pour installer la carte";
+});
+
+document.getElementById("installBtn").onclick = async ()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if(choice.outcome==="accepted"){
+      document.getElementById("installHint").textContent = "Installé avec succès";
+    }
+    return;
+  }
+
+  if(isIos() && !isStandalone()){
+    document.getElementById("installHint").textContent =
+      "iPhone : bouton partager → Sur l’écran d’accueil";
+    return;
+  }
+
+  document.getElementById("installHint").textContent =
+    "Installation non disponible ici";
+};
+
+window.addEventListener("appinstalled", ()=>{
+  document.getElementById("installHint").textContent = "Carte installée";
+});
+
+async function loadMemberCard(){
+  const code = document.getElementById("codeInput").value;
+
+  const sb = supabase.createClient(
+    window.env.SUPABASE_URL,
+    window.env.SUPABASE_ANON
+  );
+
+  const {data} = await sb
+    .from("rsl_member_cards")
+    .select("*")
+    .eq("member_code",code)
+    .maybeSingle();
+
+  if(!data){
+    alert("Code invalide");
+    return;
+  }
+
+  document.getElementById("memberCard").style.display="block";
+  document.getElementById("memberName").textContent = data.full_name;
+  document.getElementById("memberTier").textContent = data.membership_tier;
+}
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/sw.js");
+}
+</script>
+
+</body>
+</html>

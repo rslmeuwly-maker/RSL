@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin cartes membres — RSL</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="js/env.js"></script>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --fg:#e5e7eb;
+      --muted:#94a3b8;
+      --card:rgba(15,23,42,.94);
+      --card-2:rgba(15,23,42,.88);
+      --border:rgba(148,163,184,.28);
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --shadow:0 24px 60px rgba(0,0,0,.45);
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(59,130,246,.08), transparent 22%),
+        linear-gradient(180deg,#020617 0%,#0b1120 100%);
+      color:var(--fg);
+      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+
+    .wrap{
+      max-width:1380px;
+      margin:0 auto;
+      padding:22px;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+
+    .sub{
+      color:var(--muted);
+      margin-bottom:20px;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:460px 1fr;
+      gap:20px;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+
+    .panel h2{
+      margin:0 0 12px;
+      font-size:21px;
+      font-weight:800;
+    }
+
+    label{
+      display:block;
+      margin:12px 0 6px;
+      font-size:13px;
+      font-weight:800;
+      color:#dbe4ef;
+    }
+
+    input, textarea, select{
+      width:100%;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:#fff;
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      outline:none;
+    }
+
+    input[type="file"]{
+      padding:10px;
+      background:#0b1220;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 15px;
+      font:inherit;
+      font-weight:900;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    button:hover{ transform:translateY(-1px); }
+
+    .btn-main{
+      background:linear-gradient(135deg,#22c55e,#65f180);
+      color:#052e16;
+      box-shadow:0 12px 26px rgba(34,197,94,.28);
+    }
+
+    .btn-alt{
+      background:#263247;
+      color:#fff;
+    }
+
+    .btn-danger{
+      background:linear-gradient(135deg,#ef4444,#f87171);
+      color:#fff;
+    }
+
+    .btn-upload{
+      background:linear-gradient(135deg,#38bdf8,#60a5fa);
+      color:#06121b;
+      box-shadow:0 12px 26px rgba(56,189,248,.22);
+    }
+
+    .status{
+      min-height:20px;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .small-note{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .upload-box{
+      border:1px dashed rgba(148,163,184,.35);
+      border-radius:16px;
+      padding:12px;
+      margin-top:6px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .upload-preview{
+      margin-top:10px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .upload-preview img{
+      width:88px;
+      height:88px;
+      border-radius:16px;
+      object-fit:cover;
+      border:1px solid var(--border);
+      background:#0b1220;
+    }
+
+    .member-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:30px;
+      min-height:360px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.01)),
+        linear-gradient(145deg,#0d1118,#151d29 55%,#0f151e);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 26px 52px rgba(0,0,0,.34);
+      isolation:isolate;
+    }
+
+    .member-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(90deg,rgba(255,255,255,.016) 0 2px,transparent 2px 6px),
+        repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 4px);
+      pointer-events:none;
+    }
+
+    .member-card::after{
+      content:"";
+      position:absolute;
+      inset:-35%;
+      background:linear-gradient(
+        115deg,
+        transparent 30%,
+        rgba(255,255,255,.18) 38%,
+        rgba(82,199,255,.18) 42%,
+        rgba(137,255,0,.17) 48%,
+        transparent 56%
+      );
+      transform:rotate(8deg);
+      animation:holoSweep 7s linear infinite;
+      pointer-events:none;
+      opacity:.95;
+    }
+
+    @keyframes holoSweep{
+      0%{transform:translateX(-18%) rotate(8deg)}
+      50%{transform:translateX(18%) rotate(8deg)}
+      100%{transform:translateX(-18%) rotate(8deg)}
+    }
+
+    .secure-strip{
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:58%;
+      width:22px;
+      transform:skewX(-11deg);
+      opacity:.58;
+      pointer-events:none;
+      box-shadow:0 0 20px rgba(82,199,255,.16), inset 0 0 10px rgba(255,255,255,.12);
+    }
+
+    .holo-orb{
+      position:absolute;
+      top:16px;
+      right:18px;
+      width:84px;
+      height:84px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), transparent 20%),
+        conic-gradient(from 0deg,#ff5eea,#52c7ff,#8dff33,#ffe15a,#ff5eea);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:inset 0 0 18px rgba(255,255,255,.18), 0 0 26px rgba(82,199,255,.18);
+      animation:orbFloat 5s ease-in-out infinite;
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    @keyframes orbFloat{
+      0%,100%{transform:translateY(0) rotate(0)}
+      50%{transform:translateY(-6px) rotate(8deg)}
+    }
+
+    .dna-wrap{
+      position:absolute;
+      left:14px;
+      bottom:12px;
+      width:150px;
+      height:94px;
+      opacity:.55;
+      pointer-events:none;
+      filter:drop-shadow(0 0 10px rgba(82,199,255,.18));
+    }
+
+    .dna-wrap svg{ width:100%; height:100%; }
+    .dna-path-a,.dna-path-b,.dna-rung{ fill:none; stroke-linecap:round; }
+    .dna-path-a{ stroke-width:2.2; stroke-dasharray:10 8; animation:dnaFlowA 5s linear infinite; }
+    .dna-path-b{ stroke-width:2.2; stroke-dasharray:10 8; animation:dnaFlowB 4.6s linear infinite; }
+    .dna-rung{ stroke:rgba(255,255,255,.35); stroke-width:1.3; animation:dnaPulse 2.6s ease-in-out infinite; }
+
+    @keyframes dnaFlowA{ from{stroke-dashoffset:0} to{stroke-dashoffset:-72} }
+    @keyframes dnaFlowB{ from{stroke-dashoffset:72} to{stroke-dashoffset:0} }
+    @keyframes dnaPulse{ 0%,100%{opacity:.35} 50%{opacity:.9} }
+
+    .card-inner{
+      position:relative;
+      z-index:1;
+      padding:20px;
+    }
+
+    .topline{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .brand{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:1.7px;
+      text-transform:uppercase;
+    }
+
+    .badge{
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:1.2px;
+      text-transform:uppercase;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.04);
+      color:rgba(255,255,255,.86);
+    }
+
+    .card-title{
+      font-size:24px;
+      font-weight:900;
+      margin-bottom:16px;
+    }
+
+    .card-grid{
+      display:grid;
+      grid-template-columns:112px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .photo{
+      width:112px;
+      height:112px;
+      border-radius:20px;
+      object-fit:cover;
+      background:#263243;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 12px 24px rgba(0,0,0,.28);
+    }
+
+    .info{
+      display:grid;
+      gap:8px;
+      font-size:15px;
+    }
+
+    .info strong{ color:#fff; }
+
+    .benefits{
+      margin:10px 0 0;
+      padding-left:18px;
+    }
+
+    .benefits li{ margin-bottom:5px; }
+
+    .tier-starter{ --tier1:#c8d2e0; --tier2:#6f7e97; --glow:rgba(200,210,224,.2); }
+    .tier-rider{ --tier1:#57cbff; --tier2:#2a8fff; --glow:rgba(87,203,255,.22); }
+    .tier-soutien{ --tier1:#52f0b5; --tier2:#1ba56e; --glow:rgba(82,240,181,.2); }
+    .tier-progression{ --tier1:#8dff33; --tier2:#d9ff64; --glow:rgba(141,255,51,.22); }
+    .tier-premium{ --tier1:#ffd65a; --tier2:#ff8b2b; --glow:rgba(255,214,90,.22); }
+
+    .member-card[class*="tier-"] .brand{ color:var(--tier1); }
+    .member-card[class*="tier-"] .badge{ box-shadow:0 0 18px var(--glow); }
+    .member-card[class*="tier-"] .secure-strip{ background:linear-gradient(180deg,var(--tier1),rgba(255,255,255,.12),var(--tier2)); }
+    .member-card[class*="tier-"] .dna-path-a{ stroke:var(--tier1); }
+    .member-card[class*="tier-"] .dna-path-b{ stroke:var(--tier2); }
+    .tier-name{ font-weight:900; color:var(--tier1); }
+
+    .cards-list{
+      display:grid;
+      gap:14px;
+    }
+
+    .item{
+      background:var(--card-2);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+      display:grid;
+      grid-template-columns:82px 1fr auto;
+      gap:14px;
+      align-items:center;
+    }
+
+    .thumb{
+      width:82px;
+      height:82px;
+      border-radius:16px;
+      object-fit:cover;
+      background:#1c2533;
+      border:1px solid var(--border);
+    }
+
+    .meta h3{
+      margin:0 0 6px;
+      font-size:17px;
+      font-weight:800;
+    }
+
+    .meta p{
+      margin:3px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .tag{
+      display:inline-block;
+      margin-top:7px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .item-actions{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    /* ===== Protection par code ===== */
+    #loginOverlay{
+      position:fixed;
+      inset:0;
+      z-index:99999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(59,130,246,.08), transparent 22%),
+        linear-gradient(180deg,#020617 0%,#0b1120 100%);
+    }
+
+    .login-box{
+      width:100%;
+      max-width:380px;
+      background:rgba(15,23,42,.96);
+      border:1px solid rgba(148,163,184,.28);
+      border-radius:24px;
+      padding:24px;
+      box-shadow:0 24px 60px rgba(0,0,0,.45);
+      backdrop-filter:blur(12px);
+    }
+
+    .login-box h2{
+      margin:0 0 8px;
+      font-size:26px;
+      font-weight:900;
+      text-align:center;
+    }
+
+    .login-box p{
+      margin:0 0 16px;
+      color:#94a3b8;
+      text-align:center;
+      line-height:1.5;
+      font-size:14px;
+    }
+
+    .login-box input{
+      width:100%;
+      border:1px solid rgba(148,163,184,.28);
+      background:#0b1220;
+      color:#fff;
+      border-radius:14px;
+      padding:14px 16px;
+      font:inherit;
+      outline:none;
+    }
+
+    .login-box button{
+      width:100%;
+      margin-top:12px;
+      border:0;
+      border-radius:14px;
+      padding:14px 16px;
+      font:inherit;
+      font-weight:900;
+      cursor:pointer;
+      background:linear-gradient(135deg,#22c55e,#65f180);
+      color:#052e16;
+      box-shadow:0 12px 26px rgba(34,197,94,.28);
+    }
+
+    #loginError{
+      min-height:20px;
+      margin-top:10px;
+      color:#fca5a5;
+      text-align:center;
+      font-size:14px;
+    }
+
+    .app-locked{
+      overflow:hidden;
+    }
+
+    @media (max-width:980px){
+      .layout{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width:680px){
+      .row{ grid-template-columns:1fr; }
+      .item{ grid-template-columns:1fr; }
+      .item-actions{ flex-direction:row; flex-wrap:wrap; }
+      .card-grid{ grid-template-columns:1fr; }
+      .photo{ margin:0 auto; }
+      .topline{ flex-direction:column; align-items:flex-start; }
+    }
+  </style>
+</head>
+<body class="app-locked">
+  <div id="loginOverlay">
+    <div class="login-box">
+      <h2>Accès privé RSL</h2>
+      <p>Entre le code d’accès pour ouvrir l’administration des cartes membres.</p>
+      <input id="passwordInput" type="password" placeholder="Code d’accès" autocomplete="off" />
+      <button type="button" onclick="checkPassword()">Accéder</button>
+      <div id="loginError"></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1>Admin cartes membres RSL</h1>
+    <div class="sub">
+      Version complète avec Supabase + upload image dans Storage.
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Créer / modifier une carte</h2>
+
+        <input type="hidden" id="cardId" />
+
+        <label for="memberCode">Code membre</label>
+        <input id="memberCode" placeholder="Ex: RSL-JOEL-01" />
+
+        <label for="membershipTier">Formule membre</label>
+        <select id="membershipTier">
+          <option value="starter">Starter — 50 CHF/an</option>
+          <option value="rider">Rider — 80 CHF/an</option>
+          <option value="soutien">Pro / Soutien — 15 CHF/mois ou 149 CHF/an</option>
+          <option value="progression">Progression — 289 CHF/an ou 25 CHF/mois</option>
+          <option value="premium">Premium — 490 CHF/an ou 43 CHF/mois</option>
+        </select>
+
+        <label for="fullName">Nom complet</label>
+        <input id="fullName" placeholder="Ex: Meuwly Joël" />
+
+        <div class="row">
+          <div>
+            <label for="birthDate">Date de naissance</label>
+            <input id="birthDate" placeholder="01.08.1988" />
+          </div>
+          <div>
+            <label for="validUntil">Valable jusqu'à</label>
+            <input id="validUntil" placeholder="2030" />
+          </div>
+        </div>
+
+        <label for="roleLabel">Rôle affiché</label>
+        <input id="roleLabel" placeholder="Ex: Président — accès total" />
+
+        <label for="photoUrl">URL image</label>
+        <input id="photoUrl" placeholder="https://..." />
+
+        <div class="upload-box">
+          <label for="photoFile" style="margin-top:0;">Ou téléverser une image</label>
+          <input id="photoFile" type="file" accept="image/*" />
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn-upload" type="button" onclick="uploadMemberImage()">Téléverser l’image</button>
+          </div>
+          <div class="small-note">
+            L’image sera envoyée dans le bucket <b>member-cards</b>.  
+            Après upload, l’URL sera remplie automatiquement.
+          </div>
+          <div class="upload-preview">
+            <img id="uploadPreview" src="https://via.placeholder.com/200x200.png?text=Photo" alt="Prévisualisation upload">
+            <div class="small-note" id="uploadStatus">Aucune image envoyée.</div>
+          </div>
+        </div>
+
+        <label for="benefits">Avantages affichés (1 ligne = 1 avantage)</label>
+        <textarea id="benefits"></textarea>
+
+        <label for="isActive">Statut</label>
+        <select id="isActive">
+          <option value="true">Active</option>
+          <option value="false">Inactive</option>
+        </select>
+
+        <div class="actions">
+          <button class="btn-main" type="button" onclick="saveCard()">Enregistrer</button>
+          <button class="btn-alt" type="button" onclick="resetForm()">Nouvelle carte</button>
+          <button class="btn-danger" type="button" onclick="deleteCurrentCard()">Supprimer</button>
+        </div>
+
+        <div class="status" id="statusText"></div>
+
+        <div style="margin-top:18px;">
+          <div id="previewCard" class="member-card tier-premium">
+            <div class="secure-strip"></div>
+            <div class="holo-orb"></div>
+
+            <div class="dna-wrap">
+              <svg viewBox="0 0 145 92" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path class="dna-path-a" d="M15,8 C40,18 40,36 72,46 C104,56 104,74 130,84" />
+                <path class="dna-path-b" d="M15,84 C40,74 40,56 72,46 C104,36 104,18 130,8" />
+                <line class="dna-rung" x1="24" y1="18" x2="24" y2="74" />
+                <line class="dna-rung" x1="42" y1="24" x2="42" y2="68" />
+                <line class="dna-rung" x1="60" y1="34" x2="60" y2="58" />
+                <line class="dna-rung" x1="78" y1="34" x2="78" y2="58" />
+                <line class="dna-rung" x1="96" y1="24" x2="96" y2="68" />
+                <line class="dna-rung" x1="114" y1="18" x2="114" y2="74" />
+              </svg>
+            </div>
+
+            <div class="card-inner">
+              <div class="topline">
+                <div class="brand">RSL MEMBER PASS</div>
+                <div id="previewTierBadge" class="badge">PREMIUM</div>
+              </div>
+
+              <div id="previewTitle" class="card-title">Carte Premium</div>
+
+              <div class="card-grid">
+                <img id="previewPhoto" class="photo" src="https://via.placeholder.com/400x400.png?text=Photo" alt="Photo" />
+                <div>
+                  <div class="info">
+                    <div><strong>Nom :</strong> <span id="previewName">—</span></div>
+                    <div><strong>Naissance :</strong> <span id="previewBirth">—</span></div>
+                    <div><strong>Validité :</strong> <span id="previewValid">—</span></div>
+                    <div><strong>Formule :</strong> <span id="previewTier" class="tier-name">Premium</span></div>
+                    <div><strong>Statut :</strong> <span id="previewRole">Président — accès total</span></div>
+                  </div>
+                  <ul id="previewBenefits" class="benefits"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Cartes enregistrées</h2>
+        <div id="cardsList" class="cards-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ACCESS_CODE = "Skate2026";
+
+    function unlockApp(){
+      const overlay = document.getElementById("loginOverlay");
+      overlay.style.display = "none";
+      document.body.classList.remove("app-locked");
+      sessionStorage.setItem("rsl_admin_access", "ok");
+      const pwd = document.getElementById("passwordInput");
+      if (pwd) pwd.value = "";
+    }
+
+    function checkPassword(){
+      const input = document.getElementById("passwordInput").value;
+      const error = document.getElementById("loginError");
+
+      if(input === ACCESS_CODE){
+        error.textContent = "";
+        unlockApp();
+      } else {
+        error.textContent = "Code incorrect";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if(sessionStorage.getItem("rsl_admin_access") === "ok"){
+        unlockApp();
+      }
+
+      const pwd = document.getElementById("passwordInput");
+      if (pwd){
+        pwd.addEventListener("keydown", (e) => {
+          if(e.key === "Enter"){
+            checkPassword();
+          }
+        });
+      }
+    });
+
+    const STORAGE_BUCKET = "member-cards";
+
+    function waitForEnv(timeoutMs = 3500){
+      return new Promise((resolve)=>{
+        const start = Date.now();
+        (function tick(){
+          const ok = !!(window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON);
+          if(ok) return resolve(true);
+          if(Date.now() - start > timeoutMs) return resolve(false);
+          setTimeout(tick, 30);
+        })();
+      });
+    }
+
+    function getSupa(){
+      if(window.__rslSupaCardsAdmin) return window.__rslSupaCardsAdmin;
+
+      const url = window.env?.SUPABASE_URL || "https://jynxifufaauoxwzjapzq.supabase.co";
+      const anon = window.env?.SUPABASE_ANON || "TA_CLE_ANON_ICI";
+
+      if(!window.supabase?.createClient){
+        console.error("Supabase JS non chargé.");
+        return null;
+      }
+
+      if(!url || typeof url !== "string" || !(url.startsWith("https://") || url.startsWith("http://"))){
+        console.error("SUPABASE_URL invalide :", url);
+        return null;
+      }
+
+      if(!anon || typeof anon !== "string"){
+        console.error("SUPABASE_ANON invalide.");
+        return null;
+      }
+
+      window.__rslSupaCardsAdmin = window.supabase.createClient(url, anon);
+      return window.__rslSupaCardsAdmin;
+    }
+
+    const defaultBenefitsByTier = {
+      starter: [
+        "Statut membre officiel RSL",
+        "Cours RSL à 20 CHF au lieu de 30 CHF",
+        "-10% sur le livret de tricks",
+        "-10% dans les boutiques partenaires",
+        "Sticker / support visuel RSL inclus"
+      ],
+      rider: [
+        "Accès prioritaire à certaines sessions & événements",
+        "Cours RSL à 20 CHF au lieu de 30 CHF",
+        "-15% sur le livret de tricks",
+        "-15% dans les boutiques partenaires RSL",
+        "Sticker / support visuel RSL inclus"
+      ],
+      soutien: [
+        "Livret de tricks offert",
+        "Cours RSL à 20 CHF au lieu de 30 CHF",
+        "-15% dans les boutiques partenaires RSL",
+        "Sticker / support visuel RSL inclus"
+      ],
+      progression: [
+        "15 cours inclus",
+        "Après : cours à 20 CHF",
+        "-15% matériel & partenaires",
+        "T-shirt RSL offert"
+      ],
+      premium: [
+        "Tous les cours gratuits",
+        "-50% sur events",
+        "Suivi avancé",
+        "T-shirt + Sweat offerts"
+      ]
+    };
+
+    function tierLabel(tier){
+      return {
+        starter: "Starter",
+        rider: "Rider",
+        soutien: "Pro / Soutien",
+        progression: "Progression",
+        premium: "Premium"
+      }[tier] || "Membre";
+    }
+
+    function tierClass(tier){
+      return `tier-${tier || "starter"}`;
+    }
+
+    function setStatus(text, isError = false){
+      const el = document.getElementById("statusText");
+      el.textContent = text || "";
+      el.style.color = isError ? "#fca5a5" : "#94a3b8";
+    }
+
+    function setUploadStatus(text, isError = false){
+      const el = document.getElementById("uploadStatus");
+      el.textContent = text || "";
+      el.style.color = isError ? "#fca5a5" : "#94a3b8";
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function updatePreview(){
+      const tier = document.getElementById("membershipTier").value || "premium";
+      const fullName = document.getElementById("fullName").value.trim() || "—";
+      const birthDate = document.getElementById("birthDate").value.trim() || "—";
+      const validUntil = document.getElementById("validUntil").value.trim() || "—";
+      const roleLabel = document.getElementById("roleLabel").value.trim() || "Membre officiel";
+      const photoUrl = document.getElementById("photoUrl").value.trim() || "https://via.placeholder.com/400x400.png?text=Photo";
+      const benefits = document.getElementById("benefits").value
+        .split("\n")
+        .map(v => v.trim())
+        .filter(Boolean);
+
+      const card = document.getElementById("previewCard");
+      card.className = `member-card ${tierClass(tier)}`;
+
+      document.getElementById("previewTierBadge").textContent = tierLabel(tier).toUpperCase();
+      document.getElementById("previewTitle").textContent = `Carte ${tierLabel(tier)}`;
+      document.getElementById("previewPhoto").src = photoUrl;
+      document.getElementById("previewName").textContent = fullName;
+      document.getElementById("previewBirth").textContent = birthDate;
+      document.getElementById("previewValid").textContent = validUntil;
+      document.getElementById("previewTier").textContent = tierLabel(tier);
+      document.getElementById("previewRole").textContent = roleLabel;
+      document.getElementById("previewBenefits").innerHTML =
+        benefits.length
+          ? benefits.map(b => `<li>${escapeHtml(b)}</li>`).join("")
+          : "<li>Aucun avantage</li>";
+
+      document.getElementById("uploadPreview").src = photoUrl;
+    }
+
+    function resetForm(){
+      document.getElementById("cardId").value = "";
+      document.getElementById("memberCode").value = "";
+      document.getElementById("membershipTier").value = "starter";
+      document.getElementById("fullName").value = "";
+      document.getElementById("birthDate").value = "";
+      document.getElementById("validUntil").value = "";
+      document.getElementById("roleLabel").value = "";
+      document.getElementById("photoUrl").value = "";
+      document.getElementById("photoFile").value = "";
+      document.getElementById("benefits").value = defaultBenefitsByTier.starter.join("\n");
+      document.getElementById("isActive").value = "true";
+      document.getElementById("uploadPreview").src = "https://via.placeholder.com/200x200.png?text=Photo";
+      setUploadStatus("Aucune image envoyée.");
+      setStatus("");
+      updatePreview();
+    }
+
+    function fillForm(card){
+      document.getElementById("cardId").value = card.id || "";
+      document.getElementById("memberCode").value = card.member_code || "";
+      document.getElementById("membershipTier").value = card.membership_tier || "starter";
+      document.getElementById("fullName").value = card.full_name || "";
+      document.getElementById("birthDate").value = card.birth_date || "";
+      document.getElementById("validUntil").value = card.valid_until || "";
+      document.getElementById("roleLabel").value = card.role_label || "";
+      document.getElementById("photoUrl").value = card.photo_url || "";
+      document.getElementById("benefits").value = Array.isArray(card.benefits) ? card.benefits.join("\n") : "";
+      document.getElementById("isActive").value = String(card.is_active ?? true);
+      document.getElementById("uploadPreview").src = card.photo_url || "https://via.placeholder.com/200x200.png?text=Photo";
+      setUploadStatus(card.photo_url ? "Image déjà liée à cette carte." : "Aucune image envoyée.");
+      updatePreview();
+    }
+
+    function fillBenefitsForTierIfEmpty(){
+      const tier = document.getElementById("membershipTier").value;
+      const field = document.getElementById("benefits");
+      if(!field.value.trim()){
+        field.value = (defaultBenefitsByTier[tier] || []).join("\n");
+      }
+    }
+
+    async function uploadMemberImage(){
+      const supa = getSupa();
+      if(!supa){
+        setUploadStatus("Supabase indisponible.", true);
+        return;
+      }
+
+      const fileInput = document.getElementById("photoFile");
+      const file = fileInput.files?.[0];
+
+      if(!file){
+        setUploadStatus("Choisis une image d’abord.", true);
+        return;
+      }
+
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const safeName = `member-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `cards/${safeName}`;
+
+      setUploadStatus("Upload en cours...");
+
+      const { error: uploadError } = await supa.storage
+        .from(STORAGE_BUCKET)
+        .upload(path, file, {
+          cacheControl: "3600",
+          upsert: false
+        });
+
+      if(uploadError){
+        console.error(uploadError);
+        setUploadStatus("Erreur upload : " + uploadError.message, true);
+        return;
+      }
+
+      const { data } = supa.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      const publicUrl = data?.publicUrl || "";
+
+      if(!publicUrl){
+        setUploadStatus("Upload fait, mais URL publique introuvable.", true);
+        return;
+      }
+
+      document.getElementById("photoUrl").value = publicUrl;
+      document.getElementById("uploadPreview").src = publicUrl;
+      setUploadStatus("Image envoyée avec succès.");
+      updatePreview();
+    }
+
+    async function loadCards(){
+      const supa = getSupa();
+
+      if(!supa){
+        setStatus("Supabase indisponible ou mal configuré.", true);
+        return;
+      }
+
+      setStatus("Chargement des cartes...");
+
+      const result = await supa
+        .from("rsl_member_cards")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if(result.error){
+        setStatus("Erreur chargement : " + result.error.message, true);
+        console.error(result.error);
+        return;
+      }
+
+      renderCards(result.data || []);
+      setStatus(`${(result.data || []).length} carte(s) chargée(s).`);
+    }
+
+    function renderCards(cards){
+      const list = document.getElementById("cardsList");
+      window.__cardsCache = cards;
+
+      if(!cards.length){
+        list.innerHTML = "<p>Aucune carte enregistrée.</p>";
+        return;
+      }
+
+      list.innerHTML = cards.map(card => `
+        <div class="item">
+          <img class="thumb" src="${escapeHtml(card.photo_url || "https://via.placeholder.com/300x300.png?text=Photo")}" alt="Photo">
+          <div class="meta">
+            <h3>${escapeHtml(card.full_name)}</h3>
+            <p><strong>Code :</strong> ${escapeHtml(card.member_code)}</p>
+            <p><strong>Formule :</strong> ${escapeHtml(tierLabel(card.membership_tier))}</p>
+            <p><strong>Statut :</strong> ${escapeHtml(card.role_label || "Membre")}</p>
+            <p><strong>Active :</strong> ${card.is_active ? "Oui" : "Non"}</p>
+            <div class="tag">${escapeHtml((card.benefits || []).length + " avantage(s)")}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn-alt" type="button" onclick="editCard('${card.id}')">Modifier</button>
+            <button class="btn-danger" type="button" onclick="deleteCard('${card.id}', '${escapeHtml(card.photo_url || "")}')">Supprimer</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function editCard(id){
+      const cards = window.__cardsCache || [];
+      const card = cards.find(c => c.id === id);
+      if(!card) return;
+      fillForm(card);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function saveCard(){
+      const supa = getSupa();
+
+      if(!supa){
+        setStatus("Supabase indisponible ou mal configuré.", true);
+        return;
+      }
+
+      const id = document.getElementById("cardId").value.trim();
+
+      const payload = {
+        member_code: document.getElementById("memberCode").value.trim(),
+        membership_tier: document.getElementById("membershipTier").value,
+        full_name: document.getElementById("fullName").value.trim(),
+        birth_date: document.getElementById("birthDate").value.trim(),
+        valid_until: document.getElementById("validUntil").value.trim(),
+        role_label: document.getElementById("roleLabel").value.trim(),
+        photo_url: document.getElementById("photoUrl").value.trim(),
+        benefits: document.getElementById("benefits").value
+          .split("\n")
+          .map(v => v.trim())
+          .filter(Boolean),
+        is_active: document.getElementById("isActive").value === "true"
+      };
+
+      if(!payload.member_code || !payload.full_name){
+        setStatus("Le code membre et le nom sont obligatoires.", true);
+        return;
+      }
+
+      setStatus("Enregistrement...");
+
+      let result;
+
+      if(id){
+        result = await supa
+          .from("rsl_member_cards")
+          .update(payload)
+          .eq("id", id);
+      } else {
+        result = await supa
+          .from("rsl_member_cards")
+          .insert(payload);
+      }
+
+      if(result.error){
+        console.error(result.error);
+        setStatus("Erreur enregistrement : " + result.error.message, true);
+        return;
+      }
+
+      setStatus("Carte enregistrée.");
+      await loadCards();
+
+      if(!id){
+        resetForm();
+      }
+    }
+
+    async function deleteStorageImageIfPossible(photoUrl){
+      if(!photoUrl) return;
+
+      try{
+        const marker = `/storage/v1/object/public/${STORAGE_BUCKET}/`;
+        const idx = photoUrl.indexOf(marker);
+        if(idx === -1) return;
+
+        const path = decodeURIComponent(photoUrl.substring(idx + marker.length));
+        if(!path) return;
+
+        const supa = getSupa();
+        if(!supa) return;
+
+        await supa.storage.from(STORAGE_BUCKET).remove([path]);
+      } catch (e){
+        console.warn("Impossible de supprimer l'image du storage :", e);
+      }
+    }
+
+    async function deleteCard(id, photoUrl = ""){
+      const supa = getSupa();
+
+      if(!supa){
+        setStatus("Supabase indisponible ou mal configuré.", true);
+        return;
+      }
+
+      if(!confirm("Supprimer cette carte ?")) return;
+
+      setStatus("Suppression...");
+
+      const result = await supa
+        .from("rsl_member_cards")
+        .delete()
+        .eq("id", id);
+
+      if(result.error){
+        console.error(result.error);
+        setStatus("Erreur suppression : " + result.error.message, true);
+        return;
+      }
+
+      await deleteStorageImageIfPossible(photoUrl);
+
+      setStatus("Carte supprimée.");
+      await loadCards();
+      resetForm();
+    }
+
+    async function deleteCurrentCard(){
+      const id = document.getElementById("cardId").value.trim();
+      if(!id){
+        setStatus("Aucune carte ouverte.", true);
+        return;
+      }
+
+      const photoUrl = document.getElementById("photoUrl").value.trim();
+      await deleteCard(id, photoUrl);
+    }
+
+    async function boot(){
+      setStatus("Initialisation...");
+      await waitForEnv(3500);
+
+      const supa = getSupa();
+      if(!supa){
+        setStatus("Impossible d'initialiser Supabase.", true);
+        return;
+      }
+
+      resetForm();
+      await loadCards();
+    }
+
+    document.getElementById("membershipTier").addEventListener("change", () => {
+      fillBenefitsForTierIfEmpty();
+      updatePreview();
+    });
+
+    document.getElementById("photoFile").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+
+      const localUrl = URL.createObjectURL(file);
+      document.getElementById("uploadPreview").src = localUrl;
+      setUploadStatus("Image sélectionnée. Clique sur “Téléverser l’image”.");
+    });
+
+    ["memberCode","fullName","birthDate","validUntil","roleLabel","photoUrl","benefits","isActive"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updatePreview);
+      document.getElementById(id).addEventListener("change", updatePreview);
+    });
+
+    boot();
+  </script>
+</body>
+</html>
