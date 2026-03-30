@@ -7,13 +7,12 @@
 
   <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#0b1120" />
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Carte RSL" />
   <link rel="apple-touch-icon" href="/icons/rsl-card-192.png" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -24,7 +23,6 @@
       --fg:#e5e7eb;
       --muted:#94a3b8;
       --border:rgba(255,255,255,.10);
-      --glass:rgba(255,255,255,.05);
     }
 
     *{box-sizing:border-box}
@@ -37,7 +35,7 @@
         radial-gradient(circle at top right, rgba(59,130,246,.08), transparent 22%),
         linear-gradient(180deg,#020617 0%,#0b1120 100%);
       color:var(--fg);
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font-family:"Outfit",sans-serif;
     }
 
     .wrap{
@@ -46,18 +44,9 @@
       padding:22px 14px 40px;
     }
 
-    .panel{
-      background:rgba(15,23,42,.94);
-      border:1px solid rgba(148,163,184,.22);
-      border-radius:24px;
-      padding:18px;
-      box-shadow:0 24px 60px rgba(0,0,0,.45);
-      backdrop-filter:blur(12px);
-    }
-
     h1{
-      margin:0 0 8px;
       text-align:center;
+      margin:0 0 8px;
       font-size:28px;
       font-weight:900;
     }
@@ -70,41 +59,28 @@
       line-height:1.5;
     }
 
-    label{
-      display:block;
-      margin-bottom:8px;
-      font-size:14px;
+    input,button{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:none;
       font-weight:800;
-      color:#dbe4ef;
+      margin-top:10px;
+      font-family:"Outfit",sans-serif;
     }
 
     input{
-      width:100%;
-      border:1px solid rgba(255,255,255,.12);
-      background:#0b1220;
+      background:#111827;
       color:#fff;
-      border-radius:14px;
-      padding:13px 14px;
-      font:inherit;
-      outline:none;
+      border:1px solid rgba(255,255,255,.10);
     }
 
     button{
-      margin-top:10px;
-      width:100%;
-      border:0;
-      border-radius:14px;
-      padding:13px 14px;
-      font:inherit;
-      font-weight:900;
-      cursor:pointer;
       background:linear-gradient(135deg,#22c55e,#65f180);
       color:#052e16;
+      cursor:pointer;
       box-shadow:0 12px 26px rgba(34,197,94,.28);
-      transition:.18s ease;
     }
-
-    button:hover{ transform:translateY(-1px); }
 
     .message{
       margin-top:12px;
@@ -114,60 +90,32 @@
       font-size:14px;
     }
 
-    .install-wrap{
-      margin-top:14px;
-    }
-
+    /* ===== GROS BOUTON INSTALL ===== */
     #installBtn{
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:12px;
       width:100%;
-      margin-top:0;
-      border:0;
-      border-radius:18px;
-      padding:20px 18px;
-      font:inherit;
-      font-size:24px;
+      margin-top:18px;
+      padding:22px;
+      border-radius:20px;
+      font-size:22px;
       font-weight:900;
       text-transform:uppercase;
-      cursor:pointer;
       background:linear-gradient(135deg,#38bdf8,#2563eb);
-      color:#fff;
-      box-shadow:
-        0 20px 45px rgba(37,99,235,.34),
-        inset 0 1px 0 rgba(255,255,255,.16);
-    }
-
-    #installBtn:hover{
-      transform:translateY(-2px);
-    }
-
-    .install-link{
-      display:block;
-      margin-top:10px;
-      text-align:center;
-      font-size:14px;
-      font-weight:800;
-      color:#93c5fd;
-      text-decoration:none;
-    }
-
-    .install-link:hover{
-      text-decoration:underline;
+      color:white;
+      box-shadow:0 20px 40px rgba(37,99,235,.4);
     }
 
     #installHint{
-      margin-top:10px;
       text-align:center;
-      color:var(--muted);
-      min-height:20px;
-      font-size:14px;
+      margin-top:10px;
       font-weight:700;
+      color:#94a3b8;
+      min-height:20px;
     }
 
-    /* ===== CARD FORMAT ===== */
+    /* ===== CARTE COMPLÈTE ===== */
     .member-card{
       position:relative;
       overflow:hidden;
@@ -612,349 +560,284 @@
         font-size:10px;
         line-height:1.45;
       }
-
-      #installBtn{
-        font-size:18px;
-        padding:18px 16px;
-      }
     }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="panel">
-      <h1>Carte membre RSL</h1>
-      <div class="sub">
-        Entre ton code membre pour afficher ta carte officielle.
+<div class="wrap">
+
+  <h1>Carte membre RSL</h1>
+  <div class="sub">Entre ton code membre pour afficher ta carte officielle.</div>
+
+  <input id="codeInput" placeholder="Code membre" />
+  <button onclick="loadMemberCard()">Afficher ma carte</button>
+
+  <button id="installBtn">📲 Installer la carte RSL</button>
+  <div id="installHint"></div>
+  <div id="message" class="message"></div>
+
+  <div id="memberCard" class="member-card tier-premium" oncontextmenu="return false;">
+    <div class="secure-strip"></div>
+    <div class="holo-orb"></div>
+
+    <img
+      class="rsl-top-logo"
+      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/logo%20site/logo%20160x160.png"
+      alt="Logo RSL haut gauche"
+    />
+
+    <img
+      class="orb-logo"
+      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/logo%20site/logo%20160x160.png"
+      alt="Logo RSL central"
+    />
+
+    <img
+      class="rsl-bg-logo"
+      src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/logo%20site/logo%20160x160.png"
+      alt="Logo RSL fond"
+    />
+
+    <div class="dna-wrap">
+      <svg viewBox="0 0 145 92" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path class="dna-path-a" d="M15,8 C40,18 40,36 72,46 C104,56 104,74 130,84" />
+        <path class="dna-path-b" d="M15,84 C40,74 40,56 72,46 C104,36 104,18 130,8" />
+        <line class="dna-rung" x1="24" y1="18" x2="24" y2="74" />
+        <line class="dna-rung" x1="42" y1="24" x2="42" y2="68" />
+        <line class="dna-rung" x1="60" y1="34" x2="60" y2="58" />
+        <line class="dna-rung" x1="78" y1="34" x2="78" y2="58" />
+        <line class="dna-rung" x1="96" y1="24" x2="96" y2="68" />
+        <line class="dna-rung" x1="114" y1="18" x2="114" y2="74" />
+      </svg>
+    </div>
+
+    <div class="card-inner">
+      <div class="topline">
+        <div class="brand-stack">
+          <div class="brand">RSL Member Pass</div>
+          <div class="brand-sub">Romandie Scooter League</div>
+        </div>
+        <div id="memberTierBadge" class="badge">PREMIUM</div>
       </div>
 
-      <label for="codeInput">Code membre</label>
-      <input id="codeInput" placeholder="Ex: RSL-JOEL-01" />
-      <button type="button" onclick="loadMemberCard()">Afficher ma carte</button>
+      <div id="memberTitle" class="card-title">Carte Premium</div>
+      <div class="card-subtitle">Licence digitale officielle</div>
 
-      <div class="install-wrap">
-        <button type="button" id="installBtn">📲 INSTALLER LA CARTE RSL</button>
-        <a class="install-link" href="/manifest.webmanifest" target="_blank" rel="noopener">
-          Lien PWA / manifest
-        </a>
-        <div id="installHint">Appuie sur le bouton pour installer la carte.</div>
+      <div class="license-bar">
+        <div class="license-left">Association reconnue • Carte active</div>
+        <div class="license-right" id="memberBottomTier">Premium</div>
       </div>
 
-      <div id="message" class="message"></div>
-
-      <div id="memberCard" class="member-card tier-premium" oncontextmenu="return false;">
-        <div class="secure-strip"></div>
-        <div class="holo-orb"></div>
-
-        <img
-          class="rsl-top-logo"
-          src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/logo%20site/logo%20160x160.png"
-          alt="Logo RSL haut gauche"
-        />
-
-        <img
-          class="orb-logo"
-          src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/logo%20site/logo%20160x160.png"
-          alt="Logo RSL central"
-        />
-
-        <img
-          class="rsl-bg-logo"
-          src="https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/logo%20site/logo%20160x160.png"
-          alt="Logo RSL fond"
-        />
-
-        <div class="dna-wrap">
-          <svg viewBox="0 0 145 92" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path class="dna-path-a" d="M15,8 C40,18 40,36 72,46 C104,56 104,74 130,84" />
-            <path class="dna-path-b" d="M15,84 C40,74 40,56 72,46 C104,36 104,18 130,8" />
-            <line class="dna-rung" x1="24" y1="18" x2="24" y2="74" />
-            <line class="dna-rung" x1="42" y1="24" x2="42" y2="68" />
-            <line class="dna-rung" x1="60" y1="34" x2="60" y2="58" />
-            <line class="dna-rung" x1="78" y1="34" x2="78" y2="58" />
-            <line class="dna-rung" x1="96" y1="24" x2="96" y2="68" />
-            <line class="dna-rung" x1="114" y1="18" x2="114" y2="74" />
-          </svg>
+      <div class="main-grid">
+        <div class="photo-wrap">
+          <img
+            id="memberPhoto"
+            class="photo"
+            src="images/default-avatar.png"
+            alt="Photo membre"
+            draggable="false"
+            onerror="this.onerror=null;this.src='images/default-avatar.png';"
+          />
+          <div class="photo-shine"></div>
         </div>
 
-        <div class="card-inner">
-          <div class="topline">
-            <div class="brand-stack">
-              <div class="brand">RSL Member Pass</div>
-              <div class="brand-sub">Romandie Scooter League</div>
+        <div class="right-col">
+          <div class="info">
+            <div class="info-row">
+              <div class="info-label">Nom</div>
+              <div class="info-value" id="memberName"></div>
             </div>
-            <div id="memberTierBadge" class="badge">PREMIUM</div>
-          </div>
-
-          <div id="memberTitle" class="card-title">Carte Premium</div>
-          <div class="card-subtitle">Licence digitale officielle</div>
-
-          <div class="license-bar">
-            <div class="license-left">Association reconnue • Carte active</div>
-            <div class="license-right" id="memberBottomTier">Premium</div>
-          </div>
-
-          <div class="main-grid">
-            <div class="photo-wrap">
-              <img
-                id="memberPhoto"
-                class="photo"
-                src="images/default-avatar.png"
-                alt="Photo membre"
-                draggable="false"
-                onerror="this.onerror=null;this.src='images/default-avatar.png';"
-              />
-              <div class="photo-shine"></div>
+            <div class="info-row">
+              <div class="info-label">Naissance</div>
+              <div class="info-value" id="memberBirth"></div>
             </div>
-
-            <div class="right-col">
-              <div class="info">
-                <div class="info-row">
-                  <div class="info-label">Nom</div>
-                  <div class="info-value" id="memberName"></div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Naissance</div>
-                  <div class="info-value" id="memberBirth"></div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Validité</div>
-                  <div class="info-value" id="memberValid"></div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Formule</div>
-                  <div class="info-value tier-name" id="memberTier"></div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Statut</div>
-                  <div class="info-value" id="memberRole"></div>
-                </div>
-              </div>
-
-              <div class="benefits-wrap">
-                <div class="benefits-title">Avantages inclus</div>
-                <ul id="memberBenefits" class="benefits"></ul>
-              </div>
+            <div class="info-row">
+              <div class="info-label">Validité</div>
+              <div class="info-value" id="memberValid"></div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Formule</div>
+              <div class="info-value tier-name" id="memberTier"></div>
+            </div>
+            <div class="info-row">
+              <div class="info-label">Statut</div>
+              <div class="info-value" id="memberRole"></div>
             </div>
           </div>
 
-          <div class="bottom">
-            <span>Carte officielle RSL</span>
-            <span>Animated DNA Holo</span>
-            <span>Licence membre active</span>
+          <div class="benefits-wrap">
+            <div class="benefits-title">Avantages inclus</div>
+            <ul id="memberBenefits" class="benefits"></ul>
           </div>
         </div>
+      </div>
+
+      <div class="bottom">
+        <span>Carte officielle RSL</span>
+        <span>Animated DNA Holo</span>
+        <span>Licence membre active</span>
       </div>
     </div>
   </div>
 
-  <script>
-    function waitForEnv(timeoutMs = 3500){
-      return new Promise((resolve)=>{
-        const start = Date.now();
-        (function tick(){
-          const ok = !!(window.env && window.env.SUPABASE_URL && window.env.SUPABASE_ANON);
-          if(ok) return resolve(true);
-          if(Date.now() - start > timeoutMs) return resolve(false);
-          setTimeout(tick, 30);
-        })();
-      });
+</div>
+
+<script>
+let deferredPrompt = null;
+
+function isIos(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+
+function isStandalone(){
+  return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+}
+
+window.addEventListener("beforeinstallprompt", (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installHint").textContent = "Clique pour installer la carte";
+});
+
+document.getElementById("installBtn").onclick = async ()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if(choice.outcome==="accepted"){
+      document.getElementById("installHint").textContent = "Installé avec succès";
     }
+    return;
+  }
 
-    function getSupa(){
-      if(window.__rslSupaMemberCard) return window.__rslSupaMemberCard;
+  if(isIos() && !isStandalone()){
+    document.getElementById("installHint").textContent =
+      "iPhone : bouton partager → Sur l’écran d’accueil";
+    return;
+  }
 
-      const url  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
-      const anon = window.env?.SUPABASE_ANON || "TA_CLE_ANON_ICI";
+  document.getElementById("installHint").textContent =
+    "Installation non disponible ici";
+};
 
-      if(!window.supabase?.createClient) return null;
+window.addEventListener("appinstalled", ()=>{
+  document.getElementById("installHint").textContent = "Carte installée";
+});
 
-      window.__rslSupaMemberCard = window.supabase.createClient(url, anon);
-      return window.__rslSupaMemberCard;
-    }
+function tierLabel(tier){
+  return {
+    starter: "Starter",
+    rider: "Rider",
+    soutien: "Pro / Soutien",
+    progression: "Progression",
+    premium: "Premium"
+  }[tier] || "Membre";
+}
 
-    function tierLabel(tier){
-      return {
-        starter: "Starter",
-        rider: "Rider",
-        soutien: "Pro / Soutien",
-        progression: "Progression",
-        premium: "Premium"
-      }[tier] || "Membre";
-    }
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-    function escapeHtml(str){
-      return String(str ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
+function safePhotoUrl(url){
+  const fallback = "images/default-avatar.png";
 
-    function safePhotoUrl(url){
-      const fallback = "images/default-avatar.png";
+  if(!url || typeof url !== "string") return fallback;
 
-      if(!url || typeof url !== "string") return fallback;
+  const clean = url.trim();
+  if(!clean) return fallback;
 
-      const clean = url.trim();
-      if(!clean) return fallback;
+  if(
+    clean.startsWith("http://") ||
+    clean.startsWith("https://") ||
+    clean.startsWith("/") ||
+    clean.startsWith("images/")
+  ){
+    return clean;
+  }
 
-      if(
-        clean.startsWith("http://") ||
-        clean.startsWith("https://") ||
-        clean.startsWith("/") ||
-        clean.startsWith("images/")
-      ){
-        return clean;
-      }
+  return fallback;
+}
 
-      return fallback;
-    }
+async function loadMemberCard(){
+  const code = document.getElementById("codeInput").value.trim();
+  const msg = document.getElementById("message");
+  const card = document.getElementById("memberCard");
 
-    async function loadMemberCard(){
-      const code = document.getElementById("codeInput").value.trim();
-      const message = document.getElementById("message");
-      const cardBox = document.getElementById("memberCard");
+  if(!code){
+    msg.textContent = "Entre un code membre";
+    card.style.display = "none";
+    return;
+  }
 
-      if(!code){
-        message.textContent = "Entre un code membre.";
-        cardBox.style.display = "none";
-        return;
-      }
+  const sb = supabase.createClient(
+    window.env.SUPABASE_URL,
+    window.env.SUPABASE_ANON
+  );
 
-      await waitForEnv(3500);
-      const sb = getSupa();
+  const {data,error} = await sb
+    .from("rsl_member_cards")
+    .select("*")
+    .eq("member_code",code)
+    .eq("is_active", true)
+    .maybeSingle();
 
-      if(!sb){
-        message.textContent = "Supabase indisponible.";
-        cardBox.style.display = "none";
-        return;
-      }
+  if(error){
+    msg.textContent = "Erreur : " + error.message;
+    card.style.display = "none";
+    return;
+  }
 
-      message.textContent = "Chargement...";
+  if(!data){
+    msg.textContent = "Aucune carte active trouvée";
+    card.style.display = "none";
+    return;
+  }
 
-      const { data, error } = await sb
-        .from("rsl_member_cards")
-        .select("*")
-        .eq("member_code", code)
-        .eq("is_active", true)
-        .maybeSingle();
+  const tier = data.membership_tier || "starter";
+  card.className = `member-card tier-${tier}`;
+  card.style.display = "block";
 
-      if(error){
-        message.textContent = "Erreur : " + error.message;
-        cardBox.style.display = "none";
-        return;
-      }
+  document.getElementById("memberPhoto").src = safePhotoUrl(data.photo_url);
+  document.getElementById("memberName").textContent = data.full_name || "—";
+  document.getElementById("memberBirth").textContent = data.birth_date || "—";
+  document.getElementById("memberValid").textContent = data.valid_until || "—";
+  document.getElementById("memberTier").textContent = tierLabel(tier);
+  document.getElementById("memberRole").textContent = data.role_label || "Membre officiel";
+  document.getElementById("memberTierBadge").textContent = tierLabel(tier).toUpperCase();
+  document.getElementById("memberTitle").textContent = `Carte ${tierLabel(tier)}`;
+  document.getElementById("memberBottomTier").textContent = tierLabel(tier);
 
-      if(!data){
-        message.textContent = "Aucune carte active trouvée avec ce code.";
-        cardBox.style.display = "none";
-        return;
-      }
+  const benefits = Array.isArray(data.benefits) ? data.benefits : [];
+  document.getElementById("memberBenefits").innerHTML =
+    benefits.length
+      ? benefits.map(b => `<li>${escapeHtml(b)}</li>`).join("")
+      : "<li>Aucun avantage</li>";
 
-      const tier = data.membership_tier || "starter";
-      cardBox.className = `member-card tier-${tier}`;
-      cardBox.style.display = "block";
+  msg.textContent = "";
+}
 
-      document.getElementById("memberPhoto").src = safePhotoUrl(data.photo_url);
-      document.getElementById("memberName").textContent = data.full_name || "—";
-      document.getElementById("memberBirth").textContent = data.birth_date || "—";
-      document.getElementById("memberValid").textContent = data.valid_until || "—";
-      document.getElementById("memberTier").textContent = tierLabel(tier);
-      document.getElementById("memberRole").textContent = data.role_label || "Membre officiel";
-      document.getElementById("memberTierBadge").textContent = tierLabel(tier).toUpperCase();
-      document.getElementById("memberTitle").textContent = `Carte ${tierLabel(tier)}`;
-      document.getElementById("memberBottomTier").textContent = tierLabel(tier);
+document.getElementById("codeInput").addEventListener("keydown", function(e){
+  if(e.key === "Enter") loadMemberCard();
+});
 
-      document.getElementById("memberBenefits").innerHTML =
-        (data.benefits || []).length
-          ? data.benefits.map(b => `<li>${escapeHtml(b)}</li>`).join("")
-          : "<li>Aucun avantage</li>";
+document.addEventListener("contextmenu", function(e){
+  if(e.target.closest("#memberCard")) e.preventDefault();
+});
 
-      message.textContent = "";
-    }
+document.addEventListener("dragstart", function(e){
+  if(e.target.closest("#memberCard")) e.preventDefault();
+});
 
-    document.getElementById("codeInput").addEventListener("keydown", function(e){
-      if(e.key === "Enter") loadMemberCard();
-    });
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("/sw.js");
+}
+</script>
 
-    document.addEventListener("contextmenu", function(e){
-      if(e.target.closest("#memberCard")) e.preventDefault();
-    });
-
-    document.addEventListener("dragstart", function(e){
-      if(e.target.closest("#memberCard")) e.preventDefault();
-    });
-
-    let deferredPrompt = null;
-
-    function isIos(){
-      return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
-    }
-
-    function isAndroid(){
-      return /android/i.test(window.navigator.userAgent);
-    }
-
-    function isInStandaloneMode(){
-      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-    }
-
-    async function registerSW(){
-      if("serviceWorker" in navigator){
-        try{
-          await navigator.serviceWorker.register("/sw.js");
-        }catch(err){
-          console.warn("Service worker non enregistré :", err);
-        }
-      }
-    }
-
-    const installBtn = document.getElementById("installBtn");
-    const installHint = document.getElementById("installHint");
-
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installHint.textContent = "Appuie sur le bouton bleu pour installer la carte.";
-    });
-
-    installBtn.addEventListener("click", async () => {
-      if(deferredPrompt){
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-
-        if(choice.outcome === "accepted"){
-          installHint.textContent = "Carte installée avec succès.";
-        }else{
-          installHint.textContent = "Installation annulée.";
-        }
-
-        deferredPrompt = null;
-        return;
-      }
-
-      if(isIos() && !isInStandaloneMode()){
-        installHint.textContent = "Sur iPhone : appuie sur Partager puis “Sur l’écran d’accueil”.";
-        return;
-      }
-
-      if(isAndroid() && !isInStandaloneMode()){
-        installHint.textContent = "Ouvre cette page dans Chrome Android pour installer la carte.";
-        return;
-      }
-
-      installHint.textContent = "Installation non disponible ici.";
-    });
-
-    window.addEventListener("appinstalled", () => {
-      installHint.textContent = "La carte RSL a bien été installée.";
-    });
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      await registerSW();
-    });
-  </script>
 </body>
 </html>
