@@ -308,16 +308,16 @@
   document.getElementById("loginBtn").addEventListener("click", () => {
     const pass = document.getElementById("adminPass").value;
     const err  = document.getElementById("loginErr");
-    if (pass === ADMIN_PASSWORD) { sessionStorage.setItem("admin_ok","1"); showAdmin(); }
+    if (pass === ADMIN_PASSWORD) { localStorage.setItem("admin_ok","1"); showAdmin(); }
     else { err.textContent = "Mot de passe incorrect."; err.style.display = "block"; }
   });
   document.getElementById("adminPass").addEventListener("keydown", e => {
     if (e.key === "Enter") document.getElementById("loginBtn").click();
   });
   document.getElementById("logoutBtn").addEventListener("click", () => {
-    sessionStorage.removeItem("admin_ok"); location.reload();
+    localStorage.removeItem("admin_ok"); location.reload();
   });
-  if (sessionStorage.getItem("admin_ok") === "1") showAdmin();
+  if (localStorage.getItem("admin_ok") === "1") showAdmin();
 
   function showAdmin() {
     document.getElementById("loginScreen").style.display = "none";
@@ -414,6 +414,8 @@
       // Mise à jour locale sans tout recharger
       const row = allRows.find(r => r.id === id);
       if (row) row.paid = !current;
+      // ✅ FIX : on vide le filtre statut pour que la ligne reste visible après le toggle
+      document.getElementById("filterPaid").value = "";
       renderTable();
       renderStats();
       return;
