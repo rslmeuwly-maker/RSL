@@ -21,7 +21,6 @@
     a{color:inherit}
     .wrap{max-width:1180px;margin:auto;padding:24px 16px 40px}
 
-    /* ── mêmes composants que inscription.html ── */
     .eyebrow{
       display:inline-block;background:var(--red);color:#fff;border-radius:999px;
       padding:9px 14px;font-weight:800;text-transform:uppercase;font-size:.78rem;
@@ -40,7 +39,6 @@
     }
     .panel h2{margin:0 0 18px;text-transform:uppercase;font-size:1.15rem;letter-spacing:.03em}
 
-    /* inputs */
     .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
     label{font-weight:700;font-size:.95rem}
     input,select,textarea{
@@ -59,12 +57,10 @@
     .msg{display:none;margin-top:14px;border-radius:14px;padding:14px;line-height:1.5}
     .msg.err{background:rgba(255,107,107,.10);border:1px solid rgba(255,107,107,.22);color:#ffdede}
 
-    /* login */
     #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
     .login-box{width:100%;max-width:400px}
     .login-box h1{font-size:clamp(2rem,4vw,4rem);line-height:.95;text-transform:uppercase;margin:0 0 22px}
 
-    /* admin */
     #adminScreen{display:none}
     .topbar{
       display:flex;align-items:center;justify-content:space-between;
@@ -86,7 +82,6 @@
     }
     .btn-sm:hover{background:rgba(255,255,255,.13);color:#fff}
 
-    /* stats — même style que price-grid */
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
     .stat-card{
       padding:20px;
@@ -99,7 +94,6 @@
     .stat-card.green .val{color:var(--green)}
     .stat-card.red .val{color:#ff6b6b}
 
-    /* filters */
     .filters{display:flex;gap:10px;flex-wrap:wrap}
     .filters select,.filters input{
       background:var(--panel2);border:1px solid rgba(255,255,255,.08);
@@ -107,7 +101,6 @@
     }
     .filters input{min-width:220px}
 
-    /* table */
     .table-wrap{
       overflow-x:auto;border-radius:22px;border:1px solid var(--line);
       background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
@@ -140,7 +133,6 @@
     .del-btn{border:1px solid rgba(255,107,107,.2);background:rgba(255,107,107,.10);color:#ff6b6b;border-radius:10px;padding:7px 11px;cursor:pointer;font-size:1rem;transition:.15s}
     .del-btn:hover{background:rgba(255,107,107,.25)}
 
-    /* modal — même base que .panel */
     .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
     .modal-bg.open{display:flex}
     .modal{
@@ -312,6 +304,7 @@
   const ADMIN_PASSWORD = "rsl-2026";
   let allRows = [];
 
+  // ── LOGIN ──
   document.getElementById("loginBtn").addEventListener("click", () => {
     const pass = document.getElementById("adminPass").value;
     const err  = document.getElementById("loginErr");
@@ -332,12 +325,17 @@
     loadInscriptions();
   }
 
+  // ── DATA ──
   async function loadInscriptions() {
     document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="empty">Chargement…</td></tr>';
     const { data, error } = await _supa.from("inscriptions").select("*").order("created_at", { ascending: false });
-    if (error) { document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="empty">Erreur : ' + error.message + '</td></tr>'; return; }
+    if (error) {
+      document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="empty">Erreur : ' + error.message + '</td></tr>';
+      return;
+    }
     allRows = data || [];
-    renderTable(); renderStats();
+    renderTable();
+    renderStats();
   }
 
   function renderStats() {
@@ -355,6 +353,7 @@
     const fPaid   = document.getElementById("filterPaid").value;
     const fMethod = document.getElementById("filterMethod").value;
     const fCat    = document.getElementById("filterCategory").value;
+
     const rows = allRows.filter(r => {
       const txt = (r.first_name + " " + r.last_name + " " + (r.email||"")).toLowerCase();
       if (search && !txt.includes(search)) return false;
@@ -363,14 +362,25 @@
       if (fCat   && r.category !== fCat) return false;
       return true;
     });
+
     const tbody = document.getElementById("tableBody");
-    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="10" class="empty">Aucune inscription trouvée.</td></tr>'; return; }
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="10" class="empty">Aucune inscription trouvée.</td></tr>';
+      return;
+    }
+
     tbody.innerHTML = rows.map((r, i) => {
-      const mLabel = r.payment_method === "card" ? "Carte" : r.payment_method === "twint" ? "Twint" : r.payment_method === "cash" ? "Cash" : "Facture";
-      const mClass = r.payment_method === "card" ? "carte" : r.payment_method === "twint" ? "twint" : r.payment_method === "cash" ? "cash" : "facture";
+      const mLabel = r.payment_method === "card" ? "Carte"
+                   : r.payment_method === "twint" ? "Twint"
+                   : r.payment_method === "cash"  ? "Cash" : "Facture";
+      const mClass = r.payment_method === "card" ? "carte"
+                   : r.payment_method === "twint" ? "twint"
+                   : r.payment_method === "cash"  ? "cash" : "facture";
       const pClass = r.paid ? "paid" : "unpaid";
       const pLabel = r.paid ? "✅ Payé" : "❌ En attente";
       const pack   = r.pack_type === "member_pack" ? "Pack membre" : "Standard";
+
+      // ✅ FIX : data-attributes au lieu de onclick inline (évite les bugs avec les UUIDs)
       return `<tr>
         <td style="color:var(--muted);font-size:.82rem">${i + 1}</td>
         <td><strong>${esc(r.last_name)} ${esc(r.first_name)}</strong><br><span style="color:var(--muted);font-size:.82rem">${esc(r.phone||"")}</span></td>
@@ -380,47 +390,76 @@
         <td style="color:var(--muted);font-size:.85rem">${pack}</td>
         <td><span class="amount">${r.total||0} CHF</span></td>
         <td><span class="chip ${mClass}">${mLabel}</span></td>
-        <td><button class="paid-btn ${pClass}" onclick="togglePaid('${r.id}',${r.paid})">${pLabel}</button></td>
-        <td><button class="del-btn" onclick="deleteRow('${r.id}','${esc(r.first_name)} ${esc(r.last_name)}')">🗑</button></td>
+        <td><button class="paid-btn ${pClass}" data-id="${r.id}" data-paid="${r.paid}">${pLabel}</button></td>
+        <td><button class="del-btn" data-id="${r.id}" data-name="${esc(r.first_name)} ${esc(r.last_name)}">🗑</button></td>
       </tr>`;
     }).join("");
   }
 
-  async function togglePaid(id, current) {
-    const { error } = await _supa.from("inscriptions").update({ paid: !current }).eq("id", id);
-    if (error) { alert("Erreur : " + error.message); return; }
-    const row = allRows.find(r => r.id === id);
-    if (row) row.paid = !current;
-    renderTable(); renderStats();
-  }
+  // ✅ FIX : délégation d'événements sur le tbody — un seul listener, pas d'onclick inline
+  document.getElementById("tableBody").addEventListener("click", async e => {
+    // Bouton "Payé / En attente"
+    const paidBtn = e.target.closest(".paid-btn");
+    if (paidBtn) {
+      const id      = paidBtn.dataset.id;
+      const current = paidBtn.dataset.paid === "true";
+      paidBtn.disabled = true;
 
-  async function deleteRow(id, name) {
-    if (!confirm("Supprimer l'inscription de " + name + " ?")) return;
-    const { error } = await _supa.from("inscriptions").delete().eq("id", id);
-    if (error) { alert("Erreur : " + error.message); return; }
-    allRows = allRows.filter(r => r.id !== id);
-    renderTable(); renderStats();
-  }
+      const { error } = await _supa.from("inscriptions").update({ paid: !current }).eq("id", id);
+      if (error) {
+        alert("Erreur Supabase : " + error.message);
+        paidBtn.disabled = false;
+        return;
+      }
+      // Mise à jour locale sans tout recharger
+      const row = allRows.find(r => r.id === id);
+      if (row) row.paid = !current;
+      renderTable();
+      renderStats();
+      return;
+    }
 
+    // Bouton supprimer
+    const delBtn = e.target.closest(".del-btn");
+    if (delBtn) {
+      const id   = delBtn.dataset.id;
+      const name = delBtn.dataset.name;
+      if (!confirm("Supprimer l'inscription de " + name + " ?")) return;
+
+      const { error } = await _supa.from("inscriptions").delete().eq("id", id);
+      if (error) { alert("Erreur : " + error.message); return; }
+      allRows = allRows.filter(r => r.id !== id);
+      renderTable();
+      renderStats();
+    }
+  });
+
+  // ── FILTRES ──
   ["searchInput","filterPaid","filterMethod","filterCategory"].forEach(id => {
     document.getElementById(id).addEventListener("input", renderTable);
     document.getElementById(id).addEventListener("change", renderTable);
   });
   document.getElementById("refreshBtn").addEventListener("click", loadInscriptions);
 
+  // ── EXPORT CSV ──
   document.getElementById("exportBtn").addEventListener("click", () => {
     if (!allRows.length) return;
     const cols = ["first_name","last_name","email","phone","birth_date","sex","category","discipline","pack_type","federation","total","payment_method","paid","country","canton","city","club","notes","created_at"];
     const header = cols.join(";");
     const body = allRows.map(r => cols.map(c => `"${(r[c]??"").toString().replace(/"/g,'""')}"`).join(";")).join("\n");
     const blob = new Blob(["\uFEFF"+header+"\n"+body], {type:"text/csv;charset=utf-8;"});
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = "inscriptions_montreux_2026.csv"; a.click();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "inscriptions_montreux_2026.csv";
+    a.click();
   });
 
+  // ── MODAL ──
   document.getElementById("addBtn").addEventListener("click", () => document.getElementById("modalBg").classList.add("open"));
   document.getElementById("modalCancel").addEventListener("click", () => document.getElementById("modalBg").classList.remove("open"));
-  document.getElementById("modalBg").addEventListener("click", e => { if (e.target === document.getElementById("modalBg")) document.getElementById("modalBg").classList.remove("open"); });
+  document.getElementById("modalBg").addEventListener("click", e => {
+    if (e.target === document.getElementById("modalBg")) document.getElementById("modalBg").classList.remove("open");
+  });
 
   document.getElementById("modalSave").addEventListener("click", async () => {
     const btn = document.getElementById("modalSave");
@@ -428,6 +467,7 @@
     const first_name = g("mFirstName"), last_name = g("mLastName");
     if (!first_name || !last_name) { alert("Prénom et nom obligatoires."); return; }
     btn.disabled = true; btn.textContent = "Enregistrement…";
+
     const { error } = await _supa.from("inscriptions").insert([{
       first_name, last_name,
       email: g("mEmail"), phone: g("mPhone"),
@@ -443,7 +483,13 @@
       paid: document.getElementById("mPaid").value === "true",
       notes: g("mNotes"), pack_type: "standard"
     }]);
-    if (error) { alert("Erreur : " + error.message); btn.disabled = false; btn.textContent = "Enregistrer"; return; }
+
+    if (error) {
+      alert("Erreur : " + error.message);
+      btn.disabled = false; btn.textContent = "Enregistrer";
+      return;
+    }
+
     btn.disabled = false; btn.textContent = "Enregistrer";
     document.getElementById("modalBg").classList.remove("open");
     ["mFirstName","mLastName","mEmail","mPhone","mCity","mClub","mNotes"].forEach(id => document.getElementById(id).value = "");
@@ -455,7 +501,9 @@
     loadInscriptions();
   });
 
-  function esc(str) { return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function esc(str) {
+    return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
 </script>
 </body>
 </html>
