@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Événements — Romandie Scooter League</title>
 
-  <!-- ✅ Anti-scintillement : applique le thème AVANT le rendu -->
   <script>
     (function(){
       const KEY='rsl-theme';
@@ -19,17 +18,14 @@
     })();
   </script>
   <style>
-    /* ✅ bloque les transitions pendant le tout premier paint (anti flash) */
     html.theme-preload-light * { transition:none !important; }
   </style>
 
-  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase + scripts -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
@@ -72,7 +68,6 @@
     }
     main{ flex:1; }
 
-    /* ======= Fond vidéo ======= */
     .site-bg-video{
       position:fixed; inset:0;
       width:100%; height:100%;
@@ -91,7 +86,6 @@
       background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
     }
 
-    /* ======= NAVBAR (copie index) ======= */
     nav.nav{
       background:rgba(0,0,0,.65);
       backdrop-filter:blur(10px);
@@ -230,7 +224,6 @@
 
     .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
 
-    /* ===== Menu mobile (copie index) ===== */
     .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
     .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
@@ -266,7 +259,6 @@
       .coach-fab{ display:none; }
     }
 
-    /* ===== Page ===== */
     .container-page{
       max-width:1100px;
       margin:0 auto;
@@ -291,7 +283,6 @@
       line-height:1.55;
     }
 
-    /* MontreuxTV highlight */
     .msc-highlight{
       margin:14px 0 18px;
       padding:12px 14px;
@@ -328,7 +319,6 @@
     }
     .msc-btn:hover{ transform:translateY(-1px); filter:brightness(1.06); }
 
-    /* Cards */
     .cards{
       display:grid;
       gap:16px;
@@ -368,7 +358,6 @@
 
     .actions{ display:flex; gap:10px; flex-wrap:wrap; }
 
-    /* Footer (copie index) */
     .footer-mini .copy{
       text-align:center;
       color:var(--rsl-muted);
@@ -383,7 +372,6 @@
       border-top-color:rgba(148,163,184,.5);
     }
 
-    /* FAB coach */
     .coach-fab{
       position:fixed; right:16px; bottom:16px; z-index:80;
       display:inline-flex; align-items:center; gap:8px;
@@ -402,71 +390,64 @@
 
 <body>
 
-  <!-- Fond vidéo -->
   <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
   <div class="site-bg-dim" aria-hidden="true"></div>
 
-  <!-- NAV (copie index) -->
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class='brand' href='/'>
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
         <ul>
-          <li><a href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html" aria-current="page">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="shop-rsl.html">Shop</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href='/cours'>Cours</a></li>
+          <li><a href='/formation'>Formation RSL</a></li>
+          <li><a href='/ou_rider'>Où rider ?</a></li>
+          <li><a aria-current='page' href='/evenements'>Événements</a></li>
+          <li><a href='/disciplines'>Disciplines</a></li>
+          <li><a href='/shop-rsl'>Shop</a></li>
+          <li><a href='/comite'>Comité</a></li>
+          <li><a href='/contact'>Contact</a></li>
         </ul>
 
         <div class="cta">
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
-
-          <a class="btn" id="btnLogin" href="access.html">Login</a>
-          <a class="btn" id="btnAccount" href="compte.html" style="display:none">Mon compte</a>
-
-          <a href="compte.html" aria-label="Mon compte">
+          <a class='btn' href='/access' id='btnLogin'>Login</a>
+          <a class='btn' href='/compte' id='btnAccount' style='display:none'>Mon compte</a>
+          <a aria-label='Mon compte' href='/compte'>
             <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
-
-          <a class="btn" id="btnCart" href="panier/panier.html">Panier</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
+          <a class='btn' href='/panier/panier' id='btnCart'>Panier</a>
+          <a class='btn green' href='/membres'>Devenir membre</a>
           <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- MENU MOBILE (copie index) -->
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
-      <a href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
-      <a href="formation.html">Formation RSL</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html" aria-current="page">Événements</a>
-      <a href="game.html">Games</a>
-      <a href="shop-rsl.html">Shop</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="access.html">Se connecter</a>
-      <a href="compte.html">Mon compte</a>
-      <a href="coach.html" class="coach-link">👨‍🏫 Je suis coach</a>
+      <a href='/'>Accueil</a>
+      <a href='/cours'>Cours</a>
+      <a href='/membres'>Devenir membre</a>
+      <a href='/formation'>Formation RSL</a>
+      <a href='/disciplines'>Disciplines</a>
+      <a href='/ou_rider'>Où rider ?</a>
+      <a aria-current='page' href='/evenements'>Événements</a>
+      <a href='/game'>Games</a>
+      <a href='/shop-rsl'>Shop</a>
+      <a href='/comite'>Comité</a>
+      <a href='/contact'>Contact</a>
+      <a href='/conditions'>Conditions générales</a>
+      <a href='/access'>Se connecter</a>
+      <a href='/compte'>Mon compte</a>
+      <a class='coach-link' href='/coach'>👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
-  <!-- CONTENU -->
   <main>
     <div class="container-page">
 
@@ -474,29 +455,20 @@
         <h1>Événements RSL</h1>
         <p>Contests officiels, jams, journées street encadrées et événements partenaires.</p>
 
-        <!-- ✅ Bloc 1 : MontreuxTV (inchangé) -->
         <div class="msc-highlight">
           <div class="msc-text">
-            <b>Montreux Scooter Contest</b> est l’un des contests pionniers en Suisse, organisé à Montreux depuis 2005.
-            Découvre l’histoire sur <b>MontreuxTV</b>.
+            <b>Montreux Scooter Contest</b> est l'un des contests pionniers en Suisse, organisé à Montreux depuis 2005.
+            Découvre l'histoire sur <b>MontreuxTV</b>.
           </div>
-
           <a class="msc-btn" href="https://rsl-swiss.ch/montreuxtv" target="_blank" rel="noopener">Video history ▶</a>
         </div>
 
-        <!-- ✅ Bloc 2 : AwardsBest 2025 (séparé) -->
         <div class="msc-highlight">
           <div class="msc-text">
-            <b>AwardsBest 2025</b><br>
+            <b>AwardsBest 2026</b><br>
             Classement en direct &amp; vote officiel.
           </div>
-
-          <a class="msc-btn"
-             href="https://rsl-swiss.ch/riderswisss"
-             target="_blank"
-             rel="noopener noreferrer">
-            🗳️ Accéder au vote
-          </a>
+          <a class="msc-btn" href="https://rsl-swiss.ch/riderswisss" target="_blank" rel="noopener noreferrer">🗳️ Accéder au vote</a>
         </div>
 
       </header>
@@ -505,41 +477,20 @@
         <div class="cards">
 
           <article class="card">
+            <h3>Championnat Romand 2026</h3>
+            <div class="meta">📍 Romandie — Saison 2026</div>
+            <p>Le Championnat Romand de Trottinette Freestyle 2026 est lancé ! Plusieurs étapes dans toute la Romandie, avec classement officiel, catégories U13, U15, Amateur et Pro.</p>
+            <div class="actions">
+              <a class="btn green" href="/evenements/compte-a-rebours">Infos &amp; inscription</a>
+            </div>
+          </article>
+
+          <article class="card">
             <h3>Montreux Scooter Contest — 20e édition</h3>
             <div class="meta">📍 Montreux — 6 décembre 2025</div>
-            <p>Le plus grand contest de Suisse romande fête ses 20 ans ! Park, street, kids &amp; pros.</p>
+            <p>Le plus grand contest de Suisse romande a fêté ses 20 ans le 6 décembre 2025. Une édition historique avec Park, Street, kids &amp; pros. Merci à tous les riders, juges et bénévoles !</p>
             <div class="actions">
-              <a class="btn green"
-                 href="https://www.jfrideshop.ch/shop?order=website_sequence+asc&category=67"
-                 target="_blank" rel="noopener">Infos &amp; programme</a>
-              <a class="btn" href="access_photos.html">📸 Accès photos 2025</a>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Événement RSL — à venir</h3>
-            <div class="meta">📍 À définir — À venir</div>
-            <p>Prochains contests, jams et journées street annoncés bientôt.</p>
-            <div class="actions">
-              <button class="btn" type="button" disabled>À venir</button>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Événement RSL — à venir</h3>
-            <div class="meta">📍 À définir — À venir</div>
-            <p>Prochains contests, jams et journées street annoncés bientôt.</p>
-            <div class="actions">
-              <button class="btn" type="button" disabled>À venir</button>
-            </div>
-          </article>
-
-          <article class="card">
-            <h3>Événement RSL — à venir</h3>
-            <div class="meta">📍 À définir — À venir</div>
-            <p>Prochains contests, jams et journées street annoncés bientôt.</p>
-            <div class="actions">
-              <button class="btn" type="button" disabled>À venir</button>
+              <a class="btn" href="/access_photos">📸 Photos 2025</a>
             </div>
           </article>
 
@@ -553,10 +504,9 @@
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <a href="coach.html" class="coach-fab">👨‍🏫 Devenir coach</a>
+  <a class='coach-fab' href='/coach'>👨‍🏫 Devenir coach</a>
 
   <script>
-    // ✅ Thème (clair / sombre) — EXACT index + sans flash
     (function(){
       const STORAGE_KEY = 'rsl-theme';
       const body = document.body;
@@ -565,10 +515,8 @@
       function applyTheme(theme, withNoTransition){
         if(withNoTransition){
           document.documentElement.classList.add('no-theme-anim');
-          // force reflow
           void document.documentElement.offsetHeight;
         }
-
         if(theme === 'light'){
           body.classList.add('theme-light');
           if(btn) btn.textContent = '☀️';
@@ -576,10 +524,7 @@
           body.classList.remove('theme-light');
           if(btn) btn.textContent = '🌙';
         }
-
-        // enlève le preload (si présent)
         document.documentElement.classList.remove('theme-preload-light');
-
         if(withNoTransition){
           requestAnimationFrame(()=>{
             document.documentElement.classList.remove('no-theme-anim');
@@ -587,7 +532,6 @@
         }
       }
 
-      // style anti transition pendant switch
       const st = document.createElement('style');
       st.textContent = 'html.no-theme-anim *,html.no-theme-anim *:before,html.no-theme-anim *:after{transition:none!important}';
       document.head.appendChild(st);
@@ -598,8 +542,6 @@
         const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
         saved = prefersLight ? 'light' : 'dark';
       }
-
-      // ✅ applique tout de suite (sans transition)
       applyTheme(saved, true);
 
       if(btn){
@@ -612,7 +554,6 @@
       }
     })();
 
-    // Vidéo de fond (index)
     (function(){
       const vids = [
         "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
@@ -621,12 +562,10 @@
       const pick = vids[Math.floor(Math.random()*vids.length)];
       const v = document.getElementById('rslBg');
       if(!v) return;
-
       const s = document.createElement('source');
       s.src = pick;
       s.type = 'video/mp4';
       v.appendChild(s);
-
       const start = () => {
         try{
           v.playbackRate = 0.6;
@@ -634,7 +573,6 @@
           if(p && p.catch) p.catch(()=>{});
         }catch(e){}
       };
-
       start();
       document.addEventListener('visibilitychange', () => {
         if(document.hidden) v.pause();
@@ -642,12 +580,10 @@
       });
     })();
 
-    // Menu mobile (index)
     (function(){
       const menuBtn=document.getElementById('menuBtn');
       const mobile=document.getElementById('mobileMenu');
       if(!menuBtn || !mobile) return;
-
       menuBtn.addEventListener('click',e=>{
         e.stopPropagation();
         mobile.classList.add('open');
