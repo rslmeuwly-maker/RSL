@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Juge 3 — Montreux 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--red:#d71920;--p2:#232326;--txt:#f5f5f5;--mu:#b8b8bd;--ln:rgba(255,255,255,.10);--gr:#29c66f;--go:#f6c90e;--jc:#f97316}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:radial-gradient(circle at top,rgba(215,25,32,.12),transparent 34%),linear-gradient(180deg,#111,#0d0d0f 55%,#111);color:var(--txt);min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--ln);background:rgba(0,0,0,.4);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;gap:12px;flex-wrap:wrap}
+.badge{background:var(--jc);color:#fff;border-radius:999px;padding:6px 18px;font-weight:900;font-size:.95rem;text-transform:uppercase;letter-spacing:.05em}
+.topbar h1{font-size:1rem;text-transform:uppercase;letter-spacing:.04em}
+.seg{display:flex;background:var(--p2);border-radius:12px;overflow:hidden;border:1px solid var(--ln)}
+.seg button{border:none;padding:8px 18px;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--mu);background:transparent;transition:.15s}
+.seg button.active{background:var(--red);color:#fff}
+.bsm{border:none;border-radius:10px;padding:7px 14px;background:rgba(255,255,255,.08);color:var(--mu);font-size:.82rem;font-weight:700;cursor:pointer}
+.bsm:hover{background:rgba(255,255,255,.13);color:#fff}
+.wrap{padding:18px 22px}
+.cb{margin-bottom:22px;border:1px solid var(--ln);border-radius:20px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01))}
+.ch{display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(0,0,0,.25);border-bottom:1px solid var(--ln)}
+.cl{background:var(--red);color:#fff;border-radius:999px;padding:4px 14px;font-weight:900;font-size:.85rem;text-transform:uppercase}
+.cs{background:rgba(255,255,255,.07);color:var(--mu);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.82rem}
+.cc{color:var(--mu);font-size:.82rem;margin-left:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:9px 8px;text-align:left;text-transform:uppercase;font-size:.65rem;letter-spacing:.06em;color:var(--mu);border-bottom:1px solid var(--ln);white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04)}
+tbody tr:last-child{border-bottom:none}
+td{padding:8px;vertical-align:middle}
+.rk{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem}
+.rk1{background:var(--go);color:#000}.rk2{background:#c0c0c0;color:#000}.rk3{background:#cd7f32;color:#fff}.rkn{background:rgba(255,255,255,.07);color:var(--mu)}
+.rname{font-weight:700;font-size:.9rem}
+.rsub{color:var(--mu);font-size:.75rem;margin-top:1px}
+.ig{display:flex;flex-direction:column;align-items:center;gap:2px}
+.il{font-size:.6rem;color:var(--mu);font-weight:700;text-transform:uppercase}
+.si{width:50px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:var(--p2);color:#fff;text-align:center;font:inherit;font-size:.92rem;font-weight:700;padding:6px 2px;outline:none;transition:.15s;-moz-appearance:textfield}
+.si::-webkit-outer-spin-button,.si::-webkit-inner-spin-button{-webkit-appearance:none}
+.si:focus{border-color:var(--jc)}
+.si.ib{border-color:var(--go);color:var(--go);background:rgba(246,201,14,.07)}
+.si.sv{border-color:rgba(41,198,111,.5)}
+.vl{font-size:1.1rem;font-weight:900;text-align:center;min-width:38px}
+.vv{color:var(--jc)}.vg{color:var(--go)}.vd{color:var(--mu);font-size:.85rem}
+.sbtn{border:none;border-radius:9px;padding:7px 12px;background:var(--jc);color:#fff;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap}
+.sbtn.ok{background:var(--gr)}
+.sbtn:disabled{opacity:.5;cursor:not-allowed}
+.empty{text-align:center;padding:36px;color:var(--mu)}
+@media(max-width:700px){.wrap{padding:10px}.si{width:42px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="badge">Juge 3</span>
+    <h1>Montreux 2026</h1>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <div class="seg" id="dSeg">
+      <button id="btnPark" class="active">Park</button>
+      <button id="btnStreet">Street</button>
+    </div>
+    <button class="bsm" id="btnRefresh">&#8635; Actualiser</button>
+    <button class="bsm" onclick="window.print()">&#128424; Imprimer</button>
+  </div>
+</div>
+<div class="wrap" id="mWrap"><div class="empty">Chargement&hellip;</div></div>
+
+<script>
+var SB_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
+var SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+var db = supabase.createClient(SB_URL, SB_ANON);
+var JUGE = 3;
+var CATS = ["U13","U15","Amateur","Pro"];
+var SEXES = ["Homme","Femme"];
+var disc = "Park";
+var riders = [];
+var sc = {};
+
+document.getElementById("btnPark").addEventListener("click", function(){ setDisc("Park"); });
+document.getElementById("btnStreet").addEventListener("click", function(){ setDisc("Street"); });
+document.getElementById("btnRefresh").addEventListener("click", function(){ load(); });
+
+function setDisc(d) {
+  disc = d;
+  document.getElementById("btnPark").classList.toggle("active", d==="Park");
+  document.getElementById("btnStreet").classList.toggle("active", d==="Street");
+  renderAll();
+}
+
+async function load() {
+  document.getElementById("mWrap").innerHTML = '<div class="empty">Chargement&hellip;</div>';
+  var r1 = await db.from("inscriptions").select("*").order("last_name");
+  if (r1.error) {
+    document.getElementById("mWrap").innerHTML = '<div class="empty" style="color:#f66">Erreur: ' + r1.error.message + '</div>';
+    return;
+  }
+  riders = r1.data || [];
+  var r2 = await db.from("scores").select("*").eq("juge", JUGE);
+  sc = {};
+  (r2.data || []).forEach(function(s) {
+    sc[s.inscription_id + "_" + s.discipline] = {style:s.style, technique:s.technique, originalite:s.originalite, t1:s.t1, t2:s.t2, t3:s.t3};
+  });
+  renderAll();
+}
+
+function renderAll() {
+  var wrap = document.getElementById("mWrap");
+  wrap.innerHTML = "";
+  var filtered = riders.filter(function(r){ return matchDisc(r); });
+  if (!filtered.length) {
+    wrap.innerHTML = '<div class="empty">Aucun rider pour ' + disc + ' (total DB: ' + riders.length + ')</div>';
+    return;
+  }
+  var found = false;
+  CATS.forEach(function(cat) {
+    SEXES.forEach(function(sex) {
+      var grp = filtered.filter(function(r){ return r.category===cat && nSex(r.sex)===sex; });
+      if (!grp.length) return;
+      found = true;
+      grp.sort(function(a,b){ return tot(b.id)-tot(a.id); });
+      var blk = document.createElement("div");
+      blk.className = "cb";
+      blk.innerHTML =
+        '<div class="ch"><span class="cl">'+cat+'</span><span class="cs">'+sex+'</span><span class="cc">'+grp.length+' rider'+(grp.length>1?'s':'')+'</span></div>'+
+        '<table><thead><tr>'+
+        '<th>Pos.</th><th>Rider</th>'+
+        '<th>Style</th><th>Tech.</th><th>Orig.</th><th>Moy.</th>'+
+        '<th>T1</th><th>T2</th><th>T3</th><th>Best</th>'+
+        '<th>Total</th><th></th>'+
+        '</tr></thead><tbody id="tb-'+cat+'-'+sex+'"></tbody></table>';
+      wrap.appendChild(blk);
+      renderGrp(grp, cat, sex);
+    });
+  });
+  if (!found) wrap.innerHTML = '<div class="empty">Aucun rider trouv&#233;.</div>';
+}
+
+function renderGrp(grp, cat, sex) {
+  var tb = document.getElementById("tb-"+cat+"-"+sex);
+  if (!tb) return;
+  tb.innerHTML = "";
+  grp.forEach(function(r, i) {
+    var key = r.id+"_"+disc;
+    var s   = sc[key] || {};
+    var rk  = i+1;
+    var rc  = rk===1?"rk1":rk===2?"rk2":rk===3?"rk3":"rkn";
+    var saved = !!sc[key];
+    var av = avg(r.id);
+    var bt = bestT(r.id);
+    var tt = tot(r.id);
+    var tv = [s.t1!=null?parseFloat(s.t1):null, s.t2!=null?parseFloat(s.t2):null, s.t3!=null?parseFloat(s.t3):null];
+    var mx = Math.max.apply(null, tv.filter(function(v){return v!==null;}).concat([0]));
+
+    function inp(f, v, trick) {
+      var best2 = trick && v!==null && v===mx && mx>0;
+      var cls = "si"+(saved?" sv":"")+(best2?" ib":"");
+      return '<div class="ig"><span class="il">'+f.substring(0,4)+'</span>'+
+        '<input class="'+cls+'" type="number" min="0" max="10" step="0.1"'+
+        ' id="'+f+'_'+r.id+'"'+
+        ' value="'+(v!==null&&v!==undefined?v:'')+'"'+
+        ' placeholder="&#8212;"'+
+        ' data-rid="'+r.id+'" data-cat="'+cat+'" data-sex="'+sex+'"'+
+        ' oninput="upd(this)">'+
+        '</div>';
+    }
+
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td><div class="rk '+rc+'">'+rk+'</div></td>'+
+      '<td><div class="rname">'+esc(r.first_name)+' '+esc(r.last_name)+'</div>'+
+          '<div class="rsub">'+(r.club?esc(r.club):'')+'</div></td>'+
+      '<td>'+inp('style', s.style!=null?s.style:null, false)+'</td>'+
+      '<td>'+inp('technique', s.technique!=null?s.technique:null, false)+'</td>'+
+      '<td>'+inp('originalite', s.originalite!=null?s.originalite:null, false)+'</td>'+
+      '<td><span class="vl '+(av>0?'vv':'vd')+'" id="av_'+r.id+'">'+(av>0?av.toFixed(1):'&#8212;')+'</span></td>'+
+      '<td>'+inp('t1', tv[0], true)+'</td>'+
+      '<td>'+inp('t2', tv[1], true)+'</td>'+
+      '<td>'+inp('t3', tv[2], true)+'</td>'+
+      '<td><span class="vl '+(bt>0?'vg':'vd')+'" id="bt_'+r.id+'">'+(bt>0?bt:'&#8212;')+'</span></td>'+
+      '<td><span class="vl '+(tt>0?'vv':'vd')+'" id="tt_'+r.id+'">'+(tt>0?tt.toFixed(1):'&#8212;')+'</span></td>'+
+      '<td><button class="sbtn'+(saved?' ok':'')+'" id="sb_'+r.id+'"'+
+        ' data-rid="'+r.id+'" data-cat="'+cat+'" data-sex="'+sex+'"'+
+        ' onclick="save(this)">'+
+        (saved?'&#10003; Sauv&#233;':'Sauver')+'</button></td>';
+    tb.appendChild(tr);
+  });
+}
+
+function upd(el) {
+  var id  = el.getAttribute("data-rid");
+  var cat = el.getAttribute("data-cat");
+  var sex = el.getAttribute("data-sex");
+  function gv(f) { var e=document.getElementById(f+"_"+id); var v=e?parseFloat(e.value):NaN; return isNaN(v)?null:Math.min(10,Math.max(0,v)); }
+  var st=gv("style"),te=gv("technique"),or=gv("originalite"),t1=gv("t1"),t2=gv("t2"),t3=gv("t3");
+  var fl=[st,te,or].filter(function(v){return v!==null;});
+  var av2 = fl.length ? fl.reduce(function(a,b){return a+b;},0)/3 : 0;
+  var bt2 = Math.max(t1||0,t2||0,t3||0);
+  var tt2 = av2+bt2;
+  var mx2 = bt2;
+  ["t1","t2","t3"].forEach(function(k,i){
+    var e=document.getElementById(k+"_"+id); if(!e) return;
+    e.classList.toggle("ib",[t1,t2,t3][i]!==null&&[t1,t2,t3][i]===mx2&&mx2>0);
+  });
+  var e;
+  e=document.getElementById("av_"+id); if(e){e.textContent=av2>0?av2.toFixed(1):"—"; e.className="vl "+(av2>0?"vv":"vd");}
+  e=document.getElementById("bt_"+id); if(e){e.textContent=bt2>0?bt2:"—"; e.className="vl "+(bt2>0?"vg":"vd");}
+  e=document.getElementById("tt_"+id); if(e){e.textContent=tt2>0?tt2.toFixed(1):"—"; e.className="vl "+(tt2>0?"vv":"vd");}
+  e=document.getElementById("sb_"+id); if(e){e.textContent="Sauver"; e.className="sbtn";}
+}
+
+async function save(btn) {
+  var id  = btn.getAttribute("data-rid");
+  var cat = btn.getAttribute("data-cat");
+  var sex = btn.getAttribute("data-sex");
+  function gv(f){var e=document.getElementById(f+"_"+id);return e&&e.value!==""?parseFloat(e.value):null;}
+  var style=gv("style"),technique=gv("technique"),originalite=gv("originalite"),t1=gv("t1"),t2=gv("t2"),t3=gv("t3");
+  btn.disabled=true; btn.textContent="…";
+  var res = await db.from("scores").upsert(
+    {inscription_id:id,discipline:disc,juge:JUGE,style:style,technique:technique,originalite:originalite,t1:t1,t2:t2,t3:t3},
+    {onConflict:"inscription_id,discipline,juge"}
+  );
+  if (res.error){ alert("Erreur: "+res.error.message); btn.disabled=false; btn.textContent="Sauver"; return; }
+  sc[id+"_"+disc]={style:style,technique:technique,originalite:originalite,t1:t1,t2:t2,t3:t3};
+  btn.disabled=false; btn.textContent="✅ Sauvé"; btn.className="sbtn ok";
+  ["style","technique","originalite","t1","t2","t3"].forEach(function(k){
+    var e=document.getElementById(k+"_"+id); if(e) e.classList.add("sv");
+  });
+  var grp=riders.filter(function(r){return matchDisc(r)&&r.category===cat&&nSex(r.sex)===sex;});
+  grp.sort(function(a,b){return tot(b.id)-tot(a.id);});
+  renderGrp(grp,cat,sex);
+}
+
+function avg(id){var s=sc[id+"_"+disc];if(!s)return 0;var fl=[s.style,s.technique,s.originalite].filter(function(v){return v!=null;});return fl.length?fl.reduce(function(a,b){return a+b;},0)/3:0;}
+function bestT(id){var s=sc[id+"_"+disc];if(!s)return 0;return Math.max(s.t1||0,s.t2||0,s.t3||0);}
+function tot(id){return avg(id)+bestT(id);}
+function matchDisc(r){var d=(r.discipline||"").toLowerCase(),p=(r.pack_type||"").toLowerCase();return p.indexOf("pack")>=0||!r.discipline||d===disc.toLowerCase();}
+function nSex(s){if(!s)return "Homme";var v=s.toLowerCase().trim();return ["f","femme","female","feminin"].indexOf(v)>=0?"Femme":"Homme";}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+load();
+</script>
+</body>
+</html>

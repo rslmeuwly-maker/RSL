@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription Montreux 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#0f0f10;
+      --panel:#18181b;
+      --panel2:#232326;
+      --text:#f5f5f5;
+      --muted:#b8b8bd;
+      --red:#d71920;
+      --red-soft:rgba(215,25,32,.10);
+      --line:rgba(255,255,255,.10);
+      --green:#29c66f;
+      --shadow:0 14px 40px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(215,25,32,.12), transparent 34%),
+        linear-gradient(180deg,#111,#0d0d0f 55%, #111);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1180px;
+      margin:auto;
+      padding:24px 16px 40px;
+    }
+    .hero{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:28px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+    }
+    .eyebrow{
+      display:inline-block;
+      background:var(--red);
+      color:#fff;
+      border-radius:999px;
+      padding:9px 14px;
+      font-weight:800;
+      text-transform:uppercase;
+      font-size:.78rem;
+      letter-spacing:.08em;
+      margin-bottom:14px;
+    }
+    .hero h1{
+      margin:0 0 10px;
+      font-size:clamp(2rem, 4vw, 4rem);
+      line-height:.95;
+      text-transform:uppercase;
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      max-width:760px;
+    }
+    .price-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin:18px 0;
+    }
+    .price-card{
+      padding:20px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--line);
+      border-radius:22px;
+      cursor:pointer;
+      transition:.2s ease;
+      box-shadow:var(--shadow);
+      min-height:175px;
+    }
+    .price-card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(215,25,32,.45);
+    }
+    .price-card.active{
+      border-color:var(--red);
+      background:linear-gradient(180deg, rgba(215,25,32,.12), rgba(255,255,255,.02));
+      box-shadow:0 0 0 1px rgba(215,25,32,.16) inset, var(--shadow);
+    }
+    .price-card h3{
+      margin:0 0 10px;
+      font-size:1rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .price{
+      font-size:2.1rem;
+      font-weight:900;
+      margin-bottom:6px;
+    }
+    .small{
+      color:var(--muted);
+      font-size:.95rem;
+      line-height:1.5;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:1fr 390px;
+      gap:18px;
+      align-items:start;
+    }
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+    .panel h2{
+      margin:0 0 18px;
+      text-transform:uppercase;
+      font-size:1.35rem;
+      letter-spacing:.03em;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .field.full{
+      grid-column:1/-1;
+    }
+    label{
+      font-weight:700;
+      font-size:.95rem;
+    }
+    input, select, textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      background:var(--panel2);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      padding:14px;
+      font:inherit;
+    }
+    textarea{
+      min-height:100px;
+      resize:vertical;
+    }
+    select:disabled,
+    input:disabled,
+    textarea:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+    .choice-group{
+      display:grid;
+      gap:10px;
+    }
+    .choice{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .choice.active{
+      border-color:var(--red);
+      background:var(--red-soft);
+      box-shadow:0 0 0 1px rgba(215,25,32,.18) inset;
+    }
+    .choice input{
+      width:auto;
+      margin-top:3px;
+      accent-color:var(--red);
+      flex:0 0 auto;
+    }
+    .choice strong{
+      display:block;
+      margin-bottom:4px;
+    }
+    .choice span{
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.45;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.45;
+      margin-top:4px;
+    }
+    .summary{
+      position:sticky;
+      top:18px;
+    }
+    .sum-box{
+      border-radius:18px;
+      padding:16px;
+      background:linear-gradient(135deg, rgba(215,25,32,.18), rgba(255,255,255,.03));
+      border:1px solid rgba(215,25,32,.25);
+    }
+    .sum-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 0;
+      border-bottom:1px solid var(--line);
+      color:var(--muted);
+    }
+    .sum-row:last-child{
+      border-bottom:none;
+    }
+    .sum-row strong{
+      color:#fff;
+      text-align:right;
+    }
+    .sum-total{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:14px;
+      padding-top:14px;
+      border-top:1px solid var(--line);
+      font-size:1.2rem;
+      font-weight:900;
+    }
+    .note{
+      margin-top:14px;
+      color:var(--muted);
+      line-height:1.5;
+      font-size:.94rem;
+    }
+    .info{
+      margin-top:14px;
+      border-radius:14px;
+      padding:14px;
+      line-height:1.45;
+    }
+    .info.green{
+      background:rgba(41,198,111,.08);
+      border:1px solid rgba(41,198,111,.22);
+      color:#def8ea;
+    }
+    .info.red{
+      background:rgba(255,107,107,.08);
+      border:1px solid rgba(255,107,107,.22);
+      color:#ffdede;
+    }
+    .checkline{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+    .checkline input{
+      width:auto;
+      margin-top:3px;
+      flex:0 0 auto;
+      accent-color:var(--red);
+    }
+    .checkline a{
+      color:#fff;
+      font-weight:700;
+      text-decoration:underline;
+    }
+    .checkline a:hover{
+      color:#ffd7d8;
+    }
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:15px 18px;
+      background:var(--red);
+      color:#fff;
+      font-size:1rem;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btn:hover{
+      filter:brightness(1.05);
+    }
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+    }
+    .msg{
+      display:none;
+      margin-top:14px;
+      border-radius:14px;
+      padding:14px;
+      line-height:1.5;
+    }
+    .msg.ok{
+      background:rgba(41,198,111,.10);
+      border:1px solid rgba(41,198,111,.22);
+      color:#def8ea;
+    }
+    .msg.err{
+      background:rgba(255,107,107,.10);
+      border:1px solid rgba(255,107,107,.22);
+      color:#ffdede;
+    }
+    .pay-methods{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .pay-method{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:14px 10px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      cursor:pointer;
+      transition:.2s ease;
+      text-align:center;
+      font-size:.88rem;
+      color:var(--muted);
+      font-weight:700;
+      user-select:none;
+    }
+    .pay-method:hover{
+      border-color:rgba(215,25,32,.45);
+    }
+    .pay-method.active{
+      border-color:var(--red);
+      background:var(--red-soft);
+      color:#fff;
+      box-shadow:0 0 0 1px rgba(215,25,32,.18) inset;
+    }
+    .pay-method svg{
+      width:28px;
+      height:28px;
+      flex:0 0 auto;
+    }
+    @media (max-width:980px){
+      .price-grid,
+      .layout,
+      .grid{
+        grid-template-columns:1fr;
+      }
+      .summary{
+        position:static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <span class="eyebrow">Infos riders</span>
+      <h1>Montreux — 30 mai 2026</h1>
+      <p>
+        Inscriptions officielles pour l’étape de Montreux du Championnat Romand de Trottinette Freestyle.
+        Choisis ta formule ci-dessous, puis complète le formulaire.
+      </p>
+    </div>
+
+    <div class="price-grid">
+      <div class="price-card active" id="cardSimple">
+        <h3>Inscription simple</h3>
+        <div class="price">20 CHF</div>
+        <div class="small">
+          1 discipline<br>
+          Street ou Park
+        </div>
+      </div>
+
+      <div class="price-card" id="cardDouble">
+        <h3>2 disciplines</h3>
+        <div class="price">30 CHF</div>
+        <div class="small">
+          Park + Street
+        </div>
+      </div>
+
+      <div class="price-card" id="cardPack">
+        <h3>Pack membre event</h3>
+        <div class="price">75 CHF</div>
+        <div class="small">
+          Inscription Fédération<br>
+          Carte RSL<br>
+          1 repas + 2 boissons<br>
+          Classement officiel
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <form class="panel" id="registrationForm">
+        <h2>Formulaire d'inscription</h2>
+
+        <input type="hidden" id="hidden_pack_type" value="standard">
+        <input type="hidden" id="hidden_discipline" value="Park">
+        <input type="hidden" id="hidden_total" value="20">
+
+        <div class="grid">
+          <div class="field">
+            <label for="first_name">Prénom</label>
+            <input id="first_name" required>
+          </div>
+
+          <div class="field">
+            <label for="last_name">Nom</label>
+            <input id="last_name" required>
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" required>
+          </div>
+
+          <div class="field">
+            <label for="phone">Téléphone</label>
+            <input id="phone" type="tel">
+          </div>
+
+          <div class="field">
+            <label for="birth_date">Date de naissance</label>
+            <input id="birth_date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="sex">Sexe</label>
+            <select id="sex" required>
+              <option value="">Choisir</option>
+              <option value="Homme">Homme</option>
+              <option value="Femme">Femme</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="category">Catégorie</label>
+            <select id="category" required>
+              <option value="">Choisir</option>
+              <option value="U13">U13</option>
+              <option value="U15">U15</option>
+              <option value="Amateur">Amateur</option>
+              <option value="Pro">Pro</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="country">Pays</label>
+            <select id="country" required>
+              <option value="">Choisir</option>
+              <option value="Suisse">Suisse</option>
+              <option value="France">France</option>
+              <option value="Belgique">Belgique</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="field" id="cantonField" style="display:none;">
+            <label for="canton">Canton</label>
+            <select id="canton">
+              <option value="">Choisir</option>
+              <option value="Vaud">Vaud</option>
+              <option value="Valais">Valais</option>
+              <option value="Fribourg">Fribourg</option>
+              <option value="Genève">Genève</option>
+              <option value="Neuchâtel">Neuchâtel</option>
+              <option value="Jura">Jura</option>
+              <option value="Berne">Berne</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="city">Ville</label>
+            <input id="city">
+          </div>
+
+          <div class="field">
+            <label for="club">Club / Team</label>
+            <input id="club">
+          </div>
+
+          <div class="field full" id="singleDisciplineField">
+            <label>Choix discipline</label>
+            <div class="choice-group">
+              <label class="choice" id="choiceSinglePark">
+                <input type="radio" name="single_discipline" value="Park" checked>
+                <div>
+                  <strong>Park</strong>
+                  <span>1 discipline — 20 CHF</span>
+                </div>
+              </label>
+
+              <label class="choice" id="choiceSingleStreet">
+                <input type="radio" name="single_discipline" value="Street">
+                <div>
+                  <strong>Street</strong>
+                  <span>1 discipline — 20 CHF</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Option fédération</label>
+            <div class="choice-group">
+              <label class="choice" id="choiceFedAlready">
+                <input type="radio" name="federation_status" value="already_member">
+                <div>
+                  <strong>Je suis déjà membre de la Fédération</strong>
+                  <span>Aucun supplément à ajouter.</span>
+                </div>
+              </label>
+
+              <label class="choice" id="choiceFedAdd">
+                <input type="radio" name="federation_status" value="add_federation" checked>
+                <div>
+                  <strong>Ajouter la licence Fédération (+15 CHF)</strong>
+                  <span>Classement officiel et résultats transmis.</span>
+                </div>
+              </label>
+
+              <label class="choice" id="choiceFedNone">
+                <input type="radio" name="federation_status" value="no_federation">
+                <div>
+                  <strong>Sans licence Fédération</strong>
+                  <span>Participation possible, sans classement officiel.</span>
+                </div>
+              </label>
+            </div>
+            <div class="hint">La licence Fédération est incluse automatiquement dans le pack membre event.</div>
+          </div>
+
+          <div class="field full" id="packDisciplineField" style="display:none;">
+            <label>Choix discipline pour le pack RSL</label>
+            <div class="choice-group">
+              <label class="choice" id="choicePackPark">
+                <input type="radio" name="pack_discipline" value="Park" checked>
+                <div>
+                  <strong>Park</strong>
+                  <span>1 discipline incluse</span>
+                </div>
+              </label>
+
+              <label class="choice" id="choicePackStreet">
+                <input type="radio" name="pack_discipline" value="Street">
+                <div>
+                  <strong>Street</strong>
+                  <span>1 discipline incluse</span>
+                </div>
+              </label>
+
+              <label class="choice" id="choicePackBoth">
+                <input type="radio" name="pack_discipline" value="Street + Park">
+                <div>
+                  <strong>Street + Park</strong>
+                  <span>Option 2 disciplines possible</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label for="notes">Remarque</label>
+            <textarea id="notes" placeholder="Informations utiles, demande particulière, etc."></textarea>
+          </div>
+
+          <div class="field full">
+            <label class="checkline">
+              <input type="checkbox" id="accept_conditions" required>
+              <span>
+                J’accepte les <a href="cp.html" target="_blank" rel="noopener">conditions de participation</a> et le règlement. Le casque est obligatoire.
+              </span>
+            </label>
+          </div>
+
+          <div class="field full">
+            <label>Mode de paiement</label>
+            <div class="pay-methods">
+              <div class="pay-method active" id="pmCard" onclick="selectPayMethod('card')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="3"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Carte bancaire
+              </div>
+              <div class="pay-method" id="pmTwint" onclick="selectPayMethod('twint')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>
+                Twint
+              </div>
+              <div class="pay-method" id="pmInvoice" onclick="selectPayMethod('invoice')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Facture
+              </div>
+            </div>
+            <div id="payMethodHint" class="hint"></div>
+          </div>
+
+          <div class="field full">
+            <button class="btn" id="payBtn" type="button">Payer et valider l'inscription</button>
+          </div>
+        </div>
+
+        <div class="msg ok" id="okmsg">Redirection vers le paiement…</div>
+        <div class="msg err" id="errmsg">Une erreur est survenue.</div>
+      </form>
+
+      <aside class="panel summary">
+        <h2>Panier</h2>
+        <div class="sum-box">
+          <div class="sum-row">
+            <span>Formule</span>
+            <strong id="summaryPack">Inscription standard</strong>
+          </div>
+
+          <div class="sum-row">
+            <span>Discipline</span>
+            <strong id="summaryDiscipline">Park</strong>
+          </div>
+
+          <div class="sum-row">
+            <span>Prix discipline</span>
+            <strong id="summaryDisciplinePrice">20 CHF</strong>
+          </div>
+
+          <div class="sum-row">
+            <span>Option fédération</span>
+            <strong id="summaryFederation">+15 CHF</strong>
+          </div>
+
+          <div class="sum-row" id="summaryRslRow" style="display:none;">
+            <span>Carte RSL</span>
+            <strong>Incluse</strong>
+          </div>
+
+          <div class="sum-row" id="summaryFoodRow" style="display:none;">
+            <span>Repas + 2 boissons</span>
+            <strong>Inclus</strong>
+          </div>
+
+          <div class="sum-row">
+            <span>Classement officiel</span>
+            <strong id="summaryOfficial">Oui</strong>
+          </div>
+
+          <div class="sum-total">
+            <span>Total</span>
+            <strong id="summaryTotal">35 CHF</strong>
+          </div>
+
+          <div class="note" id="summaryNote">
+            Formule standard avec licence Fédération ajoutée.
+          </div>
+        </div>
+
+        <div class="info green">
+          Licence Fédération offerte aux 15 premiers inscrits.
+        </div>
+
+        <div class="info red">
+          Casque obligatoire.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const cardSimple = document.getElementById("cardSimple");
+    const cardDouble = document.getElementById("cardDouble");
+    const cardPack = document.getElementById("cardPack");
+
+    const country = document.getElementById("country");
+    const cantonField = document.getElementById("cantonField");
+    const canton = document.getElementById("canton");
+
+    const singleDisciplineField = document.getElementById("singleDisciplineField");
+    const packDisciplineField = document.getElementById("packDisciplineField");
+
+    const summaryPack = document.getElementById("summaryPack");
+    const summaryDiscipline = document.getElementById("summaryDiscipline");
+    const summaryDisciplinePrice = document.getElementById("summaryDisciplinePrice");
+    const summaryFederation = document.getElementById("summaryFederation");
+    const summaryOfficial = document.getElementById("summaryOfficial");
+    const summaryTotal = document.getElementById("summaryTotal");
+    const summaryNote = document.getElementById("summaryNote");
+    const summaryRslRow = document.getElementById("summaryRslRow");
+    const summaryFoodRow = document.getElementById("summaryFoodRow");
+
+    const hiddenPackType = document.getElementById("hidden_pack_type");
+    const hiddenDiscipline = document.getElementById("hidden_discipline");
+    const hiddenTotal = document.getElementById("hidden_total");
+
+    const fedAlready = document.querySelector('input[name="federation_status"][value="already_member"]');
+    const fedAdd = document.querySelector('input[name="federation_status"][value="add_federation"]');
+    const fedNone = document.querySelector('input[name="federation_status"][value="no_federation"]');
+
+    let currentPayMethod = "card";
+
+    function selectPayMethod(method) {
+      currentPayMethod = method;
+      document.getElementById("pmCard").classList.toggle("active", method === "card");
+      document.getElementById("pmTwint").classList.toggle("active", method === "twint");
+      document.getElementById("pmInvoice").classList.toggle("active", method === "invoice");
+      const hint = document.getElementById("payMethodHint");
+      const btn = document.getElementById("payBtn");
+      if (method === "card") {
+        hint.textContent = "Paiement sécurisé par carte bancaire via Stripe.";
+        btn.textContent = "Payer par carte et valider";
+      } else if (method === "twint") {
+        hint.innerHTML = 'Envoie le montant sur <strong>078 300 80 43</strong> (Twint) en indiquant ton <strong>prénom, nom et catégorie</strong> dans le message.';
+        btn.textContent = "Valider l'inscription (paiement Twint)";
+      } else {
+        hint.innerHTML = 'Virement bancaire sur IBAN <strong>CH94 8080 8009 3546 9723 0</strong> (Raiffeisen). Indique ton prénom, nom et catégorie en message.';
+        btn.textContent = "Valider et recevoir la facture";
+      }
+    }
+    selectPayMethod("card");
+
+    const payBtn = document.getElementById("payBtn");
+    const okmsg = document.getElementById("okmsg");
+    const errmsg = document.getElementById("errmsg");
+
+    let currentPackType = "standard";
+    let currentMode = "single";
+    let currentPrice = 20;
+
+    function getChecked(name) {
+      return document.querySelector(`input[name="${name}"]:checked`);
+    }
+
+    function updateCountry() {
+      if (country.value === "Suisse") {
+        cantonField.style.display = "flex";
+      } else {
+        cantonField.style.display = "none";
+        canton.value = "";
+      }
+    }
+
+    function updateChoiceStyles() {
+      document.querySelectorAll(".choice").forEach(choice => {
+        const input = choice.querySelector("input[type='radio']");
+        choice.classList.toggle("active", !!input && input.checked);
+      });
+    }
+
+    function updateTopCards() {
+      cardSimple.classList.remove("active");
+      cardDouble.classList.remove("active");
+      cardPack.classList.remove("active");
+
+      if (currentPackType === "member_pack") {
+        cardPack.classList.add("active");
+      } else if (currentMode === "double") {
+        cardDouble.classList.add("active");
+      } else {
+        cardSimple.classList.add("active");
+      }
+    }
+
+    function lockFederationForPack() {
+      const isPack = currentPackType === "member_pack";
+      fedAlready.disabled = isPack;
+      fedAdd.disabled = isPack;
+      fedNone.disabled = isPack;
+
+      if (isPack) {
+        fedAdd.checked = true;
+      }
+    }
+
+    function updateSummary() {
+      lockFederationForPack();
+
+      const federationInput = getChecked("federation_status");
+      const federation = federationInput ? federationInput.value : "add_federation";
+      const singleDiscipline = getChecked("single_discipline")?.value || "Park";
+      const packDiscipline = getChecked("pack_discipline")?.value || "Park";
+
+      let total = 0;
+
+      if (currentPackType === "member_pack") {
+        total = 75;
+
+        singleDisciplineField.style.display = "none";
+        packDisciplineField.style.display = "flex";
+
+        summaryPack.textContent = "Pack membre event";
+        summaryDiscipline.textContent = packDiscipline;
+        summaryDisciplinePrice.textContent = "Incluse";
+        summaryFederation.textContent = "Incluse";
+        summaryOfficial.textContent = "Oui";
+        summaryTotal.textContent = "75 CHF";
+        summaryNote.textContent = "Inclut l’inscription Fédération, la carte RSL, 1 repas + 2 boissons et le classement officiel.";
+
+        summaryRslRow.style.display = "flex";
+        summaryFoodRow.style.display = "flex";
+
+        hiddenPackType.value = "member_pack";
+        hiddenDiscipline.value = packDiscipline;
+        hiddenTotal.value = "75";
+      } else {
+        singleDisciplineField.style.display = currentMode === "single" ? "flex" : "none";
+        packDisciplineField.style.display = "none";
+
+        total = currentPrice;
+        const disciplineLabel = currentMode === "double" ? "Street + Park" : singleDiscipline;
+
+        summaryPack.textContent = "Inscription standard";
+        summaryDiscipline.textContent = disciplineLabel;
+        summaryDisciplinePrice.textContent = currentPrice + " CHF";
+
+        summaryRslRow.style.display = "none";
+        summaryFoodRow.style.display = "none";
+
+        if (federation === "add_federation") {
+          total += 15;
+          summaryFederation.textContent = "+15 CHF";
+          summaryOfficial.textContent = "Oui";
+          summaryNote.textContent = "Formule standard avec licence Fédération ajoutée.";
+        } else if (federation === "already_member") {
+          summaryFederation.textContent = "Déjà membre";
+          summaryOfficial.textContent = "Oui";
+          summaryNote.textContent = "Formule standard avec Fédération déjà active.";
+        } else {
+          summaryFederation.textContent = "Sans licence";
+          summaryOfficial.textContent = "Non";
+          summaryNote.textContent = "Participation libre, sans classement fédéral officiel.";
+        }
+
+        summaryTotal.textContent = total + " CHF";
+
+        hiddenPackType.value = "standard";
+        hiddenDiscipline.value = disciplineLabel;
+        hiddenTotal.value = String(total);
+      }
+
+      updateChoiceStyles();
+      updateTopCards();
+
+      return {
+        packType: hiddenPackType.value,
+        discipline: hiddenDiscipline.value,
+        federation: getChecked("federation_status") ? getChecked("federation_status").value : "add_federation",
+        total: Number(hiddenTotal.value)
+      };
+    }
+
+    cardSimple.addEventListener("click", () => {
+      currentPackType = "standard";
+      currentMode = "single";
+      currentPrice = 20;
+      updateSummary();
+    });
+
+    cardDouble.addEventListener("click", () => {
+      currentPackType = "standard";
+      currentMode = "double";
+      currentPrice = 30;
+      updateSummary();
+    });
+
+    cardPack.addEventListener("click", () => {
+      currentPackType = "member_pack";
+      currentMode = "pack";
+      currentPrice = 75;
+      fedAdd.checked = true;
+      document.querySelector('input[name="pack_discipline"][value="Park"]').checked = true;
+      updateSummary();
+    });
+
+    document.querySelectorAll('input[name="federation_status"]').forEach(input => {
+      input.addEventListener("change", updateSummary);
+    });
+
+    document.querySelectorAll('input[name="single_discipline"]').forEach(input => {
+      input.addEventListener("change", updateSummary);
+    });
+
+    document.querySelectorAll('input[name="pack_discipline"]').forEach(input => {
+      input.addEventListener("change", updateSummary);
+    });
+
+    country.addEventListener("change", updateCountry);
+
+    updateCountry();
+    updateSummary();
+
+    payBtn.addEventListener("click", async () => {
+      okmsg.style.display = "none";
+      errmsg.style.display = "none";
+
+      const first_name = document.getElementById("first_name").value.trim();
+      const last_name = document.getElementById("last_name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const birth_date = document.getElementById("birth_date").value;
+      const sex = document.getElementById("sex").value;
+      const category = document.getElementById("category").value;
+      const countryValue = document.getElementById("country").value;
+      const city = document.getElementById("city").value.trim();
+      const club = document.getElementById("club").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+      const acceptConditions = document.getElementById("accept_conditions").checked;
+
+      if (!first_name || !last_name || !email || !birth_date || !sex || !category || !countryValue) {
+        errmsg.textContent = "Merci de remplir tous les champs obligatoires.";
+        errmsg.style.display = "block";
+        return;
+      }
+
+      if (countryValue === "Suisse" && !canton.value) {
+        errmsg.textContent = "Merci de sélectionner le canton.";
+        errmsg.style.display = "block";
+        return;
+      }
+
+      if (!acceptConditions) {
+        errmsg.textContent = "Tu dois accepter les conditions.";
+        errmsg.style.display = "block";
+        return;
+      }
+
+      const state = updateSummary();
+
+      const PRICE_IDS = {
+        20: "price_1TMQ2U4CyXBvyiQ0Fj9aAAEu",
+        30: "price_1TMQ524CyXBvyiQ0DkQFuXXq",
+        35: "price_1TMQ4U4CyXBvyiQ0XfTlTU2r",
+        45: "price_1TMQ464CyXBvyiQ0qZeaXiC4",
+        75: "price_1TMQ3i4CyXBvyiQ0RyaertKJ"
+      };
+
+      const priceId = PRICE_IDS[state.total];
+
+      if (!priceId) {
+        errmsg.textContent = "Erreur prix Stripe.";
+        errmsg.style.display = "block";
+        return;
+      }
+
+      const payload = {
+        priceId,
+        first_name,
+        last_name,
+        email,
+        phone,
+        birth_date,
+        sex,
+        category,
+        country: countryValue,
+        canton: canton.value,
+        city,
+        club,
+        notes,
+        packType: state.packType,
+        discipline: state.discipline,
+        federation: state.federation,
+        total: state.total,
+        paymentMethod: currentPayMethod
+      };
+
+      // ── Supabase : enregistrement de l'inscription ──────────────────
+      const SUPABASE_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";   // ← remplacer
+      const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4"; // ← remplacer
+      const _supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+      async function saveInscription(extraFields = {}) {
+        const { error } = await _supa.from("inscriptions").insert([{
+          first_name,
+          last_name,
+          email,
+          phone,
+          birth_date,
+          sex,
+          category,
+          country: countryValue,
+          canton: canton.value,
+          city,
+          club,
+          notes,
+          pack_type:      state.packType,
+          discipline:     state.discipline,
+          federation:     state.federation,
+          total:          state.total,
+          payment_method: currentPayMethod,
+          paid:           false,
+          ...extraFields
+        }]);
+        if (error) console.warn("Supabase insert error:", error.message);
+      }
+
+      if (currentPayMethod === "card") {
+        // ── Stripe card checkout ──────────────────────────────────────────
+        try {
+          payBtn.disabled = true;
+          okmsg.textContent = "Redirection vers le paiement…";
+          okmsg.style.display = "block";
+
+          const res = await fetch("/.netlify/functions/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+
+          if (!res.ok || !data.url) {
+            throw new Error(data.error || "Impossible de créer la session Stripe.");
+          }
+
+          await saveInscription();
+          window.location.href = data.url;
+        } catch (error) {
+          errmsg.textContent = error.message || "Erreur serveur Stripe.";
+          errmsg.style.display = "block";
+          okmsg.style.display = "none";
+          payBtn.disabled = false;
+        }
+
+      } else if (currentPayMethod === "twint") {
+        // ── Twint — paiement manuel sur 078 300 80 43 ────────────────────
+        try {
+          payBtn.disabled = true;
+
+          const res = await fetch("/.netlify/functions/create-invoice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...payload, paymentMethod: "twint" })
+          });
+
+          // on ignore les erreurs serveur — l'inscription est enregistrée
+        } catch (_) {}
+
+        await saveInscription();
+        okmsg.innerHTML =
+          "✅ Inscription enregistrée !<br>" +
+          "Envoie <strong>" + state.total + " CHF</strong> sur Twint au <strong>078 300 80 43</strong><br>" +
+          "Message : <strong>" + first_name + " " + last_name + " — " + category + "</strong>";
+        okmsg.style.display = "block";
+        payBtn.disabled = false;
+
+      } else {
+        // ── Facture — virement bancaire Raiffeisen ────────────────────────
+        try {
+          payBtn.disabled = true;
+
+          const res = await fetch("/.netlify/functions/create-invoice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...payload, paymentMethod: "invoice" })
+          });
+          // on ignore les erreurs serveur
+        } catch (_) {}
+
+        await saveInscription();
+        okmsg.innerHTML =
+          "✅ Inscription enregistrée !<br><br>" +
+          "Effectue un virement de <strong>" + state.total + " CHF</strong> :<br>" +
+          "<strong>IBAN :</strong> CH94 8080 8009 3546 9723 0<br>" +
+          "<strong>Bénéficiaire :</strong> Ride4Style.(Montreux Scooter Contest)<br>" +
+          "<strong>Banque :</strong> Raiffeisen Moléson — SWIFT : RAIFCH22<br>" +
+          "<strong>Message de paiement :</strong> " + first_name + " " + last_name + " — " + category;
+        okmsg.style.display = "block";
+        payBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+      const tbody = document.getElementById("tableBody");
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="8">Aucune inscription trouvée.</td></tr>`;
+        return;
+      }
+
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${row.first_name || ""} ${row.last_name || ""}</strong><br><small>${row.email || ""}</small></td>
+          <td><span class="tag">${row.category || "—"}</span></td>
+          <td>${row.discipline || "—"}</td>
+          <td class="hide-mobile">${row.federation_status || "—"}</td>
+          <td>${row.payment_status || "pending"}</td>
+          <td class="hide-mobile">${row.total_amount || 0} CHF</td>
+          <td class="hide-mobile">${formatDate(row.created_at)}</td>
+          <td>
+            <div class="actions">
+              <button data-id="${row.id}" data-action="toggle-checkin">Check-in</button>
+              <button class="ghost" data-id="${row.id}" data-action="delete">Supprimer</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function applyFilters(){
+      const search = document.getElementById("searchInput").value.toLowerCase().trim();
+      const category = document.getElementById("categoryFilter").value;
+      const discipline = document.getElementById("disciplineFilter").value;
+
+      const filtered = allRows.filter(row => {
+        const text = `${row.first_name || ""} ${row.last_name || ""} ${row.email || ""}`.toLowerCase();
+        const okSearch = !search || text.includes(search);
+        const okCategory = !category || row.category === category;
+        const okDiscipline = !discipline || row.discipline === discipline;
+        return okSearch && okCategory && okDiscipline;
+      });
+
+      renderStats(filtered);
+      renderTable(filtered);
+    }
+
+    async function loadRows(){
+      const res = await supabaseClient
+        .from("contest_registrations")
+        .select("*")
+        .eq("event_slug", "montreux-2026")
+        .order("created_at", { ascending: false });
+
+      if (res.error) {
+        console.error(res.error);
+        alert("Erreur chargement admin. Vérifie la table Supabase et les policies.");
+        return;
+      }
+
+      allRows = res.data || [];
+      applyFilters();
+    }
+
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("categoryFilter").addEventListener("change", applyFilters);
+    document.getElementById("disciplineFilter").addEventListener("change", applyFilters);
+    document.getElementById("refreshBtn").addEventListener("click", loadRows);
+
+    document.getElementById("tableBody").addEventListener("click", async (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+
+      if (action === "delete") {
+        if (!confirm("Supprimer cette inscription ?")) return;
+        const res = await supabaseClient.from("contest_registrations").delete().eq("id", id);
+        if (res.error) return alert("Erreur suppression");
+        loadRows();
+      }
+
+      if (action === "toggle-checkin") {
+        const row = allRows.find(r => r.id === id);
+        const res = await supabaseClient.from("contest_registrations").update({ checkin_status: !row.checkin_status }).eq("id", id);
+        if (res.error) return alert("Erreur check-in");
+        loadRows();
+      }
+    });
+
+    loadRows();
+  </script>
+</body>
+</html>

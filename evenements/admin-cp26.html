@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Montreux 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{
+      --bg:#0f0f10;--panel:#18181b;--panel2:#232326;--text:#f5f5f5;--muted:#b8b8bd;
+      --red:#d71920;--red-soft:rgba(215,25,32,.10);--line:rgba(255,255,255,.10);
+      --green:#29c66f;--green-soft:rgba(41,198,111,.12);--shadow:0 14px 40px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:Arial,Helvetica,sans-serif;
+      background:radial-gradient(circle at top,rgba(215,25,32,.12),transparent 34%),
+                 linear-gradient(180deg,#111,#0d0d0f 55%,#111);
+      color:var(--text);min-height:100vh;
+    }
+    a{color:inherit}
+    .wrap{max-width:1180px;margin:auto;padding:24px 16px 40px}
+
+    /* ── mêmes composants que inscription.html ── */
+    .eyebrow{
+      display:inline-block;background:var(--red);color:#fff;border-radius:999px;
+      padding:9px 14px;font-weight:800;text-transform:uppercase;font-size:.78rem;
+      letter-spacing:.08em;margin-bottom:14px;
+    }
+    .hero{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+      border:1px solid var(--line);border-radius:28px;padding:28px;
+      margin-bottom:18px;box-shadow:var(--shadow);
+    }
+    .hero h1{margin:0 0 8px;font-size:clamp(1.8rem,3vw,3.2rem);line-height:.95;text-transform:uppercase}
+    .hero p{margin:0;color:var(--muted);line-height:1.55}
+    .panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+      border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow);
+    }
+    .panel h2{margin:0 0 18px;text-transform:uppercase;font-size:1.15rem;letter-spacing:.03em}
+
+    /* inputs */
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+    label{font-weight:700;font-size:.95rem}
+    input,select,textarea{
+      width:100%;border:none;outline:none;border-radius:14px;
+      background:var(--panel2);border:1px solid rgba(255,255,255,.08);
+      color:#fff;padding:14px;font:inherit;
+    }
+    select option{background:var(--panel2)}
+    .btn{
+      width:100%;border:none;border-radius:14px;padding:15px 18px;
+      background:var(--red);color:#fff;font-size:1rem;font-weight:800;
+      cursor:pointer;transition:.15s;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .btn:disabled{opacity:.7;cursor:not-allowed}
+    .msg{display:none;margin-top:14px;border-radius:14px;padding:14px;line-height:1.5}
+    .msg.err{background:rgba(255,107,107,.10);border:1px solid rgba(255,107,107,.22);color:#ffdede}
+
+    /* login */
+    #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+    .login-box{width:100%;max-width:400px}
+    .login-box h1{font-size:clamp(2rem,4vw,4rem);line-height:.95;text-transform:uppercase;margin:0 0 22px}
+
+    /* admin */
+    #adminScreen{display:none}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 24px;border-bottom:1px solid var(--line);
+      background:rgba(0,0,0,.35);backdrop-filter:blur(8px);
+      position:sticky;top:0;z-index:10;gap:12px;flex-wrap:wrap;
+    }
+    .topbar h2{font-size:1rem;text-transform:uppercase;letter-spacing:.05em}
+    .topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .badge{
+      background:var(--panel2);border:1px solid var(--line);
+      border-radius:999px;padding:6px 14px;font-size:.85rem;color:var(--muted);
+    }
+    .badge span{color:#fff;font-weight:700}
+    .btn-sm{
+      border:none;border-radius:10px;padding:8px 16px;
+      background:rgba(255,255,255,.08);color:var(--muted);
+      font-size:.85rem;font-weight:700;cursor:pointer;transition:.15s;
+    }
+    .btn-sm:hover{background:rgba(255,255,255,.13);color:#fff}
+
+    /* stats — même style que price-grid */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+    .stat-card{
+      padding:20px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));
+      border:1px solid var(--line);border-radius:22px;
+      cursor:default;box-shadow:var(--shadow);
+    }
+    .stat-card .val{font-size:2.1rem;font-weight:900;margin-bottom:6px;line-height:1}
+    .stat-card .lbl{color:var(--muted);font-size:.9rem}
+    .stat-card.green .val{color:var(--green)}
+    .stat-card.red .val{color:#ff6b6b}
+
+    /* filters */
+    .filters{display:flex;gap:10px;flex-wrap:wrap}
+    .filters select,.filters input{
+      background:var(--panel2);border:1px solid rgba(255,255,255,.08);
+      color:#fff;border-radius:14px;padding:12px 14px;font:inherit;font-size:.9rem;outline:none;
+    }
+    .filters input{min-width:220px}
+
+    /* table */
+    .table-wrap{
+      overflow-x:auto;border-radius:22px;border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+      box-shadow:var(--shadow);
+    }
+    table{width:100%;border-collapse:collapse;font-size:.9rem}
+    thead th{
+      padding:14px 16px;text-align:left;text-transform:uppercase;
+      font-size:.75rem;letter-spacing:.06em;color:var(--muted);
+      border-bottom:1px solid var(--line);white-space:nowrap;
+    }
+    tbody tr{border-bottom:1px solid rgba(255,255,255,.05);transition:.15s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:rgba(255,255,255,.03)}
+    td{padding:13px 16px;vertical-align:middle}
+    .empty{text-align:center;padding:40px;color:var(--muted);font-size:.95rem}
+
+    .chip{display:inline-block;border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:700;white-space:nowrap}
+    .chip.carte{background:rgba(99,179,237,.15);color:#90cdf4}
+    .chip.twint{background:rgba(154,230,180,.12);color:#9ae6b4}
+    .chip.facture{background:rgba(246,173,85,.12);color:#f6ad55}
+    .chip.cash{background:rgba(168,85,247,.12);color:#d8b4fe}
+
+    .paid-btn{border:none;border-radius:999px;padding:6px 14px;font-size:.78rem;font-weight:800;cursor:pointer;transition:.2s;white-space:nowrap}
+    .paid-btn.unpaid{background:rgba(255,107,107,.12);color:#ff6b6b;border:1px solid rgba(255,107,107,.25)}
+    .paid-btn.unpaid:hover{background:rgba(255,107,107,.22)}
+    .paid-btn.paid{background:var(--green-soft);color:var(--green);border:1px solid rgba(41,198,111,.3)}
+    .paid-btn.paid:hover{background:rgba(41,198,111,.22)}
+    .amount{font-weight:900;color:#fff}
+    .del-btn{border:1px solid rgba(255,107,107,.2);background:rgba(255,107,107,.10);color:#ff6b6b;border-radius:10px;padding:7px 11px;cursor:pointer;font-size:1rem;transition:.15s}
+    .del-btn:hover{background:rgba(255,107,107,.25)}
+
+    /* modal — même base que .panel */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
+    .modal-bg.open{display:flex}
+    .modal{
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+      border:1px solid var(--line);border-radius:28px;padding:28px;
+      width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow);
+    }
+    .modal .eyebrow{margin-bottom:8px}
+    .modal h3{margin:0 0 20px;text-transform:uppercase;font-size:1.1rem;letter-spacing:.04em}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+    .btn-cancel{border:1px solid var(--line);border-radius:14px;padding:13px 22px;background:rgba(255,255,255,.04);color:var(--muted);font:inherit;font-weight:700;cursor:pointer}
+    .btn-cancel:hover{background:rgba(255,255,255,.08)}
+    .btn-save{border:none;border-radius:14px;padding:13px 26px;background:var(--red);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+    .btn-save:hover{filter:brightness(1.08)}
+    .btn-save:disabled{opacity:.5;cursor:not-allowed}
+
+    @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+    @media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}.topbar{padding:12px 16px}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="wrap">
+    <div class="panel login-box">
+      <span class="eyebrow">Admin</span>
+      <h1>Montreux<br>2026</h1>
+      <div class="field">
+        <label for="adminPass">Mot de passe</label>
+        <input type="password" id="adminPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" id="loginBtn">Connexion</button>
+      <div class="msg err" id="loginErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminScreen">
+  <div class="topbar">
+    <h2>🏆 Inscriptions — Montreux 2026</h2>
+    <div class="topbar-right">
+      <div class="badge">Total : <span id="statTotal">—</span> riders</div>
+      <button class="btn-sm" id="addBtn" style="background:var(--red);color:#fff">+ Ajouter</button>
+      <button class="btn-sm" id="refreshBtn">↻ Actualiser</button>
+      <button class="btn-sm" id="exportBtn">⬇ CSV</button>
+      <button class="btn-sm" id="logoutBtn">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <span class="eyebrow">Back-office</span>
+      <h1>Gestion des inscriptions</h1>
+      <p>Consulte, modifie et ajoute des inscriptions pour l'étape de Montreux du 30 mai 2026.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="val" id="sTotal">—</div>
+        <div class="lbl">Inscriptions</div>
+      </div>
+      <div class="stat-card green">
+        <div class="val" id="sPaid">—</div>
+        <div class="lbl">Payés ✅</div>
+      </div>
+      <div class="stat-card red">
+        <div class="val" id="sUnpaid">—</div>
+        <div class="lbl">En attente ❌</div>
+      </div>
+      <div class="stat-card">
+        <div class="val" id="sRevenue">—</div>
+        <div class="lbl">CHF encaissés</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:18px">
+      <div class="filters">
+        <input type="text" id="searchInput" placeholder="🔍 Rechercher nom, email…">
+        <select id="filterPaid">
+          <option value="">Tous les statuts</option>
+          <option value="true">Payé ✅</option>
+          <option value="false">En attente ❌</option>
+        </select>
+        <select id="filterMethod">
+          <option value="">Tous les modes</option>
+          <option value="card">Carte</option>
+          <option value="twint">Twint</option>
+          <option value="invoice">Facture</option>
+          <option value="cash">Cash</option>
+        </select>
+        <select id="filterCategory">
+          <option value="">Toutes catégories</option>
+          <option value="U13">U13</option>
+          <option value="U15">U15</option>
+          <option value="Amateur">Amateur</option>
+          <option value="Pro">Pro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nom / Prénom</th><th>Email</th><th>Catégorie</th>
+            <th>Discipline</th><th>Formule</th><th>Montant</th><th>Paiement</th>
+            <th>Statut</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="10" class="empty">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AJOUT -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <span class="eyebrow">Nouveau</span>
+    <h3>Ajouter une inscription</h3>
+    <div class="grid2">
+      <div class="field"><label>Prénom *</label><input id="mFirstName" placeholder="Prénom"></div>
+      <div class="field"><label>Nom *</label><input id="mLastName" placeholder="Nom"></div>
+      <div class="field"><label>Email</label><input id="mEmail" type="email" placeholder="email@exemple.com"></div>
+      <div class="field"><label>Téléphone</label><input id="mPhone" placeholder="079 000 00 00"></div>
+      <div class="field"><label>Date de naissance</label><input id="mBirth" type="date"></div>
+      <div class="field"><label>Sexe</label>
+        <select id="mSex"><option value="">Choisir</option><option value="Homme">Homme</option><option value="Femme">Femme</option></select>
+      </div>
+      <div class="field"><label>Catégorie *</label>
+        <select id="mCategory"><option value="">Choisir</option><option value="U13">U13</option><option value="U15">U15</option><option value="Amateur">Amateur</option><option value="Pro">Pro</option></select>
+      </div>
+      <div class="field"><label>Discipline *</label>
+        <select id="mDiscipline"><option value="">Choisir</option><option value="Park">Park</option><option value="Street">Street</option><option value="Park+Street">Park + Street</option></select>
+      </div>
+      <div class="field"><label>Pays</label>
+        <select id="mCountry"><option value="">Choisir</option><option value="Suisse">Suisse</option><option value="France">France</option><option value="Belgique">Belgique</option><option value="Autre">Autre</option></select>
+      </div>
+      <div class="field"><label>Canton</label>
+        <select id="mCanton"><option value="">—</option><option value="Vaud">Vaud</option><option value="Valais">Valais</option><option value="Fribourg">Fribourg</option><option value="Genève">Genève</option><option value="Neuchâtel">Neuchâtel</option><option value="Jura">Jura</option><option value="Berne">Berne</option></select>
+      </div>
+      <div class="field"><label>Ville</label><input id="mCity" placeholder="Lausanne"></div>
+      <div class="field"><label>Club / Team</label><input id="mClub" placeholder="(optionnel)"></div>
+      <div class="field"><label>Mode de paiement</label>
+        <select id="mPayMethod"><option value="cash">Cash</option><option value="twint">Twint</option><option value="invoice">Facture</option><option value="card">Carte</option></select>
+      </div>
+      <div class="field"><label>Montant (CHF)</label><input id="mTotal" type="number" value="35" min="0"></div>
+      <div class="field"><label>Statut</label>
+        <select id="mPaid"><option value="true">✅ Payé</option><option value="false">❌ En attente</option></select>
+      </div>
+      <div class="field"><label>Notes internes</label><input id="mNotes" placeholder="(optionnel)"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="modalCancel">Annuler</button>
+      <button class="btn-save" id="modalSave">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
+  const _supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  const ADMIN_PASSWORD = "rsl-2026";
+  let allRows = [];
+
+  document.getElementById("loginBtn").addEventListener("click", () => {
+    const pass = document.getElementById("adminPass").value;
+    const err  = document.getElementById("loginErr");
+    if (pass === ADMIN_PASSWORD) { sessionStorage.setItem("admin_ok","1"); showAdmin(); }
+    else { err.textContent = "Mot de passe incorrect."; err.style.display = "block"; }
+  });
+  document.getElementById("adminPass").addEventListener("keydown", e => {
+    if (e.key === "Enter") document.getElementById("loginBtn").click();
+  });
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    sessionStorage.removeItem("admin_ok"); location.reload();
+  });
+  if (sessionStorage.getItem("admin_ok") === "1") showAdmin();
+
+  function showAdmin() {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("adminScreen").style.display = "block";
+    loadInscriptions();
+  }
+
+  async function loadInscriptions() {
+    document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="empty">Chargement…</td></tr>';
+    const { data, error } = await _supa.from("inscriptions").select("*").order("created_at", { ascending: false });
+    if (error) { document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="empty">Erreur : ' + error.message + '</td></tr>'; return; }
+    allRows = data || [];
+    renderTable(); renderStats();
+  }
+
+  function renderStats() {
+    const paid    = allRows.filter(r => r.paid);
+    const revenue = paid.reduce((s, r) => s + (r.total || 0), 0);
+    document.getElementById("sTotal").textContent    = allRows.length;
+    document.getElementById("sPaid").textContent     = paid.length;
+    document.getElementById("sUnpaid").textContent   = allRows.length - paid.length;
+    document.getElementById("sRevenue").textContent  = revenue + " CHF";
+    document.getElementById("statTotal").textContent = allRows.length;
+  }
+
+  function renderTable() {
+    const search  = document.getElementById("searchInput").value.toLowerCase();
+    const fPaid   = document.getElementById("filterPaid").value;
+    const fMethod = document.getElementById("filterMethod").value;
+    const fCat    = document.getElementById("filterCategory").value;
+    const rows = allRows.filter(r => {
+      const txt = (r.first_name + " " + r.last_name + " " + (r.email||"")).toLowerCase();
+      if (search && !txt.includes(search)) return false;
+      if (fPaid !== "" && String(r.paid) !== fPaid) return false;
+      if (fMethod && r.payment_method !== fMethod) return false;
+      if (fCat   && r.category !== fCat) return false;
+      return true;
+    });
+    const tbody = document.getElementById("tableBody");
+    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="10" class="empty">Aucune inscription trouvée.</td></tr>'; return; }
+    tbody.innerHTML = rows.map((r, i) => {
+      const mLabel = r.payment_method === "card" ? "Carte" : r.payment_method === "twint" ? "Twint" : r.payment_method === "cash" ? "Cash" : "Facture";
+      const mClass = r.payment_method === "card" ? "carte" : r.payment_method === "twint" ? "twint" : r.payment_method === "cash" ? "cash" : "facture";
+      const pClass = r.paid ? "paid" : "unpaid";
+      const pLabel = r.paid ? "✅ Payé" : "❌ En attente";
+      const pack   = r.pack_type === "member_pack" ? "Pack membre" : "Standard";
+      return `<tr>
+        <td style="color:var(--muted);font-size:.82rem">${i + 1}</td>
+        <td><strong>${esc(r.last_name)} ${esc(r.first_name)}</strong><br><span style="color:var(--muted);font-size:.82rem">${esc(r.phone||"")}</span></td>
+        <td style="color:var(--muted);font-size:.85rem">${esc(r.email||"")}</td>
+        <td>${esc(r.category||"")}</td>
+        <td>${esc(r.discipline||"")}</td>
+        <td style="color:var(--muted);font-size:.85rem">${pack}</td>
+        <td><span class="amount">${r.total||0} CHF</span></td>
+        <td><span class="chip ${mClass}">${mLabel}</span></td>
+        <td><button class="paid-btn ${pClass}" onclick="togglePaid('${r.id}',${r.paid})">${pLabel}</button></td>
+        <td><button class="del-btn" onclick="deleteRow('${r.id}','${esc(r.first_name)} ${esc(r.last_name)}')">🗑</button></td>
+      </tr>`;
+    }).join("");
+  }
+
+  async function togglePaid(id, current) {
+    const { error } = await _supa.from("inscriptions").update({ paid: !current }).eq("id", id);
+    if (error) { alert("Erreur : " + error.message); return; }
+    const row = allRows.find(r => r.id === id);
+    if (row) row.paid = !current;
+    renderTable(); renderStats();
+  }
+
+  async function deleteRow(id, name) {
+    if (!confirm("Supprimer l'inscription de " + name + " ?")) return;
+    const { error } = await _supa.from("inscriptions").delete().eq("id", id);
+    if (error) { alert("Erreur : " + error.message); return; }
+    allRows = allRows.filter(r => r.id !== id);
+    renderTable(); renderStats();
+  }
+
+  ["searchInput","filterPaid","filterMethod","filterCategory"].forEach(id => {
+    document.getElementById(id).addEventListener("input", renderTable);
+    document.getElementById(id).addEventListener("change", renderTable);
+  });
+  document.getElementById("refreshBtn").addEventListener("click", loadInscriptions);
+
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    if (!allRows.length) return;
+    const cols = ["first_name","last_name","email","phone","birth_date","sex","category","discipline","pack_type","federation","total","payment_method","paid","country","canton","city","club","notes","created_at"];
+    const header = cols.join(";");
+    const body = allRows.map(r => cols.map(c => `"${(r[c]??"").toString().replace(/"/g,'""')}"`).join(";")).join("\n");
+    const blob = new Blob(["\uFEFF"+header+"\n"+body], {type:"text/csv;charset=utf-8;"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "inscriptions_montreux_2026.csv"; a.click();
+  });
+
+  document.getElementById("addBtn").addEventListener("click", () => document.getElementById("modalBg").classList.add("open"));
+  document.getElementById("modalCancel").addEventListener("click", () => document.getElementById("modalBg").classList.remove("open"));
+  document.getElementById("modalBg").addEventListener("click", e => { if (e.target === document.getElementById("modalBg")) document.getElementById("modalBg").classList.remove("open"); });
+
+  document.getElementById("modalSave").addEventListener("click", async () => {
+    const btn = document.getElementById("modalSave");
+    const g = id => document.getElementById(id).value.trim();
+    const first_name = g("mFirstName"), last_name = g("mLastName");
+    if (!first_name || !last_name) { alert("Prénom et nom obligatoires."); return; }
+    btn.disabled = true; btn.textContent = "Enregistrement…";
+    const { error } = await _supa.from("inscriptions").insert([{
+      first_name, last_name,
+      email: g("mEmail"), phone: g("mPhone"),
+      birth_date: document.getElementById("mBirth").value || null,
+      sex: document.getElementById("mSex").value,
+      category: document.getElementById("mCategory").value,
+      discipline: document.getElementById("mDiscipline").value,
+      country: document.getElementById("mCountry").value,
+      canton: document.getElementById("mCanton").value,
+      city: g("mCity"), club: g("mClub"),
+      payment_method: document.getElementById("mPayMethod").value,
+      total: parseInt(document.getElementById("mTotal").value) || 0,
+      paid: document.getElementById("mPaid").value === "true",
+      notes: g("mNotes"), pack_type: "standard"
+    }]);
+    if (error) { alert("Erreur : " + error.message); btn.disabled = false; btn.textContent = "Enregistrer"; return; }
+    btn.disabled = false; btn.textContent = "Enregistrer";
+    document.getElementById("modalBg").classList.remove("open");
+    ["mFirstName","mLastName","mEmail","mPhone","mCity","mClub","mNotes"].forEach(id => document.getElementById(id).value = "");
+    ["mSex","mCategory","mDiscipline","mCountry","mCanton"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("mBirth").value = "";
+    document.getElementById("mTotal").value = "35";
+    document.getElementById("mPaid").value = "true";
+    document.getElementById("mPayMethod").value = "cash";
+    loadInscriptions();
+  });
+
+  function esc(str) { return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+</script>
+</body>
+</html>

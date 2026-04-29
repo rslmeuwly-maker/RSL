@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paiement envoyé</title>
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#111;
+      color:#fff;
+      padding:40px 20px;
+      text-align:center;
+    }
+    .box{
+      max-width:720px;
+      margin:auto;
+      background:#1b1b1f;
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:22px;
+      padding:34px 26px;
+      box-shadow:0 14px 40px rgba(0,0,0,.28);
+    }
+    h1{
+      margin:0 0 14px;
+      font-size:2rem;
+    }
+    p{
+      color:#d0d0d5;
+      line-height:1.6;
+      margin:10px 0;
+    }
+    .ok{
+      color:#7dffb0;
+      font-weight:700;
+    }
+    .muted{
+      color:#a8a8af;
+      font-size:.95rem;
+    }
+    .ref{
+      margin-top:18px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      word-break:break-word;
+    }
+    .btn{
+      display:inline-block;
+      margin-top:22px;
+      padding:14px 18px;
+      border-radius:14px;
+      background:#d71920;
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+    }
+    .btn:hover{
+      filter:brightness(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Paiement envoyé ✅</h1>
+    <p class="ok">Merci, ta demande d’inscription a bien été transmise à Stripe.</p>
+    <p>
+      Si le paiement a été validé, l’inscription sera confirmée automatiquement par notre système.
+    </p>
+    <p>
+      La confirmation peut prendre quelques secondes selon le moyen de paiement utilisé.
+    </p>
+
+    <div class="ref" id="refBox" style="display:none;"></div>
+
+    <p class="muted">
+      Tu peux fermer cette page une fois le paiement terminé.
+    </p>
+
+    <a class="btn" href="/inscription.html">Retour à l’inscription</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const registrationId = params.get("registration_id");
+    const sessionId = params.get("session_id");
+    const refBox = document.getElementById("refBox");
+
+    const refs = [];
+    if (registrationId) refs.push(`Référence inscription : ${registrationId}`);
+    if (sessionId) refs.push(`Session Stripe : ${sessionId}`);
+
+    if (refs.length) {
+      refBox.style.display = "block";
+      refBox.innerHTML = refs.join("<br>");
+    }
+  </script>
+</body>
+</html>
