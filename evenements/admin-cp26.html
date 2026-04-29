@@ -213,7 +213,7 @@
 
     <div class="panel" style="margin-bottom:18px">
       <div class="filters">
-        <input type="text" id="searchInput" placeholder="🔍 Rechercher nom, email…">
+        <input type="text" id="searchInput" placeholder="🔍 Rechercher nom, email…" autocomplete="off" name="search-riders-x7k" readonly onfocus="this.removeAttribute('readonly')">
         <select id="filterPaid">
           <option value="">Tous les statuts</option>
           <option value="true">Payé ✅</option>
@@ -322,6 +322,9 @@
   function showAdmin() {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("adminScreen").style.display = "block";
+    // Chrome injecte l'autocomplete APRÈS le JS — on vide immédiatement et 300ms après
+    document.getElementById("searchInput").value = "";
+    setTimeout(() => { document.getElementById("searchInput").value = ""; renderTable(); }, 300);
     loadInscriptions();
   }
 
