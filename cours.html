@@ -9,818 +9,302 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/common.css"/>
-
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-  <script defer src="js/env.js"></script>
-  <script defer src="js/auth.js"></script>
-  <script defer src="js/site.js"></script>
-
   <style>
     :root{
-      --rsl-bg:#020617;
-      --rsl-fg:#e5e7eb;
-      --rsl-muted:#9ca3af;
-      --rsl-card:rgba(15,23,42,.96);
-      --rsl-card-soft:rgba(15,23,42,.9);
-      --rsl-border:rgba(148,163,184,.45);
-      --rsl-accent:#22c55e;
-      --rsl-accent-soft:rgba(34,197,94,.14);
-    }
-    body.theme-light{
-      --rsl-bg:#f3f4f6;
-      --rsl-fg:#0f172a;
-      --rsl-muted:#6b7280;
-      --rsl-card:#ffffff;
-      --rsl-card-soft:#f9fafb;
-      --rsl-border:rgba(148,163,184,.35);
-      --rsl-accent:#16a34a;
-      --rsl-accent-soft:rgba(22,163,74,.12);
+      --accent:#22c55e;
     }
     *,:before,:after{ box-sizing:border-box; }
     html,body{
-      height:100%;
-      margin:0;
-      background:transparent!important;
-      display:flex;
-      flex-direction:column;
-      color:var(--rsl-fg);
-      font-family:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      min-height:100%; margin:0;
+      background:#020617;
+      display:flex; flex-direction:column;
+      color:#e5e7eb;
+      font-family:"Outfit",system-ui,-apple-system,sans-serif;
       overflow-x:hidden;
     }
-    main{ flex:1; position:relative; z-index:10; }
+    main{ flex:1; max-width:1200px; margin:0 auto; padding:0 16px 60px; width:100%; }
 
-    .site-bg-video{
-      position:fixed; inset:0;
-      width:100%; height:100%;
-      object-fit:cover;
-      z-index:-2;
-      background:#000;
-      pointer-events:none !important;
-    }
-    .site-bg-dim{
-      position:fixed; inset:0;
-      z-index:-1;
-      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.9));
-      transition:background .25s ease;
-      pointer-events:none !important;
-    }
-    body.theme-light .site-bg-dim{
-      background:linear-gradient(180deg,rgba(249,250,251,.9),rgba(15,23,42,.85));
-    }
-
+    /* NAV */
     nav.nav{
-      background:rgba(0,0,0,.65);
-      backdrop-filter:blur(10px);
+      background:rgba(0,0,0,.75); backdrop-filter:blur(10px);
       position:sticky; top:0; z-index:100;
-      transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
-      border-bottom:1px solid rgba(15,23,42,.8);
+      border-bottom:1px solid rgba(255,255,255,.08);
     }
-    nav.nav .container{ max-width:1320px; margin:0 auto; padding:10px 18px; }
-    nav.nav .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-    body.theme-light nav.nav{
-      background:rgba(248,250,252,.96);
-      border-bottom:1px solid rgba(148,163,184,.5);
-      box-shadow:0 10px 30px rgba(15,23,42,.06);
+    nav.nav .inner{
+      max-width:1200px; margin:0 auto; padding:10px 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
     }
-
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      color:inherit; text-decoration:none;
-      min-width:fit-content;
-    }
-    .brand img{
-      height:42px; border-radius:10px;
-      display:block;
-      background:#fff;
-      padding:3px;
-      box-shadow:0 10px 28px rgba(0,0,0,.35);
-    }
-    .brand span{
-      font-weight:800;
-      letter-spacing:.2px;
-      font-size:16px;
-      white-space:nowrap;
-    }
-
-    nav.nav ul{
-      display:flex; align-items:center; gap:20px;
-      padding:0; margin:0;
-      list-style:none;
-    }
-    nav.nav ul li a{
-      font-weight:600;
-      color:var(--rsl-fg);
-      font-size:15px;
-      letter-spacing:.02em;
-      white-space:nowrap;
-      text-decoration:none;
-      opacity:.9;
-      transition:.2s ease;
-    }
-    nav.nav ul li a:hover{ color:var(--rsl-accent); opacity:1; }
-
-    .cta{ display:flex; align-items:center; gap:10px; }
+    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
+    .brand img{ height:42px; border-radius:10px; background:#fff; padding:3px; box-shadow:0 10px 28px rgba(0,0,0,.35); }
+    .brand span{ font-weight:800; font-size:16px; white-space:nowrap; }
+    nav ul{ display:flex; align-items:center; gap:20px; padding:0; margin:0; list-style:none; }
+    nav ul li a{ font-weight:600; color:#e5e7eb; font-size:15px; text-decoration:none; opacity:.9; transition:.2s; }
+    nav ul li a:hover{ color:#22c55e; opacity:1; }
+    .nav-cta{ display:flex; gap:10px; align-items:center; }
     .btn{
-      border-radius:999px;
-      padding:8px 14px;
-      font-size:14px;
-      font-weight:700;
-      border:1px solid rgba(148,163,184,.5);
-      text-decoration:none;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      background:rgba(15,23,42,.9);
-      color:#f9fafb;
-      transition:.2s ease;
-      line-height:1;
-      white-space:nowrap;
+      border-radius:999px; padding:8px 14px; font-size:14px; font-weight:700;
+      border:1px solid rgba(148,163,184,.5); text-decoration:none;
+      display:inline-flex; align-items:center; gap:6px;
+      background:rgba(15,23,42,.9); color:#f9fafb; transition:.2s; white-space:nowrap;
     }
-    body.theme-light .btn{ background:#0f172a; color:#f9fafb; border-color:#0f172a; }
-    .btn.green{
-      background:var(--rsl-accent);
-      color:#052e16;
-      border-color:transparent;
-      box-shadow:0 10px 26px rgba(22,163,74,.45);
-    }
+    .btn.green{ background:#22c55e; color:#052e16; border-color:transparent; box-shadow:0 10px 26px rgba(22,163,74,.45); }
     .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
-
-    .nav-avatar{
-      width:34px; height:34px;
-      border-radius:999px;
-      object-fit:cover;
-      border:2px solid var(--rsl-accent);
-      box-shadow:0 0 10px rgba(34,197,94,.5);
-      display:block;
-    }
-
-    .theme-toggle{
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.6);
-      background:rgba(15,23,42,.9);
-      color:#e5e7eb;
-      width:34px; height:34px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:17px;
-      cursor:pointer;
-      padding:0;
-      transition:.2s ease;
-      line-height:1;
-    }
-    .theme-toggle:hover{ transform:translateY(-1px); filter:brightness(1.08); }
-    body.theme-light .theme-toggle{
-      background:#ffffff;
-      color:#0f172a;
-      border-color:rgba(148,163,184,.7);
-    }
-
     #menuBtn{
-      display:none;
-      width:40px;
-      height:40px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.18);
-      background:#0b0f19;
-      color:#fff;
-      cursor:pointer;
-      font-size:20px;
-      line-height:1;
-      padding:0;
-      align-items:center;
-      justify-content:center;
-      -webkit-tap-highlight-color: transparent;
+      display:none; width:40px; height:40px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.18); background:#0b0f19; color:#fff;
+      cursor:pointer; font-size:20px; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent;
     }
-    body.theme-light #menuBtn{ border-color:#0b0f19; background:#0b0f19; color:#fff; }
-
-    .container{ max-width:1200px; margin:0 auto; padding:0 16px; }
-
     .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
     .mobile-sheet.open{ display:block; }
     .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
     .mobile-panel{
       position:absolute; top:0; right:0; height:100%;
-      width:82vw; max-width:360px;
-      background:var(--rsl-card);
-      padding:22px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      border-left:1px solid rgba(15,23,42,.8);
-      box-shadow:-18px 0 50px rgba(0,0,0,.55);
+      width:82vw; max-width:360px; background:#0f172a; padding:22px 18px;
+      display:flex; flex-direction:column; gap:10px;
+      border-left:1px solid rgba(255,255,255,.08); box-shadow:-18px 0 50px rgba(0,0,0,.55);
     }
-    .mobile-panel a{
-      color:var(--rsl-fg);
-      text-decoration:none;
-      font-weight:800;
-      padding:6px 0;
-      font-size:14px;
-    }
+    .mobile-panel a{ color:#e5e7eb; text-decoration:none; font-weight:800; padding:6px 0; font-size:14px; }
+    @media(max-width:990px){ nav ul{ display:none !important; } #menuBtn{ display:inline-flex; } }
 
-    @media (max-width:990px){
-      nav.nav ul{ display:none !important; }
-      #btnCart, nav.nav .cta > .btn.green{ display:none !important; }
-      #menuBtn{ display:inline-flex; }
-      .coach-fab{ display:none; }
-    }
+    /* INTRO */
+    .page-intro{ padding:28px 0 14px; }
+    .page-intro h1{ margin:0 0 8px; font-size:clamp(26px,4vw,42px); font-weight:900; line-height:1.05; }
+    .page-intro p{ margin:0; font-size:clamp(14px,2vw,17px); color:#9ca3af; }
 
-    .page-intro{ color:#fff; padding:22px 0 10px; }
-    body.theme-light .page-intro{ color:#0f172a !important; }
-    .page-intro h1{
-      margin:10px 0 6px;
-      font-size:clamp(28px,4.2vw,42px);
-      font-weight:900;
-      letter-spacing:.2px;
-      line-height:1.05;
+    /* FILTRE LIEU */
+    .lieu-filters{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin:20px 0 4px;
     }
-    .page-intro p{
-      margin:0;
-      font-size:clamp(15px,2.2vw,18px);
-      opacity:.95;
-      max-width:860px;
-    }
-    body.theme-light .page-intro p{ color:#334155 !important; opacity:1; }
-
-    .filters{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin:10px 0 14px;
-      align-items:flex-end;
-      background:rgba(15,23,42,.72);
-      border:1px solid rgba(148,163,184,.35);
-      border-radius:16px;
-      padding:14px;
-      box-shadow:0 16px 40px rgba(0,0,0,.35);
-    }
-    body.theme-light .filters{
-      background:rgba(255,255,255,.92);
-      border-color:rgba(148,163,184,.35);
-      box-shadow:0 16px 40px rgba(15,23,42,.10);
-    }
-    .filter-field{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      flex:1 1 180px;
-      min-width:160px;
-    }
-    .filter-label{ font-size:13px; font-weight:800; opacity:.95; }
-    body.theme-light .filter-label{ color:#0f172a; opacity:1; }
-
-    .check-label{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:14px;
-      font-weight:800;
-      user-select:none;
-    }
-    body.theme-light .check-label{ color:#0f172a; }
-    .check-label input{ width:16px; height:16px; accent-color:#22c55e; }
-
-    .select-shell{ position:relative; }
-    .select-display{
-      width:100%;
-      background:rgba(15,23,42,.95);
-      border:1px solid rgba(148,163,184,.7);
-      border-radius:12px;
-      padding:12px 40px 12px 14px;
-      font-size:15px;
-      font-weight:900;
-      color:#f9fafb;
-      text-align:left;
-      cursor:pointer;
-      background-image:
-        linear-gradient(45deg, transparent 50%, #22c55e 50%),
-        linear-gradient(135deg, #22c55e 50%, transparent 50%);
-      background-position:
-        calc(100% - 22px) center,
-        calc(100% - 16px) center;
-      background-size: 6px 6px;
-      background-repeat:no-repeat;
-      transition:.18s ease;
+    .lieu-btn{
+      padding:10px 18px; border-radius:999px;
+      border:1.5px solid rgba(148,163,184,.35);
+      background:rgba(15,23,42,.8);
+      color:#9ca3af; font-size:14px; font-weight:800;
+      cursor:pointer; transition:.18s ease;
       -webkit-tap-highlight-color:transparent;
     }
-    body.theme-light .select-display{
-      background:#ffffff;
-      color:#0f172a;
-      border-color:rgba(148,163,184,.65);
-    }
-    .select-shell.open .select-display{
-      border-color:#22c55e;
-      box-shadow:0 0 0 2px rgba(34,197,94,.35);
-    }
-    .select-panel{
-      position:absolute;
-      top:calc(100% + 6px);
-      left:0; right:0;
-      background:#020617;
-      border-radius:14px;
-      border:1px solid rgba(148,163,184,.6);
-      padding:6px 0;
-      display:none;
-      max-height:260px;
-      overflow:auto;
-      z-index:3000;
-    }
-    body.theme-light .select-panel{ background:#ffffff; }
-    .select-shell.open .select-panel{ display:block; }
-    .select-option{
-      padding:10px 14px;
-      font-size:14px;
-      color:#e5e7eb;
-      cursor:pointer;
-      font-weight:800;
-    }
-    body.theme-light .select-option{ color:#0f172a; }
-    .select-option:hover{ background:rgba(34,197,94,.12); }
-    .select-option.is-selected{
-      background:rgba(34,197,94,.18);
-      font-weight:900;
-      color:#bbf7d0;
-    }
-    body.theme-light .select-option.is-selected{ color:#052e16; }
-    .select-native{
-      position:absolute;
-      left:-9999px;
-      width:1px;
-      height:1px;
-      opacity:0;
+    .lieu-btn:hover{ border-color:#22c55e; color:#e5e7eb; }
+    .lieu-btn.active{
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      border-color:transparent; color:#052e16;
+      box-shadow:0 8px 20px rgba(22,163,74,.4);
     }
 
-    .list{ margin:12px 0 60px; }
-
-    .item{
-      background:linear-gradient(180deg,rgba(9,13,23,.88),rgba(7,10,18,.95));
-      border-radius:16px;
-      border:1px solid rgba(148,163,184,.45);
-      padding:14px;
-      margin-bottom:12px;
-      box-shadow:0 14px 40px rgba(0,0,0,.8);
-      color:#e5e7eb;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      position:relative;
-      z-index:10;
+    /* GRILLE */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+      gap:16px; margin-top:20px;
     }
-    .course-title{ font-weight:1000; font-size:16px; letter-spacing:.1px; }
-    .course-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-      margin-top:2px;
-      font-size:13px;
-      font-weight:900;
+    .card{
+      background:linear-gradient(160deg,rgba(15,23,42,.95),rgba(7,10,20,.98));
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:20px; padding:20px;
+      display:flex; flex-direction:column; gap:14px;
+      box-shadow:0 20px 50px rgba(0,0,0,.55);
+      transition:.2s ease;
     }
-    .course-meta span{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:linear-gradient(180deg, var(--rsl-accent), #16a34a);
-      border:1px solid rgba(255,255,255,.10);
-      color:#052e16;
-      box-shadow:0 10px 22px rgba(22,163,74,.28), inset 0 1px 0 rgba(255,255,255,.18);
-      white-space:nowrap;
+    .card:hover{ border-color:rgba(34,197,94,.4); transform:translateY(-2px); }
+    .card-day{ font-size:12px; font-weight:700; color:#22c55e; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:2px; }
+    .card-date{ font-size:21px; font-weight:1000; color:#fff; }
+    .badges{ display:flex; flex-wrap:wrap; gap:8px; }
+    .badge{
+      display:inline-flex; align-items:center; gap:5px;
+      padding:5px 11px; border-radius:999px;
+      background:linear-gradient(180deg,#22c55e,#16a34a);
+      color:#052e16; font-size:12px; font-weight:900;
+      box-shadow:0 6px 16px rgba(22,163,74,.28);
     }
-    .course-meta span *{ color:inherit; }
-
-    .course-price{
-      font-size:15px;
-      font-weight:1000;
-      color:#bbf7d0;
+    .badge.lieu{
+      background:linear-gradient(180deg,rgba(99,102,241,.9),rgba(67,56,202,.9));
+      color:#e0e7ff;
+      box-shadow:0 6px 16px rgba(67,56,202,.3);
     }
-    body.theme-light .course-price{
-      color:#ffffff !important;
-      text-shadow: 0 2px 10px rgba(0,0,0,.55) !important;
-      background: rgba(0,0,0,.55) !important;
-      padding: 6px 10px !important;
-      border-radius: 999px !important;
-      display:inline-flex !important;
-      align-items:center !important;
-    }
-
-    /* ✅ BOUTON WHATSAPP */
-    .inscrire-btn{
-      display:flex;
-      width:100%;
-      border:0;
+    .wa-btn{
+      display:flex; align-items:center; justify-content:center; gap:9px;
+      width:100%; padding:13px 16px; border-radius:14px; border:0;
       background:linear-gradient(180deg,#25d366,#128c7e);
-      padding:12px 16px;
-      border-radius:14px;
-      font-size:15px;
-      font-weight:1000;
-      cursor:pointer;
-      color:#fff;
-      box-shadow:0 10px 26px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.16);
-      text-align:center;
-      -webkit-tap-highlight-color:transparent;
-      touch-action:manipulation;
+      color:#fff; font-size:15px; font-weight:1000;
       text-decoration:none;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      transition:.18s ease;
+      box-shadow:0 10px 26px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.15);
+      transition:.18s ease; -webkit-tap-highlight-color:transparent;
     }
-    .inscrire-btn:hover{ filter:brightness(1.07); transform:translateY(-1px); }
-    .inscrire-btn svg{ flex-shrink:0; }
+    .wa-btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
 
-    .footer-mini .copy{
-      text-align:center;
-      color:var(--rsl-muted);
-      font-size:13px;
+    .empty-msg{ color:#6b7280; font-size:15px; grid-column:1/-1; padding:20px 0; }
+
+    footer{
+      text-align:center; color:#374151; font-size:13px;
       padding:20px 0 24px;
-      margin:0;
-      border-top:1px solid rgba(15,23,42,.7);
-      background:rgba(15,23,42,.85);
+      border-top:1px solid rgba(255,255,255,.05);
+      background:rgba(0,0,0,.4);
     }
-    body.theme-light .footer-mini .copy{
-      background:rgba(248,250,252,.96);
-      border-top-color:rgba(148,163,184,.5);
-    }
-
-    @media (max-width:640px){
-      .filters{
-        display:grid !important;
-        grid-template-columns:1fr 1fr;
-        align-items:end;
-      }
-      .filters .filter-field{ min-width:0 !important; flex:unset !important; }
-      .filters .check-label{ grid-column:1 / -1; padding-top:2px; }
-    }
-    @media (min-width: 900px){
-      #courseList{
-        display:grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap:16px;
-      }
-      .item{ margin-bottom:0; height:100%; }
-    }
-
-    .coach-fab{
-      position:fixed; right:16px; bottom:16px; z-index:80;
-      display:inline-flex; align-items:center; gap:8px;
-      padding:10px 13px; border-radius:999px;
-      background:linear-gradient(180deg,var(--rsl-accent),#16a34a);
-      color:#052e16; font-weight:900; text-decoration:none;
-      box-shadow:0 12px 28px rgba(22,163,74,.5), inset 0 1px 0 rgba(255,255,255,.18);
-      border:0;
-      font-size:13px;
-      line-height:1;
-    }
-    .coach-fab:hover{ filter:brightness(1.05); transform:translateY(-1px); transition:.15s ease; }
-    @media (max-width:990px){ .coach-fab{ display:none; } }
   </style>
 </head>
-
 <body>
-  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
-  <div class="site-bg-dim" aria-hidden="true"></div>
 
   <nav class="nav">
-    <div class="container">
-      <div class="row">
-        <a class='brand' href='/'>
-          <img src="images/logo_rsl.png" alt="Logo RSL"/>
-          <span>RSL — Romandie Scooter League</span>
-        </a>
-
-        <ul>
-          <li><a aria-current='page' href='/cours'>Cours</a></li>
-          <li><a href='/formation'>Formation RSL</a></li>
-          <li><a href='/ou_rider'>Où rider ?</a></li>
-          <li><a href='/evenements'>Événements</a></li>
-          <li><a href='/disciplines'>Disciplines</a></li>
-          <li><a href='/shop-rsl'>Shop</a></li>
-          <li><a href='/comite'>Comité</a></li>
-          <li><a href='/contact'>Contact</a></li>
-        </ul>
-
-        <div class="cta">
-          <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
-
-          <a class='btn' href='/access' id='btnLogin'>Login</a>
-          <a class='btn' href='/compte' id='btnAccount' style='display:none'>Mon compte</a>
-
-          <a aria-label='Mon compte' href='/compte'>
-            <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
-          </a>
-
-          <a class='btn green' href='/membres'>Devenir membre</a>
-          <button id="menuBtn" aria-label="Menu">☰</button>
-        </div>
+    <div class="inner">
+      <a class="brand" href="/">
+        <img src="images/logo_rsl.png" alt="Logo RSL"/>
+        <span>RSL — Romandie Scooter League</span>
+      </a>
+      <ul>
+        <li><a aria-current="page" href="/cours">Cours</a></li>
+        <li><a href="/formation">Formation RSL</a></li>
+        <li><a href="/ou_rider">Où rider ?</a></li>
+        <li><a href="/evenements">Événements</a></li>
+        <li><a href="/disciplines">Disciplines</a></li>
+        <li><a href="/shop-rsl">Shop</a></li>
+        <li><a href="/comite">Comité</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a class="btn green" href="/membres">Devenir membre</a>
+        <button id="menuBtn" aria-label="Menu">☰</button>
       </div>
     </div>
   </nav>
 
-  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-sheet" id="mobileMenu">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href='/'>Accueil</a>
-      <a aria-current='page' href='/cours'>Cours</a>
-      <a href='/membres'>Devenir membre</a>
-      <a href='/formation'>Formation RSL</a>
-      <a href='/disciplines'>Disciplines</a>
-      <a href='/ou_rider'>Où rider ?</a>
-      <a href='/evenements'>Événements</a>
-      <a href='/game'>Games</a>
-      <a href='/shop-rsl'>Shop</a>
-      <a href='/comite'>Comité</a>
-      <a href='/contact'>Contact</a>
-      <a href='/conditions'>Conditions générales</a>
-      <a href='/access'>Se connecter</a>
-      <a href='/compte'>Mon compte</a>
-      <a class='coach-link' href='/coach'>👨‍🏫 Je suis coach</a>
+      <a href="/">Accueil</a>
+      <a href="/cours">Cours</a>
+      <a href="/membres">Devenir membre</a>
+      <a href="/formation">Formation RSL</a>
+      <a href="/disciplines">Disciplines</a>
+      <a href="/ou_rider">Où rider ?</a>
+      <a href="/evenements">Événements</a>
+      <a href="/shop-rsl">Shop</a>
+      <a href="/comite">Comité</a>
+      <a href="/contact">Contact</a>
+      <a href="/access">Se connecter</a>
+      <a href="/compte">Mon compte</a>
     </nav>
   </div>
 
-  <main class="container">
+  <main>
     <div class="page-intro">
       <h1>Inscriptions aux cours</h1>
-      <p>Choisis un cours et clique sur le bouton pour t'inscrire directement via WhatsApp.</p>
+      <p>Choisis ton lieu et un samedi — inscris-toi en un clic via WhatsApp 👇</p>
     </div>
 
-    <div class="filters">
-      <div class="filter-field">
-        <span class="filter-label">Mois</span>
-        <div class="select-shell" data-select-id="filtreMois">
-          <button type="button" class="select-display" id="filtreMoisDisplay">Tous les mois</button>
-          <div class="select-panel" id="filtreMoisPanel"></div>
-        </div>
-        <select id="filtreMois" class="select-native">
-          <option value="all">Tous les mois</option>
-          <option value="01">Janvier</option><option value="02">Février</option><option value="03">Mars</option>
-          <option value="04">Avril</option><option value="05">Mai</option><option value="06">Juin</option>
-          <option value="07">Juillet</option><option value="08">Août</option><option value="09">Septembre</option>
-          <option value="10">Octobre</option><option value="11">Novembre</option><option value="12">Décembre</option>
-        </select>
-      </div>
-
-      <div class="filter-field">
-        <span class="filter-label">Lieu</span>
-        <div class="select-shell" data-select-id="filtreLieu">
-          <button type="button" class="select-display" id="filtreLieuDisplay">Tous les lieux</button>
-          <div class="select-panel" id="filtreLieuPanel"></div>
-        </div>
-        <select id="filtreLieu" class="select-native">
-          <option value="all">Tous les lieux</option>
-        </select>
-      </div>
-
-      <label class="check-label">
-        <input type="checkbox" id="filtreDispo"> Seulement dispo
-      </label>
+    <!-- Filtre lieux -->
+    <div class="lieu-filters">
+      <button class="lieu-btn active" data-lieu="Tous">Tous les lieux</button>
+      <button class="lieu-btn" data-lieu="Lausanne Vidy">📍 Lausanne Vidy</button>
+      <button class="lieu-btn" data-lieu="Montreux">📍 Montreux</button>
+      <button class="lieu-btn" data-lieu="Bulle">📍 Bulle</button>
     </div>
 
-    <div id="courseList" class="list"></div>
+    <div class="grid" id="courseGrid"></div>
   </main>
 
-  <footer class="footer-mini">
-    <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
-  </footer>
-
-  <a class='coach-fab' href='/coach'>👨‍🏫 Je suis coach</a>
+  <footer>© 2026 — RSL Romandie Scooter League. Tous droits réservés.</footer>
 
   <script>
-    /* =========================================================
-      Base URL + helpers
-    ========================================================= */
-    const RSL_BASE = (() => {
-      const p = window.location.pathname;
-      return p.includes("/") ? p.split("/").slice(0,-1).join("/") + "/" : "/";
-    })();
+    /* ── Menu mobile ── */
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click', e => { e.stopPropagation(); mobileMenu.classList.add('open'); });
+    mobileMenu?.querySelector('.mobile-dim')?.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    document.addEventListener('keydown', e => { if(e.key==='Escape') mobileMenu.classList.remove('open'); });
 
-    /* Numéro WhatsApp (format international sans +) */
-    const WHATSAPP_NUMBER = "41783008043";
+    /* ── Config ── */
+    const WHATSAPP = "41783008043";
+    const MOIS_FR  = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+    const LIEUX    = ["Lausanne Vidy", "Montreux", "Bulle"];
 
-    /**
-     * Génère l'URL WhatsApp avec le message pré-rempli selon les infos du cours.
-     */
-    function buildWhatsAppUrl(title, date, time, place, price) {
-      const parts = ["Bonjour,"];
-      parts.push("J'aimerais participer au cours de trottinette :");
-      if (title) parts.push("📌 " + title);
-      if (date)  parts.push("📅 " + date);
-      if (time)  parts.push("🕐 " + time);
-      if (place) parts.push("📍 " + place);
-      if (price) parts.push("💰 " + price);
-      parts.push("\nMerci !");
-      const msg = encodeURIComponent(parts.join("\n"));
-      return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
+    /* ── Samedis restants en 2026 à partir d'aujourd'hui ── */
+    function getRemainingSaturdays(){
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const d = new Date(today);
+      while(d.getDay() !== 6) d.setDate(d.getDate() + 1);
+      const list = [];
+      while(d.getFullYear() === 2026){
+        list.push(new Date(d));
+        d.setDate(d.getDate() + 7);
+      }
+      return list;
     }
 
-    /* =========================================================
-      Thème
-    ========================================================= */
-    (function(){
-      const STORAGE_KEY = 'rsl-theme';
-      const body = document.body;
-      const btn = document.getElementById('themeToggle');
-
-      function applyTheme(theme){
-        if(theme === 'light'){
-          body.classList.add('theme-light');
-          if(btn) btn.textContent = '☀️';
-        }else{
-          body.classList.remove('theme-light');
-          if(btn) btn.textContent = '🌙';
-        }
-      }
-
-      let saved = null;
-      try{ saved = localStorage.getItem(STORAGE_KEY); }catch(e){}
-      if(!saved){
-        const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-        saved = prefersLight ? 'light' : 'dark';
-      }
-      applyTheme(saved);
-
-      if(btn){
-        btn.addEventListener('click', ()=>{
-          const current = body.classList.contains('theme-light') ? 'light' : 'dark';
-          const next = current === 'light' ? 'dark' : 'light';
-          applyTheme(next);
-          try{ localStorage.setItem(STORAGE_KEY, next); }catch(e){}
+    /* ── Génère les cours : chaque samedi × chaque lieu ── */
+    function buildCourses(){
+      const saturdays = getRemainingSaturdays();
+      const courses = [];
+      saturdays.forEach(date => {
+        LIEUX.forEach(lieu => {
+          courses.push({ date, lieu });
         });
-      }
-    })();
-
-    /* =========================================================
-      Vidéo de fond
-    ========================================================= */
-    (function(){
-      const vids = [
-        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
-        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
-      ];
-      const v = document.getElementById('rslBg');
-      if(!v) return;
-      const pick = vids[Math.floor(Math.random()*vids.length)];
-      const s = document.createElement('source');
-      s.src = pick;
-      s.type = 'video/mp4';
-      v.appendChild(s);
-
-      const start = () => {
-        try{
-          v.playbackRate = 0.6;
-          const p = v.play();
-          if(p && p.catch) p.catch(()=>{});
-        }catch(e){}
-      };
-      start();
-
-      document.addEventListener('visibilitychange', () => {
-        if(document.hidden) v.pause(); else start();
       });
-    })();
-
-    /* =========================================================
-      Menu mobile
-    ========================================================= */
-    (function(){
-      const menuBtn=document.getElementById('menuBtn');
-      const mobile=document.getElementById('mobileMenu');
-      if(!menuBtn || !mobile) return;
-
-      menuBtn.addEventListener('click',e=>{
-        e.stopPropagation();
-        mobile.classList.add('open');
-        mobile.setAttribute('aria-hidden','false');
-      });
-      mobile.querySelector('.mobile-dim')?.addEventListener('click',()=>{
-        mobile.classList.remove('open');
-        mobile.setAttribute('aria-hidden','true');
-      });
-      document.addEventListener('keydown',e=>{
-        if(e.key==='Escape'){
-          mobile.classList.remove('open');
-          mobile.setAttribute('aria-hidden','true');
-        }
-      });
-    })();
-
-    /* =========================================================
-      Selects custom
-    ========================================================= */
-    function setupSelect(id){
-      const native=document.getElementById(id);
-      const shell=document.querySelector('[data-select-id="'+id+'"]');
-      if(!native || !shell) return;
-      const display=shell.querySelector(".select-display");
-      const panel=shell.querySelector(".select-panel");
-
-      function sync(){
-        const opt=native.options[native.selectedIndex];
-        if(opt) display.textContent=opt.textContent;
-      }
-
-      function openPanel(){
-        panel.innerHTML="";
-        Array.from(native.options).forEach(op=>{
-          if(op.disabled) return;
-          const div=document.createElement("div");
-          div.className="select-option"+(op.value===native.value?" is-selected":"");
-          div.textContent=op.textContent;
-          div.dataset.value=op.value;
-          div.addEventListener("click",()=>{
-            native.value=op.value;
-            native.dispatchEvent(new Event("change",{bubbles:true}));
-            sync();
-            shell.classList.remove("open");
-          });
-          panel.appendChild(div);
-        });
-        shell.classList.add("open");
-      }
-
-      display.addEventListener("click",(e)=>{
-        e.stopPropagation();
-        const already=shell.classList.contains("open");
-        document.querySelectorAll(".select-shell.open").forEach(sh=>sh.classList.remove("open"));
-        if(!already) openPanel();
-      });
-
-      document.addEventListener("click",()=>shell.classList.remove("open"));
-      native.addEventListener("change",sync);
-      sync();
+      return courses;
     }
 
-    /* =========================================================
-      Fonction helper pour injecter le bouton WhatsApp dans les cards
-      Appelée depuis cours.js après avoir rendu chaque .item
-    ========================================================= */
-    function injectWhatsAppButtons(){
-      document.querySelectorAll(".item").forEach(item => {
-        // évite les doublons si déjà injecté
-        if(item.querySelector(".inscrire-btn")) return;
+    function buildWaUrl(dateStr, lieu){
+      const msg = encodeURIComponent(
+        `Bonjour,\nJ'aimerais participer au cours de trottinette du ${dateStr} à ${lieu}.\nMerci !`
+      );
+      return `https://wa.me/${WHATSAPP}?text=${msg}`;
+    }
 
-        const title = item.querySelector(".course-title")?.textContent.trim() || "";
-        const date  = item.querySelector(".course-date")?.textContent.trim()  || "";
-        const time  = item.querySelector(".course-time")?.textContent.trim()  || "";
-        const place = item.querySelector(".course-place")?.textContent.trim() || "";
-        const price = item.querySelector(".course-price")?.textContent.trim() || "";
+    /* ── Rendu ── */
+    let activeLieu = "Tous";
+    const allCourses = buildCourses();
 
-        const url = buildWhatsAppUrl(title, date, time, place, price);
+    function renderCards(){
+      const grid = document.getElementById('courseGrid');
+      grid.innerHTML = '';
 
-        const a = document.createElement("a");
-        a.className = "inscrire-btn";
-        a.href = url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.innerHTML = `
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-          S'inscrire via WhatsApp
+      const filtered = activeLieu === "Tous"
+        ? allCourses
+        : allCourses.filter(c => c.lieu === activeLieu);
+
+      if(!filtered.length){
+        grid.innerHTML = '<p class="empty-msg">Aucun cours disponible pour ce lieu.</p>';
+        return;
+      }
+
+      filtered.forEach(({ date, lieu }) => {
+        const dateStr = `${date.getDate()} ${MOIS_FR[date.getMonth()]} ${date.getFullYear()}`;
+        const waUrl   = buildWaUrl(dateStr, lieu);
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="card-day">Samedi</div>
+            <div class="card-date">${dateStr}</div>
+          </div>
+          <div class="badges">
+            <span class="badge">🛴 Trottinette</span>
+            <span class="badge lieu">📍 ${lieu}</span>
+          </div>
+          <a class="wa-btn" href="${waUrl}" target="_blank" rel="noopener noreferrer">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            S'inscrire via WhatsApp
+          </a>
         `;
-        item.appendChild(a);
+        grid.appendChild(card);
       });
     }
 
-    /* =========================================================
-      Observer pour détecter quand cours.js ajoute les cards
-    ========================================================= */
-    document.addEventListener("DOMContentLoaded",()=>{
-      setupSelect("filtreMois");
-      setupSelect("filtreLieu");
-
-      const list = document.getElementById("courseList");
-      if(list){
-        const obs = new MutationObserver(() => injectWhatsAppButtons());
-        obs.observe(list, { childList:true, subtree:true });
-      }
+    /* ── Filtre lieux ── */
+    document.querySelectorAll('.lieu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lieu-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeLieu = btn.dataset.lieu;
+        renderCards();
+      });
     });
 
-    /* =========================================================
-      Supabase fallback
-    ========================================================= */
-    (function initSupabaseFallback(){
-      try{
-        if(window.supabaseClient) return;
-
-        const url  = window.env?.SUPABASE_URL  || "https://jynxifufaauoxwzjapzq.supabase.co";
-        const anon = window.env?.SUPABASE_ANON || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bnhpZnVmYWF1b3h3emphcHpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzODI2NzcsImV4cCI6MjA3Njk1ODY3N30.vFPGhGakPIM3Xg5rn8_BrAXl6oJMJOssO780C9nXmr4";
-
-        if(window.supabase?.createClient){
-          window.supabaseClient = window.supabase.createClient(url, anon);
-        }else{
-          console.warn("Supabase CDN pas chargé.");
-        }
-      }catch(e){
-        console.warn("initSupabaseFallback error:", e);
-      }
-    })();
+    renderCards();
   </script>
-
-  <script src="js/cours.js" defer></script>
 </body>
 </html>
