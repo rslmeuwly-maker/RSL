@@ -10,23 +10,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --accent:#22c55e;
-    }
+    :root{ --accent:#22c55e; }
     *,:before,:after{ box-sizing:border-box; }
+
     html,body{
       min-height:100%; margin:0;
-      background:#020617;
+      background:transparent !important;
       display:flex; flex-direction:column;
       color:#e5e7eb;
       font-family:"Outfit",system-ui,-apple-system,sans-serif;
       overflow-x:hidden;
     }
-    main{ flex:1; max-width:1200px; margin:0 auto; padding:0 16px 60px; width:100%; }
+    main{ flex:1; max-width:1200px; margin:0 auto; padding:0 16px 60px; width:100%; position:relative; z-index:10; }
 
-    /* NAV */
+    /* ── Vidéo de fond ── */
+    .site-bg-video{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:-2;
+      background:#000;
+      pointer-events:none !important;
+    }
+    .site-bg-dim{
+      position:fixed; inset:0;
+      z-index:-1;
+      background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.92));
+      pointer-events:none !important;
+    }
+
+    /* ── NAV ── */
     nav.nav{
-      background:rgba(0,0,0,.75); backdrop-filter:blur(10px);
+      background:rgba(0,0,0,.65); backdrop-filter:blur(10px);
       position:sticky; top:0; z-index:100;
       border-bottom:1px solid rgba(255,255,255,.08);
     }
@@ -67,16 +82,13 @@
     .mobile-panel a{ color:#e5e7eb; text-decoration:none; font-weight:800; padding:6px 0; font-size:14px; }
     @media(max-width:990px){ nav ul{ display:none !important; } #menuBtn{ display:inline-flex; } }
 
-    /* INTRO */
+    /* ── INTRO ── */
     .page-intro{ padding:28px 0 14px; }
-    .page-intro h1{ margin:0 0 8px; font-size:clamp(26px,4vw,42px); font-weight:900; line-height:1.05; }
+    .page-intro h1{ margin:0 0 8px; font-size:clamp(26px,4vw,42px); font-weight:900; line-height:1.05; color:#fff; }
     .page-intro p{ margin:0; font-size:clamp(14px,2vw,17px); color:#9ca3af; }
 
-    /* FILTRE LIEU */
-    .lieu-filters{
-      display:flex; flex-wrap:wrap; gap:10px;
-      margin:20px 0 4px;
-    }
+    /* ── FILTRE LIEU ── */
+    .lieu-filters{ display:flex; flex-wrap:wrap; gap:10px; margin:20px 0 4px; }
     .lieu-btn{
       padding:10px 18px; border-radius:999px;
       border:1.5px solid rgba(148,163,184,.35);
@@ -92,19 +104,20 @@
       box-shadow:0 8px 20px rgba(22,163,74,.4);
     }
 
-    /* GRILLE */
+    /* ── GRILLE ── */
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
       gap:16px; margin-top:20px;
     }
     .card{
-      background:linear-gradient(160deg,rgba(15,23,42,.95),rgba(7,10,20,.98));
+      background:linear-gradient(160deg,rgba(15,23,42,.88),rgba(7,10,20,.94));
       border:1px solid rgba(148,163,184,.25);
       border-radius:20px; padding:20px;
       display:flex; flex-direction:column; gap:14px;
-      box-shadow:0 20px 50px rgba(0,0,0,.55);
+      box-shadow:0 20px 50px rgba(0,0,0,.7);
       transition:.2s ease;
+      backdrop-filter:blur(6px);
     }
     .card:hover{ border-color:rgba(34,197,94,.4); transform:translateY(-2px); }
     .card-day{ font-size:12px; font-weight:700; color:#22c55e; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:2px; }
@@ -119,8 +132,7 @@
     }
     .badge.lieu{
       background:linear-gradient(180deg,rgba(99,102,241,.9),rgba(67,56,202,.9));
-      color:#e0e7ff;
-      box-shadow:0 6px 16px rgba(67,56,202,.3);
+      color:#e0e7ff; box-shadow:0 6px 16px rgba(67,56,202,.3);
     }
     .wa-btn{
       display:flex; align-items:center; justify-content:center; gap:9px;
@@ -139,11 +151,16 @@
       text-align:center; color:#374151; font-size:13px;
       padding:20px 0 24px;
       border-top:1px solid rgba(255,255,255,.05);
-      background:rgba(0,0,0,.4);
+      background:rgba(0,0,0,.5);
+      position:relative; z-index:10;
     }
   </style>
 </head>
 <body>
+
+  <!-- Vidéo de fond -->
+  <video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
+  <div class="site-bg-dim" aria-hidden="true"></div>
 
   <nav class="nav">
     <div class="inner">
@@ -192,7 +209,6 @@
       <p>Choisis ton lieu et un samedi — inscris-toi en un clic via WhatsApp 👇</p>
     </div>
 
-    <!-- Filtre lieux -->
     <div class="lieu-filters">
       <button class="lieu-btn active" data-lieu="Tous">Tous les lieux</button>
       <button class="lieu-btn" data-lieu="Lausanne Vidy">📍 Lausanne Vidy</button>
@@ -206,6 +222,31 @@
   <footer>© 2026 — RSL Romandie Scooter League. Tous droits réservés.</footer>
 
   <script>
+    /* ── Vidéo de fond ── */
+    (function(){
+      const vids = [
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const v = document.getElementById('rslBg');
+      if(!v) return;
+      const s = document.createElement('source');
+      s.src = vids[Math.floor(Math.random() * vids.length)];
+      s.type = 'video/mp4';
+      v.appendChild(s);
+      const start = () => {
+        try{
+          v.playbackRate = 0.6;
+          const p = v.play();
+          if(p && p.catch) p.catch(()=>{});
+        }catch(e){}
+      };
+      start();
+      document.addEventListener('visibilitychange', () => {
+        if(document.hidden) v.pause(); else start();
+      });
+    })();
+
     /* ── Menu mobile ── */
     const menuBtn = document.getElementById('menuBtn');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -218,7 +259,6 @@
     const MOIS_FR  = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
     const LIEUX    = ["Lausanne Vidy", "Montreux", "Bulle"];
 
-    /* ── Samedis restants en 2026 à partir d'aujourd'hui ── */
     function getRemainingSaturdays(){
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -232,14 +272,11 @@
       return list;
     }
 
-    /* ── Génère les cours : chaque samedi × chaque lieu ── */
     function buildCourses(){
       const saturdays = getRemainingSaturdays();
       const courses = [];
       saturdays.forEach(date => {
-        LIEUX.forEach(lieu => {
-          courses.push({ date, lieu });
-        });
+        LIEUX.forEach(lieu => courses.push({ date, lieu }));
       });
       return courses;
     }
@@ -251,27 +288,20 @@
       return `https://wa.me/${WHATSAPP}?text=${msg}`;
     }
 
-    /* ── Rendu ── */
     let activeLieu = "Tous";
     const allCourses = buildCourses();
 
     function renderCards(){
       const grid = document.getElementById('courseGrid');
       grid.innerHTML = '';
-
-      const filtered = activeLieu === "Tous"
-        ? allCourses
-        : allCourses.filter(c => c.lieu === activeLieu);
-
+      const filtered = activeLieu === "Tous" ? allCourses : allCourses.filter(c => c.lieu === activeLieu);
       if(!filtered.length){
         grid.innerHTML = '<p class="empty-msg">Aucun cours disponible pour ce lieu.</p>';
         return;
       }
-
       filtered.forEach(({ date, lieu }) => {
         const dateStr = `${date.getDate()} ${MOIS_FR[date.getMonth()]} ${date.getFullYear()}`;
         const waUrl   = buildWaUrl(dateStr, lieu);
-
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
@@ -294,7 +324,6 @@
       });
     }
 
-    /* ── Filtre lieux ── */
     document.querySelectorAll('.lieu-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.lieu-btn').forEach(b => b.classList.remove('active'));
