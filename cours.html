@@ -5,17 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Cours — Romandie Scooter League</title>
 
-  <!-- Fonts + styles globaux -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/common.css"/>
 
-  <!-- Supabase (CDN) -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  <!-- tes scripts -->
   <script defer src="js/env.js"></script>
   <script defer src="js/auth.js"></script>
   <script defer src="js/site.js"></script>
@@ -356,7 +353,7 @@
       opacity:0;
     }
 
-    .list{ margin:12px 0 140px; }
+    .list{ margin:12px 0 60px; }
 
     .item{
       background:linear-gradient(180deg,rgba(9,13,23,.88),rgba(7,10,18,.95));
@@ -396,7 +393,6 @@
     }
     .course-meta span *{ color:inherit; }
 
-    /* ✅ PRIX (DARK = vert clair, LIGHT = BLANC lisible) */
     .course-price{
       font-size:15px;
       font-weight:1000;
@@ -412,80 +408,30 @@
       align-items:center !important;
     }
 
+    /* ✅ BOUTON WHATSAPP */
     .inscrire-btn{
-      display:block;
+      display:flex;
       width:100%;
       border:0;
-      background:linear-gradient(180deg,#22c55e,#16a34a);
-      padding:12px 12px;
+      background:linear-gradient(180deg,#25d366,#128c7e);
+      padding:12px 16px;
       border-radius:14px;
       font-size:15px;
       font-weight:1000;
       cursor:pointer;
-      color:#062312;
+      color:#fff;
       box-shadow:0 10px 26px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.16);
       text-align:center;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
-    }
-    .inscrire-btn.selected{ filter:brightness(1.05); background:#16a34a; }
-
-    .basket-bar{
-      position:fixed;
-      bottom:0; left:0; right:0;
-      background:rgba(0,0,0,.93);
-      padding:12px 16px;
-      border-top:1px solid rgba(255,255,255,.15);
-      display:none;
-      justify-content:space-between;
+      text-decoration:none;
       align-items:center;
-      flex-wrap:wrap;
-      z-index:300;
-      gap:10px;
-      font-size:14px;
-      font-weight:900;
-      border-top-left-radius:16px;
-      border-top-right-radius:16px;
-      box-shadow:0 -16px 50px rgba(0,0,0,.45);
+      justify-content:center;
+      gap:8px;
+      transition:.18s ease;
     }
-    body.theme-light .basket-bar{
-      background:rgba(248,250,252,.96);
-      border-top-color:rgba(148,163,184,.5);
-      color:#0f172a;
-      box-shadow:0 -16px 50px rgba(15,23,42,.10);
-    }
-    .basket-actions{ display:flex; gap:10px; flex-wrap:wrap; }
-    .basket-btn{
-      background:#22c55e;
-      color:#062312;
-      border-radius:999px;
-      padding:11px 16px;
-      font-size:15px;
-      font-weight:1000;
-      border:0;
-      cursor:pointer;
-      min-width:130px;
-      text-align:center;
-      -webkit-tap-highlight-color:transparent;
-    }
-    .basket-clear-btn{
-      background:rgba(0,0,0,.6);
-      color:#e5e7eb;
-      border-radius:999px;
-      padding:10px 14px;
-      font-size:13px;
-      font-weight:900;
-      border:1px solid rgba(255,255,255,.25);
-      cursor:pointer;
-      min-width:160px;
-      text-align:center;
-      -webkit-tap-highlight-color:transparent;
-    }
-    body.theme-light .basket-clear-btn{
-      background:#ffffff;
-      color:#0f172a;
-      border-color:rgba(148,163,184,.65);
-    }
+    .inscrire-btn:hover{ filter:brightness(1.07); transform:translateY(-1px); }
+    .inscrire-btn svg{ flex-shrink:0; }
 
     .footer-mini .copy{
       text-align:center;
@@ -519,29 +465,6 @@
       .item{ margin-bottom:0; height:100%; }
     }
 
-    #mobileInscrireBtn{
-      display:block !important;
-      position:fixed !important;
-      left:16px !important;
-      right:16px !important;
-      bottom:calc(16px + env(safe-area-inset-bottom)) !important;
-      z-index:99999 !important;
-      height:56px !important;
-      border-radius:16px !important;
-      border:0 !important;
-      background:linear-gradient(180deg,#22c55e,#16a34a) !important;
-      color:#062312 !important;
-      font-weight:1000 !important;
-      font-size:16px !important;
-      cursor:pointer !important;
-      box-shadow:0 18px 50px rgba(0,0,0,.55) !important;
-      pointer-events:auto !important;
-      -webkit-tap-highlight-color:transparent !important;
-      touch-action:manipulation !important;
-    }
-    @media (min-width: 991px){ #mobileInscrireBtn{ display:none !important; } }
-    @media (max-width: 990px){ main.container{ padding-bottom:170px !important; } }
-
     .coach-fab{
       position:fixed; right:16px; bottom:16px; z-index:80;
       display:inline-flex; align-items:center; gap:8px;
@@ -565,34 +488,33 @@
   <nav class="nav">
     <div class="container">
       <div class="row">
-        <a class="brand" href="index.html">
+        <a class='brand' href='/'>
           <img src="images/logo_rsl.png" alt="Logo RSL"/>
           <span>RSL — Romandie Scooter League</span>
         </a>
 
         <ul>
-          <li><a aria-current="page" href="cours.html">Cours</a></li>
-          <li><a href="formation.html">Formation RSL</a></li>
-          <li><a href="ou_rider.html">Où rider ?</a></li>
-          <li><a href="evenements.html">Événements</a></li>
-          <li><a href="disciplines.html">Disciplines</a></li>
-          <li><a href="shop-rsl.html">Shop</a></li>
-          <li><a href="comite.html">Comité</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a aria-current='page' href='/cours'>Cours</a></li>
+          <li><a href='/formation'>Formation RSL</a></li>
+          <li><a href='/ou_rider'>Où rider ?</a></li>
+          <li><a href='/evenements'>Événements</a></li>
+          <li><a href='/disciplines'>Disciplines</a></li>
+          <li><a href='/shop-rsl'>Shop</a></li>
+          <li><a href='/comite'>Comité</a></li>
+          <li><a href='/contact'>Contact</a></li>
         </ul>
 
         <div class="cta">
           <button id="themeToggle" class="theme-toggle" aria-label="Changer le thème">🌙</button>
 
-          <a class="btn" href="access.html" id="btnLogin">Login</a>
-          <a class="btn" href="compte.html" id="btnAccount" style="display:none">Mon compte</a>
+          <a class='btn' href='/access' id='btnLogin'>Login</a>
+          <a class='btn' href='/compte' id='btnAccount' style='display:none'>Mon compte</a>
 
-          <a aria-label="Mon compte" href="compte.html">
+          <a aria-label='Mon compte' href='/compte'>
             <img id="navAvatar" class="nav-avatar" src="images/logo_rsl.png" alt="Avatar" style="display:none;">
           </a>
 
-          <a class="btn" href="panier/panier.html" id="btnCart">Panier</a>
-          <a class="btn green" href="membres.html">Devenir membre</a>
+          <a class='btn green' href='/membres'>Devenir membre</a>
           <button id="menuBtn" aria-label="Menu">☰</button>
         </div>
       </div>
@@ -602,28 +524,28 @@
   <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
     <div class="mobile-dim"></div>
     <nav class="mobile-panel">
-      <a href="index.html">Accueil</a>
-      <a aria-current="page" href="cours.html">Cours</a>
-      <a href="membres.html">Devenir membre</a>
-      <a href="formation.html">Formation RSL</a>
-      <a href="disciplines.html">Disciplines</a>
-      <a href="ou_rider.html">Où rider ?</a>
-      <a href="evenements.html">Événements</a>
-      <a href="game.html">Games</a>
-      <a href="shop-rsl.html">Shop</a>
-      <a href="comite.html">Comité</a>
-      <a href="contact.html">Contact</a>
-      <a href="conditions.html">Conditions générales</a>
-      <a href="access.html">Se connecter</a>
-      <a href="compte.html">Mon compte</a>
-      <a class="coach-link" href="coach.html">👨‍🏫 Je suis coach</a>
+      <a href='/'>Accueil</a>
+      <a aria-current='page' href='/cours'>Cours</a>
+      <a href='/membres'>Devenir membre</a>
+      <a href='/formation'>Formation RSL</a>
+      <a href='/disciplines'>Disciplines</a>
+      <a href='/ou_rider'>Où rider ?</a>
+      <a href='/evenements'>Événements</a>
+      <a href='/game'>Games</a>
+      <a href='/shop-rsl'>Shop</a>
+      <a href='/comite'>Comité</a>
+      <a href='/contact'>Contact</a>
+      <a href='/conditions'>Conditions générales</a>
+      <a href='/access'>Se connecter</a>
+      <a href='/compte'>Mon compte</a>
+      <a class='coach-link' href='/coach'>👨‍🏫 Je suis coach</a>
     </nav>
   </div>
 
   <main class="container">
     <div class="page-intro">
       <h1>Inscriptions aux cours</h1>
-      <p>Choisis un cours, ajoute-le au panier, puis continue pour finaliser l’inscription.</p>
+      <p>Choisis un cours et clique sur le bouton pour t'inscrire directement via WhatsApp.</p>
     </div>
 
     <div class="filters">
@@ -661,36 +583,38 @@
     <div id="courseList" class="list"></div>
   </main>
 
-  <div class="basket-bar" id="basketBar">
-    <div id="basketInfo">0 cours sélectionné</div>
-    <div class="basket-actions">
-      <button class="basket-clear-btn" id="basketClear" type="button">Tout désélectionner</button>
-      <button class="basket-btn" id="basketPay" type="button">Continuer</button>
-    </div>
-  </div>
-
-  <button id="mobileInscrireBtn" type="button">S’inscrire</button>
-
   <footer class="footer-mini">
     <p class="copy">© 2026 — RSL Romandie Scooter League. Tous droits réservés.</p>
   </footer>
 
-  <a class="coach-fab" href="coach.html">👨‍🏫 Je suis coach</a>
+  <a class='coach-fab' href='/coach'>👨‍🏫 Je suis coach</a>
 
   <script>
     /* =========================================================
-      ✅ FIX GLOBAL : base URL + helpers
+      Base URL + helpers
     ========================================================= */
     const RSL_BASE = (() => {
       const p = window.location.pathname;
       return p.includes("/") ? p.split("/").slice(0,-1).join("/") + "/" : "/";
     })();
 
-    function rslHref(path){
-      if(!path) return path;
-      if(path.startsWith("http")) return path;
-      if(path.startsWith("/")) return path;
-      return RSL_BASE + path;
+    /* Numéro WhatsApp (format international sans +) */
+    const WHATSAPP_NUMBER = "41783008043";
+
+    /**
+     * Génère l'URL WhatsApp avec le message pré-rempli selon les infos du cours.
+     */
+    function buildWhatsAppUrl(title, date, time, place, price) {
+      const parts = ["Bonjour,"];
+      parts.push("J'aimerais participer au cours de trottinette :");
+      if (title) parts.push("📌 " + title);
+      if (date)  parts.push("📅 " + date);
+      if (time)  parts.push("🕐 " + time);
+      if (place) parts.push("📍 " + place);
+      if (price) parts.push("💰 " + price);
+      parts.push("\nMerci !");
+      const msg = encodeURIComponent(parts.join("\n"));
+      return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
     }
 
     /* =========================================================
@@ -831,83 +755,48 @@
     }
 
     /* =========================================================
-      Panier UI
+      Fonction helper pour injecter le bouton WhatsApp dans les cards
+      Appelée depuis cours.js après avoir rendu chaque .item
     ========================================================= */
-    function collectSelectedCourses(){
-      const res=[];
-      document.querySelectorAll(".inscrire-btn.selected").forEach(btn=>{
-        const item=btn.closest(".item");
-        if(!item) return;
-        res.push({
-          id:item.dataset.id || "",
-          title:item.querySelector(".course-title")?.textContent.trim() || "",
-          date:item.querySelector(".course-date")?.textContent.trim() || "",
-          time:item.querySelector(".course-time")?.textContent.trim() || "",
-          place:item.querySelector(".course-place")?.textContent.trim() || "",
-          price:item.querySelector(".course-price")?.textContent.trim() || ""
-        });
+    function injectWhatsAppButtons(){
+      document.querySelectorAll(".item").forEach(item => {
+        // évite les doublons si déjà injecté
+        if(item.querySelector(".inscrire-btn")) return;
+
+        const title = item.querySelector(".course-title")?.textContent.trim() || "";
+        const date  = item.querySelector(".course-date")?.textContent.trim()  || "";
+        const time  = item.querySelector(".course-time")?.textContent.trim()  || "";
+        const place = item.querySelector(".course-place")?.textContent.trim() || "";
+        const price = item.querySelector(".course-price")?.textContent.trim() || "";
+
+        const url = buildWhatsAppUrl(title, date, time, place, price);
+
+        const a = document.createElement("a");
+        a.className = "inscrire-btn";
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          S'inscrire via WhatsApp
+        `;
+        item.appendChild(a);
       });
-      return res;
     }
 
-    function updateBasketUI(){
-      const items=collectSelectedCourses();
-      const bar=document.getElementById("basketBar");
-      const info=document.getElementById("basketInfo");
-      const mobileBtn=document.getElementById("mobileInscrireBtn");
-      const n=items.length;
-
-      if(info) info.textContent = n + (n>1 ? " cours sélectionnés" : " cours sélectionné");
-      if(bar) bar.style.display = n>0 ? "flex" : "none";
-      if(mobileBtn) mobileBtn.textContent = n>0 ? `Continuer (${n})` : "S’inscrire";
-    }
-
-    function goToBasket(){
-      const items=collectSelectedCourses();
-      if(!items.length){
-        alert("Sélectionne au moins un cours.");
-        return;
-      }
-      try{
-        localStorage.setItem("rsl_panier_cours", JSON.stringify(items));
-        localStorage.setItem("rsl_panier_courses", JSON.stringify(items));
-      }catch(_){}
-      window.location.href = rslHref("panier/panier.html");
-    }
-
-    document.addEventListener("click",(e)=>{
-      const btn = e.target.closest(".inscrire-btn");
-      if(!btn) return;
-      e.preventDefault();
-      btn.classList.toggle("selected");
-      updateBasketUI();
-    });
-
+    /* =========================================================
+      Observer pour détecter quand cours.js ajoute les cards
+    ========================================================= */
     document.addEventListener("DOMContentLoaded",()=>{
       setupSelect("filtreMois");
       setupSelect("filtreLieu");
-      updateBasketUI();
 
-      document.getElementById("basketPay")?.addEventListener("click", goToBasket);
-      document.getElementById("basketClear")?.addEventListener("click", ()=>{
-        document.querySelectorAll(".inscrire-btn.selected").forEach(b=>b.classList.remove("selected"));
-        try{
-          localStorage.removeItem("rsl_panier_cours");
-          localStorage.removeItem("rsl_panier_courses");
-        }catch(_){}
-        updateBasketUI();
-      });
-
-      document.getElementById("mobileInscrireBtn")?.addEventListener("click", ()=>{
-        const n = collectSelectedCourses().length;
-        if(n>0){ goToBasket(); return; }
-        document.getElementById("courseList")?.scrollIntoView({behavior:"smooth", block:"start"});
-      }, {passive:true});
-
-      const list=document.getElementById("courseList");
+      const list = document.getElementById("courseList");
       if(list){
-        const obs=new MutationObserver(()=>updateBasketUI());
-        obs.observe(list,{childList:true,subtree:true});
+        const obs = new MutationObserver(() => injectWhatsAppButtons());
+        obs.observe(list, { childList:true, subtree:true });
       }
     });
 
@@ -932,7 +821,6 @@
     })();
   </script>
 
-  <!-- ton script principal -->
   <script src="js/cours.js" defer></script>
 </body>
 </html>
