@@ -862,7 +862,7 @@
       };
     }
 
-    async function saveInscription(payload, extraFields = {}) {
+    async function saveInscription(payload) {
       const { error } = await _supa.from("inscriptions").insert([{
         first_name: payload.first_name,
         last_name: payload.last_name,
@@ -881,13 +881,15 @@
         federation: payload.federation,
         total: payload.total,
         payment_method: payload.paymentMethod,
-        paid: false,
-        ...extraFields
+        paid: false
       }]);
 
       if (error) {
-        throw new Error("Erreur Supabase : " + error.message);
+        console.warn("Supabase insert error:", error.message);
+        return { ok: false, error };
       }
+
+      return { ok: true };
     }
 
     cardSimple.addEventListener("click", () => {
@@ -994,7 +996,7 @@
             throw new Error("Aucun lien de paiement pour ce tarif.");
           }
 
-          okmsg.textContent = "Inscription enregistrée. Redirection vers le paiement…";
+          okmsg.textContent = "Redirection vers le paiement…";
           okmsg.style.display = "block";
 
           await saveInscription(payload);
@@ -1009,7 +1011,10 @@
 
       } else if (currentPayMethod === "twint") {
         try {
-          await saveInscription(payload);
+          const saveResult = await saveInscription(payload);
+          if (!saveResult.ok) {
+            throw new Error("L’inscription n’a pas pu être enregistrée dans Supabase : " + saveResult.error.message);
+          }
 
           okmsg.innerHTML =
             "✅ Inscription enregistrée !<br>" +
@@ -1025,7 +1030,10 @@
 
       } else {
         try {
-          await saveInscription(payload);
+          const saveResult = await saveInscription(payload);
+          if (!saveResult.ok) {
+            throw new Error("L’inscription n’a pas pu être enregistrée dans Supabase : " + saveResult.error.message);
+          }
 
           okmsg.innerHTML =
             "✅ Inscription enregistrée !<br><br>" +
