@@ -999,13 +999,13 @@
           okmsg.textContent = "Redirection vers le paiement…";
           okmsg.style.display = "block";
 
-          // On essaie d'enregistrer l'inscription, mais on ne bloque pas Stripe si Supabase refuse.
-          // Comme ça, on corrige uniquement le problème Stripe sans casser le reste.
+          // Paiement carte : on ne bloque pas la redirection Stripe.
+          // L'inscription est tentée dans Supabase, mais le paiement reste prioritaire.
           await saveInscription(payload);
 
           window.location.href = paymentUrl;
         } catch (error) {
-          errmsg.textContent = error.message || "Erreur lors de l’enregistrement.";
+          errmsg.textContent = error.message || "Erreur lors de la redirection vers le paiement.";
           errmsg.style.display = "block";
           okmsg.style.display = "none";
           payBtn.disabled = false;
@@ -1013,10 +1013,15 @@
 
       } else if (currentPayMethod === "twint") {
         try {
-          await saveInscription(payload);
+          const saveResult = await saveInscription(payload);
+
+          if (!saveResult.ok) {
+            throw new Error("L'inscription n'a pas pu être enregistrée. Merci de réessayer ou de nous contacter.");
+          }
 
           okmsg.innerHTML =
-            "✅ Inscription prise en compte !<br>" +
+            "✅ Inscription enregistrée !<br>" +
+            "Elle est en attente de validation par l'organisation.<br><br>" +
             "Envoie <strong>" + state.total + " CHF</strong> sur Twint au <strong>078 300 80 43</strong><br>" +
             "Message : <strong>" + first_name + " " + last_name + " — " + category + "</strong>";
           okmsg.style.display = "block";
@@ -1029,10 +1034,15 @@
 
       } else {
         try {
-          await saveInscription(payload);
+          const saveResult = await saveInscription(payload);
+
+          if (!saveResult.ok) {
+            throw new Error("L'inscription n'a pas pu être enregistrée. Merci de réessayer ou de nous contacter.");
+          }
 
           okmsg.innerHTML =
-            "✅ Inscription prise en compte !<br><br>" +
+            "✅ Inscription enregistrée !<br>" +
+            "Elle est en attente de validation par l'organisation.<br><br>" +
             "Effectue un virement de <strong>" + state.total + " CHF</strong> :<br>" +
             "<strong>IBAN :</strong> CH94 8080 8009 3546 9723 0<br>" +
             "<strong>Bénéficiaire :</strong> Ride4Style.(Montreux Scooter Contest)<br>" +
