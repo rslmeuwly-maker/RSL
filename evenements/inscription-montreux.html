@@ -1,10 +1,11 @@
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inscription Montreux 2026</title>
+  <title>Inscription Vidy 2026</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
@@ -355,9 +356,9 @@
   <div class="wrap">
     <div class="hero">
       <span class="eyebrow">Infos riders</span>
-      <h1>Montreux — 30 mai 2026</h1>
+      <h1>Vidy — 27 juin 2026</h1>
       <p>
-        Inscriptions officielles pour l’étape de Montreux du Championnat Romand de Trottinette Freestyle.
+        Inscriptions officielles pour l’étape de Vidy du Championnat Romand de Trottinette Freestyle.
         Choisis ta formule ci-dessous, puis complète le formulaire.
       </p>
     </div>
@@ -418,7 +419,17 @@
 
           <div class="field">
             <label for="phone">Téléphone</label>
-            <input id="phone" type="tel">
+            <input id="phone" type="tel" autocomplete="tel">
+          </div>
+
+          <div class="field">
+            <label for="address_line">Adresse complète</label>
+            <input id="address_line" placeholder="Rue et numéro" autocomplete="street-address" required>
+          </div>
+
+          <div class="field">
+            <label for="postal_code">NPA / Code postal</label>
+            <input id="postal_code" placeholder="Ex : 1820" autocomplete="postal-code" required>
           </div>
 
           <div class="field">
@@ -448,7 +459,7 @@
 
           <div class="field">
             <label for="country">Pays</label>
-            <select id="country" required>
+            <select id="country" required autocomplete="country-name">
               <option value="">Choisir</option>
               <option value="Suisse">Suisse</option>
               <option value="France">France</option>
@@ -492,7 +503,7 @@
 
           <div class="field">
             <label for="city">Ville</label>
-            <input id="city">
+            <input id="city" autocomplete="address-level2" required>
           </div>
 
           <div class="field">
@@ -528,7 +539,7 @@
                 <input type="radio" name="federation_status" value="already_member">
                 <div>
                   <strong>Je suis déjà membre de la Fédération</strong>
-                  <span>Aucun supplément à ajouter.</span>
+                  <span>Aucun supplément à ajouter. Le rider apparaît au classement officiel.</span>
                 </div>
               </label>
 
@@ -548,7 +559,18 @@
                 </div>
               </label>
             </div>
-            <div class="hint">La licence Fédération est incluse automatiquement dans le pack membre event.</div>
+
+            <div class="choice-group" id="rslMemberLine" style="margin-top:14px;">
+              <label class="choice" style="border-color:rgba(41,198,111,.45); background:rgba(41,198,111,.08);">
+                <input type="checkbox" id="rsl_member_checked" style="width:auto; margin-top:3px; accent-color:var(--green);">
+                <div>
+                  <strong>Je suis déjà membre RSL</strong>
+                  <span>À cocher uniquement si tu as déjà la carte membre RSL. Avantage : 2 boissons incluses avec ton inscription.</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="hint">RSL = association / carte membre. Fédération = licence pour le classement officiel. La licence Fédération est incluse automatiquement dans le pack membre event.</div>
           </div>
 
           <div class="field full" id="packDisciplineField" style="display:none;">
@@ -651,8 +673,8 @@
           </div>
 
           <div class="sum-row" id="summaryFoodRow" style="display:none;">
-            <span>Repas + 2 boissons</span>
-            <strong>Inclus</strong>
+            <span id="summaryFoodLabel">Repas + 2 boissons</span>
+            <strong id="summaryFoodValue">Inclus</strong>
           </div>
 
           <div class="sum-row">
@@ -670,9 +692,6 @@
           </div>
         </div>
 
-        <div class="info green">
-          Licence Fédération offerte aux 15 premiers inscrits.
-        </div>
 
         <div class="info red">
           Casque obligatoire.
@@ -711,6 +730,8 @@
 
     const singleDisciplineField = document.getElementById("singleDisciplineField");
     const packDisciplineField = document.getElementById("packDisciplineField");
+    const rslMemberChecked = document.getElementById("rsl_member_checked");
+    const rslMemberLine = document.getElementById("rslMemberLine");
 
     const summaryPack = document.getElementById("summaryPack");
     const summaryDiscipline = document.getElementById("summaryDiscipline");
@@ -721,6 +742,8 @@
     const summaryNote = document.getElementById("summaryNote");
     const summaryRslRow = document.getElementById("summaryRslRow");
     const summaryFoodRow = document.getElementById("summaryFoodRow");
+    const summaryFoodLabel = document.getElementById("summaryFoodLabel");
+    const summaryFoodValue = document.getElementById("summaryFoodValue");
 
     const hiddenPackType = document.getElementById("hidden_pack_type");
     const hiddenDiscipline = document.getElementById("hidden_discipline");
@@ -810,6 +833,7 @@
 
       const federationInput = getChecked("federation_status");
       const federation = federationInput ? federationInput.value : "add_federation";
+      const rslMember = rslMemberChecked && rslMemberChecked.checked ? "yes" : "no";
       const singleDiscipline = getChecked("single_discipline")?.value || "Park";
       const packDiscipline = getChecked("pack_discipline")?.value || "Park";
 
@@ -820,6 +844,7 @@
 
         singleDisciplineField.style.display = "none";
         packDisciplineField.style.display = "flex";
+        if (rslMemberLine) rslMemberLine.style.display = "grid";
 
         summaryPack.textContent = "Pack membre event";
         summaryDiscipline.textContent = packDiscipline;
@@ -830,6 +855,8 @@
         summaryNote.textContent = "Inclut l’inscription Fédération, la carte RSL, 1 repas + 2 boissons et le classement officiel.";
 
         summaryRslRow.style.display = "flex";
+        summaryFoodLabel.textContent = "Repas + 2 boissons";
+        summaryFoodValue.textContent = "Inclus";
         summaryFoodRow.style.display = "flex";
 
         hiddenPackType.value = "member_pack";
@@ -838,6 +865,7 @@
       } else {
         singleDisciplineField.style.display = currentMode === "single" ? "flex" : "none";
         packDisciplineField.style.display = "none";
+        if (rslMemberLine) rslMemberLine.style.display = "grid";
 
         total = currentPrice;
         const disciplineLabel = currentMode === "double" ? "Street + Park" : singleDiscipline;
@@ -855,13 +883,20 @@
           summaryOfficial.textContent = "Oui";
           summaryNote.textContent = "Formule standard avec licence Fédération ajoutée.";
         } else if (federation === "already_member") {
-          summaryFederation.textContent = "Déjà membre";
+          summaryFederation.textContent = "Déjà membre Fédération";
           summaryOfficial.textContent = "Oui";
-          summaryNote.textContent = "Formule standard avec Fédération déjà active.";
+          summaryNote.textContent = "Formule standard avec licence Fédération déjà active.";
         } else {
           summaryFederation.textContent = "Sans licence";
           summaryOfficial.textContent = "Non";
           summaryNote.textContent = "Participation libre, sans classement fédéral officiel.";
+        }
+
+        if (rslMember === "yes") {
+          summaryFoodLabel.textContent = "Avantage membre RSL";
+          summaryFoodValue.textContent = "2 boissons incluses";
+          summaryFoodRow.style.display = "flex";
+          summaryNote.textContent += " Membre RSL : 2 boissons incluses.";
         }
 
         summaryTotal.textContent = total + " CHF";
@@ -878,16 +913,27 @@
         packType: hiddenPackType.value,
         discipline: hiddenDiscipline.value,
         federation: getChecked("federation_status") ? getChecked("federation_status").value : "add_federation",
+        rslMember: rslMemberChecked && rslMemberChecked.checked ? "yes" : "no",
         total: Number(hiddenTotal.value)
       };
     }
 
     async function saveInscription(payload, extraFields = {}) {
-      const { error } = await _supa.from("inscriptions").insert([{
+      const baseNotes = payload.notes || "";
+      const addressNote =
+        "Adresse complète : " + payload.address_line +
+        " | NPA / Code postal : " + payload.postal_code +
+        " | Ville : " + payload.city +
+        (payload.canton ? " | Canton : " + payload.canton : "") +
+        " | Pays : " + payload.country;
+
+      const inscriptionData = {
         first_name: payload.first_name,
         last_name: payload.last_name,
         email: payload.email,
         phone: payload.phone,
+        address_line: payload.address_line,
+        postal_code: payload.postal_code,
         birth_date: payload.birth_date,
         sex: payload.sex,
         category: payload.category,
@@ -895,19 +941,42 @@
         canton: payload.canton,
         city: payload.city,
         club: payload.club,
-        notes: payload.notes,
+        notes: baseNotes ? baseNotes + "\n\n" + addressNote : addressNote,
         pack_type: payload.packType,
         discipline: payload.discipline,
         federation: payload.federation,
+        rsl_member: payload.rslMember === "yes",
         total: payload.total,
         payment_method: payload.paymentMethod,
         paid: false,
         ...extraFields
-      }]);
+      };
 
-      if (error) {
-        throw new Error("Erreur Supabase : " + error.message);
+      const { error } = await _supa.from("inscriptions").insert([inscriptionData]);
+
+      if (!error) return;
+
+      // Sécurité : si les colonnes address_line / postal_code / rsl_member n’existent pas encore
+      // dans Supabase, on sauvegarde quand même l’adresse et le statut RSL dans le champ notes.
+      const errorMessage = (error.message || "").toLowerCase();
+      const missingAddressColumns =
+        error.code === "PGRST204" ||
+        errorMessage.includes("address_line") ||
+        errorMessage.includes("postal_code") ||
+        errorMessage.includes("rsl_member");
+
+      if (missingAddressColumns) {
+        const fallbackData = { ...inscriptionData };
+        delete fallbackData.address_line;
+        delete fallbackData.postal_code;
+        delete fallbackData.rsl_member;
+
+        const retry = await _supa.from("inscriptions").insert([fallbackData]);
+        if (!retry.error) return;
+        throw new Error("Erreur Supabase : " + retry.error.message);
       }
+
+      throw new Error("Erreur Supabase : " + error.message);
     }
 
     cardSimple.addEventListener("click", () => {
@@ -937,6 +1006,10 @@
       input.addEventListener("change", updateSummary);
     });
 
+    if (rslMemberChecked) {
+      rslMemberChecked.addEventListener("change", updateSummary);
+    }
+
     document.querySelectorAll('input[name="single_discipline"]').forEach(input => {
       input.addEventListener("change", updateSummary);
     });
@@ -957,6 +1030,8 @@
       const last_name = document.getElementById("last_name").value.trim();
       const email = document.getElementById("email").value.trim();
       const phone = document.getElementById("phone").value.trim();
+      const address_line = document.getElementById("address_line").value.trim();
+      const postal_code = document.getElementById("postal_code").value.trim();
       const birth_date = document.getElementById("birth_date").value;
       const sex = document.getElementById("sex").value;
       const category = document.getElementById("category").value;
@@ -966,8 +1041,8 @@
       const notes = document.getElementById("notes").value.trim();
       const acceptConditions = document.getElementById("accept_conditions").checked;
 
-      if (!first_name || !last_name || !email || !birth_date || !sex || !category || !countryValue) {
-        errmsg.textContent = "Merci de remplir tous les champs obligatoires.";
+      if (!first_name || !last_name || !email || !address_line || !postal_code || !birth_date || !sex || !category || !countryValue || !city) {
+        errmsg.textContent = "Merci de remplir tous les champs obligatoires, y compris l’adresse complète.";
         errmsg.style.display = "block";
         return;
       }
@@ -991,6 +1066,8 @@
         last_name,
         email,
         phone,
+        address_line,
+        postal_code,
         birth_date,
         sex,
         category,
@@ -1002,6 +1079,7 @@
         packType: state.packType,
         discipline: state.discipline,
         federation: state.federation,
+        rslMember: state.rslMember,
         total: state.total,
         paymentMethod: currentPayMethod
       };
@@ -1051,7 +1129,7 @@
             "✅ Inscription enregistrée !<br><br>" +
             "Effectue un virement de <strong>" + state.total + " CHF</strong> :<br>" +
             "<strong>IBAN :</strong> CH94 8080 8009 3546 9723 0<br>" +
-            "<strong>Bénéficiaire :</strong> Ride4Style.(Montreux Scooter Contest)<br>" +
+            "<strong>Bénéficiaire :</strong> Ride4Style.(Vidy Scooter Contest)<br>" +
             "<strong>Banque :</strong> Raiffeisen Moléson — SWIFT : RAIFCH22<br>" +
             "<strong>Message de paiement :</strong> " + first_name + " " + last_name + " — " + category;
           okmsg.style.display = "block";
