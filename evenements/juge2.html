@@ -3,56 +3,65 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Juge 2 — Montreux 2026</title>
+<title>Juge 2 — Montreux 2026 — Mobile — 2 runs — BT départage</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--red:#d71920;--p2:#232326;--txt:#f5f5f5;--mu:#b8b8bd;--ln:rgba(255,255,255,.10);--gr:#29c66f;--go:#f6c90e;--jc:#a855f7}
+:root{--red:#d71920;--p1:#18181b;--p2:#232326;--txt:#f5f5f5;--mu:#b8b8bd;--ln:rgba(255,255,255,.10);--gr:#29c66f;--go:#f6c90e;--jc:#3b82f6;--orange:#fb923c}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:radial-gradient(circle at top,rgba(215,25,32,.12),transparent 34%),linear-gradient(180deg,#111,#0d0d0f 55%,#111);color:var(--txt);min-height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--ln);background:rgba(0,0,0,.4);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;gap:12px;flex-wrap:wrap}
+body{font-family:Arial,sans-serif;-webkit-text-size-adjust:100%;touch-action:manipulation;background:radial-gradient(circle at top,rgba(215,25,32,.12),transparent 34%),linear-gradient(180deg,#111,#0d0d0f 55%,#111);color:var(--txt);min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;padding-top:calc(14px + env(safe-area-inset-top));border-bottom:1px solid var(--ln);background:rgba(0,0,0,.4);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20;gap:12px;flex-wrap:wrap}
 .badge{background:var(--jc);color:#fff;border-radius:999px;padding:6px 18px;font-weight:900;font-size:.95rem;text-transform:uppercase;letter-spacing:.05em}
 .topbar h1{font-size:1rem;text-transform:uppercase;letter-spacing:.04em}
 .seg{display:flex;background:var(--p2);border-radius:12px;overflow:hidden;border:1px solid var(--ln)}
-.seg button{border:none;padding:8px 18px;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--mu);background:transparent;transition:.15s}
+.seg button{border:none;padding:11px 18px;min-height:44px;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--mu);background:transparent;transition:.15s}
 .seg button.active{background:var(--red);color:#fff}
-.bsm{border:none;border-radius:10px;padding:7px 14px;background:rgba(255,255,255,.08);color:var(--mu);font-size:.82rem;font-weight:700;cursor:pointer}
+.bsm{border:none;border-radius:10px;padding:10px 14px;min-height:44px;background:rgba(255,255,255,.08);color:var(--mu);font-size:.82rem;font-weight:700;cursor:pointer}
 .bsm:hover{background:rgba(255,255,255,.13);color:#fff}
 .wrap{padding:18px 22px}
+.info{margin-bottom:14px;border:1px solid rgba(59,130,246,.25);background:rgba(59,130,246,.08);color:#cfe3ff;border-radius:16px;padding:12px 14px;font-size:.9rem;line-height:1.45}
 .cb{margin-bottom:22px;border:1px solid var(--ln);border-radius:20px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01))}
 .ch{display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(0,0,0,.25);border-bottom:1px solid var(--ln)}
 .cl{background:var(--red);color:#fff;border-radius:999px;padding:4px 14px;font-weight:900;font-size:.85rem;text-transform:uppercase}
 .cs{background:rgba(255,255,255,.07);color:var(--mu);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.82rem}
 .cc{color:var(--mu);font-size:.82rem;margin-left:auto}
-table{width:100%;border-collapse:collapse}
-thead th{padding:9px 8px;text-align:left;text-transform:uppercase;font-size:.65rem;letter-spacing:.06em;color:var(--mu);border-bottom:1px solid var(--ln);white-space:nowrap}
-tbody tr{border-bottom:1px solid rgba(255,255,255,.04)}
-tbody tr:last-child{border-bottom:none}
-td{padding:8px;vertical-align:middle}
-.rk{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem}
+.rider-card{border-bottom:1px solid rgba(255,255,255,.06);padding:12px 14px}
+.rider-card:last-child{border-bottom:none}
+.rider-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.rk{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.86rem;flex:0 0 30px}
 .rk1{background:var(--go);color:#000}.rk2{background:#c0c0c0;color:#000}.rk3{background:#cd7f32;color:#fff}.rkn{background:rgba(255,255,255,.07);color:var(--mu)}
-.rname{font-weight:700;font-size:.9rem}
-.rsub{color:var(--mu);font-size:.75rem;margin-top:1px}
-.ig{display:flex;flex-direction:column;align-items:center;gap:2px}
-.il{font-size:.6rem;color:var(--mu);font-weight:700;text-transform:uppercase}
-.si{width:50px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:var(--p2);color:#fff;text-align:center;font:inherit;font-size:.92rem;font-weight:700;padding:6px 2px;outline:none;transition:.15s;-moz-appearance:textfield}
+.rname{font-weight:900;font-size:1rem}.rsub{color:var(--mu);font-size:.8rem;margin-top:2px}
+.bestbox{margin-left:auto;background:rgba(255,255,255,.07);border:1px solid var(--ln);border-radius:12px;padding:7px 10px;font-size:.82rem;color:var(--mu)}
+.bestbox strong{color:#fff;font-size:1rem}
+.runs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.runbox{border:1px solid var(--ln);border-radius:16px;background:rgba(255,255,255,.025);overflow:hidden}
+.runhead{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:rgba(0,0,0,.22);border-bottom:1px solid var(--ln)}
+.runlabel{font-weight:900;text-transform:uppercase;font-size:.82rem;letter-spacing:.05em}
+.runlabel.r1{color:var(--jc)}.runlabel.r2{color:var(--orange)}
+.saved{font-size:.75rem;color:var(--gr);font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:10px}
+.ig{display:flex;flex-direction:column;gap:3px;min-width:0}
+.il{font-size:.58rem;color:var(--mu);font-weight:800;text-transform:uppercase;letter-spacing:.03em;text-align:center}
+.si{width:100%;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:var(--p2);color:#fff;text-align:center;font:inherit;font-size:1.05rem;font-weight:900;padding:12px 4px;min-height:48px;outline:none;transition:.15s;-moz-appearance:textfield}
 .si::-webkit-outer-spin-button,.si::-webkit-inner-spin-button{-webkit-appearance:none}
-.si:focus{border-color:var(--jc)}
-.si.ib{border-color:var(--go);color:var(--go);background:rgba(246,201,14,.07)}
-.si.sv{border-color:rgba(41,198,111,.5)}
-.vl{font-size:1.1rem;font-weight:900;text-align:center;min-width:38px}
-.vv{color:var(--jc)}.vg{color:var(--go)}.vd{color:var(--mu);font-size:.85rem}
-.sbtn{border:none;border-radius:9px;padding:7px 12px;background:var(--jc);color:#fff;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap}
-.sbtn.ok{background:var(--gr)}
-.sbtn:disabled{opacity:.5;cursor:not-allowed}
+.si:focus{border-color:var(--jc)}.si.ib{border-color:var(--go);color:var(--go);background:rgba(246,201,14,.07)}.si.sv{border-color:rgba(41,198,111,.5)}
+.runfoot{display:grid;grid-template-columns:1fr 1fr 1fr auto;align-items:center;gap:8px;padding:0 10px 10px}
+.val{border-radius:10px;background:rgba(255,255,255,.055);padding:7px 8px;text-align:center;color:var(--mu);font-size:.72rem;text-transform:uppercase;font-weight:800}.val strong{display:block;color:#fff;font-size:1.02rem;margin-top:2px}.val.best strong{color:var(--go)}
+.sbtn{border:none;border-radius:12px;padding:13px 13px;min-height:48px;background:var(--jc);color:#fff;font-size:.8rem;font-weight:900;cursor:pointer;white-space:nowrap}.sbtn.r2{background:var(--orange)}.sbtn.ok{background:var(--gr)}.sbtn:disabled{opacity:.5;cursor:not-allowed}
 .empty{text-align:center;padding:36px;color:var(--mu)}
-@media(max-width:700px){.wrap{padding:10px}.si{width:42px}}
+@media(max-width:900px){.runs{grid-template-columns:1fr}.bestbox{margin-left:0;width:100%}}
+@media(max-width:560px){
+  .wrap{padding:10px 8px 18px}.topbar{padding:10px 8px;padding-top:calc(10px + env(safe-area-inset-top));align-items:stretch}.topbar>div{width:100%;justify-content:space-between}.topbar h1{font-size:.82rem}.badge{font-size:.8rem;padding:6px 12px}.seg{width:100%;display:grid;grid-template-columns:1fr 1fr}.seg button{width:100%;font-size:.95rem}.bsm{flex:1}.ch{padding:10px 12px;flex-wrap:wrap}.cc{margin-left:0;width:100%}.rider-card{padding:12px 10px}.rider-head{align-items:flex-start}.rname{font-size:1.05rem}.bestbox{width:100%;margin-left:0}.runs{gap:14px}.runhead{padding:11px}.grid{grid-template-columns:repeat(3,1fr);gap:9px;padding:11px}.il{font-size:.66rem}.runfoot{grid-template-columns:1fr 1fr 1fr;gap:7px;padding:0 11px 11px}.val{font-size:.68rem;padding:8px 4px}.val strong{font-size:1.15rem}.sbtn{grid-column:1/-1;width:100%;font-size:.95rem}
+}
+@media(max-width:360px){.grid{grid-template-columns:repeat(2,1fr)}.runfoot{grid-template-columns:1fr}.val{text-align:left}.sbtn{grid-column:auto}}
+
+@media print{.topbar,.info,.sbtn{display:none!important}body{background:#fff;color:#000}.cb,.runbox{border-color:#aaa}.rider-card{page-break-inside:avoid}.wrap{padding:0}}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
     <span class="badge">Juge 2</span>
-    <h1>Montreux 2026</h1>
+    <h1>Montreux 2026 — Mobile</h1>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
     <div class="seg" id="dSeg">
@@ -63,7 +72,10 @@ td{padding:8px;vertical-align:middle}
     <button class="bsm" onclick="window.print()">&#128424; Imprimer</button>
   </div>
 </div>
-<div class="wrap" id="mWrap"><div class="empty">Chargement&hellip;</div></div>
+<div class="wrap">
+  <div class="info">Chaque rider a <strong>Run 1</strong> et <strong>Run 2</strong>. Le score du run = <strong>moyenne Style / Technique / Originalité</strong>. Le <strong>Best Trick</strong> ne s'additionne pas au score : il sert uniquement à départager en cas d'égalité.</div>
+  <div id="mWrap"><div class="empty">Chargement&hellip;</div></div>
+</div>
 
 <script>
 var SB_URL  = "https://jynxifufaauoxwzjapzq.supabase.co";
@@ -75,6 +87,7 @@ var SEXES = ["Homme","Femme"];
 var disc = "Park";
 var riders = [];
 var sc = {};
+var saveMode = localStorage.getItem("score_save_mode") || "run";
 
 document.getElementById("btnPark").addEventListener("click", function(){ setDisc("Park"); });
 document.getElementById("btnStreet").addEventListener("click", function(){ setDisc("Street"); });
@@ -91,24 +104,39 @@ async function load() {
   document.getElementById("mWrap").innerHTML = '<div class="empty">Chargement&hellip;</div>';
   var r1 = await db.from("inscriptions").select("*").order("last_name");
   if (r1.error) {
-    document.getElementById("mWrap").innerHTML = '<div class="empty" style="color:#f66">Erreur: ' + r1.error.message + '</div>';
+    document.getElementById("mWrap").innerHTML = '<div class="empty" style="color:#f66">Erreur inscriptions: ' + esc(r1.error.message) + '</div>';
     return;
   }
   riders = r1.data || [];
+
   var r2 = await db.from("scores").select("*").eq("juge", JUGE);
   sc = {};
-  (r2.data || []).forEach(function(s) {
-    sc[s.inscription_id + "_" + s.discipline] = {style:s.style, technique:s.technique, originalite:s.originalite, t1:s.t1, t2:s.t2, t3:s.t3};
-  });
+  if (!r2.error) {
+    (r2.data || []).forEach(function(s) {
+      var info = normalizeScoreDisc(s);
+      var key = scoreKey(s.inscription_id, info.discipline, info.run);
+      sc[key] = {style:s.style, technique:s.technique, originalite:s.originalite, t1:s.t1, t2:s.t2, t3:s.t3, db:s};
+    });
+  }
   renderAll();
 }
+
+function normalizeScoreDisc(s) {
+  var d = s.discipline || "";
+  var run = parseInt(s.run || s.run_number || s.run_no || 1, 10);
+  var m = d.match(/^(Park|Street)\s*(?:Run|R)\s*([12])$/i);
+  if (m) return {discipline: cap(m[1]), run: parseInt(m[2],10)};
+  return {discipline: cap(d), run: (run===2?2:1)};
+}
+function cap(v){v=String(v||"").toLowerCase();return v==="street"?"Street":"Park";}
+function scoreKey(id, d, run){ return id + "_" + d + "_R" + run; }
 
 function renderAll() {
   var wrap = document.getElementById("mWrap");
   wrap.innerHTML = "";
   var filtered = riders.filter(function(r){ return matchDisc(r); });
   if (!filtered.length) {
-    wrap.innerHTML = '<div class="empty">Aucun rider pour ' + disc + ' (total DB: ' + riders.length + ')</div>';
+    wrap.innerHTML = '<div class="empty">Aucun rider pour ' + esc(disc) + ' (total DB: ' + riders.length + ')</div>';
     return;
   }
   var found = false;
@@ -117,17 +145,10 @@ function renderAll() {
       var grp = filtered.filter(function(r){ return r.category===cat && nSex(r.sex)===sex; });
       if (!grp.length) return;
       found = true;
-      grp.sort(function(a,b){ return tot(b.id)-tot(a.id); });
+      grp.sort(function(a,b){ return bestRunTotal(b.id)-bestRunTotal(a.id); });
       var blk = document.createElement("div");
       blk.className = "cb";
-      blk.innerHTML =
-        '<div class="ch"><span class="cl">'+cat+'</span><span class="cs">'+sex+'</span><span class="cc">'+grp.length+' rider'+(grp.length>1?'s':'')+'</span></div>'+
-        '<table><thead><tr>'+
-        '<th>Pos.</th><th>Rider</th>'+
-        '<th>Style</th><th>Tech.</th><th>Orig.</th><th>Moy.</th>'+
-        '<th>T1</th><th>T2</th><th>T3</th><th>Best</th>'+
-        '<th>Total</th><th></th>'+
-        '</tr></thead><tbody id="tb-'+cat+'-'+sex+'"></tbody></table>';
+      blk.innerHTML = '<div class="ch"><span class="cl">'+esc(cat)+'</span><span class="cs">'+esc(sex)+'</span><span class="cc">'+grp.length+' rider'+(grp.length>1?'s':'')+'</span></div><div id="grp-'+safe(cat)+'-'+safe(sex)+'"></div>';
       wrap.appendChild(blk);
       renderGrp(grp, cat, sex);
     });
@@ -136,106 +157,132 @@ function renderAll() {
 }
 
 function renderGrp(grp, cat, sex) {
-  var tb = document.getElementById("tb-"+cat+"-"+sex);
-  if (!tb) return;
-  tb.innerHTML = "";
+  var box = document.getElementById("grp-"+safe(cat)+"-"+safe(sex));
+  if (!box) return;
+  box.innerHTML = "";
   grp.forEach(function(r, i) {
-    var key = r.id+"_"+disc;
-    var s   = sc[key] || {};
-    var rk  = i+1;
-    var rc  = rk===1?"rk1":rk===2?"rk2":rk===3?"rk3":"rkn";
-    var saved = !!sc[key];
-    var av = avg(r.id);
-    var bt = bestT(r.id);
-    var tt = tot(r.id);
-    var tv = [s.t1!=null?parseFloat(s.t1):null, s.t2!=null?parseFloat(s.t2):null, s.t3!=null?parseFloat(s.t3):null];
-    var mx = Math.max.apply(null, tv.filter(function(v){return v!==null;}).concat([0]));
-
-    function inp(f, v, trick) {
-      var best2 = trick && v!==null && v===mx && mx>0;
-      var cls = "si"+(saved?" sv":"")+(best2?" ib":"");
-      return '<div class="ig"><span class="il">'+f.substring(0,4)+'</span>'+
-        '<input class="'+cls+'" type="number" min="0" max="10" step="0.1"'+
-        ' id="'+f+'_'+r.id+'"'+
-        ' value="'+(v!==null&&v!==undefined?v:'')+'"'+
-        ' placeholder="&#8212;"'+
-        ' data-rid="'+r.id+'" data-cat="'+cat+'" data-sex="'+sex+'"'+
-        ' oninput="upd(this)">'+
-        '</div>';
-    }
-
-    var tr = document.createElement("tr");
-    tr.innerHTML =
-      '<td><div class="rk '+rc+'">'+rk+'</div></td>'+
-      '<td><div class="rname">'+esc(r.first_name)+' '+esc(r.last_name)+'</div>'+
-          '<div class="rsub">'+(r.club?esc(r.club):'')+'</div></td>'+
-      '<td>'+inp('style', s.style!=null?s.style:null, false)+'</td>'+
-      '<td>'+inp('technique', s.technique!=null?s.technique:null, false)+'</td>'+
-      '<td>'+inp('originalite', s.originalite!=null?s.originalite:null, false)+'</td>'+
-      '<td><span class="vl '+(av>0?'vv':'vd')+'" id="av_'+r.id+'">'+(av>0?av.toFixed(1):'&#8212;')+'</span></td>'+
-      '<td>'+inp('t1', tv[0], true)+'</td>'+
-      '<td>'+inp('t2', tv[1], true)+'</td>'+
-      '<td>'+inp('t3', tv[2], true)+'</td>'+
-      '<td><span class="vl '+(bt>0?'vg':'vd')+'" id="bt_'+r.id+'">'+(bt>0?bt:'&#8212;')+'</span></td>'+
-      '<td><span class="vl '+(tt>0?'vv':'vd')+'" id="tt_'+r.id+'">'+(tt>0?tt.toFixed(1):'&#8212;')+'</span></td>'+
-      '<td><button class="sbtn'+(saved?' ok':'')+'" id="sb_'+r.id+'"'+
-        ' data-rid="'+r.id+'" data-cat="'+cat+'" data-sex="'+sex+'"'+
-        ' onclick="save(this)">'+
-        (saved?'&#10003; Sauv&#233;':'Sauver')+'</button></td>';
-    tb.appendChild(tr);
+    var rk = i+1;
+    var rc = rk===1?"rk1":rk===2?"rk2":rk===3?"rk3":"rkn";
+    var best = bestRunTotal(r.id);
+    var bestRun = runTotal(r.id,2) > runTotal(r.id,1) ? 2 : 1;
+    var card = document.createElement("div");
+    card.className = "rider-card";
+    card.innerHTML =
+      '<div class="rider-head">'+
+        '<div class="rk '+rc+'">'+rk+'</div>'+
+        '<div><div class="rname">'+esc(r.first_name)+' '+esc(r.last_name)+'</div><div class="rsub">'+(r.club?esc(r.club):'')+'</div></div>'+
+        '<div class="bestbox">Score meilleur run : <strong>'+(best>0?best.toFixed(1):'—')+'</strong>'+(best>0?' <span style="color:var(--mu)">Run '+bestRun+'</span>':'')+'</div>'+
+      '</div>'+
+      '<div class="runs">'+runHtml(r,1,cat,sex)+runHtml(r,2,cat,sex)+'</div>';
+    box.appendChild(card);
   });
 }
+
+function runHtml(r, run, cat, sex) {
+  var s = getScore(r.id, run) || {};
+  var saved = !!getScore(r.id, run);
+  var av = avg(r.id, run), bt = bestT(r.id, run), tt = runTotal(r.id, run);
+  var tv = [s.t1!=null?parseFloat(s.t1):null, s.t2!=null?parseFloat(s.t2):null, s.t3!=null?parseFloat(s.t3):null];
+  var mx = Math.max.apply(null, tv.filter(function(v){return v!==null;}).concat([0]));
+  function inp(f, v, trick) {
+    var best2 = trick && v!==null && v===mx && mx>0;
+    var cls = "si"+(saved?" sv":"")+(best2?" ib":"");
+    return '<div class="ig"><span class="il">'+label(f)+'</span><input class="'+cls+'" type="number" min="0" max="10" step="0.1" id="'+f+'_r'+run+'_'+r.id+'" value="'+(v!==null&&v!==undefined?v:'')+'" placeholder="—" data-rid="'+r.id+'" data-run="'+run+'" data-cat="'+esc(cat)+'" data-sex="'+esc(sex)+'" oninput="upd(this)"></div>';
+  }
+  return '<div class="runbox">'+
+    '<div class="runhead"><span class="runlabel r'+run+'">Run '+run+'</span><span class="saved" id="saved_r'+run+'_'+r.id+'">'+(saved?'✓ Sauvé':'')+'</span></div>'+
+    '<div class="grid">'+
+      inp('style', s.style!=null?s.style:null, false)+
+      inp('technique', s.technique!=null?s.technique:null, false)+
+      inp('originalite', s.originalite!=null?s.originalite:null, false)+
+      inp('t1', tv[0], true)+inp('t2', tv[1], true)+inp('t3', tv[2], true)+
+    '</div>'+
+    '<div class="runfoot">'+
+      '<div class="val">Moy.<strong id="av_r'+run+'_'+r.id+'">'+(av>0?av.toFixed(1):'—')+'</strong></div>'+
+      '<div class="val best">Best trick<br><small style="color:var(--mu);font-size:.66rem">départage</small><strong id="bt_r'+run+'_'+r.id+'">'+(bt>0?bt:'—')+'</strong></div>'+
+      '<div class="val">Score<strong id="tt_r'+run+'_'+r.id+'">'+(tt>0?tt.toFixed(1):'—')+'</strong></div>'+
+      '<button class="sbtn r'+run+(saved?' ok':'')+'" id="sb_r'+run+'_'+r.id+'" data-rid="'+r.id+'" data-run="'+run+'" data-cat="'+esc(cat)+'" data-sex="'+esc(sex)+'" onclick="saveRun(this)">'+(saved?'✓ Sauvé':'Sauver')+'</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function label(f){if(f==='technique')return 'Tech.'; if(f==='originalite')return 'Orig.'; if(f==='t1')return 'BT 1'; if(f==='t2')return 'BT 2'; if(f==='t3')return 'BT 3'; return f.toUpperCase();}
+function getScore(id, run){return sc[scoreKey(id, disc, run)] || null;}
+function gv(id, run, f) { var e=document.getElementById(f+"_r"+run+"_"+id); var v=e?parseFloat(e.value):NaN; return isNaN(v)?null:Math.min(10,Math.max(0,v)); }
 
 function upd(el) {
   var id  = el.getAttribute("data-rid");
-  var cat = el.getAttribute("data-cat");
-  var sex = el.getAttribute("data-sex");
-  function gv(f) { var e=document.getElementById(f+"_"+id); var v=e?parseFloat(e.value):NaN; return isNaN(v)?null:Math.min(10,Math.max(0,v)); }
-  var st=gv("style"),te=gv("technique"),or=gv("originalite"),t1=gv("t1"),t2=gv("t2"),t3=gv("t3");
+  var run = parseInt(el.getAttribute("data-run"),10);
+  var st=gv(id,run,"style"),te=gv(id,run,"technique"),or=gv(id,run,"originalite"),t1=gv(id,run,"t1"),t2=gv(id,run,"t2"),t3=gv(id,run,"t3");
   var fl=[st,te,or].filter(function(v){return v!==null;});
-  var av2 = fl.length ? fl.reduce(function(a,b){return a+b;},0)/3 : 0;
+  var av2 = fl.length ? fl.reduce(function(a,b){return a+b;},0)/fl.length : 0;
   var bt2 = Math.max(t1||0,t2||0,t3||0);
-  var tt2 = av2+bt2;
-  var mx2 = bt2;
-  ["t1","t2","t3"].forEach(function(k,i){
-    var e=document.getElementById(k+"_"+id); if(!e) return;
-    e.classList.toggle("ib",[t1,t2,t3][i]!==null&&[t1,t2,t3][i]===mx2&&mx2>0);
-  });
-  var e;
-  e=document.getElementById("av_"+id); if(e){e.textContent=av2>0?av2.toFixed(1):"—"; e.className="vl "+(av2>0?"vv":"vd");}
-  e=document.getElementById("bt_"+id); if(e){e.textContent=bt2>0?bt2:"—"; e.className="vl "+(bt2>0?"vg":"vd");}
-  e=document.getElementById("tt_"+id); if(e){e.textContent=tt2>0?tt2.toFixed(1):"—"; e.className="vl "+(tt2>0?"vv":"vd");}
-  e=document.getElementById("sb_"+id); if(e){e.textContent="Sauver"; e.className="sbtn";}
+  var tt2 = av2; // Best trick = départage seulement, pas additionné
+  ["t1","t2","t3"].forEach(function(k,i){ var e=document.getElementById(k+"_r"+run+"_"+id); if(e){ e.classList.toggle("ib",[t1,t2,t3][i]!==null&&[t1,t2,t3][i]===bt2&&bt2>0); }});
+  setTxt("av_r"+run+"_"+id, av2>0?av2.toFixed(1):"—");
+  setTxt("bt_r"+run+"_"+id, bt2>0?bt2:"—");
+  setTxt("tt_r"+run+"_"+id, tt2>0?tt2.toFixed(1):"—");
+  var b=document.getElementById("sb_r"+run+"_"+id); if(b){b.textContent="Sauver"; b.className="sbtn r"+run;}
+  setTxt("saved_r"+run+"_"+id, "");
 }
 
-async function save(btn) {
+async function saveRun(btn) {
   var id  = btn.getAttribute("data-rid");
+  var run = parseInt(btn.getAttribute("data-run"),10);
   var cat = btn.getAttribute("data-cat");
   var sex = btn.getAttribute("data-sex");
-  function gv(f){var e=document.getElementById(f+"_"+id);return e&&e.value!==""?parseFloat(e.value):null;}
-  var style=gv("style"),technique=gv("technique"),originalite=gv("originalite"),t1=gv("t1"),t2=gv("t2"),t3=gv("t3");
+  var payload = {
+    inscription_id:id, discipline:disc, juge:JUGE, run:run,
+    style:gv(id,run,"style"), technique:gv(id,run,"technique"), originalite:gv(id,run,"originalite"),
+    t1:gv(id,run,"t1"), t2:gv(id,run,"t2"), t3:gv(id,run,"t3")
+  };
   btn.disabled=true; btn.textContent="…";
-  var res = await db.from("scores").upsert(
-    {inscription_id:id,discipline:disc,juge:JUGE,style:style,technique:technique,originalite:originalite,t1:t1,t2:t2,t3:t3},
-    {onConflict:"inscription_id,discipline,juge"}
-  );
-  if (res.error){ alert("Erreur: "+res.error.message); btn.disabled=false; btn.textContent="Sauver"; return; }
-  sc[id+"_"+disc]={style:style,technique:technique,originalite:originalite,t1:t1,t2:t2,t3:t3};
-  btn.disabled=false; btn.textContent="✅ Sauvé"; btn.className="sbtn ok";
-  ["style","technique","originalite","t1","t2","t3"].forEach(function(k){
-    var e=document.getElementById(k+"_"+id); if(e) e.classList.add("sv");
-  });
+  var res = await saveScorePayload(payload, run);
+  if (res.error){ alert("Erreur Supabase : "+res.error.message); btn.disabled=false; btn.textContent="Sauver"; return; }
+  sc[scoreKey(id, disc, run)]={style:payload.style,technique:payload.technique,originalite:payload.originalite,t1:payload.t1,t2:payload.t2,t3:payload.t3};
+  btn.disabled=false; btn.textContent="✓ Sauvé"; btn.className="sbtn r"+run+" ok";
+  setTxt("saved_r"+run+"_"+id,"✓ Sauvé");
+  ["style","technique","originalite","t1","t2","t3"].forEach(function(k){var e=document.getElementById(k+"_r"+run+"_"+id); if(e) e.classList.add("sv");});
   var grp=riders.filter(function(r){return matchDisc(r)&&r.category===cat&&nSex(r.sex)===sex;});
-  grp.sort(function(a,b){return tot(b.id)-tot(a.id);});
+  grp.sort(riderCompare);
   renderGrp(grp,cat,sex);
 }
 
-function avg(id){var s=sc[id+"_"+disc];if(!s)return 0;var fl=[s.style,s.technique,s.originalite].filter(function(v){return v!=null;});return fl.length?fl.reduce(function(a,b){return a+b;},0)/3:0;}
-function bestT(id){var s=sc[id+"_"+disc];if(!s)return 0;return Math.max(s.t1||0,s.t2||0,s.t3||0);}
-function tot(id){return avg(id)+bestT(id);}
-function matchDisc(r){var d=(r.discipline||"").toLowerCase(),p=(r.pack_type||"").toLowerCase();return p.indexOf("pack")>=0||!r.discipline||d===disc.toLowerCase();}
-function nSex(s){if(!s)return "Homme";var v=s.toLowerCase().trim();return ["f","femme","female","feminin"].indexOf(v)>=0?"Femme":"Homme";}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+async function saveScorePayload(payload, run) {
+  var p;
+  if (saveMode === "run") {
+    p = Object.assign({}, payload);
+    var r = await db.from("scores").upsert(p,{onConflict:"inscription_id,discipline,juge,run"});
+    if (!r.error) { localStorage.setItem("score_save_mode","run"); return r; }
+    saveMode = "run_number";
+  }
+  if (saveMode === "run_number") {
+    p = Object.assign({}, payload);
+    delete p.run;
+    p.run_number = run;
+    var r2 = await db.from("scores").upsert(p,{onConflict:"inscription_id,discipline,juge,run_number"});
+    if (!r2.error) { localStorage.setItem("score_save_mode","run_number"); return r2; }
+    saveMode = "discipline_suffix";
+  }
+  p = Object.assign({}, payload);
+  delete p.run;
+  p.discipline = disc + " Run " + run;
+  var r3 = await db.from("scores").upsert(p,{onConflict:"inscription_id,discipline,juge"});
+  if (!r3.error) { localStorage.setItem("score_save_mode","discipline_suffix"); return r3; }
+  return r3;
+}
+
+function avg(id, run){var s=getScore(id,run);if(!s)return 0;var fl=[s.style,s.technique,s.originalite].filter(function(v){return v!=null;});return fl.length?fl.reduce(function(a,b){return a+b;},0)/fl.length:0;}
+function bestT(id, run){var s=getScore(id,run);if(!s)return 0;return Math.max(s.t1||0,s.t2||0,s.t3||0);}
+function runTotal(id, run){return avg(id,run);}
+function bestRunTotal(id){return Math.max(runTotal(id,1),runTotal(id,2));}
+function bestTieBreaker(id){return Math.max(bestT(id,1),bestT(id,2));}
+function riderCompare(a,b){var fa=bestRunTotal(a.id), fb=bestRunTotal(b.id); if(fb!==fa) return fb-fa; return bestTieBreaker(b.id)-bestTieBreaker(a.id);}
+function matchDisc(r){var d=(r.discipline||"").toLowerCase(),p=(r.pack_type||"").toLowerCase();return p.indexOf("pack")>=0||!r.discipline||d===disc.toLowerCase()||d.indexOf(disc.toLowerCase())>=0;}
+function nSex(s){if(!s)return "Homme";var v=s.toLowerCase().trim();return ["f","femme","female","feminin","féminin"].indexOf(v)>=0?"Femme":"Homme";}
+function setTxt(id,v){var e=document.getElementById(id); if(e) e.textContent=v;}
+function safe(s){return String(s||"").replace(/[^a-z0-9]/gi,"_");}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");}
 
 load();
 </script>
