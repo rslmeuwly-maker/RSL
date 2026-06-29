@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résultats — Vidy 2026</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&display=swap');
+
+    :root{
+      --bg:#0f0f10;
+      --panel:#18181b;
+      --panel2:#232326;
+      --text:#f5f5f5;
+      --muted:#b8b8bd;
+      --red:#d71920;
+      --red-soft:rgba(215,25,32,.14);
+      --line:rgba(255,255,255,.10);
+      --gold:#f5c518;
+      --silver:#c0c0c0;
+      --bronze:#cd7f32;
+      --shadow:0 14px 40px rgba(0,0,0,.28);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    body{
+      font-family:'Barlow',Arial,sans-serif;
+      background:
+        radial-gradient(circle at top right,rgba(215,25,32,.18),transparent 30%),
+        radial-gradient(circle at top left,rgba(215,25,32,.08),transparent 24%),
+        linear-gradient(180deg,#111,#0d0d0f 55%,#111);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .wrap{max-width:1180px;margin:auto;padding:24px 16px 60px;}
+
+    .hero{
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:36px 32px 28px;
+      margin-bottom:24px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:'';
+      position:absolute;
+      top:-70px;
+      right:-70px;
+      width:260px;
+      height:260px;
+      background:radial-gradient(circle,rgba(215,25,32,.24),transparent 68%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-block;
+      background:var(--red);
+      color:#fff;
+      border-radius:999px;
+      padding:7px 14px;
+      font-weight:800;
+      text-transform:uppercase;
+      font-size:.78rem;
+      letter-spacing:.08em;
+      margin-bottom:14px;
+      font-family:'Barlow Condensed',sans-serif;
+    }
+
+    .hero h1{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:clamp(2.3rem,6vw,4.6rem);
+      font-weight:900;
+      line-height:.92;
+      text-transform:uppercase;
+      letter-spacing:.01em;
+      margin-bottom:10px;
+    }
+
+    .hero h1 span{color:var(--red);}
+
+    .hero p{
+      color:var(--muted);
+      line-height:1.5;
+      max-width:760px;
+      font-size:1rem;
+    }
+
+    .stats-strip{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      margin-bottom:24px;
+    }
+
+    .stat-card{
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 16px;
+      text-align:center;
+    }
+
+    .stat-num{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:2.25rem;
+      font-weight:900;
+      color:var(--red);
+      line-height:1;
+      margin-bottom:4px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:.82rem;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-weight:600;
+    }
+
+    .tabs-nav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .tab-btn{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--muted);
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:.9rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.07em;
+      padding:10px 18px;
+      cursor:pointer;
+      transition:.2s ease;
+      white-space:nowrap;
+    }
+
+    .tab-btn:hover{border-color:rgba(215,25,32,.45);color:#fff;}
+    .tab-btn.active{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 4px 16px rgba(215,25,32,.35);}
+
+    .category-section{display:none;}
+    .category-section.visible{display:block;}
+
+    .category-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .category-title{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.75rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .category-note{
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .disc-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .disc-panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .disc-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+      padding-bottom:12px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .disc-title h2{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.45rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .disc-badge{
+      background:var(--red-soft);
+      border:1px solid rgba(215,25,32,.35);
+      color:#ff7373;
+      border-radius:999px;
+      padding:5px 11px;
+      font-family:'Barlow Condensed',sans-serif;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.07em;
+      font-size:.78rem;
+    }
+
+    .result-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:11px 0;
+      border-bottom:1px solid var(--line);
+    }
+
+    .result-row:last-child{border-bottom:none;}
+
+    .rank-badge{
+      width:38px;
+      height:38px;
+      border-radius:10px;
+      background:var(--red);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.1rem;
+      font-weight:900;
+      flex:0 0 38px;
+      box-shadow:0 3px 10px rgba(215,25,32,.28);
+    }
+
+    .rank-badge.r1{background:linear-gradient(135deg,#f5c518,#d4a017);color:#1a1000;}
+    .rank-badge.r2{background:linear-gradient(135deg,#d0d0d0,#a0a0a0);color:#1a1a1a;}
+    .rank-badge.r3{background:linear-gradient(135deg,#cd7f32,#a05c20);color:#1a0d00;}
+
+    .result-info{flex:1;min-width:0;}
+
+    .result-name{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.15rem;
+      font-weight:900;
+      text-transform:uppercase;
+      line-height:1.05;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .result-meta{
+      color:var(--muted);
+      font-size:.82rem;
+      margin-top:3px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .result-right{
+      text-align:right;
+      flex:0 0 auto;
+      min-width:86px;
+    }
+
+    .result-score{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.45rem;
+      font-weight:900;
+      line-height:1;
+    }
+
+    .denom{
+      font-size:.78rem;
+      font-weight:600;
+      color:var(--muted);
+    }
+
+    .result-bt{
+      font-size:.74rem;
+      color:#ff6b6b;
+      margin-top:3px;
+      font-weight:800;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .nc{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.55rem;
+      font-weight:900;
+      color:#fff;
+    }
+
+    .empty{
+      color:var(--muted);
+      font-size:.95rem;
+      padding:10px 0;
+    }
+
+    .femme-panel{
+      margin-top:18px;
+      background:linear-gradient(180deg,rgba(215,25,32,.09),rgba(255,255,255,.015));
+      border:1px solid rgba(215,25,32,.25);
+      border-radius:26px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .footer{
+      margin-top:34px;
+      padding:26px;
+      border:1px solid var(--line);
+      border-radius:26px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+      text-align:center;
+    }
+
+    .footer-title{
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:1.1rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#fff;
+      margin-bottom:10px;
+    }
+
+    .partners{
+      color:var(--muted);
+      line-height:1.65;
+      font-weight:600;
+    }
+
+    .partners span{
+      color:#fff;
+      display:inline-block;
+      margin:0 5px;
+    }
+
+    @media(max-width:860px){
+      .disc-grid{grid-template-columns:1fr;}
+      .stats-strip{grid-template-columns:repeat(2,1fr);}
+      .hero{padding:30px 22px 24px;}
+    }
+
+    @media(max-width:520px){
+      .wrap{padding:16px 12px 42px;}
+      .hero h1{font-size:2.55rem;}
+      .stats-strip{grid-template-columns:1fr 1fr;}
+      .stat-num{font-size:1.9rem;}
+      .disc-panel,.femme-panel{padding:17px;}
+      .result-row{gap:10px;}
+      .result-name{font-size:1.02rem;}
+      .result-meta{font-size:.76rem;}
+      .result-score{font-size:1.25rem;}
+      .result-right{min-width:74px;}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="eyebrow">Résultats officiels RSL</span>
+    <h1>Vidy <span>2026</span></h1>
+    <p>Championnat Romand de Trottinette Freestyle — manche de Vidy. Résultats du contest par catégorie, avec canton, pays, score final et Best Trick.</p>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat-card"><div class="stat-num">9</div><div class="stat-label">Classements</div></div>
+    <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">Catégories</div></div>
+    <div class="stat-card"><div class="stat-num">2</div><div class="stat-label">Disciplines</div></div>
+    <div class="stat-card"><div class="stat-num">100</div><div class="stat-label">Best Trick max</div></div>
+  </div>
+
+  <div class="tabs-nav" id="tabsNav"></div>
+  <div id="sectionsContainer"></div>
+
+  <div class="footer">
+    <div class="footer-title">Merci à nos partenaires et soutiens</div>
+    <div class="partners">
+      <span>@jfrideshop</span>
+      <span>@chili_proscooter</span>
+      <span>@swissskate</span>
+      <span>@prime_scootering</span>
+      <span>@ethicdtc</span>
+      <span>@lpittetch</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CATS = [
+  { id:'u13', label:'U13', title:'Classement U13' },
+  { id:'u15', label:'U15', title:'Classement U15' },
+  { id:'amateur', label:'Amateur', title:'Classement Amateur' },
+  { id:'pro', label:'Pro', title:'Classement Pro' },
+];
+
+const DATA = {
+  u13: {
+    park: [
+      {r:1,n:'Nilo Schaltegger',m:'Vaud • Suisse',s:76,bt:87},
+      {r:2,n:'Etan Burkharde',m:'Vaud • Suisse',s:73,bt:0},
+      {r:3,n:'Vincent Hesse',m:'Vaud • Suisse',s:63,bt:0},
+      {r:4,n:'Jonathan Sandala',m:'Fribourg • Suisse',s:56,bt:70},
+      {r:5,n:'Isak Pera',m:'Vaud • Suisse',s:40,bt:0},
+      {r:6,n:'Maylone Meuwly',m:'Fribourg • Suisse',s:17,bt:0},
+    ],
+    street: [
+      {r:1,n:'Malek Tawakoli',m:'Vaud • Suisse',s:66,bt:73},
+      {r:2,n:'Theo Berdoz',m:'Fribourg • Suisse',s:43,bt:50},
+      {r:3,n:'Maylone Meuwly',m:'Fribourg • Suisse',s:12,bt:null},
+      {r:4,n:'Vincent Hesse',m:'Vaud • Suisse',s:null,bt:null},
+    ]
+  },
+  u15: {
+    park: [
+      {r:1,n:'Natan Siegenthaler',m:'Vaud • Suisse',s:72,bt:40},
+      {r:2,n:'Arno Perret',m:'Vaud • Suisse',s:49,bt:37},
+      {r:3,n:'Aïdan Ganière',m:'Vaud • Suisse',s:47,bt:0},
+      {r:4,n:'Nathan Pradervand',m:'Vaud • Suisse',s:37,bt:28},
+    ],
+    street: [
+      {r:1,n:'Dmytro Lisovyi',m:'Vaud • Autre',s:49,bt:25},
+      {r:2,n:'Natan Siegenthaler',m:'Vaud • Suisse',s:44,bt:37},
+    ]
+  },
+  amateur: {
+    park: [
+      {r:1,n:'Rubin Aidin',m:'Valais • Suisse',s:81,bt:90},
+      {r:2,n:'Romain Abramowski',m:'Vaud • Suisse',s:74,bt:82},
+      {r:3,n:'Eugster Livio',m:'Zurich • Suisse',s:71,bt:90},
+      {r:4,n:'Sébastien Huck',m:'Vaud • Suisse',s:62,bt:0},
+      {r:5,n:'Reijo Karjalainen',m:'Zurich • Suisse',s:58,bt:0},
+      {r:6,n:'Tahar Marinoni',m:'Vaud • Suisse',s:51,bt:48},
+    ],
+    street: [
+      {r:1,n:'Rubin Aidin',m:'Valais • Suisse',s:71,bt:7},
+      {r:2,n:'Eliot Benoit',m:'— • France',s:63,bt:67},
+      {r:3,n:'Matthieu Carnal',m:'Neuchâtel • Suisse',s:61,bt:57},
+      {r:4,n:'Florian Barbezat',m:'Vaud • Suisse',s:59,bt:63},
+      {r:5,n:'Sébastien Huck',m:'Vaud • Suisse',s:53,bt:30},
+      {r:6,n:'Josh Vuille',m:'Fribourg • Suisse',s:51,bt:57},
+    ],
+    femme: [
+      {r:1,n:'Zoé Stockar',m:'Vaud • Suisse',s:61,bt:53},
+    ]
+  },
+  pro: {
+    park: [
+      {r:1,n:'Janosch Steinmann',m:'Saint-Gall • Suisse',s:83,bt:100},
+      {r:2,n:'Fernando Alves',m:'Vaud • Suisse',s:73,bt:0},
+      {r:3,n:'Jari Brandstetter',m:'Schaffhouse • Suisse',s:70,bt:70},
+      {r:4,n:'Colin Cavallin',m:'Neuchâtel • Suisse',s:64,bt:63},
+    ],
+    street: [
+      {r:1,n:'Felix Corcoran',m:'Autre • Autre',s:77,bt:0},
+      {r:2,n:'Ruben Victorio',m:'Vaud • Suisse',s:72,bt:70},
+      {r:3,n:'Pierrick Frossard',m:'Valais • Suisse',s:72,bt:0},
+      {r:4,n:'Clément Laugier',m:'— • France',s:62,bt:60},
+      {r:5,n:'Mathias Gaudiano',m:'Neuchâtel • Suisse',s:61,bt:71},
+      {r:6,n:'Adrien Gay-Crosier',m:'Valais • Suisse',s:61,bt:57},
+      {r:7,n:'Martin Rolle',m:'Valais • Suisse',s:59,bt:38},
+      {r:8,n:'Djamal Momoh',m:'Vaud • Suisse',s:54,bt:0},
+      {r:9,n:'Mathieu Vilminot',m:'Valais • Suisse',s:54,bt:17},
+      {r:10,n:'Julien Rouge',m:'Valais • Suisse',s:54,bt:20},
+      {r:11,n:'Killian Froidevaux',m:'Berne • Suisse',s:51,bt:0},
+      {r:12,n:'Darragh Hudson',m:'Autre • Autre',s:45,bt:0},
+      {r:13,n:'Fernando Alves',m:'Vaud • Suisse',s:null,bt:null},
+    ]
+  }
+};
+
+function scoreHtml(item){
+  if(item.s === null || item.s === undefined) return `<div class="nc">NC</div>`;
+  return `<div class="result-score">${item.s}<span class="denom">/100</span></div>`;
+}
+
+function btHtml(item){
+  if(item.bt === null || item.bt === undefined) return '';
+  return `<div class="result-bt">Best Trick ${item.bt}/100</div>`;
+}
+
+function rowHtml(item){
+  const rankClass = item.r <= 3 ? `r${item.r}` : '';
+  return `
+    <div class="result-row">
+      <div class="rank-badge ${rankClass}">${item.r}</div>
+      <div class="result-info">
+        <div class="result-name">${item.n}</div>
+        <div class="result-meta">${item.m}</div>
+      </div>
+      <div class="result-right">
+        ${scoreHtml(item)}
+        ${btHtml(item)}
+      </div>
+    </div>
+  `;
+}
+
+function panelHtml(title, items, badge){
+  if(!items || !items.length){
+    return `
+      <div class="disc-panel">
+        <div class="disc-title"><h2>${title}</h2><span class="disc-badge">${badge}</span></div>
+        <div class="empty">Aucun résultat.</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="disc-panel">
+      <div class="disc-title">
+        <h2>${title}</h2>
+        <span class="disc-badge">${badge}</span>
+      </div>
+      ${items.map(rowHtml).join('')}
+    </div>
+  `;
+}
+
+function render(){
+  const tabs = document.getElementById('tabsNav');
+  const sections = document.getElementById('sectionsContainer');
+
+  tabs.innerHTML = CATS.map((c,i)=>`
+    <button class="tab-btn ${i===0?'active':''}" onclick="setCat('${c.id}', this)">${c.label}</button>
+  `).join('');
+
+  sections.innerHTML = CATS.map((c,i)=>{
+    const d = DATA[c.id] || {};
+    const femme = d.femme ? `
+      <div class="femme-panel">
+        <div class="disc-title">
+          <h2>Femme Park</h2>
+          <span class="disc-badge">Femme</span>
+        </div>
+        ${d.femme.map(rowHtml).join('')}
+      </div>
+    ` : '';
+
+    return `
+      <section id="cat-${c.id}" class="category-section ${i===0?'visible':''}">
+        <div class="category-head">
+          <div>
+            <div class="category-title">${c.title}</div>
+            <div class="category-note">Vidy 2026 — résultats contest, canton + pays, score et Best Trick.</div>
+          </div>
+        </div>
+        <div class="disc-grid">
+          ${panelHtml('Park', d.park || [], 'Park')}
+          ${panelHtml('Street', d.street || [], 'Street')}
+        </div>
+        ${femme}
+      </section>
+    `;
+  }).join('');
+}
+
+function setCat(id, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.category-section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('cat-' + id).classList.add('visible');
+}
+
+render();
+</script>
+</body>
+</html>
