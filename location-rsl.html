@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Location de modules, animations skate et trottinette freestyle et événements sur mesure avec la RSL."/>
+<title>Location de matériel — Romandie Scooter League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script defer src="/js/env.js"></script><script defer src="/js/auth.js"></script><script defer src="/js/site.js"></script>
+<style>
+:root{--red:#c00;--red2:#e51010;--bg:#080808;--fg:#f0f0f0;--muted:#777;--card:#111}*,*:before,*:after{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Barlow Condensed',system-ui,sans-serif;overflow-x:hidden}a{color:inherit;text-decoration:none}b,strong{color:#fff}#bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3;filter:brightness(.18) saturate(.18) contrast(1.2);background:#000}.vig{position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(ellipse 60% 55% at 50% 15%,transparent 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.97) 100%),linear-gradient(180deg,rgba(0,0,0,.2),#080808 70%)}.grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.33;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E")}.sitenav{position:sticky;top:0;z-index:500;background:#000;border-bottom:3px solid var(--red);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:54px}.sitenav-brand{display:flex;align-items:center}.sitenav-tab{background:var(--red);height:54px;width:58px;display:flex;align-items:center;justify-content:center;margin-left:-28px;margin-right:16px}.sitenav-tab img{height:34px}.sitenav-name{font-family:'Bebas Neue';font-size:18px;letter-spacing:.1em;line-height:1}.sitenav-name small{display:block;font-family:'Barlow Condensed';font-size:9px;font-weight:700;letter-spacing:.22em;color:var(--red)}.sitenav-links{display:flex;align-items:center;list-style:none;height:54px}.sitenav-links li{height:100%}.sitenav-links a{display:flex;align-items:center;height:100%;padding:0 14px;font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,240,240,.5);border-bottom:3px solid transparent;margin-bottom:-3px}.sitenav-links a:hover,.sitenav-links a[aria-current=page]{color:#fff;border-bottom-color:var(--red)}.sitenav-right{display:flex;align-items:center;gap:8px}.snbtn{padding:7px 14px;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(240,240,240,.6)}.snbtn.red{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 16px rgba(200,0,0,.45)}#menuBtn{display:none;background:transparent;border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 10px;font-size:18px}.mobile-sheet{position:fixed;inset:0;display:none;z-index:600}.mobile-sheet.open{display:block}.mobile-dim{position:absolute;inset:0;background:rgba(0,0,0,.6)}.mobile-panel{position:absolute;top:0;right:0;height:100%;width:80vw;max-width:320px;background:#0f0f0f;border-left:3px solid var(--red);padding:20px 18px;display:flex;flex-direction:column;overflow-y:auto}.mobile-panel .mp-title{font-family:'Bebas Neue';font-size:20px;letter-spacing:.1em;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px}.mobile-panel .mp-title span,.mobile-panel .mp-red{color:var(--red)}.mobile-panel a{color:rgba(240,240,240,.6);font-weight:700;font-size:15px;letter-spacing:.1em;text-transform:uppercase;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}.mp-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;width:32px;height:32px}.page-hero{position:relative;min-height:430px;display:flex;align-items:center;justify-content:center;padding:74px 20px 64px;overflow:hidden;border-bottom:1px solid rgba(200,0,0,.18)}.page-hero:before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,86vw);height:min(560px,86vw);border-radius:50%;background:radial-gradient(circle,rgba(200,0,0,.34),rgba(200,0,0,.08) 48%,transparent 70%);animation:breathe 3.8s ease-in-out infinite}.hero-inner{position:relative;z-index:1;text-align:center;max-width:950px}.fed{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}.fed-bar{width:28px;height:1px;background:rgba(255,255,255,.12)}.fed-dot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red)}.fed-txt{font-size:8px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.32)}h1{font-family:'Bebas Neue';font-size:clamp(52px,9vw,102px);line-height:.88;letter-spacing:.03em;text-shadow:0 0 34px rgba(200,0,0,.48)}h1 span,.section-title span,.quote-title span,.sp-title span,.ft-brand span{color:var(--red)}.redsep{width:36px;height:3px;background:var(--red);box-shadow:0 0 12px rgba(200,0,0,.9);margin:20px auto 18px}.hero-sub{max-width:760px;margin:auto;color:rgba(240,240,240,.65);font-size:19px;line-height:1.55}.hero-actions,.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 20px;font-weight:900;font-size:12px;letter-spacing:.16em;text-transform:uppercase;border:0;cursor:pointer}.btn.red{background:var(--red);color:#fff;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);box-shadow:0 0 20px rgba(200,0,0,.55)}.btn.ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.66)}.wrap{max-width:1200px;margin:auto;padding:56px 28px 80px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:2px solid rgba(255,255,255,.06);padding-bottom:16px;margin-bottom:28px}.section-kicker{display:flex;align-items:flex-end;gap:12px}.num{font-family:'Bebas Neue';font-size:56px;color:rgba(200,0,0,.18);line-height:1}.section-title{font-family:'Bebas Neue';font-size:clamp(34px,4.5vw,54px);line-height:1;letter-spacing:.04em}.section-sub{max-width:390px;text-align:right;font-size:14px;color:var(--muted);line-height:1.55}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:3px}.card{background:var(--card);border:1px solid rgba(255,255,255,.06);padding:25px 20px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);transform:scaleY(0);transform-origin:bottom;transition:.2s}.card:hover:before,.card.featured:before{transform:scaleY(1)}.card.featured{background:linear-gradient(135deg,rgba(200,0,0,.09),var(--card) 72%);border-color:rgba(200,0,0,.22)}.badge{display:inline-flex;width:max-content;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--red);border:1px solid rgba(200,0,0,.35);padding:3px 10px}.card h2,.card h3{font-weight:900;font-size:24px;letter-spacing:.04em;text-transform:uppercase;line-height:1.05}.card.featured h2{font-size:30px}.meta{font-size:14px;color:var(--red);font-weight:700;letter-spacing:.05em;text-transform:uppercase}.card p{font-size:15px;color:var(--muted);line-height:1.62;flex:1}.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:20px}.strip-item{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);padding:20px 18px}.strip-item strong{display:block;font-family:'Bebas Neue';letter-spacing:.06em;font-size:26px;margin-bottom:8px}.strip-item span{color:var(--muted);font-size:14px;line-height:1.5}.highlight{background:var(--card);border:1px solid rgba(200,0,0,.18);padding:24px 22px;position:relative}.highlight:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red);box-shadow:0 0 20px rgba(200,0,0,.75)}.h-tag{font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--red);margin-bottom:8px}.h-title{font-family:'Bebas Neue';font-size:30px}.h-desc{font-size:14px;color:var(--muted);line-height:1.55;margin-top:8px}.tick-list{display:grid;gap:8px}.tick{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);padding:12px 14px;color:var(--muted);font-size:15px}.tick:before{content:"✓";color:var(--red);font-weight:900;margin-right:9px}
+
+.furniture{display:grid;grid-template-columns:1.1fr .9fr;gap:3px}
+.furniture-info{background:var(--card);border:1px solid rgba(255,255,255,.06);padding:30px}
+.furniture-visual{min-height:360px;background:linear-gradient(145deg,#161616,#090909);border:1px solid rgba(200,0,0,.18);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.furniture-visual:before{content:"EVENT";position:absolute;font-family:'Bebas Neue';font-size:clamp(90px,15vw,180px);color:rgba(255,255,255,.03);letter-spacing:.04em}
+.beer-set{position:relative;z-index:1;width:min(440px,82%);height:210px}
+.table-top{position:absolute;left:50%;top:55px;transform:translateX(-50%);width:86%;height:38px;background:linear-gradient(#d6a66e,#9a6936);border:1px solid rgba(255,255,255,.16);box-shadow:0 14px 25px rgba(0,0,0,.45)}
+.table-leg{position:absolute;top:93px;width:6px;height:100px;background:#2b2b2b}
+.table-leg.l1{left:24%}.table-leg.l2{right:24%}
+
+
+
+
+
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.spec-item{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);padding:12px 13px;color:var(--muted);font-size:14px;line-height:1.4}
+.spec-item b{display:block;color:#fff;font-size:16px;margin-bottom:2px}
+.equipment{display:grid;grid-template-columns:.9fr 1.4fr;gap:3px}
+.equipment-visual{min-height:390px;background:radial-gradient(circle at 50% 38%,rgba(200,0,0,.24),transparent 48%),#0d0d0d;border:1px solid rgba(200,0,0,.2);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.equipment-visual:before{content:"SONO";font-family:'Bebas Neue';font-size:clamp(90px,14vw,180px);letter-spacing:.04em;color:rgba(255,255,255,.035);position:absolute}
+.sound-stack{position:relative;z-index:1;text-align:center}
+.sound-stack .speaker-row{display:flex;align-items:flex-end;justify-content:center;gap:34px}
+.sound-stack .speaker{width:72px;height:118px;border-radius:6px;background:linear-gradient(145deg,#282828,#090909);border:1px solid rgba(255,255,255,.12);box-shadow:0 15px 28px rgba(0,0,0,.5);position:relative}
+.sound-stack .speaker:after,.sound-stack .sub:after{content:"";position:absolute;inset:12px;border-radius:50%;border:1px solid rgba(255,255,255,.06);box-shadow:inset 0 0 22px rgba(0,0,0,.9)}
+.sound-stack .stand{width:2px;height:75px;background:#333;margin:auto;position:relative}
+.sound-stack .stand:after{content:"";position:absolute;bottom:0;left:50%;width:64px;height:2px;background:#333;transform:translateX(-50%)}
+.sound-stack .mixer{width:112px;height:72px;background:linear-gradient(145deg,#323232,#101010);border:1px solid rgba(255,255,255,.14);margin:0 auto 18px;box-shadow:0 12px 25px rgba(0,0,0,.45)}
+.sound-stack .sub{width:150px;height:118px;margin:18px auto 0;border-radius:5px;background:linear-gradient(145deg,#252525,#080808);border:1px solid rgba(255,255,255,.12);position:relative;box-shadow:0 18px 30px rgba(0,0,0,.55)}
+.equipment-info{background:var(--card);border:1px solid rgba(255,255,255,.06);padding:30px}
+.equipment-name{font-family:'Bebas Neue';font-size:clamp(34px,4vw,50px);line-height:.95;letter-spacing:.03em;color:#fff}
+.equipment-name span{color:var(--red)}
+.equipment-lead{font-size:16px;color:var(--muted);line-height:1.55;margin:14px 0 20px}
+.kit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kit-item{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);padding:12px 13px;color:var(--muted);font-size:14px;line-height:1.4}
+.kit-item b{display:block;color:#fff;font-size:16px;margin-bottom:2px}
+.equipment-note{margin-top:18px;padding:14px;border-left:3px solid var(--red);background:rgba(200,0,0,.07);color:rgba(240,240,240,.65);font-size:14px;line-height:1.5}
+.quote-box{background:linear-gradient(135deg,rgba(200,0,0,.13),rgba(17,17,17,.96));border:1px solid rgba(200,0,0,.28);padding:34px;position:relative;overflow:hidden}.quote-title{font-family:'Bebas Neue';font-size:38px;letter-spacing:.04em}.quote-text{max-width:760px;color:rgba(240,240,240,.58);font-size:16px;line-height:1.6;margin-top:10px}.event-form{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px;margin-top:28px}.form-field{display:flex;flex-direction:column;gap:6px}.form-field.full{grid-column:1/-1}.form-field label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.form-field input,.form-field textarea,.form-field select{width:100%;background:#0d0d0d;border:1px solid rgba(255,255,255,.12);color:#fff;padding:12px 13px;font-family:'Barlow Condensed';font-size:15px;outline:none}.form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:rgba(200,0,0,.65)}.form-field textarea{resize:vertical;min-height:130px}.form-note{grid-column:1/-1;color:var(--muted);font-size:12px}.sp-card{background:var(--card);border:1px solid rgba(200,0,0,.18);padding:38px 34px;position:relative}.sp-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red)}.sp-title{font-family:'Bebas Neue';font-size:36px;letter-spacing:.05em;margin-bottom:22px}.sponsors-grid{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.sponsor-card{min-width:190px;min-height:96px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;padding:18px 22px}.sponsor-card img{max-width:220px;max-height:70px}footer{background:#000;border-top:3px solid var(--red);padding:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.ft-brand{font-family:'Bebas Neue';font-size:18px;letter-spacing:.1em}.ft-copy{font-size:11px;color:var(--muted);margin-top:3px}.ft-links{display:flex;gap:16px;list-style:none;flex-wrap:wrap}.ft-links a{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}@media(max-width:980px){.sitenav-links{display:none}.snbtn:not(.red){display:none}.sitenav{padding:0 14px}.sitenav-tab{margin-left:-14px}#menuBtn{display:block}.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.strip{grid-template-columns:1fr 1fr}}@media(max-width:760px){.equipment,.furniture{grid-template-columns:1fr}.equipment-visual,.furniture-visual{min-height:330px}.kit-grid,.spec-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.page-hero{min-height:370px;padding:54px 16px 50px}.wrap{padding:40px 16px 60px}.cards,.strip,.event-form{grid-template-columns:1fr}.section-sub{text-align:left}.btn{width:100%}.form-field.full,.form-note{grid-column:auto}.quote-box{padding:26px 20px}footer{padding:20px 16px;flex-direction:column;align-items:flex-start}}@keyframes breathe{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.92)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+</style>
+</head>
+<body>
+<video id="bg" autoplay muted loop playsinline poster="/images/hero-poster.jpg"></video><div class="vig"></div><div class="grain"></div>
+<nav class="sitenav"><a class="sitenav-brand" href="/"><div class="sitenav-tab"><img src="/images/logo_rsl.png" alt="RSL"></div><div class="sitenav-name">RSL<small>Romandie Scooter League</small></div></a><ul class="sitenav-links"><li><a href="/cours">Cours</a></li><li><a href="/formation">Formation</a></li><li><a href="/ou_rider">Où rider ?</a></li><li><a href="/evenements">Événements</a></li><li><a href="/disciplines">Disciplines</a></li><li><a href="/shop-rsl">Shop</a></li><li><a href="/comite">Comité</a></li><li><a href="/contact">Contact</a></li></ul><div class="sitenav-right"><a class="snbtn" href="/access" id="btnLogin">Login</a><a class="snbtn" href="/compte" id="btnAccount" style="display:none">Compte</a><a class="snbtn red" href="#demande">Demander une location</a><button id="menuBtn" aria-label="Menu">☰</button></div></nav>
+<div class="mobile-sheet" id="mobileMenu" aria-hidden="true"><div class="mobile-dim"></div><nav class="mobile-panel"><button class="mp-close" id="closeMenu">×</button><div class="mp-title"><span>RSL</span> MENU</div><a href="/">Accueil</a><a href="/cours">Cours</a><a href="/membres" class="mp-red">Devenir membre</a><a href="/formation">Formation RSL</a><a href="/disciplines">Disciplines</a><a href="/ou_rider">Où rider ?</a><a href="/evenements">Événements</a><a href="#materiel" class="mp-red">Location</a><a href="/shop-rsl">Shop</a><a href="/comite">Comité</a><a href="/contact">Contact</a></nav></div>
+<header class="page-hero"><div class="hero-inner"><div class="fed"><div class="fed-bar"></div><div class="fed-dot"></div><div class="fed-txt">Modules · initiations · démonstrations · événements sur mesure</div><div class="fed-dot"></div><div class="fed-bar"></div></div><h1>LOCATION & <span>ÉVÉNEMENTS</span></h1><div class="redsep"></div><p class="hero-sub">Faites vivre une expérience sportive originale à votre public avec la RSL : location de matériel, initiations, démonstrations et animations de trottinette freestyle.</p><div class="hero-actions"><a class="btn red" href="#demande">Demander une offre</a><a class="btn ghost" href="#prestations">Voir les prestations</a></div></div></header>
+
+  <main>
+    <section class="wrap" id="materiel">
+      <div class="section-head">
+        <div class="section-kicker">
+          <div class="num">01</div>
+          <div class="section-title">MATÉRIEL <span>À LOUER</span></div>
+        </div>
+        <p class="section-sub">
+          Le matériel ci-dessous appartient à la RSL et peut être loué selon disponibilité.
+        </p>
+      </div>
+
+      <div class="equipment">
+        <div class="equipment-visual" aria-label="Illustration du système de sonorisation RSL">
+          <div class="sound-stack">
+            <div class="mixer"></div>
+            <div class="speaker-row">
+              <div><div class="speaker"></div><div class="stand"></div></div>
+              <div><div class="speaker"></div><div class="stand"></div></div>
+            </div>
+            <div class="sub"></div>
+          </div>
+        </div>
+
+        <div class="equipment-info">
+          <span class="badge">Disponible à la location</span>
+          <div class="equipment-name">SONORISATION COMPLÈTE <span>ALTO PROFESSIONAL</span></div>
+
+          <p class="equipment-lead">
+            Système complet adapté à la diffusion de musique, aux annonces au micro,
+            aux présentations et aux manifestations de petite ou moyenne taille.
+          </p>
+
+          <div class="kit-grid">
+            <div class="kit-item"><b>2 enceintes actives</b>Alto Professional TX412 12 pouces</div>
+            <div class="kit-item"><b>1 caisson de basses</b>Alto Professional TX18S 18 pouces</div>
+            <div class="kit-item"><b>1 table de mixage</b>Alto TrueMix 800FX, USB, Bluetooth et effets</div>
+            <div class="kit-item"><b>2 supports d’enceinte</b>Avec sac de transport</div>
+            <div class="kit-item"><b>1 microphone</b>Micro vocal dynamique</div>
+            <div class="kit-item"><b>1 pied de micro</b>Pied à perche réglable</div>
+            <div class="kit-item"><b>Câbles inclus</b>XLR et jack nécessaires au branchement</div>
+            <div class="kit-item"><b>Utilisation</b>Intérieur ou extérieur sous abri</div>
+          </div>
+
+          <div class="equipment-note">
+            La location est proposée selon la durée, le lieu, le transport et les besoins d’installation.
+          </div>
+
+          <div class="actions" style="justify-content:flex-start;margin-top:20px">
+            <a class="btn red" href="#demande">Louer la sonorisation</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="furniture" style="margin-top:36px">
+        <div class="furniture-info">
+          <span class="badge">Disponible à la location</span>
+          <div class="equipment-name">TABLE DE BRASSERIE <span>PLIANTE</span></div>
+
+          <p class="equipment-lead">
+            Une table simple, solide et facile à transporter pour un stand,
+            des inscriptions, un accueil, un jury ou une zone de travail.
+          </p>
+
+          <div class="spec-grid">
+            <div class="spec-item"><b>Quantité</b>1 table</div>
+            <div class="spec-item"><b>Dimensions</b>177 × 46 × 75 cm</div>
+            <div class="spec-item"><b>Matériaux</b>Bois de sapin et structure en acier</div>
+            <div class="spec-item"><b>Transport</b>Table pliante</div>
+            <div class="spec-item"><b>Utilisation</b>Intérieur ou extérieur</div>
+            <div class="spec-item"><b>État</b>Matériel utilisé mais fonctionnel</div>
+          </div>
+
+          <div class="equipment-note">
+            La table est louée seule. Les bancs ne sont pas compris.
+          </div>
+
+          <div class="actions" style="justify-content:flex-start;margin-top:20px">
+            <a class="btn red" href="#demande">Louer la table</a>
+          </div>
+        </div>
+
+        <div class="furniture-visual" aria-label="Illustration d’une table de brasserie pliante">
+          <div class="beer-set">
+            <div class="table-top"></div>
+            <div class="table-leg l1"></div>
+            <div class="table-leg l2"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="conditions" style="padding-top:0">
+      <div class="section-head">
+        <div class="section-kicker">
+          <div class="num">02</div>
+          <div class="section-title">CONDITIONS DE <span>LOCATION</span></div>
+        </div>
+        <p class="section-sub">
+          Les modalités exactes sont confirmées avant chaque location.
+        </p>
+      </div>
+
+      <div class="tick-list">
+        <div class="tick"><b>Disponibilité :</b> le matériel doit être réservé à l’avance.</div>
+        <div class="tick"><b>Durée :</b> location à la journée, au week-end ou selon accord.</div>
+        <div class="tick"><b>Transport :</b> retrait, livraison et installation à convenir.</div>
+        <div class="tick"><b>Responsabilité :</b> le matériel doit être rendu complet et dans le même état.</div>
+        <div class="tick"><b>Tarif :</b> prix communiqué selon le matériel, la durée et le déplacement.</div>
+      </div>
+    </section>
+
+    <section class="wrap" id="demande" style="padding-top:0">
+      <div class="section-head">
+        <div class="section-kicker">
+          <div class="num">03</div>
+          <div class="section-title">DEMANDE DE <span>LOCATION</span></div>
+        </div>
+        <p class="section-sub">
+          Indiquez le matériel souhaité, la date et le lieu.
+        </p>
+      </div>
+
+      <div class="quote-box" style="margin-top:0">
+        <div class="quote-title">RÉSERVER DU <span>MATÉRIEL</span></div>
+
+        <form class="event-form" action="/contact" method="get">
+          <div class="form-field">
+            <label for="nom">Nom et prénom *</label>
+            <input id="nom" name="nom" type="text" autocomplete="name" required>
+          </div>
+
+          <div class="form-field">
+            <label for="organisation">Organisation / entreprise</label>
+            <input id="organisation" name="organisation" type="text" autocomplete="organization">
+          </div>
+
+          <div class="form-field">
+            <label for="email">Adresse e-mail *</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+
+          <div class="form-field">
+            <label for="telephone">Téléphone *</label>
+            <input id="telephone" name="telephone" type="tel" autocomplete="tel" required>
+          </div>
+
+          <div class="form-field">
+            <label for="materiel">Matériel souhaité *</label>
+            <select id="materiel" name="materiel" required>
+              <option value="">Choisir le matériel</option>
+              <option value="sono">Sonorisation complète</option>
+              <option value="table">Table pliante</option>
+              <option value="sono-table">Sonorisation complète + table pliante</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="date">Date souhaitée *</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+
+          <div class="form-field">
+            <label for="duree">Durée de location</label>
+            <input id="duree" name="duree" type="text" placeholder="Ex. une journée ou un week-end">
+          </div>
+
+          <div class="form-field">
+            <label for="lieu">Lieu d’utilisation *</label>
+            <input id="lieu" name="lieu" type="text" placeholder="Ville ou adresse" required>
+          </div>
+
+          <div class="form-field full">
+            <label for="message">Informations complémentaires</label>
+            <textarea id="message" name="message" placeholder="Besoin de livraison, installation, horaires, accès au lieu..."></textarea>
+          </div>
+
+          <div class="form-note">
+            Une demande ne confirme pas automatiquement la réservation. La RSL vous recontactera pour confirmer la disponibilité et le prix.
+          </div>
+
+          <div class="form-field full">
+            <button class="btn red" type="submit">Envoyer la demande</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:0 28px 78px">
+      <div class="sp-card">
+        <div class="sp-title">AVEC LE <span>SOUTIEN DE</span></div>
+        <div class="sponsors-grid">
+          <a class="sponsor-card" href="https://travaux-sur-bois.ch/" target="_blank" rel="noopener">
+            <img src="/images/sponsors/travaux-sur-bois.png" alt="Travaux sur Bois">
+          </a>
+          <a class="sponsor-card" href="https://www.jfrideshop.ch/" target="_blank" rel="noopener">
+            <img src="/images/logo_jf.png" alt="JF Rideshop">
+          </a>
+          <a class="sponsor-card" href="https://www.isaac-isaac.com/fr-ch" target="_blank" rel="noopener">
+            <img src="/images/sponsors/isaac.png" alt="Isaac">
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<footer><div><div class="ft-brand">ROMANDIE <span>SCOOTER LEAGUE</span></div><div class="ft-copy">© 2026 RSL — Tous droits réservés.</div></div><ul class="ft-links"><li><a href="/cours">Cours</a></li><li><a href="/formation">Formation</a></li><li><a href="/evenements">Événements</a></li><li><a href="#materiel">Location</a></li><li><a href="/contact">Contact</a></li></ul></footer>
+<script>(function(){const v=document.getElementById('bg');if(!v)return;const vids=['https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4','https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4'];v.src=vids[Math.floor(Math.random()*vids.length)];v.playbackRate=.5;try{v.play()}catch(e){}})();(function(){const b=document.getElementById('menuBtn'),m=document.getElementById('mobileMenu'),c=document.getElementById('closeMenu');if(!b||!m)return;const o=()=>{m.classList.add('open');m.setAttribute('aria-hidden','false')},s=()=>{m.classList.remove('open');m.setAttribute('aria-hidden','true')};b.addEventListener('click',o);c?.addEventListener('click',s);m.querySelector('.mobile-dim')?.addEventListener('click',s);document.addEventListener('keydown',e=>{if(e.key==='Escape')s()})})();</script>
+</body></html>
