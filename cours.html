@@ -3,90 +3,263 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Inscriptions aux cours de trottinette freestyle RSL à Lausanne Vidy, Montreux, Martigny et Yverdon."/>
   <title>Cours — Romandie Scooter League</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="/js/env.js"></script>
+  <script defer src="/js/auth.js"></script>
+  <script defer src="/js/site.js"></script>
 
   <style>
-    :root{ --accent:#22c55e; }
-    *,:before,:after{ box-sizing:border-box; }
-    html,body{ min-height:100%; margin:0; background:transparent !important; display:flex; flex-direction:column; color:#e5e7eb; font-family:"Outfit",system-ui,-apple-system,sans-serif; overflow-x:hidden; }
-    main{ flex:1; max-width:1200px; margin:0 auto; padding:0 16px 60px; width:100%; position:relative; z-index:10; }
+    :root{
+      --red:#c00;
+      --red2:#e51010;
+      --bg:#080808;
+      --fg:#f0f0f0;
+      --muted:#777;
+      --card:#111;
+      --border:rgba(255,255,255,.07);
+    }
 
-    .site-bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; background:#000; pointer-events:none !important; }
-    .site-bg-dim{ position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.92)); pointer-events:none !important; }
+    *,*:before,*:after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--fg);
+      font-family:'Barlow Condensed',system-ui,sans-serif;
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    button,input,textarea,select{font:inherit}
 
-    nav.nav{ background:rgba(0,0,0,.65); backdrop-filter:blur(10px); position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(255,255,255,.08); }
-    nav.nav .inner{ max-width:1200px; margin:0 auto; padding:10px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-    .brand{ display:flex; align-items:center; gap:10px; color:#fff; text-decoration:none; }
-    .brand img{ height:42px; border-radius:10px; background:#fff; padding:3px; box-shadow:0 10px 28px rgba(0,0,0,.35); }
-    .brand span{ font-weight:800; font-size:16px; white-space:nowrap; }
-    nav ul{ display:flex; align-items:center; gap:20px; padding:0; margin:0; list-style:none; }
-    nav ul li a{ font-weight:600; color:#e5e7eb; font-size:15px; text-decoration:none; opacity:.9; transition:.2s; }
-    nav ul li a:hover{ color:#22c55e; opacity:1; }
-    .nav-cta{ display:flex; gap:10px; align-items:center; }
-    .btn{ border-radius:999px; padding:8px 14px; font-size:14px; font-weight:700; border:1px solid rgba(148,163,184,.5); text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(15,23,42,.9); color:#f9fafb; transition:.2s; white-space:nowrap; }
-    .btn.green{ background:#22c55e; color:#052e16; border-color:transparent; box-shadow:0 10px 26px rgba(22,163,74,.45); }
-    .btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
-    #menuBtn{ display:none; width:40px; height:40px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:#0b0f19; color:#fff; cursor:pointer; font-size:20px; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; }
-    .mobile-sheet{ position:fixed; inset:0; display:none; z-index:120; }
-    .mobile-sheet.open{ display:block; }
-    .mobile-dim{ position:absolute; inset:0; background:rgba(0,0,0,.55); }
-    .mobile-panel{ position:absolute; top:0; right:0; height:100%; width:82vw; max-width:360px; background:#0f172a; padding:22px 18px; display:flex; flex-direction:column; gap:10px; border-left:1px solid rgba(255,255,255,.08); box-shadow:-18px 0 50px rgba(0,0,0,.55); }
-    .mobile-panel a{ color:#e5e7eb; text-decoration:none; font-weight:800; padding:6px 0; font-size:14px; }
-    @media(max-width:990px){ nav ul{ display:none !important; } #menuBtn{ display:inline-flex; } }
+    /* BACKGROUND — même DA que la page Location */
+    #bg{
+      position:fixed;inset:0;width:100%;height:100%;object-fit:cover;
+      z-index:-3;filter:brightness(.18) saturate(.18) contrast(1.2);background:#000;
+    }
+    .vig{
+      position:fixed;inset:0;z-index:-2;pointer-events:none;
+      background:
+        radial-gradient(ellipse 60% 55% at 50% 15%,transparent 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.97) 100%),
+        linear-gradient(180deg,rgba(0,0,0,.2),#080808 70%);
+    }
+    .grain{
+      position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.33;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
+    }
 
-    .page-intro{ padding:28px 0 14px; }
-    .page-intro h1{ margin:0 0 8px; font-size:clamp(26px,4vw,42px); font-weight:900; line-height:1.05; color:#fff; }
-    .page-intro p{ margin:0; font-size:clamp(14px,2vw,17px); color:#9ca3af; }
+    /* NAV */
+    .sitenav{
+      position:sticky;top:0;z-index:500;background:#000;border-bottom:3px solid var(--red);
+      padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:54px;
+    }
+    .sitenav-brand{display:flex;align-items:center}
+    .sitenav-tab{
+      background:var(--red);height:54px;width:58px;display:flex;align-items:center;justify-content:center;
+      margin-left:-28px;margin-right:16px;
+    }
+    .sitenav-tab img{height:34px}
+    .sitenav-name{font-family:'Bebas Neue';font-size:18px;letter-spacing:.1em;line-height:1}
+    .sitenav-name small{
+      display:block;font-family:'Barlow Condensed';font-size:9px;font-weight:700;
+      letter-spacing:.22em;color:var(--red);
+    }
+    .sitenav-links{display:flex;align-items:center;list-style:none;height:54px}
+    .sitenav-links li{height:100%}
+    .sitenav-links a{
+      display:flex;align-items:center;height:100%;padding:0 14px;font-weight:700;font-size:12px;
+      letter-spacing:.12em;text-transform:uppercase;color:rgba(240,240,240,.5);
+      border-bottom:3px solid transparent;margin-bottom:-3px;
+    }
+    .sitenav-links a:hover,.sitenav-links a[aria-current=page]{color:#fff;border-bottom-color:var(--red)}
+    .sitenav-right{display:flex;align-items:center;gap:8px}
+    .snbtn{
+      padding:7px 14px;font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(240,240,240,.6);
+    }
+    .snbtn.red{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 16px rgba(200,0,0,.45)}
+    #menuBtn{display:none;background:transparent;border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 10px;font-size:18px}
 
-    .lieu-filters{ display:flex; flex-wrap:wrap; gap:10px; margin:20px 0 4px; }
-    .lieu-btn{ padding:10px 18px; border-radius:999px; border:1.5px solid rgba(148,163,184,.35); background:rgba(15,23,42,.8); color:#9ca3af; font-size:14px; font-weight:800; cursor:pointer; transition:.18s ease; -webkit-tap-highlight-color:transparent; }
-    .lieu-btn:hover{ border-color:#22c55e; color:#e5e7eb; }
-    .lieu-btn.active{ background:linear-gradient(180deg,#22c55e,#16a34a); border-color:transparent; color:#052e16; box-shadow:0 8px 20px rgba(22,163,74,.4); }
+    .mobile-sheet{position:fixed;inset:0;display:none;z-index:600}
+    .mobile-sheet.open{display:block}
+    .mobile-dim{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+    .mobile-panel{
+      position:absolute;top:0;right:0;height:100%;width:80vw;max-width:320px;background:#0f0f0f;
+      border-left:3px solid var(--red);padding:20px 18px;display:flex;flex-direction:column;overflow-y:auto;
+    }
+    .mobile-panel .mp-title{
+      font-family:'Bebas Neue';font-size:20px;letter-spacing:.1em;margin-bottom:12px;
+      border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;
+    }
+    .mobile-panel .mp-title span,.mobile-panel .mp-red{color:var(--red)}
+    .mobile-panel a{
+      color:rgba(240,240,240,.6);font-weight:700;font-size:15px;letter-spacing:.1em;
+      text-transform:uppercase;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .mp-close{
+      position:absolute;top:14px;right:14px;background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);color:#fff;width:32px;height:32px;
+    }
 
-    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:16px; margin-top:20px; }
-    .card{ background:linear-gradient(160deg,rgba(15,23,42,.88),rgba(7,10,20,.94)); border:1px solid rgba(148,163,184,.25); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:14px; box-shadow:0 20px 50px rgba(0,0,0,.7); transition:.2s ease; backdrop-filter:blur(6px); }
-    .card:hover{ border-color:rgba(34,197,94,.4); transform:translateY(-2px); }
-    .card-day{ font-size:12px; font-weight:700; color:#22c55e; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:2px; }
-    .card-date{ font-size:21px; font-weight:900; color:#fff; }
-    .badges{ display:flex; flex-wrap:wrap; gap:8px; }
-    .badge{ display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:999px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#052e16; font-size:12px; font-weight:900; box-shadow:0 6px 16px rgba(22,163,74,.28); }
-    .badge.lieu{ background:linear-gradient(180deg,rgba(99,102,241,.9),rgba(67,56,202,.9)); color:#e0e7ff; box-shadow:0 6px 16px rgba(67,56,202,.3); }
-    .wa-btn{ display:flex; align-items:center; justify-content:center; gap:9px; width:100%; padding:13px 16px; border-radius:14px; border:0; background:linear-gradient(180deg,#25d366,#128c7e); color:#fff; font-size:15px; font-weight:900; text-decoration:none; box-shadow:0 10px 26px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.15); transition:.18s ease; -webkit-tap-highlight-color:transparent; }
-    .wa-btn:hover{ filter:brightness(1.08); transform:translateY(-1px); }
-    .empty-msg{ color:#6b7280; font-size:15px; grid-column:1/-1; padding:20px 0; }
+    /* HERO */
+    .page-hero{
+      position:relative;min-height:390px;display:flex;align-items:center;justify-content:center;
+      padding:70px 20px 58px;overflow:hidden;border-bottom:1px solid rgba(200,0,0,.18);
+    }
+    .page-hero:before{
+      content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(560px,86vw);height:min(560px,86vw);border-radius:50%;
+      background:radial-gradient(circle,rgba(200,0,0,.34),rgba(200,0,0,.08) 48%,transparent 70%);
+      animation:breathe 3.8s ease-in-out infinite;
+    }
+    .hero-inner{position:relative;z-index:1;text-align:center;max-width:950px}
+    .fed{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+    .fed-bar{width:28px;height:1px;background:rgba(255,255,255,.12)}
+    .fed-dot{width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red)}
+    .fed-txt{font-size:8px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.32)}
+    h1{font-family:'Bebas Neue';font-size:clamp(56px,9vw,104px);line-height:.88;letter-spacing:.03em;text-shadow:0 0 34px rgba(200,0,0,.48)}
+    h1 span{color:var(--red)}
+    .redsep{width:36px;height:3px;background:var(--red);box-shadow:0 0 12px rgba(200,0,0,.9);margin:20px auto 18px}
+    .hero-sub{max-width:700px;margin:auto;color:rgba(240,240,240,.65);font-size:19px;line-height:1.55}
+    .hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:27px}
 
-    /* Section extra */
-    .section-divider{ margin:40px 0 20px; border-top:1px solid rgba(255,255,255,.07); padding-top:32px; }
-    .section-divider h2{ font-size:22px; font-weight:900; color:#fff; margin:0 0 6px; }
-    .section-divider p{ color:#9ca3af; font-size:15px; margin:0 0 20px; }
-    .extra-card{ background:linear-gradient(160deg,rgba(15,23,42,.88),rgba(7,10,20,.94)); border:1px solid rgba(148,163,184,.25); border-radius:20px; padding:22px; display:flex; flex-direction:column; gap:12px; box-shadow:0 20px 50px rgba(0,0,0,.7); backdrop-filter:blur(6px); transition:.2s; }
-    .extra-card:hover{ border-color:rgba(34,197,94,.4); transform:translateY(-2px); }
-    .extra-card h3{ font-size:18px; font-weight:900; color:#fff; margin:0; }
-    .extra-card p{ font-size:14px; color:#9ca3af; margin:0; line-height:1.6; }
-    .contact-btn{ display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:14px; background:linear-gradient(180deg,#22c55e,#16a34a); color:#052e16; font-size:14px; font-weight:900; text-decoration:none; box-shadow:0 8px 20px rgba(22,163,74,.35); transition:.18s; }
-    .contact-btn:hover{ filter:brightness(1.07); transform:translateY(-1px); }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;padding:11px 20px;font-weight:900;
+      font-size:12px;letter-spacing:.16em;text-transform:uppercase;border:0;cursor:pointer;
+    }
+    .btn.red{
+      background:var(--red);color:#fff;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);
+      box-shadow:0 0 20px rgba(200,0,0,.55);
+    }
+    .btn.ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.66)}
 
-    footer{ text-align:center; color:#374151; font-size:13px; padding:20px 0 24px; border-top:1px solid rgba(255,255,255,.05); background:rgba(0,0,0,.5); position:relative; z-index:10; }
+    /* CONTENT */
+    .wrap{max-width:1200px;margin:auto;padding:56px 28px 80px}
+    .section-head{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;
+      border-bottom:2px solid rgba(255,255,255,.06);padding-bottom:16px;margin-bottom:24px;
+    }
+    .section-kicker{display:flex;align-items:flex-end;gap:12px}
+    .num{font-family:'Bebas Neue';font-size:56px;color:rgba(200,0,0,.18);line-height:1}
+    .section-title{font-family:'Bebas Neue';font-size:clamp(34px,4.5vw,54px);line-height:1;letter-spacing:.04em}
+    .section-title span{color:var(--red)}
+    .section-sub{max-width:420px;text-align:right;font-size:14px;color:var(--muted);line-height:1.55}
+
+    /* FILTRES */
+    .lieu-filters{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 28px}
+    .lieu-btn{
+      border:1px solid rgba(255,255,255,.12);background:#0d0d0d;color:rgba(240,240,240,.52);
+      padding:10px 16px;font-weight:900;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+      cursor:pointer;transition:.18s ease;
+    }
+    .lieu-btn:hover{color:#fff;border-color:rgba(200,0,0,.55)}
+    .lieu-btn.active{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 0 16px rgba(200,0,0,.35)}
+    .lieu-btn.yverdon:after{
+      content:"NOUVEAU";font-size:7px;letter-spacing:.13em;margin-left:8px;color:#fff;
+      border:1px solid rgba(255,255,255,.35);padding:2px 5px;vertical-align:1px;
+    }
+
+    /* CARTES COURS */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+    .card{
+      background:var(--card);border:1px solid rgba(255,255,255,.06);padding:22px 20px;
+      display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;min-height:260px;
+    }
+    .card:before{
+      content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);
+      transform:scaleY(0);transform-origin:bottom;transition:.2s;
+    }
+    .card:hover:before{transform:scaleY(1)}
+    .card:hover{background:linear-gradient(135deg,rgba(200,0,0,.07),var(--card) 72%);border-color:rgba(200,0,0,.18)}
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+    .card-day{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:5px}
+    .card-date{font-family:'Bebas Neue';font-size:34px;letter-spacing:.04em;line-height:1;color:#fff}
+    .course-number{font-family:'Bebas Neue';font-size:48px;color:rgba(255,255,255,.035);line-height:.8}
+    .badges{display:flex;flex-wrap:wrap;gap:7px}
+    .badge{
+      display:inline-flex;width:max-content;font-size:9px;font-weight:700;letter-spacing:.14em;
+      text-transform:uppercase;color:var(--red);border:1px solid rgba(200,0,0,.35);padding:4px 9px;
+    }
+    .badge.lieu{color:#fff;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.035)}
+    .course-info{color:var(--muted);font-size:15px;line-height:1.55;flex:1}
+    .wa-btn{
+      display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;
+      background:var(--red);color:#fff;font-size:12px;font-weight:900;letter-spacing:.12em;
+      text-transform:uppercase;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);
+      transition:.18s ease;
+    }
+    .wa-btn:hover{background:var(--red2);filter:brightness(1.05)}
+    .wa-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:auto}
+    .group-btn{
+      display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 14px;
+      background:rgba(255,255,255,.035);color:#fff;border:1px solid rgba(255,255,255,.16);
+      font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;transition:.18s ease;
+    }
+    .group-btn:hover{border-color:rgba(200,0,0,.65);background:rgba(200,0,0,.08)}
+    .empty-msg{grid-column:1/-1;color:var(--muted);padding:30px 0;font-size:16px}
+
+    /* AUTRES FORMULES */
+    .extras{margin-top:58px}
+    .extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+    .extra-card{
+      background:var(--card);border:1px solid var(--border);padding:28px 24px;position:relative;overflow:hidden;
+    }
+    .extra-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
+    .extra-tag{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+    .extra-card h3{font-family:'Bebas Neue';font-size:31px;letter-spacing:.04em;line-height:1;margin-bottom:10px}
+    .extra-card p{color:var(--muted);font-size:15px;line-height:1.6;max-width:520px}
+    .extra-card .btn{margin-top:20px}
+
+    footer{
+      background:#000;border-top:3px solid var(--red);padding:28px;display:flex;
+      align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    }
+    .ft-brand{font-family:'Bebas Neue';font-size:18px;letter-spacing:.1em}
+    .ft-brand span{color:var(--red)}
+    .ft-copy{font-size:11px;color:var(--muted);margin-top:3px}
+    .ft-links{display:flex;gap:16px;list-style:none;flex-wrap:wrap}
+    .ft-links a{font-weight:700;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+    @media(max-width:980px){
+      .sitenav-links{display:none}.snbtn:not(.red){display:none}.sitenav{padding:0 14px}.sitenav-tab{margin-left:-14px}#menuBtn{display:block}
+      .grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:680px){
+      .page-hero{min-height:360px;padding:54px 16px 50px}
+      .wrap{padding:40px 16px 60px}
+      .grid,.extra-grid{grid-template-columns:1fr}
+      .section-sub{text-align:left}
+      .btn{width:100%}
+      .lieu-btn{flex:1 1 calc(50% - 8px);text-align:center}
+      footer{padding:20px 16px;flex-direction:column;align-items:flex-start}
+    }
+    @keyframes breathe{
+      0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.92)}
+      50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+    }
   </style>
 </head>
 <body>
 
-<video class="site-bg-video" autoplay muted loop playsinline id="rslBg" poster="images/hero-poster.jpg"></video>
-<div class="site-bg-dim" aria-hidden="true"></div>
+  <video id="bg" autoplay muted loop playsinline poster="/images/hero-poster.jpg"></video>
+  <div class="vig"></div>
+  <div class="grain"></div>
 
-<nav class="nav">
-  <div class="inner">
-    <a class="brand" href="/">
-      <img src="images/logo_rsl.png" alt="Logo RSL"/>
-      <span>RSL — Romandie Scooter League</span>
+  <nav class="sitenav">
+    <a class="sitenav-brand" href="/">
+      <div class="sitenav-tab"><img src="/images/logo_rsl.png" alt="RSL"></div>
+      <div class="sitenav-name">RSL<small>Romandie Scooter League</small></div>
     </a>
-    <ul>
+
+    <ul class="sitenav-links">
       <li><a aria-current="page" href="/cours">Cours</a></li>
-      <li><a href="/formation">Formation RSL</a></li>
+      <li><a href="/formation">Formation</a></li>
       <li><a href="/ou_rider">Où rider ?</a></li>
       <li><a href="/evenements">Événements</a></li>
       <li><a href="/disciplines">Disciplines</a></li>
@@ -94,151 +267,245 @@
       <li><a href="/comite">Comité</a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
-    <div class="nav-cta">
-      <a class="btn green" href="/membres">Devenir membre</a>
+
+    <div class="sitenav-right">
+      <a class="snbtn" href="/access" id="btnLogin">Login</a>
+      <a class="snbtn" href="/compte" id="btnAccount" style="display:none">Compte</a>
+      <a class="snbtn red" href="#cours">S'inscrire</a>
       <button id="menuBtn" aria-label="Menu">☰</button>
     </div>
-  </div>
-</nav>
-
-<div class="mobile-sheet" id="mobileMenu">
-  <div class="mobile-dim"></div>
-  <nav class="mobile-panel">
-    <a href="/">Accueil</a>
-    <a href="/cours">Cours</a>
-    <a href="/membres">Devenir membre</a>
-    <a href="/formation">Formation RSL</a>
-    <a href="/disciplines">Disciplines</a>
-    <a href="/ou_rider">Où rider ?</a>
-    <a href="/evenements">Événements</a>
-    <a href="/shop-rsl">Shop</a>
-    <a href="/comite">Comité</a>
-    <a href="/contact">Contact</a>
-    <a href="/access">Se connecter</a>
-    <a href="/compte">Mon compte</a>
   </nav>
-</div>
 
-<main>
-  <div class="page-intro">
-    <h1>Inscriptions aux cours</h1>
-    <p>Choisis ton lieu et un samedi — inscris-toi en un clic via WhatsApp 👇</p>
+  <div class="mobile-sheet" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-dim"></div>
+    <nav class="mobile-panel">
+      <button class="mp-close" id="closeMenu">×</button>
+      <div class="mp-title"><span>RSL</span> MENU</div>
+      <a href="/">Accueil</a>
+      <a href="/cours" class="mp-red">Cours</a>
+      <a href="/membres" class="mp-red">Devenir membre</a>
+      <a href="/formation">Formation RSL</a>
+      <a href="/disciplines">Disciplines</a>
+      <a href="/ou_rider">Où rider ?</a>
+      <a href="/evenements">Événements</a>
+      <a href="/shop-rsl">Shop</a>
+      <a href="/comite">Comité</a>
+      <a href="/contact">Contact</a>
+      <a href="/access">Se connecter</a>
+      <a href="/compte">Mon compte</a>
+    </nav>
   </div>
 
-  <div class="lieu-filters">
-    <button class="lieu-btn active" data-lieu="Tous">Tous les lieux</button>
-    <button class="lieu-btn" data-lieu="Lausanne Vidy">📍 Lausanne Vidy</button>
-    <button class="lieu-btn" data-lieu="Montreux">📍 Montreux</button>
-    <button class="lieu-btn" data-lieu="Martigny">📍 Martigny</button>
-  </div>
-
-  <div class="grid" id="courseGrid"></div>
-
-  <!-- Coaching individuel & scolaire -->
-  <div class="section-divider">
-    <h2>Autres formules</h2>
-    <p>En plus des cours collectifs du samedi, RSL propose des formules sur mesure.</p>
-    <div class="grid">
-
-      <div class="extra-card">
-        <h3>🎯 Coaching individuel</h3>
-        <p>Cours privés personnalisés avec un coach RSL certifié. Progresser rapidement à ton propre rythme, sur le spot de ton choix en Romandie.</p>
-        <a class="contact-btn" href="/contact">Demander un devis</a>
+  <header class="page-hero">
+    <div class="hero-inner">
+      <div class="fed">
+        <div class="fed-bar"></div><div class="fed-dot"></div>
+        <div class="fed-txt">Cours collectifs · Coaching · Progression</div>
+        <div class="fed-dot"></div><div class="fed-bar"></div>
       </div>
-
-      <div class="extra-card">
-        <h3>🏫 Interventions scolaires</h3>
-        <p>RSL intervient dans les écoles pour des journées découverte trottinette freestyle. Idéal pour les journées sportives, sorties de classe ou événements parascolaires.</p>
-        <a class="contact-btn" href="/contact">Nous contacter</a>
+      <h1>COURS <span>RSL</span></h1>
+      <div class="redsep"></div>
+      <p class="hero-sub">Choisis ton lieu et ton samedi, puis inscris-toi directement via WhatsApp.</p>
+      <div class="hero-actions">
+        <a class="btn red" href="#cours">Voir les cours</a>
+        <a class="btn ghost" href="/membres">Devenir membre RSL</a>
       </div>
-
     </div>
-  </div>
+  </header>
 
-</main>
-
-<footer>© 2026 — RSL Romandie Scooter League. Tous droits réservés.</footer>
-
-<script>
-(function(){
-  const vids=["https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4","https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"];
-  const v=document.getElementById('rslBg');if(!v)return;
-  const s=document.createElement('source');s.src=vids[Math.floor(Math.random()*vids.length)];s.type='video/mp4';v.appendChild(s);
-  const start=()=>{try{v.playbackRate=0.6;const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}};
-  start();document.addEventListener('visibilitychange',()=>{if(document.hidden)v.pause();else start();});
-})();
-
-const menuBtn=document.getElementById('menuBtn');
-const mobileMenu=document.getElementById('mobileMenu');
-menuBtn?.addEventListener('click',e=>{e.stopPropagation();mobileMenu.classList.add('open');});
-mobileMenu?.querySelector('.mobile-dim')?.addEventListener('click',()=>mobileMenu.classList.remove('open'));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')mobileMenu.classList.remove('open');});
-
-const WHATSAPP="41783008043";
-const MOIS_FR=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
-const LIEUX=["Lausanne Vidy","Montreux","Martigny"];
-
-function getRemainingSaturdays(){
-  const today=new Date();today.setHours(0,0,0,0);
-  const d=new Date(today);
-  while(d.getDay()!==6)d.setDate(d.getDate()+1);
-  const list=[];
-  while(d.getFullYear()===2026){list.push(new Date(d));d.setDate(d.getDate()+7);}
-  return list;
-}
-
-function buildCourses(){
-  const saturdays=getRemainingSaturdays();
-  const courses=[];
-  saturdays.forEach(date=>{LIEUX.forEach(lieu=>courses.push({date,lieu}));});
-  return courses;
-}
-
-function buildWaUrl(dateStr,lieu){
-  const msg=encodeURIComponent(`Bonjour,\nJ'aimerais participer au cours de trottinette du ${dateStr} à ${lieu}.\nMerci !`);
-  return `https://wa.me/${WHATSAPP}?text=${msg}`;
-}
-
-let activeLieu="Tous";
-const allCourses=buildCourses();
-
-function renderCards(){
-  const grid=document.getElementById('courseGrid');
-  grid.innerHTML='';
-  const filtered=activeLieu==="Tous"?allCourses:allCourses.filter(c=>c.lieu===activeLieu);
-  if(!filtered.length){grid.innerHTML='<p class="empty-msg">Aucun cours disponible pour ce lieu.</p>';return;}
-  filtered.forEach(({date,lieu})=>{
-    const dateStr=`${date.getDate()} ${MOIS_FR[date.getMonth()]} ${date.getFullYear()}`;
-    const waUrl=buildWaUrl(dateStr,lieu);
-    const card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=`
-      <div>
-        <div class="card-day">Samedi</div>
-        <div class="card-date">${dateStr}</div>
+  <main>
+    <section class="wrap" id="cours">
+      <div class="section-head">
+        <div class="section-kicker">
+          <div class="num">01</div>
+          <div class="section-title">INSCRIPTIONS <span>AUX COURS</span></div>
+        </div>
+        <p class="section-sub">Lausanne Vidy · Montreux · Martigny · Yverdon. Sélectionne un lieu pour afficher uniquement ses prochaines dates.</p>
       </div>
-      <div class="badges">
-        <span class="badge">🛴 Trottinette</span>
-        <span class="badge lieu">📍 ${lieu}</span>
-      </div>
-      <a class="wa-btn" href="${waUrl}" target="_blank" rel="noopener noreferrer">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        S'inscrire via WhatsApp
-      </a>`;
-    grid.appendChild(card);
-  });
-}
 
-document.querySelectorAll('.lieu-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.lieu-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeLieu=btn.dataset.lieu;
+      <div class="lieu-filters" aria-label="Filtrer les cours par lieu">
+        <button class="lieu-btn active" data-lieu="Tous">Tous les lieux</button>
+        <button class="lieu-btn" data-lieu="Lausanne Vidy">Lausanne Vidy</button>
+        <button class="lieu-btn" data-lieu="Montreux">Montreux</button>
+        <button class="lieu-btn" data-lieu="Martigny">Martigny</button>
+        <button class="lieu-btn yverdon" data-lieu="Yverdon">Yverdon</button>
+      </div>
+
+      <div class="grid" id="courseGrid"></div>
+
+      <div class="extras">
+        <div class="section-head">
+          <div class="section-kicker">
+            <div class="num">02</div>
+            <div class="section-title">AUTRES <span>FORMULES</span></div>
+          </div>
+          <p class="section-sub">En plus des cours collectifs, la RSL propose des accompagnements adaptés aux riders, écoles et structures.</p>
+        </div>
+
+        <div class="extra-grid">
+          <article class="extra-card">
+            <div class="extra-tag">Progression personnalisée</div>
+            <h3>COACHING INDIVIDUEL</h3>
+            <p>Cours privés personnalisés avec un coach RSL certifié. Progresse à ton rythme sur un spot adapté à tes objectifs.</p>
+            <a class="btn red" href="/contact">Demander un devis</a>
+          </article>
+
+          <article class="extra-card">
+            <div class="extra-tag">Écoles & collectivités</div>
+            <h3>INTERVENTIONS SCOLAIRES</h3>
+            <p>Journées découverte de la trottinette freestyle pour journées sportives, sorties de classe et événements parascolaires.</p>
+            <a class="btn red" href="/contact">Nous contacter</a>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <div class="ft-brand"><span>RSL</span> — Romandie Scooter League</div>
+      <div class="ft-copy">© 2026 — Tous droits réservés.</div>
+    </div>
+    <ul class="ft-links">
+      <li><a href="/contact">Contact</a></li>
+      <li><a href="/membres">Devenir membre</a></li>
+      <li><a href="/evenements">Événements</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    /* Vidéo de fond */
+    (function(){
+      const vids=[
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo1.mp4",
+        "https://jynxifufaauoxwzjapzq.supabase.co/storage/v1/object/public/videos_rsl/trottvideo2.mp4"
+      ];
+      const v=document.getElementById('bg');
+      if(!v)return;
+      const s=document.createElement('source');
+      s.src=vids[Math.floor(Math.random()*vids.length)];
+      s.type='video/mp4';
+      v.appendChild(s);
+      const start=()=>{
+        try{
+          v.playbackRate=.6;
+          const p=v.play();
+          if(p&&p.catch)p.catch(()=>{});
+        }catch(e){}
+      };
+      start();
+      document.addEventListener('visibilitychange',()=>document.hidden?v.pause():start());
+    })();
+
+    /* Menu mobile */
+    const menuBtn=document.getElementById('menuBtn');
+    const mobileMenu=document.getElementById('mobileMenu');
+    const closeMenu=document.getElementById('closeMenu');
+    const closeMobile=()=>{
+      mobileMenu?.classList.remove('open');
+      mobileMenu?.setAttribute('aria-hidden','true');
+    };
+    menuBtn?.addEventListener('click',e=>{
+      e.stopPropagation();
+      mobileMenu?.classList.add('open');
+      mobileMenu?.setAttribute('aria-hidden','false');
+    });
+    closeMenu?.addEventListener('click',closeMobile);
+    mobileMenu?.querySelector('.mobile-dim')?.addEventListener('click',closeMobile);
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobile();});
+
+    /* Cours */
+    const WHATSAPP="41783008043";
+    const MOIS_FR=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+    const LIEUX=["Lausanne Vidy","Montreux","Martigny","Yverdon"];
+    const GROUPES_WHATSAPP={
+      "Lausanne Vidy":"https://chat.whatsapp.com/I6yVHc0EaaBAADx2RhqK8b",
+      "Montreux":"https://chat.whatsapp.com/H0xTYyaULM6B0CiNGFPABG",
+      "Martigny":"https://chat.whatsapp.com/CJzHibc0rBmL7E2vSWu1Wj",
+      "Yverdon":"https://chat.whatsapp.com/G6gPHACTjHYKAF7Km7joU1"
+    };
+
+    function getRemainingSaturdays(){
+      const today=new Date();
+      today.setHours(0,0,0,0);
+      const d=new Date(today);
+      while(d.getDay()!==6)d.setDate(d.getDate()+1);
+      const list=[];
+      while(d.getFullYear()===2026){
+        list.push(new Date(d));
+        d.setDate(d.getDate()+7);
+      }
+      return list;
+    }
+
+    function buildCourses(){
+      const saturdays=getRemainingSaturdays();
+      const courses=[];
+      saturdays.forEach(date=>{
+        LIEUX.forEach(lieu=>courses.push({date,lieu}));
+      });
+      return courses;
+    }
+
+    function buildWaUrl(dateStr,lieu){
+      const msg=encodeURIComponent(`Bonjour,\nJ'aimerais participer au cours de trottinette du ${dateStr} à ${lieu}.\nMerci !`);
+      return `https://wa.me/${WHATSAPP}?text=${msg}`;
+    }
+
+    let activeLieu="Tous";
+    const allCourses=buildCourses();
+
+    function renderCards(){
+      const grid=document.getElementById('courseGrid');
+      grid.innerHTML='';
+      const filtered=activeLieu==="Tous" ? allCourses : allCourses.filter(c=>c.lieu===activeLieu);
+
+      if(!filtered.length){
+        grid.innerHTML='<p class="empty-msg">Aucun cours disponible pour ce lieu.</p>';
+        return;
+      }
+
+      filtered.forEach(({date,lieu},index)=>{
+        const dateStr=`${date.getDate()} ${MOIS_FR[date.getMonth()]} ${date.getFullYear()}`;
+        const waUrl=buildWaUrl(dateStr,lieu);
+        const card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`
+          <div class="card-top">
+            <div>
+              <div class="card-day">Samedi</div>
+              <div class="card-date">${dateStr}</div>
+            </div>
+            <div class="course-number">${String(index+1).padStart(2,'0')}</div>
+          </div>
+          <div class="badges">
+            <span class="badge">Trottinette freestyle</span>
+            <span class="badge lieu">${lieu}</span>
+          </div>
+          <p class="course-info">Cours collectif RSL. Contacte-nous pour réserver ta place ou rejoins directement le groupe WhatsApp de ${lieu}.</p>
+          <div class="wa-actions">
+            <a class="wa-btn" href="${waUrl}" target="_blank" rel="noopener noreferrer" aria-label="Contacter la RSL pour le cours du ${dateStr} à ${lieu} via WhatsApp">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Contacter / réserver
+            </a>
+            <a class="group-btn" href="${GROUPES_WHATSAPP[lieu]}" target="_blank" rel="noopener noreferrer" aria-label="Rejoindre le groupe WhatsApp des cours à ${lieu}">
+              Rejoindre le groupe WhatsApp
+            </a>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll('.lieu-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.lieu-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        activeLieu=btn.dataset.lieu;
+        renderCards();
+      });
+    });
+
     renderCards();
-  });
-});
-
-renderCards();
-</script>
+  </script>
 </body>
 </html>
